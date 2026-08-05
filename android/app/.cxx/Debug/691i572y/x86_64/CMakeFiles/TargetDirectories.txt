@@ -1,0 +1,2 @@
+D:/User-app-and-web/User-app-and-webold/android/app/.cxx/Debug/691i572y/x86_64/CMakeFiles/edit_cache.dir
+D:/User-app-and-web/User-app-and-webold/android/app/.cxx/Debug/691i572y/x86_64/CMakeFiles/rebuild_cache.dir

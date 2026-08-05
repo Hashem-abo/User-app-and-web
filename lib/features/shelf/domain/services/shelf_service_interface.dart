@@ -1,0 +1,6 @@
+import 'package:sixam_mart/common/enums/data_source_enum.dart';
+import 'package:sixam_mart/features/shelf/domain/models/shelf_model.dart';
+
+abstract class ShelfServiceInterface {
+  Future<ShelfDataModel?> getShelfList(DataSourceEnum source, {int? offset});
+}
