@@ -78,8 +78,8 @@ class SignInScreenState extends State<SignInScreen> {
             // Background Image
             Positioned.fill(
               child: Image.asset(
-                Images.onboard_3, 
-                fit: BoxFit.cover,
+                Images.onboard_1, 
+                fit: BoxFit.fill,
               ),
             ),
 
@@ -88,7 +88,7 @@ class SignInScreenState extends State<SignInScreen> {
               child: BackdropFilter(
                 filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                 child: Container(
-                  color: Colors.black.withOpacity(0.2), 
+                  color: Colors.black.withAlpha(50), 
                 ),
               ),
             ),
@@ -106,11 +106,11 @@ class SignInScreenState extends State<SignInScreen> {
                           horizontal: Dimensions.paddingSizeExtraLarge,
                           vertical: Dimensions.paddingSizeLarge),
                       decoration: BoxDecoration(
-                        color: Colors.white, 
+                        color: Colors.white.withAlpha(220), 
                         borderRadius: BorderRadius.circular(30),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withAlpha(25),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           )
@@ -152,7 +152,7 @@ class SignInScreenState extends State<SignInScreen> {
 
             // Custom Back Button at Top Right (RTL aware) - Moved to end of stack to be on top
             Positioned(
-              top: 50,
+              top: 60,
               right: 20,
               child: InkWell(
                 onTap: () {

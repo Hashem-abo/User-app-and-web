@@ -120,6 +120,7 @@ flutter:
     - assets/language/
     - assets/map/
     - assets/json/
+    - assets/svg/icons/linear/
 
   fonts:
     - family: Tajawal

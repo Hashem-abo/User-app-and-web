@@ -26,7 +26,7 @@ class SignUpScreenState extends State<SignUpScreen> {
           // Background Image
           Positioned.fill(
             child: Image.asset(
-              Images.onboard_3,
+              Images.onboard_1,
               fit: BoxFit.cover,
             ),
           ),
@@ -46,7 +46,7 @@ class SignUpScreenState extends State<SignUpScreen> {
             child: Center(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge , vertical: 60),
                 child: Center(
                   child: Container(
                     width: context.width > 700 ? 500 : context.width,
@@ -54,11 +54,11 @@ class SignUpScreenState extends State<SignUpScreen> {
                         horizontal: Dimensions.paddingSizeExtraLarge,
                         vertical: Dimensions.paddingSizeLarge),
                     decoration: BoxDecoration(
-                      color: Colors.white, 
+                      color: Colors.white.withAlpha(220), 
                       borderRadius: BorderRadius.circular(30),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withAlpha(25),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         )
@@ -95,7 +95,7 @@ class SignUpScreenState extends State<SignUpScreen> {
 
           // Back Button
           Positioned(
-            top: 50,
+            top: 60,
             right: 20,
             child: InkWell(
               onTap: () => Get.back(),

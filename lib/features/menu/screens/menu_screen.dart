@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
@@ -25,9 +26,9 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/menu/widgets/menu_button.dart';
 import 'package:sixam_mart/features/pro/widgets/pro_badge_avatar_widget.dart';
 import 'package:sixam_mart/common/widgets/login_suggestion_bottomsheet.dart';
-import 'package:sixam_mart/features/profile/screens/size_information_screen.dart';
-import 'package:sixam_mart/features/profile/screens/edit_size_screen.dart';
-import 'package:sixam_mart/features/profile/screens/preference_screen.dart';
+// import 'package:sixam_mart/features/profile/screens/size_information_screen.dart';
+// import 'package:sixam_mart/features/profile/screens/edit_size_screen.dart';
+// import 'package:sixam_mart/features/profile/screens/preference_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -88,7 +89,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                    boxShadow: [BoxShadow(color: Colors.black.withAlpha(12), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Row(
                     children: [
@@ -244,27 +245,27 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                   child: Column(
                     children: [
-                      MenuButton(icon: Images.profileIcon, title: 'edit_profile'.tr, route: RouteHelper.getUpdateProfileRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/user-edit.svg', title: 'edit_profile'.tr, route: RouteHelper.getUpdateProfileRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.shoppingCart, title: 'my_carts'.tr, route: RouteHelper.getMyCartsRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/shopping-cart.svg', title: 'my_carts'.tr, route: RouteHelper.getMyCartsRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.favouriteUnselect, title: 'favourite'.tr, route: RouteHelper.getFavouriteScreen()),
+                      MenuButton(icon: 'assets/svg/icons/linear/heart.svg', title: 'favourite'.tr, route: RouteHelper.getFavouriteScreen()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.storeIcon, title: 'followed_stores'.tr, route: RouteHelper.getFollowedStoresRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/shop.svg', title: 'followed_stores'.tr, route: RouteHelper.getFollowedStoresRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.orders, title: 'orders'.tr, route: RouteHelper.getOrderRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/my-order.svg', title: 'orders'.tr, route: RouteHelper.getOrderRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.addressIcon, title: 'my_address'.tr, route: RouteHelper.getAddressRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/location.svg', title: 'my_address'.tr, route: RouteHelper.getAddressRoute()),
                       if(Get.find<SplashController>().proStaus) ...[
                         const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.proPlanCrown, title: 'my_subscription'.tr, route: RouteHelper.getSubscriptionPlanRoute()),
+                        MenuButton(icon: 'assets/svg/icons/linear/crown.svg', title: 'my_subscription'.tr, route: RouteHelper.getSubscriptionPlanRoute()),
                       ],
                       // const Divider(height: 1, indent: 20, endIndent: 20),
                       // MenuButton(icon: Images.location, title: 'select_zone'.tr, onTap: () {
                       //   Get.bottomSheet(const ZoneSelectionBottomSheet(), isScrollControlled: true);
                       // }),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.chatIcon, title: 'my_questions'.tr, onTap: () {
+                      MenuButton(icon: 'assets/svg/icons/linear/message.svg', title: 'my_questions'.tr, onTap: () {
                         if(AuthHelper.isLoggedIn()) {
                           Get.toNamed(RouteHelper.getMyQuestionsRoute());
                         } else {
@@ -272,7 +273,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         }
                       }),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.profileIcon, title: 'my_reviews'.tr, onTap: () {
+                      MenuButton(icon: 'assets/svg/icons/linear/user-tick.svg', title: 'my_reviews'.tr, onTap: () {
                         if(AuthHelper.isLoggedIn()) {
                           Get.toNamed(RouteHelper.getUserReviewRoute());
                         } else {
@@ -281,7 +282,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       }),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       if(Get.find<SplashController>().module?.moduleType == 'services') ...[
-                        MenuButton(icon: Images.note, title: 'my_quotations'.tr, onTap: () {
+                        MenuButton(icon: 'assets/svg/icons/linear/document-text.svg', title: 'my_quotations'.tr, onTap: () {
                           if(AuthHelper.isLoggedIn()) {
                             Get.toNamed(RouteHelper.getServiceQuotationListRoute());
                           } else {
@@ -290,7 +291,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         }),
                         const Divider(height: 1, indent: 20, endIndent: 20),
                       ],
-                      MenuButton(icon: Images.settings, title: 'settings'.tr, route: RouteHelper.getSettingScreen()),
+                      MenuButton(icon: 'assets/svg/icons/linear/setting.svg', title: 'settings'.tr, route: RouteHelper.getSettingScreen()),
 
                     ],
                   ),
@@ -316,16 +317,16 @@ class _MenuScreenState extends State<MenuScreen> {
                   ),
                   child: Column(
                     children: [
-                      MenuButton(icon: Images.couponIcon, title: 'coupon'.tr, route: RouteHelper.getCouponRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/ticket-star.svg', title: 'coupon'.tr, route: RouteHelper.getCouponRoute()),
                       
                       if(Get.find<SplashController>().configModel!.loyaltyPointStatus == 1) ...[
                         const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.pointIcon, title: 'loyalty_points'.tr, route: RouteHelper.getLoyaltyRoute()),
+                        MenuButton(icon: 'assets/svg/icons/linear/coin.svg', title: 'loyalty_points'.tr, route: RouteHelper.getLoyaltyRoute()),
                       ],
                       
                       if(Get.find<SplashController>().configModel!.customerWalletStatus == 1) ...[
                         const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.walletIcon, title: 'my_wallet'.tr, route: RouteHelper.getWalletRoute()),
+                        MenuButton(icon: 'assets/svg/icons/linear/wallet.svg', title: 'my_wallet'.tr, route: RouteHelper.getWalletRoute()),
                       ],
                     ],
                   ),
@@ -348,21 +349,21 @@ class _MenuScreenState extends State<MenuScreen> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                    boxShadow: [BoxShadow(color: Colors.black.withAlpha(12), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
                     children: [
                       if(Get.find<SplashController>().configModel!.refEarningStatus == 1)
-                        MenuButton(icon: Images.referIcon, title: 'refer_and_earn'.tr, route: RouteHelper.getReferAndEarnRoute()),
+                        MenuButton(icon: 'assets/svg/icons/linear/people.svg', title: 'refer_and_earn'.tr, route: RouteHelper.getReferAndEarnRoute()),
                       
                       if(Get.find<SplashController>().configModel!.toggleDmRegistration! && !ResponsiveHelper.isDesktop(context)) ...[
                         if(Get.find<SplashController>().configModel!.refEarningStatus == 1) const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.dmIcon, title: 'join_as_a_delivery_man'.tr, route: RouteHelper.getDeliverymanRegistrationRoute()),
+                        MenuButton(icon: 'assets/svg/icons/linear/user-octagon.svg', title: 'join_as_a_delivery_man'.tr, route: RouteHelper.getDeliverymanRegistrationRoute()),
                       ],
                       
                       if(Get.find<SplashController>().configModel!.toggleStoreRegistration! && !ResponsiveHelper.isDesktop(context)) ...[
                         if(Get.find<SplashController>().configModel!.refEarningStatus == 1 || (Get.find<SplashController>().configModel!.toggleDmRegistration! && !ResponsiveHelper.isDesktop(context))) const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.storeIcon, title: 'open_vendor'.tr, route: RouteHelper.getRestaurantRegistrationRoute()),
+                        MenuButton(icon: 'assets/svg/icons/linear/shop-add.svg', title: 'open_vendor'.tr, route: RouteHelper.getRestaurantRegistrationRoute()),
                       ],
                     ],
                   ),
@@ -383,23 +384,23 @@ class _MenuScreenState extends State<MenuScreen> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                    boxShadow: [BoxShadow(color: Colors.black.withAlpha(12), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
                     children: [
-                      MenuButton(icon: Images.chatIcon, title: 'live_chat'.tr, route: RouteHelper.getConversationRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/messages.svg', title: 'live_chat'.tr, route: RouteHelper.getConversationRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.helpIcon, title: 'help_and_support'.tr, route: RouteHelper.getSupportRoute()),
+                      MenuButton(icon: 'assets/svg/icons/linear/24-support.svg', title: 'help_and_support'.tr, route: RouteHelper.getSupportRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.aboutIcon, title: 'about_us'.tr, route: RouteHelper.getHtmlRoute('about-us')),
+                      MenuButton(icon: 'assets/svg/icons/linear/buildings.svg', title: 'about_us'.tr, route: RouteHelper.getHtmlRoute('about-us')),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.termsIcon, title: 'terms_conditions'.tr, route: RouteHelper.getHtmlRoute('terms-and-condition')),
+                      MenuButton(icon: 'assets/svg/icons/linear/document-text.svg', title: 'terms_conditions'.tr, route: RouteHelper.getHtmlRoute('terms-and-condition')),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: Images.privacyIcon, title: 'privacy_policy'.tr, route: RouteHelper.getHtmlRoute('privacy-policy')),
+                      MenuButton(icon: 'assets/svg/icons/linear/document-text.svg', title: 'privacy_policy'.tr, route: RouteHelper.getHtmlRoute('privacy-policy')),
  
                       if(Get.find<SplashController>().configModel!.refundPolicyStatus == 1) ...[
                         const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.refundIcon, title: 'refund_policy'.tr, route: RouteHelper.getHtmlRoute('refund-policy')),
+                        MenuButton(icon: 'assets/svg/icons/linear/return.svg', title: 'refund_policy'.tr, route: RouteHelper.getHtmlRoute('refund-policy')),
                       ],
  
                       if(Get.find<SplashController>().configModel!.cancellationPolicyStatus == 1) ...[
@@ -450,13 +451,14 @@ class _MenuScreenState extends State<MenuScreen> {
                     border: Border.all(color: Theme.of(context).colorScheme.error, width: 1),
                   ),
                   child: ListTile(
-                    leading: Icon(AuthHelper.isLoggedIn() ? Icons.logout : Icons.login, color: Theme.of(context).colorScheme.error),
+                    leading: SvgPicture.asset(AuthHelper.isLoggedIn() ? 'assets/svg/icons/linear/logout.svg' : 'assets/svg/icons/linear/logout.svg',
+                    colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.error, BlendMode.srcIn),),
                     title: Text(
                       AuthHelper.isLoggedIn() ? 'logout'.tr : 'sign_in'.tr,
                       style: robotoMedium.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeDefault),
                     ),
                     trailing: Icon(
-                      Directionality.of(context) == TextDirection.rtl ? Icons.arrow_back_ios : Icons.arrow_forward_ios,
+                      Icons.arrow_forward_ios,
                       size: 16,
                       color: Theme.of(context).colorScheme.error,
                     ),

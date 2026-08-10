@@ -165,17 +165,14 @@ class SocialLoginWidget extends StatelessWidget {
 
       const SizedBox(height: Dimensions.paddingSizeSmall),
 
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-        child: Row(children: [
-          Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-            child: Text('or_continue_with'.tr, style: robotoMedium.copyWith(color: Theme.of(context).disabledColor)),
-          ),
-          Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
-        ]),
-      ),
+      Row(children: [
+        Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
+          child: Text('or_continue_with'.tr, style: robotoMedium.copyWith(color: Theme.of(context).disabledColor)),
+        ),
+        Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
+      ]),
       const SizedBox(height: Dimensions.paddingSizeSmall),
 
       Wrap(spacing: 15, runSpacing: 15, children: [

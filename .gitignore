@@ -54,3 +54,6 @@ app.*.map.json
 android/app/build/
 android/.gradle/
 build/
+
+# Osama edit this
+android/build.gradle.kts

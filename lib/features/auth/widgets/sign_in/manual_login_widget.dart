@@ -48,6 +48,7 @@ class ManualLoginWidget extends StatelessWidget {
       }
 
       return Column(
+        spacing: Dimensions.paddingSizeExtraSmall,
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -59,7 +60,6 @@ class ManualLoginWidget extends StatelessWidget {
               color:Theme.of(context).secondaryHeaderColor,
             ),
           ),
-          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
           // Dynamically enforce LTR directionality when entering a phone number
           Directionality(
@@ -103,8 +103,6 @@ class ManualLoginWidget extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: Dimensions.paddingSizeLarge),
-
           // Password Label
           Text(
             'password'.tr,
@@ -113,7 +111,6 @@ class ManualLoginWidget extends StatelessWidget {
               color: Theme.of(context).secondaryHeaderColor,
             ),
           ),
-          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
           CustomTextField(
             hintText: '8_character'.tr,
@@ -146,8 +143,6 @@ class ManualLoginWidget extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: Dimensions.paddingSizeDefault),
-
           CustomButton(
             buttonText: 'continue'.tr,
             radius: 15,
@@ -156,12 +151,10 @@ class ManualLoginWidget extends StatelessWidget {
             onPressed: onClickLoginButton,
             color: Theme.of(context).primaryColor,
           ),
-          const SizedBox(height: Dimensions.paddingSizeLarge),
 
           // Google Login
           socialEnable ? SocialLoginWidget(onlySocialLogin: false, backFromThis: backFromThis) : const SizedBox(),
 
-          const SizedBox(height: Dimensions.paddingSizeLarge),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
             child: Row(children: [
@@ -173,7 +166,6 @@ class ManualLoginWidget extends StatelessWidget {
               Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
             ]),
           ),
-          const SizedBox(height: Dimensions.paddingSizeSmall),
 
           // Sign Up
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
