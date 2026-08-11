@@ -40,9 +40,12 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+    if (expandedHeight == 0) {
+      return const SizedBox();
+    }
     // Calculate percent based on the shrinkable part only (the module part)
     double shrinkableAmount = maxExtent - minExtent;
-    double percent = (shrinkOffset / shrinkableAmount).clamp(0.0, 1.0);
+    double percent = shrinkableAmount == 0 ? 0.0 : (shrinkOffset / shrinkableAmount).clamp(0.0, 1.0);
     bool isCollapsed = percent > 0.5;
 
     double expandedInitialOffset = 0;
@@ -572,6 +575,8 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
             showLocationHeader || // Check if module type changed
         oldDelegate.locationHeaderFontColor != locationHeaderFontColor ||
         oldDelegate.paddingTop != paddingTop ||
+        oldDelegate.expandedHeight != expandedHeight ||
+        oldDelegate.collapsedHeight != collapsedHeight ||
         oldDelegate.splashController != splashController;
   }
 }

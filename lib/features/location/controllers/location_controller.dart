@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -184,10 +185,13 @@ class LocationController extends GetxController implements GetxService {
     _inZone = true;
     _isManualZone = true;
     
+    Get.find<SharedPreferences>().setBool('is_manual_zone', true);
+    
     AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
     address ??= AddressModel(latitude: '0', longitude: '0', address: 'Manual Zone');
     address.zoneId = zoneId;
     address.zoneIds = [zoneId];
+    address.house = 'manual';
     await AddressHelper.saveUserAddressInSharedPref(address);
     
     update();
@@ -221,7 +225,15 @@ class LocationController extends GetxController implements GetxService {
   }
 
   Future<void> syncZoneData() async {
-    if (_isManualZone) {
+    final userAddress = AddressHelper.getUserAddressFromSharedPref();
+    bool isManual = Get.find<SharedPreferences>().getBool('is_manual_zone') ?? false;
+    if (userAddress != null) {
+      if (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('\u200b\u200b\u200b'))) {
+        isManual = true;
+      }
+    }
+
+    if (_isManualZone || isManual) {
       return;
     }
     bool hasInternet = await checkInternet();
@@ -280,6 +292,19 @@ class LocationController extends GetxController implements GetxService {
   }
 
   void saveAddressAndNavigate(AddressModel? address, bool fromSignUp, String? route, bool canRoute, bool isDesktop) {
+    if (address != null) {
+      bool isManual = false;
+      if (address.house == 'manual' || address.latitude == '0' || (address.address != null && address.address!.contains('\u200b\u200b\u200b'))) {
+        isManual = true;
+      }
+      if (isManual) {
+        Get.find<SharedPreferences>().setBool('is_manual_zone', true);
+        autoNavigate(address, fromSignUp, route, canRoute, isDesktop);
+        return;
+      }
+    }
+
+    Get.find<SharedPreferences>().setBool('is_manual_zone', false);
     _prepareZoneData(address!, fromSignUp, route, canRoute, isDesktop);
   }
 

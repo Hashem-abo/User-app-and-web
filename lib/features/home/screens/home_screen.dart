@@ -61,6 +61,8 @@ import 'package:sixam_mart/features/home/widgets/module_sticky_delegate.dart'; /
 import 'package:sixam_mart/features/home/widgets/views/national_products_view.dart'; // + ahmed
 import 'package:sixam_mart/features/home/widgets/views/national_products_filter_widget.dart'; // + ahmed
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
+import 'package:sixam_mart/features/store/widgets/prescription_store_bottom_sheet_widget.dart';
+import 'package:sixam_mart/common/widgets/custom_bottom_sheet_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -228,6 +230,8 @@ class _HomeScreenState extends State<HomeScreen>
   int _currentHintIndex = 0;
   final bool _firstTimeSubModuleLoaded = true;
   int? _currentModuleId;
+  bool _pinTopHeader = true;
+  final GlobalKey _exploreMoreKey = GlobalKey();
 
   @override
   bool get wantKeepAlive => true;
@@ -299,6 +303,48 @@ class _HomeScreenState extends State<HomeScreen>
           Get.find<HomeController>().changeFavVisibility();
           Future.delayed(const Duration(milliseconds: 800),
               () => Get.find<HomeController>().changeFavVisibility());
+        }
+      }
+
+      bool isAggregatedModule = Get.find<SplashController>().module?.showNationalProducts ?? false;
+      if (isAggregatedModule) {
+        double topHeaderHeight = MediaQuery.of(context).padding.top + (_pinTopHeader ? 60.0 : 0.0);
+        double exploreMoreY = 9999.0;
+        try {
+          final RenderBox? renderBox = _exploreMoreKey.currentContext?.findRenderObject() as RenderBox?;
+          if (renderBox != null) {
+            exploreMoreY = renderBox.localToGlobal(Offset.zero).dy;
+          }
+        } catch (e) {
+          // ignore
+        }
+
+        if (exploreMoreY <= topHeaderHeight + 5) {
+          if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+            if (_pinTopHeader) {
+              setState(() {
+                _pinTopHeader = false;
+              });
+            }
+          } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+            if (!_pinTopHeader) {
+              setState(() {
+                _pinTopHeader = true;
+              });
+            }
+          }
+        } else {
+          if (!_pinTopHeader) {
+            setState(() {
+              _pinTopHeader = true;
+            });
+          }
+        }
+      } else {
+        if (!_pinTopHeader) {
+          setState(() {
+            _pinTopHeader = true;
+          });
         }
       }
     });
@@ -485,13 +531,11 @@ class _HomeScreenState extends State<HomeScreen>
                                     pinned: true,
                                     delegate: ModuleStickyDelegate(
                                       splashController: splashController,
-                                      expandedHeight: 115,
-                                      collapsedHeight: 60,
-                                      paddingTop: MediaQuery.of(context)
-                                          .padding
-                                          .top, // + ahmed
-                                      searchBarHeight: 50,
-                                      searchBar: Center(
+                                      expandedHeight: _pinTopHeader ? 115 : 0.0,
+                                      collapsedHeight: _pinTopHeader ? 60 : 0.0,
+                                      paddingTop: _pinTopHeader ? MediaQuery.of(context).padding.top : 0.0, // + ahmed
+                                      searchBarHeight: _pinTopHeader ? 50 : 0.0,
+                                      searchBar: _pinTopHeader ? Center(
                                           child: isParcel
                                               ? const SizedBox()
                                               : Container(
@@ -507,9 +551,14 @@ class _HomeScreenState extends State<HomeScreen>
                                                     children: [
                                                       Expanded(
                                                         child: InkWell(
-                                                          onTap: () => Get
-                                                              .toNamed(RouteHelper
-                                                                  .getSearchRoute()),
+                                                          onTap: () {
+                                                            String currentHint = (Get.find<SplashController>().module?.searchHints?.isNotEmpty ?? false)
+                                                                ? Get.find<SplashController>().module!.searchHints![_currentHintIndex % Get.find<SplashController>().module!.searchHints!.length]
+                                                                : (Get.find<CategoryController>().categoryList?.isNotEmpty ?? false)
+                                                                    ? Get.find<CategoryController>().categoryList![_currentHintIndex % Get.find<CategoryController>().categoryList!.length].name!
+                                                                    : '';
+                                                            Get.toNamed(RouteHelper.getSearchRoute(queryText: currentHint));
+                                                          },
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(
@@ -747,7 +796,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                       ),
                                                     ],
                                                   ),
-                                                )),
+                                                )) : null,
                                     ),
                                   )
                                 : const SliverToBoxAdapter(),
@@ -882,6 +931,7 @@ class _HomeScreenState extends State<HomeScreen>
                             // Sticky Header for Aggregated Modules (More) // + ahmed
                             isAggregatedModule // + ahmed
                                 ? SliverPersistentHeader(
+                                    key: _exploreMoreKey,
                                     pinned: true,
                                     delegate: SliverDelegate(
                                       height: 90,
@@ -967,7 +1017,61 @@ class _HomeScreenState extends State<HomeScreen>
                 bottom: ResponsiveHelper.isDesktop(context) ? 0 : 70),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                if (isPharmacy &&
+                    Get.find<SplashController>().configModel!.moduleConfig!.module!.orderAttachment! &&
+                    Get.find<SplashController>().configModel!.prescriptionStatus! &&
+                    AuthHelper.isLoggedIn() &&
+                    homeController.showFavButton) ...[
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                          blurRadius: 10,
+                          offset: const Offset(2, 2),
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: ResponsiveHelper.isDesktop(context) ? 180 : 150,
+                          height: 30,
+                          child: Center(
+                            child: Text(
+                              'prescription_order'.tr,
+                              textAlign: TextAlign.center,
+                              style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            showCustomBottomSheet(
+                              child: const PrescriptionStoreBottomSheetWidget(),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                            ),
+                            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                            child: Image.asset(Images.prescriptionIcon, height: 25, width: 25),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+                ],
                 if (_showBackToTop) ...[
                   FloatingActionButton(
                     mini: true,

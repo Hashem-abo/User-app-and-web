@@ -137,6 +137,67 @@ class _AIChatScreenState extends State<AIChatScreen> {
                               textAlign: TextAlign.center,
                             ),
                             const SizedBox(height: 30),
+
+                            // Dropdown to switch active module (placed above the features)
+                            GetBuilder<SplashController>(
+                              builder: (splashCtrl) {
+                                if (splashCtrl.moduleList == null || splashCtrl.moduleList!.isEmpty) {
+                                  return const SizedBox();
+                                }
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                                  margin: const EdgeInsets.only(bottom: 20),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor,
+                                    borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withValues(alpha: 0.1),
+                                        spreadRadius: 1,
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                    border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "القسم النشط:  ",
+                                        style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color),
+                                      ),
+                                      DropdownButtonHideUnderline(
+                                        child: DropdownButton<int>(
+                                          value: splashCtrl.module?.id,
+                                          icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).primaryColor, size: 20),
+                                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).primaryColor),
+                                          dropdownColor: Theme.of(context).cardColor,
+                                          onChanged: (int? newValue) {
+                                            if (newValue != null && newValue != splashCtrl.module?.id) {
+                                              final selectedModule = splashCtrl.moduleList!.firstWhere((mod) => mod.id == newValue);
+                                              chatController.switchActiveModule(selectedModule);
+                                            }
+                                          },
+                                          items: splashCtrl.moduleList!.map<DropdownMenuItem<int>>((mod) {
+                                            return DropdownMenuItem<int>(
+                                              value: mod.id,
+                                              child: Text(
+                                                mod.moduleName ?? '', 
+                                                style: robotoBold.copyWith(
+                                                  fontSize: Dimensions.fontSizeDefault,
+                                                  color: Theme.of(context).primaryColor,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                             
                             _buildFeatureItem(context, Icons.search, "البحث عن المنتجات", "مثال: \"أين أجد تفاح أحمر؟\""),
                             _buildFeatureItem(context, Icons.store, "البحث عن المتاجر", "مثال: \"أقرب متجر بقالة مني\""),
@@ -145,7 +206,9 @@ class _AIChatScreenState extends State<AIChatScreen> {
                             _buildFeatureItem(context, Icons.navigation, "التنقل داخل التطبيق", "مثال: \"خذني إلى سلة التسوق\""),
                             _buildFeatureItem(context, Icons.build_circle_outlined, "الخدمات والحجوزات", "مثال: \"أريد قسم خدمات السباكة\""),
                             _buildFeatureItem(context, Icons.camera_alt, "تحليل الصور", "التقط صورة لمنتج واسألني عنه!"),
-                            
+                            const SizedBox(height: 10),
+
+                            /*
                             const Divider(height: 40),
                             Text(
                               "القسم النشط حالياً: ${Get.find<SplashController>().module?.moduleName ?? ''} 📍",
@@ -187,6 +250,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                                 }).toList(),
                               );
                             }),
+                            */
 
                             if (chatController.alerts.isNotEmpty) ...[
                               const Divider(height: 40),
