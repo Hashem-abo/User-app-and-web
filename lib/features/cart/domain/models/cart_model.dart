@@ -74,7 +74,7 @@ class CartModel {
 
   CartModel.fromJson(Map<String, dynamic> json) {
     _id = json['cart_id'];
-    _price = json['price'].toDouble();
+    _price = (json['price'] as num?)?.toDouble() ?? 0;
     _discountedPrice = json['discounted_price']?.toDouble();
     if (json['variation'] != null) {
       _variation = [];
@@ -111,7 +111,7 @@ class CartModel {
       _item = Item.fromJson(json['item']);
     }
     if (json['quantity_limit'] != null) {
-      _quantityLimit = int.parse(json['quantity_limit']);
+      _quantityLimit = int.parse(json['quantity_limit'].toString());
     }
     _isLoading = json['is_loading'] ?? false;
     _note = json['note'];
@@ -137,7 +137,9 @@ class CartModel {
     }
     data['is_campaign'] = _isCampaign;
     data['stock'] = _stock;
-    data['item'] = _item!.toJson();
+    if (_item != null) {
+      data['item'] = _item!.toJson();
+    }
     data['quantity_limit'] = _quantityLimit?.toString();
     data['note'] = _note;
     // data['is_loading'] = _isLoading?? false;

@@ -6,21 +6,38 @@ class CustomValidator {
   static Future<PhoneValid> isPhoneValid(String number) async {
     String phone = '';
     String countryCode = '';
-    bool isValid = true;
+    // FIX: initialize to false so exceptions leave it false instead of true
+    bool isValid = false;
     try {
       PhoneNumber phoneNumber = PhoneNumber.parse(number);
       isValid = phoneNumber.isValid(type: PhoneNumberType.mobile);
       countryCode = phoneNumber.countryCode;
-      if(isValid) {
+      if (isValid) {
         phone = '+${phoneNumber.countryCode}${phoneNumber.nsn}';
       }
     } catch (e) {
       debugPrint('Phone Number is not parsing: $e');
+      // isValid stays false — correct behaviour
     }
-    return PhoneValid(isValid: isValid, countryCode: countryCode,  phone: phone);
+    return PhoneValid(isValid: isValid, countryCode: countryCode, phone: phone);
   }
 
   static bool isEmailValid(String email) {
+    if (email.isEmpty) return false;
+
+    // Pre-checks that the RFC 5322 regex does not enforce:
+    final parts = email.split('@');
+    if (parts.length != 2) return false;
+    final localPart = parts[0];
+    final domainPart = parts[1];
+
+    // Leading / trailing dot in local part
+    if (localPart.startsWith('.') || localPart.endsWith('.')) return false;
+    // Consecutive dots anywhere
+    if (localPart.contains('..') || domainPart.contains('..')) return false;
+    // Trailing dot in domain
+    if (domainPart.endsWith('.')) return false;
+
     const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
         r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
         r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
@@ -29,8 +46,7 @@ class CustomValidator {
         r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\'
         r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
     final kEmailValid = RegExp(pattern);
-    bool isValid = kEmailValid.hasMatch(email.toString());
-    return isValid;
+    return kEmailValid.hasMatch(email.toString());
   }
 
 }

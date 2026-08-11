@@ -26,8 +26,15 @@ class ItemModel {
     if (json['items'] != null) {
       items = [];
       json['items'].forEach((v) {
+        bool isNewVariation = false;
+        try {
+          if (Get.isRegistered<SplashController>() && Get.find<SplashController>().configModel != null) {
+            isNewVariation = Get.find<SplashController>().getModuleConfig(v['module_type'])?.newVariation ?? false;
+          }
+        } catch (_) {}
+
         if (v['module_type'] == null ||
-          !Get.find<SplashController>().getModuleConfig(v['module_type']).newVariation! ||
+          !isNewVariation ||
           v['variations'] == null ||
           v['variations'].isEmpty ||
           (v['food_variations'] != null && v['food_variations'].isNotEmpty)) {
@@ -255,9 +262,9 @@ class Item {
         }
       }
     }
-    price = json['price'].toDouble();
+    price = (json['price'] as num?)?.toDouble() ?? 0;
     tax = json['tax']?.toDouble();
-    discount = json['discount'].toDouble();
+    discount = (json['discount'] as num?)?.toDouble() ?? 0;
     discountType = json['discount_type'];
     availableTimeStarts = json['available_time_starts'];
     availableTimeEnds = json['available_time_ends'];
