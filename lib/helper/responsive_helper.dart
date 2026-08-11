@@ -16,7 +16,8 @@ class ResponsiveHelper {
   }
 
   static bool isMobile(BuildContext? context) {
-    final size = MediaQuery.of(context!).size.width;
+    if (context == null) return !kIsWeb;
+    final size = MediaQuery.of(context).size.width;
     if (size < 650 || !kIsWeb) {
       return true;
     } else {
@@ -25,7 +26,8 @@ class ResponsiveHelper {
   }
 
   static bool isTab(BuildContext? context) {
-    final size = MediaQuery.of(context!).size.width;
+    if (context == null) return false;
+    final size = MediaQuery.of(context).size.width;
     if (size < 1300 && size >= 650) {
       return true;
     } else {
@@ -34,7 +36,8 @@ class ResponsiveHelper {
   }
 
   static bool isDesktop(BuildContext? context) {
-    final size = MediaQuery.of(context!).size.width;
+    if (context == null) return false;
+    final size = MediaQuery.of(context).size.width;
     if (size >= 1300) {
       return true;
     } else {

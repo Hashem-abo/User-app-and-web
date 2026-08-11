@@ -43,7 +43,17 @@ class DateConverter {
   }
 
   static String dateTimeStringToUTCTime(String dateTime) {
-    return DateFormat('dd MMM yyyy  ${_timeFormatter()}').format(DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime));
+    try {
+      DateTime dt;
+      try {
+        dt = DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(dateTime);
+      } catch (_) {
+        dt = DateTime.parse(dateTime);
+      }
+      return DateFormat('dd MMM yyyy  ${_timeFormatter()}').format(dt);
+    } catch (_) {
+      return dateTime;
+    }
   }
 
   static String dateTimeStringToDateOnly(String dateTime) {
@@ -125,7 +135,12 @@ class DateConverter {
   }
 
   static String _timeFormatter() {
-    return Get.find<SplashController>().configModel!.timeformat == '24' ? 'HH:mm' : 'hh:mm a';
+    try {
+      if (Get.isRegistered<SplashController>() && Get.find<SplashController>().configModel != null) {
+        return Get.find<SplashController>().configModel!.timeformat == '24' ? 'HH:mm' : 'hh:mm a';
+      }
+    } catch (_) {}
+    return 'hh:mm a';
   }
 
   static String convertFromMinute(int minMinute, int maxMinute) {
@@ -177,22 +192,44 @@ class DateConverter {
         minTime = int.parse(timeList[0]);
       }catch(_) {}
     }
-    DateTime deliveryTime0 = dateTimeStringToDate(scheduleAt ?? orderTime!).add(Duration(minutes: minTime));
-    return deliveryTime0.difference(DateTime.now()).inMinutes;
+    final targetTimeStr = scheduleAt ?? orderTime;
+    if (targetTimeStr == null || targetTimeStr.isEmpty) return 0;
+    try {
+      DateTime deliveryTime0 = dateTimeStringToDate(targetTimeStr).add(Duration(minutes: minTime));
+      return deliveryTime0.difference(DateTime.now()).inMinutes;
+    } catch (_) {
+      return 0;
+    }
   }
 
   static String containTAndZToUTCFormat(String time) {
-    var newTime = '${time.substring(0,10)} ${time.substring(11,23)}';
-    return DateFormat('dd MMM, yyyy').format(DateFormat('yyyy-MM-dd HH:mm:ss').parse(newTime));
+    try {
+      // Need at least 23 chars for "yyyy-MM-ddTHH:mm:ss.SSS"
+      if (time.length >= 23) {
+        final newTime = '${time.substring(0, 10)} ${time.substring(11, 23)}';
+        return DateFormat('dd MMM, yyyy').format(
+          DateFormat('yyyy-MM-dd HH:mm:ss').parse(newTime),
+        );
+      }
+      // Fallback: parse whatever we have (date-only, short ISO, etc.)
+      return DateFormat('dd MMM, yyyy').format(DateTime.parse(time.split('T').first));
+    } catch (_) {
+      // Last resort: return the raw string rather than crashing
+      return time;
+    }
   }
 
   static String convertTodayYesterdayFormat(String createdAt) {
     final now = DateTime.now();
     final createdAtDate = DateTime.parse(createdAt).toLocal();
 
-    if (createdAtDate.year == now.year && createdAtDate.month == now.month && createdAtDate.day == now.day) {
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final createdDay = DateTime(createdAtDate.year, createdAtDate.month, createdAtDate.day);
+
+    if (createdDay == today) {
       return 'Today, ${DateFormat.jm().format(createdAtDate)}';
-    } else if (createdAtDate.year == now.year && createdAtDate.month == now.month && createdAtDate.day == now.day - 1) {
+    } else if (createdDay == yesterday) {
       return 'Yesterday, ${DateFormat.jm().format(createdAtDate)}';
     } else {
       return DateConverter.localDateToIsoStringAMPM(createdAtDate);

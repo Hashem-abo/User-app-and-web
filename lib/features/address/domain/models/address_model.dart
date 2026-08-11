@@ -42,11 +42,11 @@ class AddressModel {
   AddressModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     addressType = json['address_type'];
-    contactPersonNumber = json['contact_person_number'].toString();
+    contactPersonNumber = json['contact_person_number']?.toString();
     address = json['address'];
     additionalAddress = json['additional_address'];
-    latitude = json['latitude'].toString();
-    longitude = json['longitude'].toString();
+    latitude = json['latitude']?.toString();
+    longitude = json['longitude']?.toString();
     zoneId = (json['zone_id'] != null && json['zone_id'] != 'null') ? int.parse(json['zone_id'].toString()) : null;
     zoneIds = json['zone_ids']?.cast<int>();
     method = json['_method'];

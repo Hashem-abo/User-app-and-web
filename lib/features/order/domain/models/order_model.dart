@@ -180,19 +180,19 @@ class OrderModel {
   OrderModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['user_id'];
-    orderAmount = json['order_amount'].toDouble();
-    couponDiscountAmount = json['coupon_discount_amount'].toDouble();
+    orderAmount = (json['order_amount'] as num?)?.toDouble() ?? 0;
+    couponDiscountAmount = (json['coupon_discount_amount'] as num?)?.toDouble() ?? 0;
     couponDiscountTitle = json['coupon_discount_title'];
     paymentStatus = json['payment_status'];
     orderStatus = json['order_status'];
-    totalTaxAmount = json['total_tax_amount'].toDouble();
+    totalTaxAmount = (json['total_tax_amount'] as num?)?.toDouble();
     paymentMethod = json['payment_method'];
     couponCode = json['coupon_code'];
     orderNote = json['order_note'];
     orderType = json['order_type'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    deliveryCharge = json['delivery_charge'].toDouble();
+    deliveryCharge = (json['delivery_charge'] as num?)?.toDouble() ?? 0;
     scheduleAt = json['schedule_at'];
     otp = json['otp'];
     pending = json['pending'];
@@ -206,7 +206,7 @@ class OrderModel {
     refundRequested = json['refund_requested'];
     refunded = json['refunded'];
     scheduled = json['scheduled'];
-    storeDiscountAmount = json['store_discount_amount'].toDouble();
+    storeDiscountAmount = (json['store_discount_amount'] as num?)?.toDouble() ?? 0;
     failed = json['failed'];
     detailsCount = json['details_count'];
     if (json['order_attachment_full_url'] != null) {
@@ -222,7 +222,7 @@ class OrderModel {
     deliveryAddress = json['delivery_address'] != null ? AddressModel.fromJson(json['delivery_address']) : null;
     receiverDetails = json['receiver_details'] != null ? AddressModel.fromJson(json['receiver_details']) : null;
     parcelCategory = json['parcel_category'] != null ? ParcelCategoryModel.fromJson(json['parcel_category']) : null;
-    dmTips = json['dm_tips'].toDouble();
+    dmTips = (json['dm_tips'] as num?)?.toDouble() ?? 0;
     refundCancellationNote = json['refund_cancellation_note'];
     refundCustomerNote = json['refund_customer_note'];
     refund = json['refund'] != null ? Refund.fromJson(json['refund']) : null;
@@ -327,7 +327,7 @@ class OrderModel {
     data['dm_tips'] = dmTips;
     data['refund_cancellation_note'] = refundCancellationNote;
     data['refund_customer_note'] = refundCustomerNote;
-    if (deliveryAddress != null) {
+    if (refund != null) {
       data['refund'] = refund!.toJson();
     }
     data['prescription_order'] = prescriptionOrder;
@@ -408,7 +408,7 @@ class DeliveryMan {
     zoneId = json['zone_id'];
     active = json['active'];
     available = json['available'];
-    avgRating = json['avg_rating'].toDouble();
+    avgRating = (json['avg_rating'] as num?)?.toDouble() ?? 0;
     ratingCount = json['rating_count'];
     lat = json['lat'];
     lng = json['lng'];
@@ -509,7 +509,7 @@ class OfflinePayment {
       data['data'] = this.data!.toJson();
     }
     if (methodFields != null) {
-      data['method_fields'] = input!.map((v) => v.toJson()).toList();
+      data['method_fields'] = methodFields!.map((v) => v.toJson()).toList();
     }
     return data;
   }

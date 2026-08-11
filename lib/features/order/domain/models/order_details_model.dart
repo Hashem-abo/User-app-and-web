@@ -52,7 +52,7 @@ class OrderDetailsModel {
     id = json['id'];
     itemId = json['item_id'];
     orderId = json['order_id'];
-    price = json['price'].toDouble();
+    price = (json['price'] as num?)?.toDouble() ?? 0;
     itemDetails = json['item_details'] != null ? Item.fromJson(json['item_details']) : null;
     variation = [];
     foodVariation = [];
@@ -73,15 +73,15 @@ class OrderDetailsModel {
         addOns!.add(AddOn.fromJson(v));
       });
     }
-    discountOnItem = json['discount_on_item']?.toDouble();
+    discountOnItem = (json['discount_on_item'] as num?)?.toDouble();
     discountType = json['discount_type'];
-    quantity = json['quantity'];
-    taxAmount = json['tax_amount']?.toDouble();
+    quantity = json['quantity'] != null ? int.tryParse(json['quantity'].toString()) : null;
+    taxAmount = (json['tax_amount'] as num?)?.toDouble();
     variant = json['variant'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     itemCampaignId = json['item_campaign_id'];
-    totalAddOnPrice = json['total_add_on_price']?.toDouble();
+    totalAddOnPrice = (json['total_add_on_price'] as num?)?.toDouble();
     imageFullUrl = json['image_full_url'];
     isGuest = json['is_guest'];
     parcelCancellation = json['parcel_cancellation'] != null ? ParcelCancellation.fromJson(json['parcel_cancellation']) : null;
@@ -137,7 +137,7 @@ class AddOn {
 
   AddOn.fromJson(Map<String, dynamic> json) {
     name = json['name'];
-    price = json['price'].toDouble();
+    price = (json['price'] as num?)?.toDouble() ?? 0;
     quantity = int.parse(json['quantity'].toString());
   }
 
