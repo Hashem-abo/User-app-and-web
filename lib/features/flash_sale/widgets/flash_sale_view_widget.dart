@@ -17,79 +17,93 @@ class FlashSaleViewWidget extends StatefulWidget {
 }
 
 class _FlashSaleViewWidgetState extends State<FlashSaleViewWidget> {
-
   @override
   Widget build(BuildContext context) {
     return GetBuilder<FlashSaleController>(builder: (flashSaleController) {
-      
       int days = 0, hours = 0, minutes = 0, seconds = 0;
       if (flashSaleController.duration != null) {
         Duration duration = flashSaleController.duration!;
         days = duration.inDays;
         hours = duration.inHours - days * 24;
         minutes = duration.inMinutes - (days * 24 * 60) - (hours * 60);
-        seconds = duration.inSeconds - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
+        seconds = duration.inSeconds -
+            (days * 24 * 60 * 60) -
+            (hours * 60 * 60) -
+            (minutes * 60);
       }
 
-      return flashSaleController.flashSaleModel != null && flashSaleController.flashSaleModel!.activeProducts != null && flashSaleController.duration!.inSeconds > 1 ? Container(
-        width: Get.width,
-        margin: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-        padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withValues(alpha: 0.1), // Use primary color with opacity
-          borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header: Title and Timer
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Title & Subtitle (Right in RTL, Left in LTR)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.title ?? 'تخفيضات حصرية', // Use widget.title if available, else hardcoded
-                      style: robotoBold.copyWith(fontSize: 18, color: Colors.black),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'limited_time_offer'.tr,
-                      style: robotoRegular.copyWith(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+      return flashSaleController.flashSaleModel != null &&
+              flashSaleController.flashSaleModel!.activeProducts != null &&
+              flashSaleController.duration!.inSeconds > 1
+          ? Container(
+              width: Get.width,
+              margin: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+              decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .primaryColor
+                    .withValues(alpha: 0.1), // Use primary color with opacity
+                borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header: Title and Timer
+                  Padding(
+                    padding:
+                        const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Title & Subtitle (Right in RTL, Left in LTR)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.title ??
+                                  'تخفيضات حصرية', // Use widget.title if available, else hardcoded
+                              style: robotoBold.copyWith(
+                                  fontSize: 18, color: Colors.black),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'limited_time_offer'.tr,
+                              style: robotoRegular.copyWith(
+                                  fontSize: 12, color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
 
-                // Timer (Left in RTL, Right in LTR)
-                Row(
-                  children: [
-                    _buildTimerBox(days, 'days'.tr),
-                    const SizedBox(width: 6),
-                    _buildTimerBox(hours, 'hours'.tr),
-                    const SizedBox(width: 6),
-                    _buildTimerBox(minutes, 'mins'.tr),
-                    const SizedBox(width: 6),
-                    _buildTimerBox(seconds, 'sec'.tr),
-                  ],
-                ),
-              ],
-            ),
-            
-            const SizedBox(height: Dimensions.paddingSizeDefault),
-            
-            // Content: FlashSaleCard (Carousel)
-            flashSaleController.flashSaleModel!.activeProducts != null
-                ? FlashSaleCard(
-                    activeProducts: flashSaleController.flashSaleModel!.activeProducts!,
-                  )
-                : const SizedBox(),
+                        // Timer (Left in RTL, Right in LTR)
+                        Row(
+                          children: [
+                            _buildTimerBox(days, 'days'.tr),
+                            const SizedBox(width: 6),
+                            _buildTimerBox(hours, 'hours'.tr),
+                            const SizedBox(width: 6),
+                            _buildTimerBox(minutes, 'mins'.tr),
+                            const SizedBox(width: 6),
+                            _buildTimerBox(seconds, 'sec'.tr),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
 
-            const SizedBox(height: Dimensions.paddingSizeSmall),
-          ],
-        ),
-      ) : const SizedBox(); // Remove shimmer fallback to prevent flashing
+                  const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                  // Content: FlashSaleCard (Carousel)
+                  flashSaleController.flashSaleModel!.activeProducts != null
+                      ? FlashSaleCard(
+                          activeProducts: flashSaleController
+                              .flashSaleModel!.activeProducts!,
+                        )
+                      : const SizedBox(),
+
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+                ],
+              ),
+            )
+          : const SizedBox(); // Remove shimmer fallback to prevent flashing
     });
   }
 
@@ -117,7 +131,10 @@ class _FlashSaleViewWidgetState extends State<FlashSaleViewWidget> {
         const SizedBox(height: 4),
         Text(
           unit,
-          style: robotoRegular.copyWith(fontSize: 10, color: const Color(0xFF8BA850), fontWeight: FontWeight.bold),
+          style: robotoRegular.copyWith(
+              fontSize: 10,
+              color: const Color(0xFF8BA850),
+              fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -130,7 +147,8 @@ class FlashSaleShimmerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: Get.width, height: ResponsiveHelper.isDesktop(context) ? 330 : 350,
+      width: Get.width,
+      height: ResponsiveHelper.isDesktop(context) ? 330 : 350,
       margin: const EdgeInsets.all(Dimensions.paddingSizeDefault),
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
@@ -139,79 +157,80 @@ class FlashSaleShimmerView extends StatelessWidget {
       child: Shimmer(
         duration: const Duration(seconds: 2),
         enabled: true,
-        child: Column(children: [
-
-          Padding(
-            padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-            child: Row(children: [
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('flash_sale'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-                ResponsiveHelper.isDesktop(context) ? const SizedBox() : Text('limited_time_offer'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-              ],
-              ),
-              const Spacer(),
-
-              Row(children: [
-
-                TimerWidget(
-                  timeCount: 00,
-                  timeUnit: 'days'.tr,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+              child: Row(children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('flash_sale'.tr,
+                        style: robotoBold.copyWith(
+                            fontSize: Dimensions.fontSizeLarge)),
+                    const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                    ResponsiveHelper.isDesktop(context)
+                        ? const SizedBox()
+                        : Text('limited_time_offer'.tr,
+                            style: robotoRegular.copyWith(
+                                fontSize: Dimensions.fontSizeSmall,
+                                color: Theme.of(context).disabledColor)),
+                  ],
                 ),
-                const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                TimerWidget(
-                  timeCount: 00,
-                  timeUnit: 'hours'.tr,
-                ),
-                const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                TimerWidget(
-                  timeCount: 00,
-                  timeUnit: 'mins'.tr,
-                ),
-                const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                TimerWidget(
-                  timeCount: 00,
-                  timeUnit: 'sec'.tr,
-                ),
-
-              ])
-            ]),
-          ),
-
-          Container(
-            height: ResponsiveHelper.isDesktop(context) ? 150 : 170, width: Get.width * 0.7,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                const Spacer(),
+                Row(children: [
+                  TimerWidget(
+                    timeCount: 00,
+                    timeUnit: 'days'.tr,
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeDefault),
+                  TimerWidget(
+                    timeCount: 00,
+                    timeUnit: 'hours'.tr,
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeDefault),
+                  TimerWidget(
+                    timeCount: 00,
+                    timeUnit: 'mins'.tr,
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeDefault),
+                  TimerWidget(
+                    timeCount: 00,
+                    timeUnit: 'sec'.tr,
+                  ),
+                ])
+              ]),
             ),
-          ),
-          const SizedBox(height: Dimensions.paddingSizeDefault),
-
-          Container(
-            height: 10, width: 100,
-            color: Colors.grey[300],
-          ),
-          const SizedBox(height: Dimensions.paddingSizeSmall),
-
-          Container(
-            height: 10, width: 200,
-            color: Colors.grey[300],
-          ),
-          const SizedBox(height: Dimensions.paddingSizeSmall),
-
-          Container(
-            height: 10, width: 100,
-            color: Colors.grey[300],
-          ),
-          const SizedBox(height: Dimensions.paddingSizeSmall),
-        ],
+            Container(
+              height: ResponsiveHelper.isDesktop(context) ? 150 : 170,
+              width: Get.width * 0.7,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+              ),
+            ),
+            const SizedBox(height: Dimensions.paddingSizeDefault),
+            Container(
+              height: 10,
+              width: 100,
+              color: Colors.grey[300],
+            ),
+            const SizedBox(height: Dimensions.paddingSizeSmall),
+            Container(
+              height: 10,
+              width: 200,
+              color: Colors.grey[300],
+            ),
+            const SizedBox(height: Dimensions.paddingSizeSmall),
+            Container(
+              height: 10,
+              width: 100,
+              color: Colors.grey[300],
+            ),
+            const SizedBox(height: Dimensions.paddingSizeSmall),
+          ],
         ),
       ),
     );
   }
 }
-

@@ -82,7 +82,7 @@ class _FlashSaleCardState extends State<FlashSaleCard> {
             },
             itemBuilder: (context, index) {
               return Container(
-                margin: EdgeInsets.zero,
+                margin: EdgeInsets.symmetric(horizontal: 4),
                 child: AnimatedBuilder(
                   animation: _pageController,
                   builder: (context, child) {

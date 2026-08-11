@@ -70,7 +70,10 @@ class MedicineItemCard extends StatelessWidget {
                       freeDelivery: false,
                     ),
 
-                    OrganicTag(item: item, placeInImage: false),
+                    PositionedDirectional(
+                      top: 4,
+                      end:4,
+                      child: OrganicTag(item: item, placeInImage: false)),
 
                     isShop ? const SizedBox() : Positioned(
                       bottom: 10, right: 10,

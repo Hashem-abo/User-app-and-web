@@ -136,7 +136,7 @@ class StoreCardWithDistance extends StatelessWidget {
                                 child: Text(store.name ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                               ),
                               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                              store.verifiedSeller == 1 ? Image.asset(Images.verifiedBadge2, width: 16, height: 16) : const SizedBox.shrink(),
+                              store.verifiedSeller == 1 ? Icon(Icons.check_circle, size: 16, color: Colors.blue) : const SizedBox.shrink(),
                             ],
                           ), 
                           const SizedBox(height: Dimensions.paddingSizeExtraSmall),

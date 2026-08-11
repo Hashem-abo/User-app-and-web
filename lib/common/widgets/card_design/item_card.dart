@@ -695,14 +695,27 @@ class _ItemCardState extends State<ItemCard> {
                             child: Container(
                               height: 30,
                               margin: const EdgeInsets.symmetric(vertical: 4),
-                              alignment: Alignment.centerRight,
+                              alignment: AlignmentDirectional.centerStart,
                               child: AnimatedSize(
                                 duration: const Duration(milliseconds: 350),
+                                alignment: AlignmentDirectional.centerStart,
                                 curve: Curves.easeInOutCubic,
                                 child: AnimatedSwitcher(
                                   duration: _statusSwitchDuration, 
                                   switchInCurve: Curves.easeInOutCubic,        
-                                  switchOutCurve: Curves.easeInOutCubic,       
+                                  switchOutCurve: Curves.easeInOutCubic,  
+                                  layoutBuilder: (
+                                    Widget? currentChild,
+                                    List<Widget> previousChildren,
+                                  ) {
+                                    return Stack(
+                                      alignment: AlignmentDirectional.centerStart,
+                                      children: [
+                                        ...previousChildren,
+                                        if (currentChild != null) currentChild,
+                                      ],
+                                    );
+                                  },     
                                   transitionBuilder: (Widget child, Animation<double> animation) {
                                     return SlideTransition(
                                       position: Tween<Offset>(
