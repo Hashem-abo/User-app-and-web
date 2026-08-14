@@ -427,4 +427,8 @@ class AppConstants {
   static const String hourly = 'hourly';
   static const String distanceWise = 'distance_wise';
   static const String dayWise = 'day_wise';
+
+  //static const String customerCreditAccountsUri = '/api/v1/customer/credit/accounts';
+  //static const String customerCreditValidateCheckoutUri = '/api/v1/customer/credit/checkout-validate';
+ // static const String customerCreditRepayUri = '/api/v1/customer/credit/repay';
 }

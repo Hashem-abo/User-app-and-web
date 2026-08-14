@@ -1,3 +1,8 @@
+import 'package:sixam_mart/features/bnpl_credit/controllers/customer_credit_controller.dart';
+import 'package:sixam_mart/features/bnpl_credit/data/repositories/customer_credit_repository.dart';
+import 'package:sixam_mart/features/bnpl_credit/domain/repositories/customer_credit_repository_interface.dart';
+import 'package:sixam_mart/features/bnpl_credit/domain/services/customer_credit_service.dart';
+import 'package:sixam_mart/features/bnpl_credit/domain/services/customer_credit_service_interface.dart';
 import 'dart:convert';
 import 'package:sixam_mart/features/brands/controllers/brands_controller.dart';
 import 'package:sixam_mart/features/trends/controllers/trends_controller.dart';
@@ -363,6 +368,8 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.put<GlobalShoppingServiceInterface>(GlobalShoppingService(repo: Get.find<GlobalShoppingRepositoryInterface>()));
   Get.lazyPut<ProServiceInterface>(() => ProService(proRepositoryInterface: Get.find()));
   Get.lazyPut<ReelsServiceInterface>(() => ReelsService(reelsRepositoryInterface: Get.find()), fenix: true);
+
+    Get.lazyPut(() => CustomerCreditController(customerCreditServiceInterface: Get.find()));
 
   /// Controller
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
