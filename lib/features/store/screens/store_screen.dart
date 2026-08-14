@@ -1406,11 +1406,11 @@ class _StoreScreenState extends State<StoreScreen> {
                 ),
               ],
             ) : _selectedTab == 1 ? GetBuilder<ReviewController>(builder: (reviewController) {
-              return reviewController.storeReviewList != null ? reviewController.storeReviewList!.isNotEmpty ? Padding(
+              return reviewController.storeReviewList != null ? Padding(
                 padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                 child: Column(children: [
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text('${store?.reviewsCommentsCount ?? 0} ${'ratings_1'.tr}', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                    Text('${(reviewController.originalStoreReviewList != null && reviewController.originalStoreReviewList!.isNotEmpty) ? reviewController.originalStoreReviewList!.length : (store?.reviewsCommentsCount ?? 0)} ${'ratings_1'.tr}', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                     Row(children: [
                       InkWell(
                         onTap: () {
@@ -1479,13 +1479,15 @@ class _StoreScreenState extends State<StoreScreen> {
                   RatingWidget(
                     averageRating: store?.avgRating ?? 0,
                     ratingCount: store?.ratingCount ?? 0,
-                    reviewCommentCount: store?.reviewsCommentsCount ?? 0,
+                    reviewCommentCount: (reviewController.originalStoreReviewList != null && reviewController.originalStoreReviewList!.isNotEmpty) ? reviewController.originalStoreReviewList!.length : (store?.reviewsCommentsCount ?? 0),
                     ratings: store?.ratings,
                   ),
                   const SizedBox(height: Dimensions.paddingSizeLarge),
-                  ReviewListWidget(reviewController: reviewController, storeName: store?.name, reviewList: reviewController.storeReviewList),
+                  reviewController.storeReviewList!.isNotEmpty ? ReviewListWidget(
+                    reviewController: reviewController, storeName: store?.name, reviewList: reviewController.storeReviewList,
+                  ) : Center(child: Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeDefault), child: Text('no_review_found'.tr))),
                 ]),
-              ) : Center(child: Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeDefault), child: Text('no_review_found'.tr))) : const Center(child: Padding(padding: EdgeInsets.all(Dimensions.paddingSizeLarge), child: CircularProgressIndicator()));
+              ) : const Center(child: Padding(padding: EdgeInsets.all(Dimensions.paddingSizeLarge), child: CircularProgressIndicator()));
             }) : Padding(
               padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
               child: Column(

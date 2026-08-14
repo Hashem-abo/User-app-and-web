@@ -11,10 +11,15 @@ class AddressHelper {
 
   static Future<bool> saveUserAddressInSharedPref(AddressModel address) async {
     SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+    List<int>? zoneIds = address.zoneIds;
+    if ((zoneIds == null || zoneIds.isEmpty) && address.zoneId != null) {
+      zoneIds = [address.zoneId!];
+      address.zoneIds = zoneIds;
+    }
     String userAddress = jsonEncode(address.toJson());
     Get.find<ApiClient>().updateHeader(
       sharedPreferences.getString(AppConstants.token),
-      address.zoneIds,[],
+      zoneIds,[],
       sharedPreferences.getString(AppConstants.languageCode),
       Get.find<SplashController>().module?.id,
       address.latitude,

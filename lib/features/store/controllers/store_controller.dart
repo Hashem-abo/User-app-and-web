@@ -512,6 +512,9 @@ class StoreController extends GetxController implements GetxService {
           _categoryList!.add(category);
         }
       }
+      debugPrint("DEBUG: [Store Category Info] Store: ${_store!.name} (ID: ${_store!.id})");
+      debugPrint("DEBUG: category_ids returned by server: ${_store!.categoryIds}");
+      debugPrint("DEBUG: parsed categories displayed in App: ${_categoryList!.map((e) => '${e.name} (ID: ${e.id})').toList()}");
     }
   }
 

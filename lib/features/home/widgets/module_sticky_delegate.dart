@@ -20,6 +20,8 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
   final double collapsedHeight;
   final Widget? searchBar; // ahmed: Optional search bar content
   final double searchBarHeight;
+  final ScrollController? expandedScrollController;
+  final ScrollController? collapsedScrollController;
 
   final double paddingTop; // ahmed: padding top from media query
 
@@ -35,37 +37,18 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
     this.searchBar,
     this.searchBarHeight = 120,
     this.paddingTop = 0, // ahmed: new parameter
+    this.expandedScrollController,
+    this.collapsedScrollController,
   });
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    if (expandedHeight == 0) {
-      return const SizedBox();
-    }
-    // Calculate percent based on the shrinkable part only (the module part)
-    double shrinkableAmount = maxExtent - minExtent;
-    double percent = shrinkableAmount == 0 ? 0.0 : (shrinkOffset / shrinkableAmount).clamp(0.0, 1.0);
-    bool isCollapsed = percent > 0.5;
+    // Calculating offsets inside delegate build is no longer necessary as it is managed by persistent controllers.
 
-    double expandedInitialOffset = 0;
-    double collapsedInitialOffset = 0;
-    if (splashController.module != null &&
-        splashController.moduleList != null) {
-      int selectedIndex = splashController.moduleList!.indexWhere((m) =>
-          m.id == splashController.module!.id ||
-          (m.moduleType != null &&
-              m.moduleType == splashController.module!.moduleType));
-      if (selectedIndex > 0) {
-        for (int i = 0; i < selectedIndex; i++) {
-          double buttonWidth =
-              splashController.moduleList![i].moduleButtonWidth ?? 65;
-          expandedInitialOffset += buttonWidth + Dimensions.paddingSizeLarge;
-          collapsedInitialOffset +=
-              115.0; // Approximation for collapsed chip width
-        }
-      }
-    }
+    double shrinkableAmount = maxExtent - minExtent;
+    double percent = (shrinkOffset / shrinkableAmount).clamp(0.0, 1.0);
+    bool isCollapsed = percent > 0.5;
 
     return Container(
       color: Theme.of(context).colorScheme.surface, // Base color
@@ -117,14 +100,11 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                           opacity: (1 - percent).clamp(0.0, 1.0),
                           child: SingleChildScrollView(
                             physics: const NeverScrollableScrollPhysics(),
-                            child: ScrollControllerProvider(
-                              initialScrollOffset: expandedInitialOffset,
-                              builder: (context, scrollController) {
-                                return SizedBox(
-                                  height: expandedHeight,
-                                  child: ListView.builder(
-                                    controller: scrollController,
-                                    scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: expandedHeight,
+                              child: ListView.builder(
+                                controller: expandedScrollController,
+                                scrollDirection: Axis.horizontal,
                                     padding: const EdgeInsets.only(
                                         left: Dimensions.paddingSizeSmall,
                                         right: Dimensions.paddingSizeSmall,
@@ -392,28 +372,23 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                       );
                                     },
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
 
                       // Collapsed View (Text Chips)
-                      IgnorePointer(
+                       IgnorePointer(
                         ignoring: !isCollapsed,
                         child: Opacity(
                           opacity: percent.clamp(0.0, 1.0),
                           child: Align(
                             alignment: Alignment.centerLeft,
-                            child: ScrollControllerProvider(
-                              initialScrollOffset: collapsedInitialOffset,
-                              builder: (context, scrollController) {
-                                return SizedBox(
-                                  height: collapsedHeight,
-                                  child: ListView.builder(
-                                    controller: scrollController,
-                                    scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: collapsedHeight,
+                              child: ListView.builder(
+                                controller: collapsedScrollController,
+                                scrollDirection: Axis.horizontal,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: Dimensions.paddingSizeSmall,
                                         vertical: 10),
@@ -457,12 +432,10 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                       );
                                     },
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -571,12 +544,14 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(ModuleStickyDelegate oldDelegate) {
     return oldDelegate.searchBar != searchBar ||
         oldDelegate.searchBarHeight != searchBarHeight ||
+        oldDelegate.expandedHeight != expandedHeight ||
+        oldDelegate.collapsedHeight != collapsedHeight ||
         oldDelegate.showLocationHeader !=
             showLocationHeader || // Check if module type changed
         oldDelegate.locationHeaderFontColor != locationHeaderFontColor ||
         oldDelegate.paddingTop != paddingTop ||
-        oldDelegate.expandedHeight != expandedHeight ||
-        oldDelegate.collapsedHeight != collapsedHeight ||
+        oldDelegate.expandedScrollController != expandedScrollController ||
+        oldDelegate.collapsedScrollController != collapsedScrollController ||
         oldDelegate.splashController != splashController;
   }
 }
