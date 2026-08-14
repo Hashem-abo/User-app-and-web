@@ -83,7 +83,8 @@ class HomeRepository implements HomeRepositoryInterface {
     HomepageModel? homepageModel;
     int homepageCacheVersion = Get.find<SplashController>().configModel?.homepageCacheVersion ?? 1;
     int? moduleId = Get.find<SplashController>().module?.id;
-    String cacheId = '${AppConstants.homepageUri}-${moduleId ?? 'default'}-$homepageCacheVersion';
+    String? zoneIdHeader = apiClient.getHeader()[AppConstants.zoneId];
+    String cacheId = '${AppConstants.homepageUri}-${zoneIdHeader ?? 'default'}-${moduleId ?? 'default'}-$homepageCacheVersion';
 
     switch(source) {
       case DataSourceEnum.client:

@@ -342,8 +342,14 @@ class _DropdownLocationBottomSheetState extends State<DropdownLocationBottomShee
                     String lat = '0';
                     String lng = '0';
                     if (_selectedZone!.formatedCoordinates != null && _selectedZone!.formatedCoordinates!.isNotEmpty) {
-                      lat = _selectedZone!.formatedCoordinates![0].latitude.toString();
-                      lng = _selectedZone!.formatedCoordinates![0].longitude.toString();
+                      double sumLat = 0;
+                      double sumLng = 0;
+                      for (var coord in _selectedZone!.formatedCoordinates!) {
+                        sumLat += coord.latitude;
+                        sumLng += coord.longitude;
+                      }
+                      lat = (sumLat / _selectedZone!.formatedCoordinates!.length).toString();
+                      lng = (sumLng / _selectedZone!.formatedCoordinates!.length).toString();
                     }
 
                     AddressModel address = AddressModel(

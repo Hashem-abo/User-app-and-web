@@ -554,9 +554,9 @@ class SplashController extends GetxController implements GetxService {
           _moduleList!.add(module);
         }
       }
-      if (_module != null && !_moduleList!.any((m) => m.id == _module!.id || m.moduleType == _module!.moduleType)) {
-        _moduleList!.add(_module!);
-      }
+      // if (_module != null && !_moduleList!.any((m) => m.id == _module!.id || m.moduleType == _module!.moduleType)) {
+      //   _moduleList!.add(_module!);
+      // }
       if (_moduleList!.isNotEmpty) {
         if (_module == null) {
            setModule(_moduleList![0]);
@@ -567,6 +567,8 @@ class SplashController extends GetxController implements GetxService {
             if(_configModel != null && _configModel!.module != null && _configModel!.module!.id == _moduleList![index].id) {
                _configModel!.module = _moduleList![index];
             }
+          } else {
+            setModule(null);
           }
         }
       }

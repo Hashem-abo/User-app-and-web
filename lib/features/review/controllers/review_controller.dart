@@ -19,6 +19,7 @@ class ReviewController extends GetxController implements GetxService {
   List<ReviewModel>? get storeReviewList => _storeReviewList;
 
   List<ReviewModel>? _originalStoreReviewList;
+  List<ReviewModel>? get originalStoreReviewList => _originalStoreReviewList;
 
   String? _loadingStoreId;
   String? _activeStoreId;

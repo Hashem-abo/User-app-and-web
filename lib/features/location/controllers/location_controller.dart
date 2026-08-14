@@ -27,6 +27,7 @@ import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
 import 'package:sixam_mart/features/location/widgets/module_dialog_widget.dart';
 import 'package:sixam_mart/features/rental_module/rental_cart_screen/controllers/taxi_cart_controller.dart';
+import 'package:sixam_mart/common/enums/data_source_enum.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -194,6 +195,9 @@ class LocationController extends GetxController implements GetxService {
     address.house = 'manual';
     await AddressHelper.saveUserAddressInSharedPref(address);
     
+    Get.find<SplashController>().setModuleList(null);
+    await Get.find<SplashController>().getModules(dataSource: DataSourceEnum.client);
+
     update();
     Get.offAllNamed(RouteHelper.getInitialRoute());
   }
@@ -362,12 +366,11 @@ class LocationController extends GetxController implements GetxService {
     await _handleTaxiModuleCart(address);
 
     await AddressHelper.saveUserAddressInSharedPref(address);
+    Get.find<SplashController>().setModule(null);
+    Get.find<SplashController>().setModuleList(null);
+    await Get.find<SplashController>().getModules(dataSource: DataSourceEnum.client);
+    await Get.find<SplashController>().getConfigData();
     if(AuthHelper.isLoggedIn()) {
-      if(Get.find<SplashController>().module != null) {
-        await Get.find<FavouriteController>().getFavouriteList();
-      } else {
-        Get.find<SplashController>().getConfigData();
-      }
       Get.find<AuthController>().updateZone();
     }
     HomeScreen.loadData(true);

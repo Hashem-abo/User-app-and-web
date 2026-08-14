@@ -375,11 +375,11 @@ class ItemController extends GetxController implements GetxService {
 
   void applyFilters({bool isPopular = false, bool isSpecial = false}) {
     if(isPopular){
-      getPopularItemList(notify: true, offset: '1', dataSource: DataSourceEnum.client);
+      getPopularItemList(notify: true, offset: '1', dataSource: DataSourceEnum.client, reload: true);
     }else if(isSpecial){
-      getDiscountedItemList(notify: true, offset: '1', dataSource: DataSourceEnum.client);
+      getDiscountedItemList(notify: true, offset: '1', dataSource: DataSourceEnum.client, reload: true);
     }else{
-      getReviewedItemList(notify: true, offset: '1', dataSource: DataSourceEnum.client);
+      getReviewedItemList(notify: true, offset: '1', dataSource: DataSourceEnum.client, reload: true);
     }
   }
 
@@ -399,11 +399,11 @@ class ItemController extends GetxController implements GetxService {
     _searchController.text = '';
 
     if (isPopular) {
-      getPopularItemList(offset: '1', dataSource: DataSourceEnum.client);
+      getPopularItemList(offset: '1', dataSource: DataSourceEnum.client, reload: true);
     } else if(isSpecial) {
-      getDiscountedItemList(offset: '1', dataSource: DataSourceEnum.client);
+      getDiscountedItemList(offset: '1', dataSource: DataSourceEnum.client, reload: true);
     } else {
-      getReviewedItemList(offset: '1', dataSource: DataSourceEnum.client);
+      getReviewedItemList(offset: '1', dataSource: DataSourceEnum.client, reload: true);
     }
 
     update();
@@ -425,11 +425,11 @@ class ItemController extends GetxController implements GetxService {
     _searchController.text = '';
 
     if (isPopular) {
-      getPopularItemList(offset: '1', dataSource: DataSourceEnum.client, firstTimeCategoryLoad: true);
+      getPopularItemList(offset: '1', dataSource: DataSourceEnum.client, firstTimeCategoryLoad: true, reload: true);
     } else if (isSpecial) {
-      getDiscountedItemList(offset: '1', dataSource: DataSourceEnum.client, firstTimeCategoryLoad: true);
+      getDiscountedItemList(offset: '1', dataSource: DataSourceEnum.client, firstTimeCategoryLoad: true, reload: true);
     } else {
-      getReviewedItemList(offset: '1', dataSource: DataSourceEnum.client, firstTimeCategoryLoad: true);
+      getReviewedItemList(offset: '1', dataSource: DataSourceEnum.client, firstTimeCategoryLoad: true, reload: true);
     }
   }
 
@@ -724,6 +724,7 @@ class ItemController extends GetxController implements GetxService {
       _offset = 1;
       _popularItemList = null;
       _isPopularItemListLoaded = false;
+      _pageSize = null;
       if(firstTimeCategoryLoad) _categoryList = null;
       if(notify) update();
     }
@@ -962,6 +963,7 @@ class ItemController extends GetxController implements GetxService {
         _reviewedItemList = null;
         _reviewedCategoriesList = null;
         _isReviewedItemListLoaded = false;
+        _pageSize = null;
         if(firstTimeCategoryLoad) _categoryList = null;
         if (notify) update();
       } else {
@@ -1096,6 +1098,7 @@ class ItemController extends GetxController implements GetxService {
       _offset = 1;
       _discountedItemList = null;
       _isDiscountedItemListLoaded = false;
+      _pageSize = null;
       if(firstTimeCategoryLoad) _categoryList = null;
       if (notify) update();
     }

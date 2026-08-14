@@ -57,8 +57,13 @@ class ApiClient extends GetxService {
     if (userAddress != null && (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('\u200b\u200b\u200b')))) {
       latitude = '0';
       longitude = '0';
-    } else if (latitude == '0' && longitude == '0') {
-      // already manual
+    }
+    if ((zoneIDs == null || zoneIDs.isEmpty) && userAddress != null) {
+      if (userAddress.zoneIds != null && userAddress.zoneIds!.isNotEmpty) {
+        zoneIDs = userAddress.zoneIds;
+      } else if (userAddress.zoneId != null) {
+        zoneIDs = [userAddress.zoneId!];
+      }
     }
 
     if(moduleID != null || sharedPreferences.getString(AppConstants.cacheModuleId) != null) {
