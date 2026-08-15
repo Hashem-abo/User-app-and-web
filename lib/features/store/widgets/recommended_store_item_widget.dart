@@ -149,7 +149,7 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                          // Current Price
                         Text(
                           PriceConverter.convertPrice(item.price, discount: discount, discountType: discountType),
-                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor), textDirection: TextDirection.ltr, 
+                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).primaryColor), textDirection: TextDirection.ltr, 
                         ),
                         
                         Row(
@@ -159,7 +159,7 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                               Text(
                                 PriceConverter.convertPrice(item.price),
                                 style: robotoMedium.copyWith(
-                                  fontSize: Dimensions.fontSizeSmall, 
+                                  fontSize: Dimensions.fontSizeExtraSmall, 
                                   color: Theme.of(context).disabledColor,
                                   decoration: TextDecoration.lineThrough,
                                 ), textDirection: TextDirection.ltr,
@@ -170,7 +170,7 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                              // Discount Percentage
                             if(discount > 0) Text(
                               '${discountPercentage.toStringAsFixed(0)}% ${'off'.tr}',
-                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor), 
+                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor), 
                             ),
                           ],
                         )
