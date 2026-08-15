@@ -521,7 +521,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                   itemId: item.id, itemCampaignId: widget.isCampaign ? item.id : null,
                                   price: priceWithDiscountAndAddons.toString(), variant: '',
                                   variation: variation != null ? [variation] : null,
-                                  variations: Get.find<SplashController>().getModuleConfig(item.moduleType).newVariation! ? variations : null,
+                                  variations: (Get.find<SplashController>().getModuleConfig(item.moduleType).newVariation ?? false) ? variations : null,
                                   quantity: itemController.quantity, addOnIds: listOfAddOnId, addOns: addOnsList, addOnQtys: listOfAddOnQty, model: widget.isCampaign ? 'ItemCampaign' : 'Item',
                                   note: widget.cart?.note,
                                 );
@@ -538,7 +538,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                     Get.dialog(ConfirmationDialog(
                                       icon: Images.warning,
                                       title: 'are_you_sure_to_reset'.tr,
-                                      description: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
+                                      description: (Get.find<SplashController>().configModel?.moduleConfig?.module?.showRestaurantText ?? false)
                                           ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr,
                                       onYesPressed: () {
                                         Get.back();

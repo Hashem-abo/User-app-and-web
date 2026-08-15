@@ -256,6 +256,16 @@ class _MenuScreenState extends State<MenuScreen> {
                       MenuButton(icon: 'assets/svg/icons/linear/my-order.svg', title: 'orders'.tr, route: RouteHelper.getOrderRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/location.svg', title: 'my_address'.tr, route: RouteHelper.getAddressRoute()),
+                      if(Get.find<SplashController>().configModel?.monthlyOrderRemainder == 1) ...[
+                        const Divider(height: 1, indent: 20, endIndent: 20),
+                        MenuButton(icon: 'assets/svg/icons/linear/my-order.svg', title: 'my_items'.tr, onTap: () {
+                          if(AuthHelper.isLoggedIn()) {
+                            Get.toNamed(RouteHelper.getMyItemsRoute());
+                          } else {
+                            Get.bottomSheet(const LoginSuggestionBottomSheet(), isScrollControlled: true);
+                          }
+                        }),
+                      ],
                       if(Get.find<SplashController>().proStaus) ...[
                         const Divider(height: 1, indent: 20, endIndent: 20),
                         MenuButton(icon: 'assets/svg/icons/linear/crown.svg', title: 'my_subscription'.tr, route: RouteHelper.getSubscriptionPlanRoute()),
@@ -503,7 +513,10 @@ class _MenuScreenState extends State<MenuScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
                   child: Text(
                     isAmount ? PriceConverter.convertPrice(value, forMenuWallet: true) : value.toStringAsFixed(0),
-                    style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
+                    style: robotoBold.copyWith(
+                      fontSize: (title == 'my_balance'.tr || isAmount) ? Dimensions.fontSizeSmall : Dimensions.fontSizeSmall,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                 ),
                 Padding(

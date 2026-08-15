@@ -57,3 +57,7 @@ build/
 
 # Osama edit this
 android/build.gradle.kts
+
+# Android memory dumps
+*.hprof
+

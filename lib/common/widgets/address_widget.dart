@@ -21,6 +21,10 @@ class AddressWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (address == null) return const SizedBox();
+    String type = address?.addressType ?? 'others';
+    String fullAddress = address?.address ?? '';
+
     return Padding(
       padding: EdgeInsets.only(bottom: fromCheckout ? 0 : Dimensions.paddingSizeSmall),
       child: Container(
@@ -44,20 +48,20 @@ class AddressWidget extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                     Row(mainAxisSize: MainAxisSize.min, children: [
                       Image.asset(
-                        address!.addressType == 'home' ? Images.homeIcon : address!.addressType == 'office' ? Images.workIcon : Images.otherIcon,
+                        type == 'home' ? Images.homeIcon : type == 'office' ? Images.workIcon : Images.otherIcon,
                         color: Theme.of(context).primaryColor, height: ResponsiveHelper.isDesktop(context) ? 25 : 20, width: ResponsiveHelper.isDesktop(context) ? 25 : 20,
                       ),
                       const SizedBox(width: Dimensions.paddingSizeSmall),
 
                       Text(
-                        address!.addressType!.tr,
+                        type.tr,
                         style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault),
                       ),
                     ]),
                     const SizedBox(height: 3),
 
                     Text(
-                      address!.address!,
+                      fullAddress,
                       style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
                       maxLines: 1, overflow: TextOverflow.ellipsis,
                     ),

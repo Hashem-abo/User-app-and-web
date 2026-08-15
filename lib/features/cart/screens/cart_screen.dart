@@ -1319,17 +1319,22 @@ class CheckoutButton extends StatelessWidget {
 
                                 if (Get.find<SplashController>().module == null) {
                                   int i = 0;
-                                  for (i = 0; i < Get.find<SplashController>().moduleList!.length; i++) {
-                                    if (cartController.cartList.isNotEmpty && cartController.cartList[0].item!.moduleId == Get.find<SplashController>().moduleList![i].id) {
-                                      break;
+                                  List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
+                                  if (mList != null) {
+                                    for (i = 0; i < mList.length; i++) {
+                                      if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
+                                        break;
+                                      }
+                                    }
+                                    if (i < mList.length) {
+                                      Get.find<SplashController>().switchModule(i, true);
                                     }
                                   }
-                                  Get.find<SplashController>().switchModule(i, true);
                                 }
                                 Get.find<CouponController>().removeCouponData(false);
 
                                 if (isFoodOrGrocery && selectedStoreId != null) {
-                                  List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item!.storeId == selectedStoreId).toList();
+                                  List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
                                   Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
                                     fromCart: false,
                                     cartList: filteredCartList,
@@ -1345,17 +1350,22 @@ class CheckoutButton extends StatelessWidget {
                       } else {
                         if (Get.find<SplashController>().module == null) {
                           int i = 0;
-                          for (i = 0; i < Get.find<SplashController>().moduleList!.length; i++) {
-                            if (cartController.cartList[0].item!.moduleId == Get.find<SplashController>().moduleList![i].id) {
-                              break;
+                          List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
+                          if (mList != null) {
+                            for (i = 0; i < mList.length; i++) {
+                              if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
+                                break;
+                              }
+                            }
+                            if (i < mList.length) {
+                              Get.find<SplashController>().switchModule(i, true);
                             }
                           }
-                          Get.find<SplashController>().switchModule(i, true);
                         }
                         Get.find<CouponController>().removeCouponData(false);
                         
                         if (isFoodOrGrocery && selectedStoreId != null) {
-                          List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item!.storeId == selectedStoreId).toList();
+                          List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
                           
                           Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
                             fromCart: false,

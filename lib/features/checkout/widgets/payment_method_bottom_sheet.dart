@@ -54,19 +54,20 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
 
   void configurePartialPayment() {
     if(!AuthHelper.isGuestLoggedIn()) {
-      double walletBalance = Get.find<ProfileController>().userInfoModel!.walletBalance!;
+      double walletBalance = Get.find<ProfileController>().userInfoModel?.walletBalance ?? 0;
       if(walletBalance < widget.totalPrice){
         canSelectWallet = false;
       }
       if(Get.find<CheckoutController>().isPartialPay){
         notHideWallet = false;
-        if(Get.find<SplashController>().configModel!.partialPaymentMethod! == 'cod'){
+        String? partialPayMethod = Get.find<SplashController>().configModel?.partialPaymentMethod;
+        if(partialPayMethod == 'cod'){
           notHideCod = true;
           notHideDigital = false;
-        } else if(Get.find<SplashController>().configModel!.partialPaymentMethod! == 'digital_payment'){
+        } else if(partialPayMethod == 'digital_payment'){
           notHideCod = false;
           notHideDigital = true;
-        } else if(Get.find<SplashController>().configModel!.partialPaymentMethod! == 'both'){
+        } else if(partialPayMethod == 'both'){
           notHideCod = true;
           notHideDigital = true;
         }

@@ -46,15 +46,20 @@ class _OrderSuccessfulDialogState extends State<OrderSuccessfulDialog> {
           success = orderController.trackModel!.paymentStatus == 'paid' || orderController.trackModel!.paymentMethod == 'cash_on_delivery'
               || orderController.trackModel!.paymentMethod == 'partial_payment';
           parcel = orderController.trackModel!.paymentMethod == 'parcel';
-          for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-            for(Modules m in zData.modules!) {
-              if(m.id == Get.find<SplashController>().module!.id) {
-                maximumCodOrderAmount = m.pivot!.maximumCodOrderAmount;
-                break;
+          List<ZoneData>? zList = AddressHelper.getUserAddressFromSharedPref()?.zoneData;
+          if (zList != null) {
+            for(ZoneData zData in zList) {
+              if (zData.modules != null) {
+                for(Modules m in zData.modules!) {
+                  if(m.id == Get.find<SplashController>().module?.id) {
+                    maximumCodOrderAmount = m.pivot?.maximumCodOrderAmount;
+                    break;
+                  }
+                }
               }
-            }
-            if(zData.id ==  AddressHelper.getUserAddressFromSharedPref()!.zoneId){
-              _isCashOnDeliveryActive = zData.cashOnDelivery;
+              if(zData.id == AddressHelper.getUserAddressFromSharedPref()?.zoneId){
+                _isCashOnDeliveryActive = zData.cashOnDelivery;
+              }
             }
           }
 

@@ -11,6 +11,7 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_dropdown.dart';
 import 'package:sixam_mart/features/checkout/widgets/guest_delivery_address.dart';
+import 'package:sixam_mart/features/checkout/widgets/add_address_options_bottom_sheet.dart';
 
 class DeliverySection extends StatelessWidget {
   final CheckoutController checkoutController;
@@ -45,17 +46,11 @@ class DeliverySection extends StatelessWidget {
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Text('deliver_to'.tr, style: robotoMedium),
             TextButton.icon(
-              onPressed: () async {
-                var address = await Get.toNamed(RouteHelper.getAddAddressRoute(true, false, checkoutController.store!.zoneId));
-                if(address != null) {
-                  checkoutController.getDistanceInKM(
-                    LatLng(double.parse(address.latitude), double.parse(address.longitude)),
-                    LatLng(double.parse(checkoutController.store!.latitude!), double.parse(checkoutController.store!.longitude!)),
-                  );
-                  checkoutController.streetNumberController.text = address.streetNumber ?? '';
-                  checkoutController.houseController.text = address.house ?? '';
-                  checkoutController.floorController.text = address.floor ?? '';
-                }
+              onPressed: () {
+                Get.bottomSheet(
+                  AddAddressOptionsBottomSheet(checkoutController: checkoutController),
+                  isScrollControlled: true,
+                );
               },
               icon: const Icon(Icons.add, size: 20),
               label: Text('add_new'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
@@ -111,13 +106,18 @@ class DeliverySection extends StatelessWidget {
                       address.length, (index) => PopupMenuItem(
                       child: InkWell(
                         onTap: () {
-                          checkoutController.getDistanceInKM(
-                            LatLng(
-                              double.parse(address[index].latitude!),
-                              double.parse(address[index].longitude!),
-                            ),
-                            LatLng(double.parse(checkoutController.store!.latitude!), double.parse(checkoutController.store!.longitude!)),
-                          );
+                          double? lat = double.tryParse(address[index].latitude ?? '');
+                          double? lng = double.tryParse(address[index].longitude ?? '');
+                          if (lat != null && lng != null && checkoutController.store != null && checkoutController.store!.latitude != null && checkoutController.store!.longitude != null) {
+                            double? storeLat = double.tryParse(checkoutController.store!.latitude!);
+                            double? storeLng = double.tryParse(checkoutController.store!.longitude!);
+                            if (storeLat != null && storeLng != null) {
+                              checkoutController.getDistanceInKM(
+                                LatLng(lat, lng),
+                                LatLng(storeLat, storeLng),
+                              );
+                            }
+                          }
                           checkoutController.setAddressIndex(index);
                           int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;
                           checkoutController.streetNumberController.text = address[addrIndex].streetNumber ?? '';
@@ -146,11 +146,11 @@ class DeliverySection extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(address[index].addressType!.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                                    Text((address[index].addressType ?? 'others').tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
                                     const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
                                     Text(
-                                      address[index].address!, maxLines: 1, overflow: TextOverflow.ellipsis,
+                                      address[index].address ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
                                       style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
                                     ),
                                   ],
@@ -173,13 +173,18 @@ class DeliverySection extends StatelessWidget {
             child: CustomDropdown<int>(
 
               onChange: (int? value, int index) {
-                checkoutController.getDistanceInKM(
-                  LatLng(
-                    double.parse(address[index].latitude!),
-                    double.parse(address[index].longitude!),
-                  ),
-                  LatLng(double.parse(checkoutController.store!.latitude!), double.parse(checkoutController.store!.longitude!)),
-                );
+                double? lat = double.tryParse(address[index].latitude ?? '');
+                double? lng = double.tryParse(address[index].longitude ?? '');
+                if (lat != null && lng != null && checkoutController.store != null && checkoutController.store!.latitude != null && checkoutController.store!.longitude != null) {
+                  double? storeLat = double.tryParse(checkoutController.store!.latitude!);
+                  double? storeLng = double.tryParse(checkoutController.store!.longitude!);
+                  if (storeLat != null && storeLng != null) {
+                    checkoutController.getDistanceInKM(
+                      LatLng(lat, lng),
+                      LatLng(storeLat, storeLng),
+                    );
+                  }
+                }
                 checkoutController.setAddressIndex(index);
 
                 int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;

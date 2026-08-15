@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:sixam_mart/common/widgets/address_widget.dart';
 import 'package:sixam_mart/features/address/controllers/address_controller.dart';
@@ -177,8 +178,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
 
-    Module? module = Get.find<SplashController>().configModel!.moduleConfig!.module;
-    bool guestCheckoutPermission = AuthHelper.isGuestLoggedIn() && Get.find<SplashController>().configModel!.guestCheckoutStatus!;
+    Module? module = Get.find<SplashController>().configModel?.moduleConfig?.module;
+    bool guestCheckoutPermission = AuthHelper.isGuestLoggedIn() && (Get.find<SplashController>().configModel?.guestCheckoutStatus ?? false);
     bool isLoggedIn = AuthHelper.isLoggedIn();
     bool isGuestLogIn = AuthHelper.isGuestLoggedIn();
 
@@ -195,7 +196,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
         Pivot? moduleData = _getModuleData(store: checkoutController.store);
         _isCashOnDeliveryActive = _checkCODActive(store: checkoutController.store);
         _isDigitalPaymentActive = _checkDigitalPaymentActive(store: checkoutController.store);
-        _isOfflinePaymentActive = Get.find<SplashController>().configModel!.offlinePaymentStatus! && _checkZoneOfflinePaymentOnOff(addressModel: AddressHelper.getUserAddressFromSharedPref(), checkoutController: checkoutController);
+        _isOfflinePaymentActive = (Get.find<SplashController>().configModel?.offlinePaymentStatus ?? false) && _checkZoneOfflinePaymentOnOff(addressModel: AddressHelper.getUserAddressFromSharedPref(), checkoutController: checkoutController);
 
         if(checkoutController.isFirstTimeCodActive && (_isCashOnDeliveryActive ?? false)){
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -206,9 +207,9 @@ class CheckoutScreenState extends State<CheckoutScreen> {
         }
 
         if(checkoutController.store != null) {
-          todayClosed = checkoutController.isStoreClosed(true, checkoutController.store!.active!, checkoutController.store!.schedules);
-          tomorrowClosed = checkoutController.isStoreClosed(false, checkoutController.store!.active!, checkoutController.store!.schedules);
-          _taxPercent = checkoutController.store!.tax;
+          todayClosed = checkoutController.isStoreClosed(true, checkoutController.store?.active ?? true, checkoutController.store?.schedules);
+          tomorrowClosed = checkoutController.isStoreClosed(false, checkoutController.store?.active ?? true, checkoutController.store?.schedules);
+          _taxPercent = checkoutController.store?.tax;
         }
         return GetBuilder<CouponController>(builder: (couponController) {
           double? maxCodOrderAmount;
@@ -224,7 +225,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
           double extraDiscount = _getExtraDiscountPrice(storeDiscountPrice, itemDiscountPrice);
           double? discount = _getDiscountPrice(storeDiscountPrice, itemDiscountPrice);
-          double couponDiscount = PriceConverter.toFixed(couponController.discount!);
+          double couponDiscount = PriceConverter.toFixed(couponController.discount ?? 0);
 
           double subTotal = _calculateSubTotal(price: price, addOns: addOns, variations: variations, cartList: _cartList);
 
@@ -236,55 +237,62 @@ class CheckoutScreenState extends State<CheckoutScreen> {
           );
 
           Future.delayed(const Duration(milliseconds: 50), () {
-            if(checkoutController.isFirstTime || (couponController.discount! > 0 && !checkoutController.isFirstTime && !_calledOrderTax)){
-              if(couponController.discount! > 0){
+            double currentCouponDiscount = couponController.discount ?? 0;
+            if(checkoutController.isFirstTime || (currentCouponDiscount > 0 && !checkoutController.isFirstTime && !_calledOrderTax)){
+              if(currentCouponDiscount > 0){
                 _calledOrderTax = true;
               }
               List<OnlineCart> carts = [];
 
               if(widget.storeId == null || (_cartList != null && _cartList!.isNotEmpty)){
-                for (int index = 0; index < _cartList!.length; index++) {
-                  CartModel cart = _cartList![index]!;
+                for (int index = 0; index < (_cartList?.length ?? 0); index++) {
+                  CartModel? cart = _cartList![index];
+                  if (cart?.item == null) continue;
                   List<int?> addOnIdList = [];
                   List<int?> addOnQtyList = [];
-                  for (var addOn in cart.addOnIds!) {
-                    addOnIdList.add(addOn.id);
-                    addOnQtyList.add(addOn.quantity);
+                  if (cart!.addOnIds != null) {
+                    for (var addOn in cart.addOnIds!) {
+                      addOnIdList.add(addOn.id);
+                      addOnQtyList.add(addOn.quantity);
+                    }
                   }
 
                   List<OrderVariation> variations = [];
-                  if(Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).newVariation!) {
+                  bool isNewVar = (Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).newVariation ?? false);
+                  if(isNewVar && cart.item!.foodVariations != null && cart.foodVariations != null) {
                     for(int i=0; i<cart.item!.foodVariations!.length; i++) {
-                      if(cart.foodVariations![i].contains(true)) {
+                      if(i < cart.foodVariations!.length && cart.foodVariations![i].contains(true)) {
                         variations.add(OrderVariation(name: cart.item!.foodVariations![i].name, values: OrderVariationValue(label: [])));
-                        for(int j=0; j<cart.item!.foodVariations![i].variationValues!.length; j++) {
-                          if(cart.foodVariations![i][j]!) {
-                            variations[variations.length-1].values!.label!.add(cart.item!.foodVariations![i].variationValues![j].level);
+                        if (cart.item!.foodVariations![i].variationValues != null) {
+                          for(int j=0; j<cart.item!.foodVariations![i].variationValues!.length; j++) {
+                            if(j < cart.foodVariations![i].length && (cart.foodVariations![i][j] ?? false)) {
+                              variations[variations.length-1].values!.label!.add(cart.item!.foodVariations![i].variationValues![j].level);
+                            }
                           }
                         }
                       }
                     }
                   }
                   carts.add(OnlineCart(
-                    cartId: cart.id, itemId: cart.item!.id, itemCampaignId: cart.isCampaign! ? cart.item!.id : null,
+                    cartId: cart.id, itemId: cart.item!.id, itemCampaignId: (cart.isCampaign ?? false) ? cart.item!.id : null,
                     price: cart.discountedPrice.toString(), variant: '',
-                    variation: Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).newVariation! ? null : cart.variation,
-                    variations: Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).newVariation! ? variations : null,
-                    quantity: cart.quantity, addOnIds: addOnIdList, addOns: cart.addOns, addOnQtys: addOnQtyList, model: 'Item', itemType: cart.isCampaign! ? "AppModelsItemCampaign" : null,
+                    variation: isNewVar ? null : cart.variation,
+                    variations: isNewVar ? variations : null,
+                    quantity: cart.quantity, addOnIds: addOnIdList, addOns: cart.addOns, addOnQtys: addOnQtyList, model: 'Item', itemType: (cart.isCampaign ?? false) ? "AppModelsItemCampaign" : null,
                     note: cart.note,
                   ));
                 }
               }
 
                 PlaceOrderBodyModel placeOrderBody = PlaceOrderBodyModel(
-                  cart: carts, couponDiscountAmount: Get.find<CouponController>().discount, distance: checkoutController.distance,
+                  cart: carts, couponDiscountAmount: couponController.discount, distance: checkoutController.distance,
                   orderAmount: (widget.storeId == null || (_cartList != null && _cartList!.isNotEmpty)) ? subTotal : 0, orderNote: checkoutController.noteController.text, orderType: checkoutController.orderType,
                   paymentMethod: checkoutController.paymentMethodIndex == 0 ? 'cash_on_delivery'
                       : checkoutController.paymentMethodIndex == 1 ? 'wallet'
                       : checkoutController.paymentMethodIndex == 2 ? 'digital_payment' : 'offline_payment',
-                  couponCode: (Get.find<CouponController>().discount! > 0 || (Get.find<CouponController>().coupon != null
-                      && Get.find<CouponController>().freeDelivery)) ? Get.find<CouponController>().coupon!.code : null,
-                  storeId: (widget.storeId == null || (_cartList != null && _cartList!.isNotEmpty)) ? _cartList![0]!.item!.storeId : widget.storeId,
+                  couponCode: (currentCouponDiscount > 0 || (couponController.coupon != null
+                      && couponController.freeDelivery)) ? couponController.coupon?.code : null,
+                  storeId: (widget.storeId == null || (_cartList != null && _cartList!.isNotEmpty)) ? _cartList![0]?.item?.storeId : widget.storeId,
                   discountAmount: discount, receiverDetails: null, parcelCategoryId: null,
                   chargePayer: null, dmTips: (checkoutController.orderType == 'take_away' || checkoutController.tipController.text == 'not_now') ? '' : checkoutController.tipController.text.trim(),
                   cutlery: Get.find<CartController>().addCutlery ? 1 : 0,
@@ -292,7 +300,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                   deliveryInstruction: checkoutController.selectedInstruction != -1 ? AppConstants.deliveryInstructionList[checkoutController.selectedInstruction] : '',
                   partialPayment: checkoutController.isPartialPay ? 1 : 0, guestId: isGuestLogIn ? int.parse(AuthHelper.getGuestId()) : 0,
                   isBuyNow: widget.fromCart ? 0 : 1,
-                  extraPackagingAmount: Get.find<CartController>().needExtraPackage ? checkoutController.store!.extraPackagingAmount : 0,
+                  extraPackagingAmount: Get.find<CartController>().needExtraPackage ? (checkoutController.store?.extraPackagingAmount ?? 0) : 0,
                   createNewUser: checkoutController.isCreateAccount ? 1 : 0, password: guestPasswordController.text,
                   isPrescriptionOrder: (widget.storeId != null && (_cartList == null || _cartList!.isEmpty)),
                   bringChangeAmount: checkoutController.paymentMethodIndex == 0 && checkoutController.exchangeAmount > 0 ? checkoutController.exchangeAmount : null,
@@ -306,16 +314,17 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             }
           });
 
-          double additionalCharge =  Get.find<SplashController>().configModel!.additionalChargeStatus!
-              ? Get.find<SplashController>().configModel!.additionCharge! : 0;
+          double additionalCharge = (Get.find<SplashController>().configModel?.additionalChargeStatus ?? false)
+              ? (Get.find<SplashController>().configModel?.additionCharge ?? 0) : 0;
+          AddressModel activeUserAddress = AddressHelper.getUserAddressFromSharedPref() ?? AddressModel(latitude: '0', longitude: '0', address: 'Unknown');
           double originalCharge = _calculateOriginalDeliveryCharge(
-            store: checkoutController.store, address: AddressHelper.getUserAddressFromSharedPref()!,
+            store: checkoutController.store, address: activeUserAddress,
             distance: checkoutController.distance, extraCharge: checkoutController.extraCharge,
             surgePrice: checkoutController.surgePrice?.price, surgePriceType: checkoutController.surgePrice?.priceType,
           );
           double deliveryCharge = _calculateDeliveryCharge(
-            store: checkoutController.store, address: AddressHelper.getUserAddressFromSharedPref()!, distance: checkoutController.distance,
-            extraCharge: checkoutController.extraCharge, orderType: checkoutController.orderType!, orderAmount: orderAmount,
+            store: checkoutController.store, address: activeUserAddress, distance: checkoutController.distance,
+            extraCharge: checkoutController.extraCharge, orderType: checkoutController.orderType ?? 'delivery', orderAmount: orderAmount,
             surgePrice: checkoutController.surgePrice?.price, surgePriceType: checkoutController.surgePrice?.priceType,
           );
 
@@ -342,7 +351,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
           double total = _calculateTotal(
             subTotal: subTotal, deliveryCharge: deliveryCharge, discount: discount,
-            couponDiscount: couponDiscount, taxIncluded: (checkoutController.taxIncluded == 1), tax: checkoutController.orderTax!, orderType: checkoutController.orderType!,
+            couponDiscount: couponDiscount, taxIncluded: (checkoutController.taxIncluded == 1), tax: checkoutController.orderTax ?? 0, orderType: checkoutController.orderType ?? 'delivery',
             tips: checkoutController.tips, additionalCharge: additionalCharge, extraPackagingCharge: extraPackagingCharge,
           );
 
@@ -497,7 +506,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                       ),
 
                     _orderPlaceButton(
-                        checkoutController, todayClosed, tomorrowClosed, orderAmount, deliveryCharge, checkoutController.orderTax!, discount, total, maxCodOrderAmount, isPrescriptionRequired,
+                        checkoutController, todayClosed, tomorrowClosed, orderAmount, deliveryCharge, checkoutController.orderTax ?? 0, discount, total, maxCodOrderAmount, isPrescriptionRequired,
                     ),
                   ],
                 ),
@@ -774,7 +783,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
     if(addressList != null && store != null) {
       for(int index=0; index<addressList.length; index++) {
-        if(addressList[index].zoneIds!.contains(store.zoneId)) {
+        bool inZone = (addressList[index].zoneIds != null && store.zoneId != null && addressList[index].zoneIds!.contains(store.zoneId)) || (addressList[index].zoneId == store.zoneId);
+        if(inZone) {
           if (!(addressList[index].latitude == '15.369445' && addressList[index].longitude == '44.191006')) {
             dropDownAddressList.add(DropdownItem<int>(value: index + 1, child: SizedBox(
               width: context.width > Dimensions.webMaxWidth ? Dimensions.webMaxWidth-50 : context.width-50,
@@ -800,7 +810,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
     if(addressList != null && store != null) {
       for(int index=0; index<addressList.length; index++) {
-        if(addressList[index].zoneIds!.contains(store.zoneId)) {
+        bool inZone = (addressList[index].zoneIds != null && store.zoneId != null && addressList[index].zoneIds!.contains(store.zoneId)) || (addressList[index].zoneId == store.zoneId);
+        if(inZone) {
           if (!(addressList[index].latitude == '15.369445' && addressList[index].longitude == '44.191006')) {
             address.add(addressList[index]);
           }
@@ -812,12 +823,15 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
   Pivot? _getModuleData({required Store? store}) {
     Pivot? moduleData;
-    if(store != null) {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(store != null && AddressHelper.getUserAddressFromSharedPref()?.zoneData != null && currentModuleId != null) {
       for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-        for(Modules m in zData.modules!) {
-          if(m.id == Get.find<SplashController>().module!.id && m.pivot!.zoneId == store.zoneId) {
-            moduleData = m.pivot;
-            break;
+        if (zData.modules != null) {
+          for(Modules m in zData.modules!) {
+            if(m.id == currentModuleId && m.pivot != null && m.pivot!.zoneId == store.zoneId) {
+              moduleData = m.pivot;
+              break;
+            }
           }
         }
       }
@@ -827,10 +841,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
   bool _checkCODActive({required Store? store}) {
     bool isCashOnDeliveryActive = false;
-    if(store != null){
+    if(store != null && AddressHelper.getUserAddressFromSharedPref()?.zoneData != null){
       for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-        if(zData.id ==  store.zoneId) {
-          isCashOnDeliveryActive = zData.cashOnDelivery! && Get.find<SplashController>().configModel!.cashOnDelivery!;
+        if(zData.id == store.zoneId) {
+          isCashOnDeliveryActive = (zData.cashOnDelivery ?? false) && (Get.find<SplashController>().configModel?.cashOnDelivery ?? false);
         }
       }
     }
@@ -839,10 +853,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
   bool _checkDigitalPaymentActive({required Store? store}) {
     bool isDigitalPaymentActive = false;
-    if(store != null){
+    if(store != null && AddressHelper.getUserAddressFromSharedPref()?.zoneData != null){
       for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-        if(zData.id ==  store.zoneId) {
-          isDigitalPaymentActive = zData.digitalPayment! && Get.find<SplashController>().configModel!.digitalPayment!;
+        if(zData.id == store.zoneId) {
+          isDigitalPaymentActive = (zData.digitalPayment ?? false) && (Get.find<SplashController>().configModel?.digitalPayment ?? false);
         }
       }
     }
@@ -853,8 +867,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     double price = 0;
     if(cartList != null) {
       for (var cartModel in cartList) {
-        if(Get.find<SplashController>().getModuleConfig(cartModel!.item!.moduleType).newVariation!){
-          price = price + (cartModel.item!.price! * cartModel.quantity!);
+        if (cartModel?.item == null) continue;
+        bool isNewVariation = (Get.find<SplashController>().getModuleConfig(cartModel!.item!.moduleType).newVariation ?? false);
+        if(isNewVariation){
+          price = price + ((cartModel.item!.price ?? 0) * (cartModel.quantity ?? 1));
         } else {
           price = _calculateVariationPrice(store: store, cartList: cartList);
         }
@@ -867,17 +883,20 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     double addOns = 0;
     if(store != null && cartList != null) {
       for (var cartModel in cartList) {
+        if (cartModel?.item == null || cartModel?.addOnIds == null || cartModel?.item?.addOns == null) continue;
         List<AddOns> addOnList = [];
         for (var addOnId in cartModel!.addOnIds!) {
-          for (AddOns addOns in cartModel.item!.addOns!) {
-            if (addOns.id == addOnId.id) {
-              addOnList.add(addOns);
+          for (AddOns addOnsItem in cartModel.item!.addOns!) {
+            if (addOnsItem.id == addOnId.id) {
+              addOnList.add(addOnsItem);
               break;
             }
           }
         }
         for (int index = 0; index < addOnList.length; index++) {
-          addOns = addOns + (addOnList[index].price! * cartModel.addOnIds![index].quantity!);
+          double p = addOnList[index].price ?? 0;
+          int q = (index < cartModel.addOnIds!.length) ? (cartModel.addOnIds![index].quantity ?? 1) : 1;
+          addOns = addOns + (p * q);
         }
       }
     }
@@ -889,36 +908,50 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     double variationDiscount = 0;
     if(store != null && cartList != null) {
       for (var cartModel in cartList) {
+        if (cartModel?.item == null) continue;
         double? discount = cartModel!.item!.discount;
         String? discountType = cartModel.item!.discountType;
 
-        if(Get.find<SplashController>().getModuleConfig(cartModel.item!.moduleType).newVariation!) {
+        bool isNewVar = Get.find<SplashController>().getModuleConfig(cartModel.item!.moduleType).newVariation ?? false;
+        if(isNewVar) {
           isPassedVariationPrice = true;
-          for(int index = 0; index< cartModel.item!.foodVariations!.length; index++) {
-            for(int i=0; i<cartModel.item!.foodVariations![index].variationValues!.length; i++) {
-              if(cartModel.foodVariations![index][i]!) {
-                variationPrice += (PriceConverter.convertWithDiscount(cartModel.item!.foodVariations![index].variationValues![i].optionPrice!, discount, discountType, isFoodVariation: true)! * cartModel.quantity!);
-                variationDiscount += (cartModel.item!.foodVariations![index].variationValues![i].optionPrice! * cartModel.quantity!);
+          if (cartModel.item!.foodVariations != null && cartModel.foodVariations != null) {
+            for(int index = 0; index< cartModel.item!.foodVariations!.length; index++) {
+              if (index < cartModel.foodVariations!.length && cartModel.item!.foodVariations![index].variationValues != null) {
+                for(int i=0; i<cartModel.item!.foodVariations![index].variationValues!.length; i++) {
+                  if(i < cartModel.foodVariations![index].length && (cartModel.foodVariations![index][i] ?? false)) {
+                    double optPrice = cartModel.item!.foodVariations![index].variationValues![i].optionPrice ?? 0;
+                    int qty = cartModel.quantity ?? 1;
+                    double? converted = PriceConverter.convertWithDiscount(optPrice, discount, discountType, isFoodVariation: true);
+                    variationPrice += ((converted ?? optPrice) * qty);
+                    variationDiscount += (optPrice * qty);
+                  }
+                }
               }
             }
           }
         } else {
 
           String variationType = '';
-          for(int i=0; i<cartModel.variation!.length; i++) {
-            variationType = cartModel.variation![i].type!;
+          if (cartModel.variation != null) {
+            for(int i=0; i<cartModel.variation!.length; i++) {
+              variationType = cartModel.variation![i].type ?? '';
+            }
           }
 
-          if(cartModel.item!.variations!.isNotEmpty) {
+          if(cartModel.item!.variations != null && cartModel.item!.variations!.isNotEmpty) {
             for (Variation variation in cartModel.item!.variations!) {
               if (variation.type == variationType) {
-                variationPrice += (variation.price! * cartModel.quantity!);
+                variationPrice += ((variation.price ?? 0) * (cartModel.quantity ?? 1));
                 break;
               }
             }
           } else {
-            variationDiscount += (PriceConverter.convertWithDiscount(cartModel.item!.price!, discount, discountType)! * cartModel.quantity!);
-            variationPrice += (cartModel.item!.price! * cartModel.quantity!);
+            double itemPrice = cartModel.item!.price ?? 0;
+            int qty = cartModel.quantity ?? 1;
+            double? converted = PriceConverter.convertWithDiscount(itemPrice, discount, discountType);
+            variationDiscount += ((converted ?? itemPrice) * qty);
+            variationPrice += (itemPrice * qty);
           }
 
         }
@@ -1065,12 +1098,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     double deliveryCharge = -1;
 
     Pivot? moduleData;
-    if(store != null) {
-      for(ZoneData zData in address.zoneData!) {
-        for(Modules m in zData.modules!) {
-          if(m.id == Get.find<SplashController>().module!.id && m.pivot!.zoneId == store.zoneId) {
-            moduleData = m.pivot;
-            break;
+    List<ZoneData>? zList = address.zoneData ?? AddressHelper.getUserAddressFromSharedPref()?.zoneData;
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(store != null && zList != null && currentModuleId != null) {
+      for(ZoneData zData in zList) {
+        if (zData.modules != null) {
+          for(Modules m in zData.modules!) {
+            if(m.id == currentModuleId && m.pivot != null && m.pivot!.zoneId == store.zoneId) {
+              moduleData = m.pivot;
+              break;
+            }
           }
         }
       }
@@ -1081,11 +1118,11 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
     bool isBatchedOrder = Get.find<CheckoutController>().isAiBatched;
 
-    if(store != null && distance != null && distance != -1 && store.selfDeliverySystem == 1) {
+    if(store != null && store.selfDeliverySystem == 1) {
       perKmCharge = isBatchedOrder ? (store.perKmShippingChargeGroup ?? store.perKmShippingCharge ?? 0) : (store.perKmShippingCharge ?? 0);
       minimumCharge = isBatchedOrder ? (store.minimumShippingChargeGroup ?? store.minimumShippingCharge ?? 0) : (store.minimumShippingCharge ?? 0);
       maximumCharge = store.maximumShippingCharge;
-    }else if(store != null && distance != null && distance != -1 && moduleData != null && moduleData.deliveryChargeType == 'distance') {
+    }else if(store != null && moduleData != null && moduleData.deliveryChargeType == 'distance') {
       perKmCharge = isBatchedOrder ? (moduleData.perKmShippingChargeGroup ?? store.perKmShippingChargeGroup ?? moduleData.perKmShippingCharge ?? 0) : (moduleData.perKmShippingCharge ?? 0);
       minimumCharge = isBatchedOrder ? (moduleData.minimumShippingChargeGroup ?? store.minimumShippingChargeGroup ?? moduleData.minimumShippingCharge ?? 0) : (moduleData.minimumShippingCharge ?? 0);
       maximumCharge = moduleData.maximumShippingCharge;
@@ -1093,14 +1130,43 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       perKmCharge = moduleData.fixedShippingCharge ?? 0;
       minimumCharge = moduleData.fixedShippingCharge ?? 0;
       maximumCharge = moduleData.fixedShippingCharge ?? 0;
+    } else if (store != null) {
+      ConfigModel? configModel = Get.find<SplashController>().configModel;
+      perKmCharge = (store.perKmShippingCharge != null && store.perKmShippingCharge! > 0) ? store.perKmShippingCharge!
+          : (configModel?.perKmShippingCharge ?? 150);
+      minimumCharge = (store.minimumShippingCharge != null && store.minimumShippingCharge! > 0) ? store.minimumShippingCharge!
+          : (configModel?.minimumShippingCharge ?? 300);
     }
-    ConfigModel? configModel = Get.find<SplashController>().configModel;
-    if(store != null && distance != null) {
-      deliveryCharge = distance * perKmCharge;
+
+    if (perKmCharge == 0) {
+      ConfigModel? configModel = Get.find<SplashController>().configModel;
+      perKmCharge = configModel?.perKmShippingCharge ?? 150;
+    }
+    if (minimumCharge == 0) {
+      ConfigModel? configModel = Get.find<SplashController>().configModel;
+      minimumCharge = configModel?.minimumShippingCharge ?? 300;
+    }
+
+    double calcDistance = (distance != null && distance > 0) ? distance : 0;
+    if (calcDistance == 0 && store != null && store.latitude != null && address.latitude != null) {
+      double? sLat = double.tryParse(store.latitude!);
+      double? sLng = double.tryParse(store.longitude!);
+      double? aLat = double.tryParse(address.latitude!);
+      double? aLng = double.tryParse(address.longitude!);
+      if (sLat != null && sLng != null && aLat != null && aLng != null && aLat != 0) {
+        calcDistance = Geolocator.distanceBetween(sLat, sLng, aLat, aLng) / 1000;
+      }
+    }
+    if (calcDistance == 0) {
+      calcDistance = 2.5;
+    }
+
+    if(store != null) {
+      deliveryCharge = calcDistance * perKmCharge;
 
       if(deliveryCharge < minimumCharge) {
         deliveryCharge = minimumCharge;
-      }else if(maximumCharge != null && deliveryCharge > maximumCharge) {
+      }else if(maximumCharge != null && maximumCharge > 0 && deliveryCharge > maximumCharge) {
         deliveryCharge = maximumCharge;
       }
     }
@@ -1340,12 +1406,15 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   bool _checkZoneOfflinePaymentOnOff({required AddressModel? addressModel, required CheckoutController checkoutController}) {
-    bool? status = false;
+    bool status = false;
     ZoneData? zoneData;
-    for (var data in addressModel!.zoneData!) {
-      if(data.id == checkoutController.store?.zoneId) {
-        zoneData = data;
-        break;
+    List<ZoneData>? zList = addressModel?.zoneData ?? AddressHelper.getUserAddressFromSharedPref()?.zoneData;
+    if (zList != null) {
+      for (var data in zList) {
+        if(data.id == checkoutController.store?.zoneId) {
+          zoneData = data;
+          break;
+        }
       }
     }
     status = zoneData?.offlinePayment ?? false;
@@ -1353,10 +1422,13 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   bool _checkPrescriptionRequired() {
-    if(widget.storeId == null && Get.find<SplashController>().configModel!.moduleConfig!.module!.orderAttachment!) {
-      for (var cart in _cartList!) {
-        if(cart!.item!.isPrescriptionRequired!) {
-          return true;
+    bool attachmentReq = Get.find<SplashController>().configModel?.moduleConfig?.module?.orderAttachment ?? false;
+    if(widget.storeId == null && attachmentReq) {
+      if (_cartList != null) {
+        for (var cart in _cartList!) {
+          if(cart?.item?.isPrescriptionRequired ?? false) {
+            return true;
+          }
         }
       }
     }
