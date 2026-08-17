@@ -537,18 +537,4 @@ class VariationValue {
     data['isSelected'] = isSelected;
     return data;
   }
-}
-  VariationValue.fromJson(Map<String, dynamic> json) {
-    level = json['label'];
-    optionPrice = json['optionPrice'] != null ? (double.tryParse(json['optionPrice'].toString()) ?? 0.0) : 0.0;
-    isSelected = json['isSelected'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['label'] = level;
-    data['optionPrice'] = optionPrice;
-    data['isSelected'] = isSelected;
-    return data;
-  }
-}
+}
