@@ -52,6 +52,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   bool isEmailVerified = false;
   String? _countryDialCode;
   bool _isPhoneLoading = true;
+  String? _selectedGender;
 
   @override
   void initState() {
@@ -107,6 +108,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           if(profileController.userInfoModel?.phone != null && profileController.userInfoModel!.phone!.isNotEmpty){
             _splitPhoneNumber(profileController.userInfoModel!.phone!);
           }
+        }
+
+        if(profileController.userInfoModel != null && _selectedGender == null) {
+          _selectedGender = profileController.userInfoModel!.gender;
         }
 
         if(profileController.userInfoModel != null && _nameController.text.isEmpty ) {
@@ -240,6 +245,71 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       ),
 
                     ]),
+
+                    if (profileController.userInfoModel != null &&
+                        (profileController.userInfoModel!.gender == null || profileController.userInfoModel!.gender!.isEmpty)) ...[
+                      const SizedBox(height: Dimensions.paddingSizeExtraOverLarge),
+                      Text(
+                        'gender'.tr,
+                        style: robotoRegular.copyWith(
+                            fontSize: Dimensions.fontSizeDefault,
+                            color: Theme.of(context).secondaryHeaderColor),
+                      ),
+                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                      Row(children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _selectedGender = 'male';
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                              decoration: BoxDecoration(
+                                color: _selectedGender == 'male' ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.male, color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
+                                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                  Text('male'.tr, style: robotoMedium.copyWith(color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: Dimensions.paddingSizeDefault),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _selectedGender = 'female';
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                              decoration: BoxDecoration(
+                                color: _selectedGender == 'female' ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.female, color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
+                                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                  Text('female'.tr, style: robotoMedium.copyWith(color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ],
 
                   ]),
                 ),
@@ -606,8 +676,22 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     }else if (phoneNumber.length < 6) {
       showCustomSnackBar('enter_a_valid_phone_number'.tr);
     } else {
-      UpdateUserModel updatedUser = UpdateUserModel(name: name, email: email, phone: numberWithCountryCode, buttonType: fromButton ? '' : fromPhone ? 'phone' : 'email');
-      await profileController.updateUserInfo(updatedUser, Get.find<AuthController>().getUserToken(), fromButton: fromButton);
+      bool showGenderField = profileController.userInfoModel == null ||
+          profileController.userInfoModel!.gender == null ||
+          profileController.userInfoModel!.gender!.isEmpty;
+
+      if (showGenderField && _selectedGender == null) {
+        showCustomSnackBar('please_select_gender'.tr);
+      } else {
+        UpdateUserModel updatedUser = UpdateUserModel(
+          name: name,
+          email: email,
+          phone: numberWithCountryCode,
+          buttonType: fromPhone ? 'phone' : 'profile',
+          gender: showGenderField ? _selectedGender : null,
+        );
+        await profileController.updateUserInfo(updatedUser, Get.find<AuthController>().getUserToken(), fromButton: fromButton);
+      }
     }
   }
 }

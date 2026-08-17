@@ -515,7 +515,14 @@ class _CartScreenState extends State<CartScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: CustomAppBar(
         title: 'my_cart'.tr,
-        backButton: (ResponsiveHelper.isDesktop(context) || !widget.fromNav),
+        backButton: true,
+        onBackPressed: () {
+          if (Navigator.canPop(context)) {
+            Get.back();
+          } else {
+            Get.offAllNamed(RouteHelper.getInitialRoute());
+          }
+        },
         titleWidget: GetBuilder<CartController>(builder: (cartController) {
           List<ModuleModel>? moduleList = Get.find<SplashController>().moduleList;
 
@@ -1201,10 +1208,7 @@ class CheckoutButton extends StatelessWidget {
 
     return Container(
       width: Dimensions.webMaxWidth,
-      padding: EdgeInsets.only(
-        top: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-        bottom: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeSmall : 110,
-      ),
+      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],

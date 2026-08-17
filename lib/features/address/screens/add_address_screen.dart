@@ -12,6 +12,7 @@ import 'package:sixam_mart/features/address/controllers/address_controller.dart'
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/location/widgets/permission_dialog_widget.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/custom_validator.dart';
 import 'package:sixam_mart/helper/debouncer.dart';
@@ -92,9 +93,34 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
   }
 
+  bool _hasHomeAddress() {
+    List<AddressModel> list = [];
+    if (Get.isRegistered<AddressController>() && Get.find<AddressController>().addressList != null) {
+      list.addAll(Get.find<AddressController>().addressList!);
+    }
+    AddressModel? pref = AddressHelper.getUserAddressFromSharedPref();
+    if (pref != null) list.add(pref);
+    return list.any((a) {
+      String t = (a.addressType ?? '').trim().toLowerCase();
+      return t == 'home' || t == 'المنزل' || t == 'الرئيسية' || t == 'home'.tr.toLowerCase();
+    });
+  }
+
+  bool _hasOfficeAddress() {
+    List<AddressModel> list = [];
+    if (Get.isRegistered<AddressController>() && Get.find<AddressController>().addressList != null) {
+      list.addAll(Get.find<AddressController>().addressList!);
+    }
+    AddressModel? pref = AddressHelper.getUserAddressFromSharedPref();
+    if (pref != null) list.add(pref);
+    return list.any((a) {
+      String t = (a.addressType ?? '').trim().toLowerCase();
+      return t == 'office' || t == 'مكتب' || t == 'العمل' || t == 'office'.tr.toLowerCase();
+    });
+  }
+
   void initCall(){
 
-    Get.find<LocationController>().setAddressTypeIndex(0, isUpdate: false);
     if(AuthHelper.isLoggedIn() && Get.find<ProfileController>().userInfoModel == null) {
       Get.find<ProfileController>().getUserInfo();
     }
@@ -103,6 +129,18 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         double.parse(Get.find<SplashController>().configModel!.defaultLocation!.lat ?? '0'),
         double.parse(Get.find<SplashController>().configModel!.defaultLocation!.lng ?? '0'),
       );
+      if (_hasHomeAddress()) {
+        if (_hasOfficeAddress()) {
+          Get.find<LocationController>().setAddressTypeIndex(2, isUpdate: false);
+          _otherSelect = true;
+        } else {
+          Get.find<LocationController>().setAddressTypeIndex(1, isUpdate: false);
+          _otherSelect = false;
+        }
+      } else {
+        Get.find<LocationController>().setAddressTypeIndex(0, isUpdate: false);
+        _otherSelect = false;
+      }
     }else {
       Get.find<LocationController>().setUpdateAddress(widget.address!);
       _initialPosition = LatLng(
@@ -298,6 +336,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                         padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
                                         child: InkWell(
                                           onTap: () {
+                                            if (index == 0 && _hasHomeAddress() && widget.address == null) {
+                                              showCustomSnackBar('لديك عنوان رئيسي بالفعل، يرجى اختيار مكتب أو آخر');
+                                              return;
+                                            }
+                                            if (index == 1 && _hasOfficeAddress() && widget.address == null) {
+                                              showCustomSnackBar('لديك عنوان مكتب بالفعل، يرجى اختيار آخر وتسمية العنوان');
+                                              return;
+                                            }
                                             _otherSelect = index == 2;
                                             locationController.setAddressTypeIndex(index);
                                           },
@@ -626,6 +672,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
                       child: InkWell(
                         onTap: () {
+                          if (index == 0 && _hasHomeAddress() && widget.address == null) {
+                            showCustomSnackBar('لديك عنوان رئيسي بالفعل، يرجى اختيار مكتب أو آخر');
+                            return;
+                          }
+                          if (index == 1 && _hasOfficeAddress() && widget.address == null) {
+                            showCustomSnackBar('لديك عنوان مكتب بالفعل، يرجى اختيار آخر وتسمية العنوان');
+                            return;
+                          }
                           _otherSelect = index == 2;
                           locationController.setAddressTypeIndex(index);
                         },
@@ -651,7 +705,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   SizedBox(height: _otherSelect ? Dimensions.paddingSizeLarge : 0),
 
                   _otherSelect ? CustomTextField(
-                    labelText: '${'level_name'.tr}(${'optional'.tr})',
+                    labelText: '${'level_name'.tr} (إجباري)',
                     titleText: 'write_level_name'.tr,
                     inputType: TextInputType.text,
                     controller: _levelController,
@@ -826,7 +880,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   AddressModel? _prepareAddressModel(LocationController locationController, bool isValid, String numberWithCountryCode) {
     String? addressType = locationController.addressTypeList[locationController.addressTypeIndex];
     if(locationController.addressTypeIndex == 2){
-      addressType = _levelController.text.isNotEmpty ? _levelController.text.trim() : locationController.addressTypeList[locationController.addressTypeIndex];
+      if (_levelController.text.trim().isEmpty) {
+        showCustomSnackBar('يرجى إدخال اسم العنوان في مربع النص');
+        return null;
+      }
+      addressType = _levelController.text.trim();
     }
     if(_addressController.text.isEmpty) {
       showCustomSnackBar('please_enter_the_delivery_address'.tr);
@@ -863,11 +921,16 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         widget.fromNavBar ? Get.back() : Get.offNamed(RouteHelper.getAddressRoute());
         showCustomSnackBar('new_address_added_successfully'.tr, isError: false);
       } else if(response.isSuccess && widget.fromCheckout) {
-        AddressModel? addressModel;
-        try{
-          addressModel = Get.find<AddressController>().addressList![0];
-        }catch(_) {}
-        Get.back(result: addressModel);
+        AddressModel? addedAddress;
+        if (Get.find<AddressController>().addressList != null && Get.find<AddressController>().addressList!.isNotEmpty) {
+          addedAddress = Get.find<AddressController>().addressList!.firstWhere(
+            (a) => a.address == addressModel.address || (a.latitude == addressModel.latitude && a.longitude == addressModel.longitude),
+            orElse: () => Get.find<AddressController>().addressList!.last,
+          );
+        } else {
+          addedAddress = addressModel;
+        }
+        Get.back(result: addedAddress);
         showCustomSnackBar(response.message, isError: false);
       } else if(widget.fromRide) {
         Get.back();

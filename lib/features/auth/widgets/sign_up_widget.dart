@@ -48,6 +48,7 @@ class SignUpWidgetState extends State<SignUpWidget> {
   final TextEditingController _referCodeController = TextEditingController();
   String? _countryDialCode;
   GlobalKey<FormState>? _formKeySignUp;
+  String? _selectedGender;
 
   @override
   void initState() {
@@ -229,6 +230,69 @@ class SignUpWidgetState extends State<SignUpWidget> {
                   ),
                   const SizedBox(height: Dimensions.paddingSizeSmall),
                 ],
+
+                // Gender Selection
+                Text(
+                  'gender'.tr,
+                  style: robotoRegular.copyWith(
+                      fontSize: Dimensions.fontSizeDefault,
+                      color: Theme.of(context).secondaryHeaderColor),
+                ),
+                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                Row(children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedGender = 'male';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          color: _selectedGender == 'male' ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.male, color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
+                            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                            Text('male'.tr, style: robotoMedium.copyWith(color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeDefault),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedGender = 'female';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          color: _selectedGender == 'female' ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.female, color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
+                            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                            Text('female'.tr, style: robotoMedium.copyWith(color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ]),
+                const SizedBox(height: Dimensions.paddingSizeDefault),
 
                 const ConditionCheckBoxWidget(forDeliveryMan: true),
                 const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -418,6 +482,8 @@ class SignUpWidgetState extends State<SignUpWidget> {
         showCustomSnackBar('confirm_password_does_not_matched'.tr);
       } else if (referCode.isNotEmpty && referCode.length != 10) {
         showCustomSnackBar('invalid_refer_code'.tr);
+      } else if (_selectedGender == null) {
+        showCustomSnackBar('please_select_gender'.tr);
       } else {
         SignUpBodyModel signUpBody = SignUpBodyModel(
           name: name,
@@ -425,6 +491,7 @@ class SignUpWidgetState extends State<SignUpWidget> {
           phone: numberWithCountryCode,
           password: password,
           refCode: referCode,
+          gender: _selectedGender,
         );
         return signUpBody;
       }

@@ -478,11 +478,8 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                           Icon(Icons.location_on,
                                               size: 20, color: fontColor),
                                           Text(
-                                            AuthHelper.isLoggedIn()
-                                                ? AddressHelper
-                                                        .getUserAddressFromSharedPref()!
-                                                    .addressType!
-                                                    .tr
+                                            (AddressHelper.getUserAddressFromSharedPref() != null && AddressHelper.getUserAddressFromSharedPref()!.addressType != null)
+                                                ? AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr
                                                 : 'your_location'.tr,
                                             style: robotoBold.copyWith(
                                                 color: fontColor,
@@ -493,9 +490,7 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              AddressHelper
-                                                      .getUserAddressFromSharedPref()!
-                                                  .address!,
+                                              AddressHelper.getUserAddressFromSharedPref()?.address ?? 'select_location'.tr,
                                               style: robotoBold.copyWith(
                                                   color: fontColor,
                                                   fontSize:

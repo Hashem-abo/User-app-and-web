@@ -26,6 +26,7 @@ class ZoneData {
   bool? offlinePayment;
   List<Modules>? modules;
   List<LatLng>? formatedCoordinates;
+  List<String>? districts;
 
   ZoneData({
     this.id,
@@ -36,6 +37,7 @@ class ZoneData {
     this.offlinePayment,
     this.modules,
     this.formatedCoordinates,
+    this.districts,
   });
 
   ZoneData.fromJson(Map<String, dynamic> json) {
@@ -60,6 +62,12 @@ class ZoneData {
         ));
       });
     }
+    if (json['districts'] != null) {
+      districts = [];
+      json['districts'].forEach((v) {
+        districts!.add(v.toString());
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -75,6 +83,9 @@ class ZoneData {
     }
     if (formatedCoordinates != null) {
       data['formated_coordinates'] = formatedCoordinates!.map((v) => {'lat': v.latitude, 'lng': v.longitude}).toList();
+    }
+    if (districts != null) {
+      data['districts'] = districts;
     }
     return data;
   }

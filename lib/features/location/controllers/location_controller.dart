@@ -505,20 +505,29 @@ class LocationController extends GetxController implements GetxService {
       Get.back();
       locationServiceInterface.authorizeNavigation(page, Get.find<AddressController>().addressList, mapController, offNamed: offNamed, offAll: offAll);
     }else {
-      // locationServiceInterface.defaultNavigation(page, mapController);
-      if(ResponsiveHelper.isDesktop(Get.context)) {
-        showGeneralDialog(context: Get.context!, pageBuilder: (_,__,___) {
-          return SizedBox(
-            height: Get.context!.height * 0.75, width: 300,
-            child: PickMapScreen(
-              fromSignUp: (page == RouteHelper.signUp),
-              canRoute: false, fromAddAddress: false, route: null,
-              googleMapController: mapController,
-            ),
-          );
-        });
+      if(fromHome) {
+        if(offNamed) {
+          Get.offNamed(RouteHelper.getAccessLocationRoute(page));
+        } else if(offAll) {
+          Get.offAllNamed(RouteHelper.getAccessLocationRoute(page));
+        } else {
+          Get.toNamed(RouteHelper.getAccessLocationRoute(page));
+        }
       } else {
-        _checkPermission(page);
+        if(ResponsiveHelper.isDesktop(Get.context)) {
+          showGeneralDialog(context: Get.context!, pageBuilder: (_,__,___) {
+            return SizedBox(
+              height: Get.context!.height * 0.75, width: 300,
+              child: PickMapScreen(
+                fromSignUp: (page == RouteHelper.signUp),
+                canRoute: false, fromAddAddress: false, route: null,
+                googleMapController: mapController,
+              ),
+            );
+          });
+        } else {
+          _checkPermission(page);
+        }
       }
     }
   }

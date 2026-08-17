@@ -43,17 +43,9 @@ class FavouriteController extends GetxController implements GetxService {
       showCustomSnackBar(responseModel.message, isError: false, getXSnackBar: getXSnackBar);
     } else {
       if(isStore) {
-        for (var storeId in _wishStoreIdList) {
-          if (storeId == storeID) {
-            _wishStoreIdList.removeAt(_wishStoreIdList.indexOf(storeId));
-          }
-        }
-      }else{
-        for (var productId in _wishItemIdList) {
-          if(productId == product!.id){
-            _wishItemIdList.removeAt(_wishItemIdList.indexOf(productId));
-          }
-        }
+        _wishStoreIdList.removeWhere((id) => id == storeID);
+      } else {
+        _wishItemIdList.removeWhere((id) => id == product!.id);
       }
       showCustomSnackBar(responseModel.message, isError: true, getXSnackBar: getXSnackBar);
     }

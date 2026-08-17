@@ -152,32 +152,40 @@ class _MenuScreenState extends State<MenuScreen> {
                       const SizedBox(width: Dimensions.paddingSizeSmall),
                       
                       // Left side: Status tags or Login button (will be on the left in RTL)
-                      isLoggedIn ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.end, // Aligns to left edge in RTL
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              if (profileController.userInfoModel?.refCode != null) {
-                                Clipboard.setData(ClipboardData(text: profileController.userInfoModel!.refCode!));
-                                showCustomSnackBar('referral_code_copied'.tr, isError: false);
-                              }
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(profileController.userInfoModel?.refCode ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                                const SizedBox(width: 5),
-                                Icon(Icons.copy, size: 12, color: Theme.of(context).disabledColor),
-                              ],
+                      isLoggedIn ? Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end, // Aligns to left edge in RTL
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                if (profileController.userInfoModel?.refCode != null) {
+                                  Clipboard.setData(ClipboardData(text: profileController.userInfoModel!.refCode!));
+                                  showCustomSnackBar('referral_code_copied'.tr, isError: false);
+                                }
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      profileController.userInfoModel?.refCode ?? '',
+                                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                                      maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Icon(Icons.copy, size: 12, color: Theme.of(context).disabledColor),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            AddressHelper.getUserAddressFromSharedPref()?.address ?? 'صنعاء',
-                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                            maxLines: 1, overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                            const SizedBox(height: 5),
+                            Text(
+                              AddressHelper.getUserAddressFromSharedPref()?.address ?? 'صنعاء',
+                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ) : InkWell(
                         onTap: () async {
                           if(!ResponsiveHelper.isDesktop(context)) {

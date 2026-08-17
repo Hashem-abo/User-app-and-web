@@ -77,8 +77,8 @@ class AuthService implements AuthServiceInterface{
   }
 
   @override
-  Future<ResponseModel> updatePersonalInfo({required String name, required String? phone, required String loginType, required String? email, required String? referCode, bool alreadyInApp = false}) async {
-    Response response = await authRepositoryInterface.updatePersonalInfo(name: name, phone: phone, email: email, loginType: loginType, referCode: referCode);
+  Future<ResponseModel> updatePersonalInfo({required String name, required String? phone, required String loginType, required String? email, required String? referCode, required String? gender, bool alreadyInApp = false}) async {
+    Response response = await authRepositoryInterface.updatePersonalInfo(name: name, phone: phone, email: email, loginType: loginType, referCode: referCode, gender: gender);
     if (response.statusCode == 200) {
       AuthResponseModel authResponse = AuthResponseModel.fromJson(response.body);
       await _updateHeaderFunctionality(authResponse, alreadyInApp: alreadyInApp);

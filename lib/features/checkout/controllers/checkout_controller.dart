@@ -22,6 +22,7 @@ import 'package:sixam_mart/features/order/controllers/order_controller.dart';
 import 'package:sixam_mart/features/payment/domain/models/offline_method_model.dart';
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
 import 'package:sixam_mart/features/checkout/domain/models/timeslote_model.dart';
+import 'package:sixam_mart/features/address/controllers/address_controller.dart';
 import 'package:sixam_mart/features/checkout/domain/services/checkout_service_interface.dart';
 import 'package:sixam_mart/features/checkout/widgets/order_successfull_dialog.dart';
 import 'package:sixam_mart/features/order/domain/services/order_service_interface.dart';
@@ -237,8 +238,21 @@ class CheckoutController extends GetxController implements GetxService {
   List<String> getMonthlyReorderPolicy() => checkoutServiceInterface.getMonthlyReorderPolicy();
 
   void _setSaverDeliveryData() {
+    AddressModel? address;
+    if (_guestAddress != null) {
+      address = _guestAddress;
+    } else {
+      final addressController = Get.isRegistered<AddressController>() ? Get.find<AddressController>() : null;
+      if (_addressIndex == 0 || _addressIndex == null) {
+        address = AddressHelper.getUserAddressFromSharedPref();
+      } else if (addressController != null && addressController.addressList != null && _addressIndex! < addressController.addressList!.length) {
+        address = addressController.addressList![_addressIndex!];
+      } else {
+        address = AddressHelper.getUserAddressFromSharedPref();
+      }
+    }
     try {
-      _saverZoneData = AddressHelper.getUserAddressFromSharedPref()?.zoneData?.firstWhere((zone) => zone.id == _store?.zoneId);
+      _saverZoneData = address?.zoneData?.firstWhere((zone) => zone.id == _store?.zoneId);
     } catch (_) {
       _saverZoneData = null;
     }
@@ -383,6 +397,7 @@ class CheckoutController extends GetxController implements GetxService {
 
   void setOrderType(String? type, {bool notify = true}) {
     _orderType = type;
+    _setSaverDeliveryData();
     if(notify) {
       update();
     }
@@ -397,12 +412,14 @@ class CheckoutController extends GetxController implements GetxService {
 
   void setAddressIndex(int? index) {
     _addressIndex = index;
+    _setSaverDeliveryData();
     checkAiBatching();
     update();
   }
 
   void setGuestAddress(AddressModel? address, {bool isUpdate = true}){
     _guestAddress = address;
+    _setSaverDeliveryData();
     checkAiBatching(isUpdate: isUpdate);
     if(isUpdate) {
       update();

@@ -5,6 +5,7 @@ import 'package:sixam_mart/common/widgets/address_widget.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -60,19 +61,28 @@ class DeliverySection extends StatelessWidget {
 
           address.isEmpty ? Padding(
             padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeLarge),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.3)),
-              ),
-              child: Column(
-                children: [
-                  Icon(Icons.location_off, size: 40, color: Theme.of(context).disabledColor),
-                  const SizedBox(height: Dimensions.paddingSizeSmall),
-                  Text('please_setup_your_delivery_address_first'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
-                ],
+            child: InkWell(
+              onTap: () {
+                Get.bottomSheet(
+                  AddAddressOptionsBottomSheet(checkoutController: checkoutController),
+                  isScrollControlled: true,
+                );
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                  border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.5)),
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+                ),
+                child: Column(
+                  children: [
+                    Icon(Icons.location_on_outlined, size: 40, color: Theme.of(context).primaryColor),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
+                    Text('please_setup_your_delivery_address_first'.tr, style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
+                  ],
+                ),
               ),
             ),
           ) : isDesktop ?  Stack(children: [
@@ -171,8 +181,9 @@ class DeliverySection extends StatelessWidget {
               color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
             ),
             child: CustomDropdown<int>(
+              key: ValueKey('checkout_dropdown_${checkoutController.addressIndex}_${address.isNotEmpty ? (address[0].id ?? address[0].address ?? address[0].latitude) : ''}_${address.length}'),
 
-              onChange: (int? value, int index) {
+              onChange: (int? value, int index) async {
                 double? lat = double.tryParse(address[index].latitude ?? '');
                 double? lng = double.tryParse(address[index].longitude ?? '');
                 if (lat != null && lng != null && checkoutController.store != null && checkoutController.store!.latitude != null && checkoutController.store!.longitude != null) {
@@ -185,6 +196,7 @@ class DeliverySection extends StatelessWidget {
                     );
                   }
                 }
+                await AddressHelper.saveUserAddressInSharedPref(address[index]);
                 checkoutController.setAddressIndex(index);
 
                 int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;

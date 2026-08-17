@@ -72,7 +72,10 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
                   if (AuthHelper.isLoggedIn()) {
                     await Get.find<AddressController>().addAddress(address, true, checkoutController.store?.zoneId);
                     if (Get.find<AddressController>().addressList != null && Get.find<AddressController>().addressList!.isNotEmpty) {
-                      addressToApply = Get.find<AddressController>().addressList!.first;
+                      addressToApply = Get.find<AddressController>().addressList!.firstWhere(
+                        (a) => a.address == address.address || (a.latitude == address.latitude && a.longitude == address.longitude),
+                        orElse: () => Get.find<AddressController>().addressList!.last,
+                      );
                     }
                   }
                   _applyAddressToCheckout(addressToApply);
@@ -125,10 +128,16 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
 
   void _applyAddressToCheckout(AddressModel address) async {
     await AddressHelper.saveUserAddressInSharedPref(address);
+    if (!AuthHelper.isLoggedIn()) {
+      address.email = 'guest@mile.com';
+      checkoutController.setGuestAddress(address);
+    }
     if (AuthHelper.isLoggedIn()) {
       await Get.find<AddressController>().getAddressList();
     }
     checkoutController.setAddressIndex(0);
+    Get.find<AddressController>().update();
+    checkoutController.update();
     
     double? lat = double.tryParse(address.latitude ?? '');
     double? lng = double.tryParse(address.longitude ?? '');

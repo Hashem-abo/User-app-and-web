@@ -14,14 +14,14 @@ class AppConstants {
   static const List<String> fontFamilies = ['Roboto', 'Cairo', 'Tajawal', 'Rubik', 'DINNextLTArabic', 'NeoSansArabic', 'SomarSans','KOSans'];
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
-  // static const String webHostedUrl = 'http://192.168.100.125';
-  static const String webHostedUrl = 'https://t.directplace.store';
+  static const String webHostedUrl = 'http://192.168.100.125';
+  // static const String webHostedUrl = 'https://t.directplace.store';
 
   static const bool useReactWebsite = false;
   static const String googleServerClientId = '72955669368-ak9ou1maimkatvlngk39s815qc2vql19.apps.googleusercontent.com';
 
-  // static const String baseUrl = 'http://192.168.100.125/adminold';
-  static const String baseUrl = 'https://ta.directplace.store';
+  static const String baseUrl = 'http://192.168.100.125/adminold';
+  // static const String baseUrl = 'https://ta.directplace.store';
 
   static const String categoryUri = '/api/v1/categories';
   static const String homepageUri = '/api/v1/homepage';

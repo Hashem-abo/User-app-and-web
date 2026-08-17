@@ -149,6 +149,13 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       Get.find<CheckoutController>().getSharedPrefDmTipIndex().isNotEmpty ? int.parse(Get.find<CheckoutController>().getSharedPrefDmTipIndex()) : 0,
       notify: false,
     );
+    Get.find<CheckoutController>().getOfflineMethodList();
+    Get.find<CheckoutController>().initCheckoutData(
+      Get.find<CartController>().cartList[0].item!.storeId,
+    );
+    if (AuthHelper.isLoggedIn()) {
+      Get.find<ProController>().getProActiveOffer(moduleType: Get.find<SplashController>().module?.moduleType);
+    }
     Get.find<CheckoutController>().tipController.text = Get.find<CheckoutController>().selectedTips != -1 ? AppConstants.tips[Get.find<CheckoutController>().selectedTips] : '';
 
     if (AuthHelper.isGuestLoggedIn()) {
@@ -186,10 +193,12 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     return Scaffold(
       appBar: CustomAppBar(title: 'checkout'.tr),
       endDrawer: const MenuDrawer(),endDrawerEnableOpenDragGesture: false,
-      body: guestCheckoutPermission || AuthHelper.isLoggedIn() ? GetBuilder<CheckoutController>(builder: (checkoutController) {
+      body: guestCheckoutPermission || AuthHelper.isLoggedIn() ? GetBuilder<ProController>(builder: (proController) {
+        return GetBuilder<CheckoutController>(builder: (checkoutController) {
+          return GetBuilder<AddressController>(builder: (addressController) {
 
-        List<DropdownItem<int>> addressList = _getDropdownAddressList(context: context, addressList: Get.find<AddressController>().addressList, store: checkoutController.store);
-        address = _getAddressList(addressList: Get.find<AddressController>().addressList, store: checkoutController.store);
+        List<DropdownItem<int>> addressList = _getDropdownAddressList(context: context, addressList: addressController.addressList, store: checkoutController.store);
+        address = _getAddressList(addressList: addressController.addressList, store: checkoutController.store);
 
         bool todayClosed = false;
         bool tomorrowClosed = false;
@@ -316,7 +325,13 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
           double additionalCharge = (Get.find<SplashController>().configModel?.additionalChargeStatus ?? false)
               ? (Get.find<SplashController>().configModel?.additionCharge ?? 0) : 0;
-          AddressModel activeUserAddress = AddressHelper.getUserAddressFromSharedPref() ?? AddressModel(latitude: '0', longitude: '0', address: 'Unknown');
+          int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;
+          AddressModel activeUserAddress = isGuestLogIn
+              ? (checkoutController.guestAddress ?? AddressHelper.getUserAddressFromSharedPref() ?? AddressModel(latitude: '0', longitude: '0', address: 'Unknown'))
+              : (address.isNotEmpty
+                  ? address[addrIndex]
+                  : (AddressHelper.getUserAddressFromSharedPref() ?? AddressModel(latitude: '0', longitude: '0', address: 'Unknown')));
+
           double originalCharge = _calculateOriginalDeliveryCharge(
             store: checkoutController.store, address: activeUserAddress,
             distance: checkoutController.distance, extraCharge: checkoutController.extraCharge,
@@ -515,6 +530,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             ],
           ) : const CheckoutScreenShimmerView();
         });
+      });
+      });
       }) : NotLoggedInScreen(callBack: (value){
         initCall();
         setState(() {});
@@ -582,10 +599,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
           if(isGuestLogIn && checkoutController.guestAddress == null && checkoutController.orderType != 'take_away') {
             showCustomSnackBar('please_setup_your_delivery_address_first'.tr);
+          } else if(isGuestLogIn && guestContactPersonNumberController.text.trim().isEmpty) {
+            showCustomSnackBar('please_enter_contact_person_number'.tr);
           } else if(isGuestLogIn && checkoutController.orderType == 'take_away' && guestContactPersonNameController.text.isEmpty) {
             showCustomSnackBar('please_enter_contact_person_name'.tr);
-          } else if(isGuestLogIn && checkoutController.orderType == 'take_away' && guestContactPersonNumberController.text.isEmpty) {
-            showCustomSnackBar('please_enter_contact_person_number'.tr);
           }else if(isGuestLogIn && checkoutController.orderType == 'take_away' && guestEmailController.text.isEmpty) {
             showCustomSnackBar('please_enter_contact_person_email'.tr);
           }else if(isGuestLogIn && checkoutController.isCreateAccount && guestPasswordController.text.isEmpty) {
@@ -657,12 +674,22 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;
             AddressModel? finalAddress = isGuestLogIn ? checkoutController.guestAddress : (address.isEmpty ? AddressHelper.getUserAddressFromSharedPref() : address[addrIndex]);
 
-            if(isGuestLogIn && checkoutController.orderType == 'take_away') {
-              String number = checkoutController.countryDialCode! + guestContactPersonNumberController.text;
-              finalAddress = AddressModel(contactPersonName: guestContactPersonNameController.text, contactPersonNumber: number,
-                address: AddressHelper.getUserAddressFromSharedPref()!.address!, latitude: AddressHelper.getUserAddressFromSharedPref()!.latitude,
-                longitude: AddressHelper.getUserAddressFromSharedPref()!.longitude, zoneId: AddressHelper.getUserAddressFromSharedPref()!.zoneId,
-                email: guestEmailController.text,
+            if(isGuestLogIn) {
+              String number = (checkoutController.countryDialCode ?? '') + guestContactPersonNumberController.text.trim();
+              AddressModel? prefAddress = AddressHelper.getUserAddressFromSharedPref();
+              finalAddress = AddressModel(
+                id: checkoutController.guestAddress?.id,
+                addressType: checkoutController.guestAddress?.addressType ?? 'others',
+                contactPersonName: guestContactPersonNameController.text.isNotEmpty ? guestContactPersonNameController.text : 'Guest User',
+                contactPersonNumber: number,
+                address: checkoutController.guestAddress?.address ?? prefAddress?.address ?? '',
+                latitude: checkoutController.guestAddress?.latitude ?? prefAddress?.latitude ?? '0',
+                longitude: checkoutController.guestAddress?.longitude ?? prefAddress?.longitude ?? '0',
+                zoneId: checkoutController.guestAddress?.zoneId ?? prefAddress?.zoneId,
+                email: guestEmailController.text.isNotEmpty ? guestEmailController.text : 'guest@mile.com',
+                streetNumber: checkoutController.guestAddress?.streetNumber,
+                house: checkoutController.guestAddress?.house,
+                floor: checkoutController.guestAddress?.floor,
               );
             }
 
@@ -769,51 +796,79 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
   List<DropdownItem<int>> _getDropdownAddressList({required BuildContext context, required List<AddressModel>? addressList, required Store? store}) {
     List<DropdownItem<int>> dropDownAddressList = [];
+    List<AddressModel> addresses = _getAddressList(addressList: addressList, store: store);
 
-    AddressModel? defaultAddress = AddressHelper.getUserAddressFromSharedPref();
-    if(defaultAddress != null && !(defaultAddress.latitude == '15.369445' && defaultAddress.longitude == '44.191006')) {
-      dropDownAddressList.add(DropdownItem<int>(value: 0, child: SizedBox(
-        width: context.width > Dimensions.webMaxWidth ? Dimensions.webMaxWidth - 50 : context.width - 50,
-        child: AddressWidget(
-          address: defaultAddress,
-          fromAddress: false, fromCheckout: true,
+    for (int index = 0; index < addresses.length; index++) {
+      dropDownAddressList.add(DropdownItem<int>(
+        value: index,
+        child: SizedBox(
+          width: context.width > Dimensions.webMaxWidth ? Dimensions.webMaxWidth - 50 : context.width - 50,
+          child: AddressWidget(
+            address: addresses[index],
+            fromAddress: false,
+            fromCheckout: true,
+          ),
         ),
-      )));
+      ));
     }
 
-    if(addressList != null && store != null) {
-      for(int index=0; index<addressList.length; index++) {
-        bool inZone = (addressList[index].zoneIds != null && store.zoneId != null && addressList[index].zoneIds!.contains(store.zoneId)) || (addressList[index].zoneId == store.zoneId);
-        if(inZone) {
-          if (!(addressList[index].latitude == '15.369445' && addressList[index].longitude == '44.191006')) {
-            dropDownAddressList.add(DropdownItem<int>(value: index + 1, child: SizedBox(
-              width: context.width > Dimensions.webMaxWidth ? Dimensions.webMaxWidth-50 : context.width-50,
-              child: AddressWidget(
-                address: addressList[index],
-                fromAddress: false, fromCheckout: true,
-              ),
-            )));
-          }
-        }
-      }
-    }
     return dropDownAddressList;
+  }
+
+  String _getAddressKey(AddressModel address) {
+    String lat = (double.tryParse(address.latitude ?? '') ?? 0).toStringAsFixed(3);
+    String lng = (double.tryParse(address.longitude ?? '') ?? 0).toStringAsFixed(3);
+    String addrText = (address.address ?? '').trim().toLowerCase();
+    return '${lat}_${lng}_$addrText';
   }
 
   List<AddressModel> _getAddressList({required List<AddressModel>? addressList, required Store? store}) {
     List<AddressModel> address = [];
+    Set<String> addedKeys = {};
 
     AddressModel? defaultAddress = AddressHelper.getUserAddressFromSharedPref();
-    if(defaultAddress != null && !(defaultAddress.latitude == '15.369445' && defaultAddress.longitude == '44.191006')) {
+    if (defaultAddress != null) {
       address.add(defaultAddress);
+      addedKeys.add(_getAddressKey(defaultAddress));
+      if (defaultAddress.id != null) {
+        addedKeys.add('id_${defaultAddress.id}');
+      }
     }
 
-    if(addressList != null && store != null) {
-      for(int index=0; index<addressList.length; index++) {
-        bool inZone = (addressList[index].zoneIds != null && store.zoneId != null && addressList[index].zoneIds!.contains(store.zoneId)) || (addressList[index].zoneId == store.zoneId);
+    if(addressList != null && addressList.isNotEmpty) {
+      List<AddressModel> reversedList = addressList.reversed.toList();
+
+      for(int index=0; index<reversedList.length; index++) {
+        AddressModel item = reversedList[index];
+        bool inZone = true;
+        if (store != null && store.zoneId != null) {
+          int targetZone = store.zoneId!;
+          bool matchZoneId = (item.zoneId != null && item.zoneId.toString() == targetZone.toString());
+          bool matchZoneIds = (item.zoneIds != null && item.zoneIds!.any((z) => z.toString() == targetZone.toString()));
+          inZone = matchZoneId || matchZoneIds || item.zoneId == null;
+        }
         if(inZone) {
-          if (!(addressList[index].latitude == '15.369445' && addressList[index].longitude == '44.191006')) {
-            address.add(addressList[index]);
+          if (!(item.latitude == '15.369445' && item.longitude == '44.191006')) {
+            String key = _getAddressKey(item);
+            String idKey = item.id != null ? 'id_${item.id}' : key;
+            if (!addedKeys.contains(key) && !addedKeys.contains(idKey)) {
+              address.add(item);
+              addedKeys.add(key);
+              addedKeys.add(idKey);
+            }
+          }
+        }
+      }
+
+      for(int index=0; index<reversedList.length; index++) {
+        AddressModel item = reversedList[index];
+        if (!(item.latitude == '15.369445' && item.longitude == '44.191006')) {
+          String key = _getAddressKey(item);
+          String idKey = item.id != null ? 'id_${item.id}' : key;
+          if (!addedKeys.contains(key) && !addedKeys.contains(idKey)) {
+            address.add(item);
+            addedKeys.add(key);
+            addedKeys.add(idKey);
           }
         }
       }
@@ -1147,15 +1202,18 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       minimumCharge = configModel?.minimumShippingCharge ?? 300;
     }
 
-    double calcDistance = (distance != null && distance > 0) ? distance : 0;
-    if (calcDistance == 0 && store != null && store.latitude != null && address.latitude != null) {
+    double calcDistance = 0;
+    if (store != null && store.latitude != null && address.latitude != null) {
       double? sLat = double.tryParse(store.latitude!);
       double? sLng = double.tryParse(store.longitude!);
       double? aLat = double.tryParse(address.latitude!);
       double? aLng = double.tryParse(address.longitude!);
-      if (sLat != null && sLng != null && aLat != null && aLng != null && aLat != 0) {
+      if (sLat != null && sLng != null && aLat != null && aLng != null && aLat != 0 && sLat != 0) {
         calcDistance = Geolocator.distanceBetween(sLat, sLng, aLat, aLng) / 1000;
       }
+    }
+    if (calcDistance == 0 && distance != null && distance > 0) {
+      calcDistance = distance;
     }
     if (calcDistance == 0) {
       calcDistance = 2.5;

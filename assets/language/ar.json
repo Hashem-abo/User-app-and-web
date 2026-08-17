@@ -33,6 +33,15 @@
   "system_under_maintenance": "النظام تحت الصيانة",
   "maintenance_message": "نعمل حالياً على تحسين الخدمة وإجراء تحديثات مهمة. سنعود قريباً، شكراً لتفهمك.",
   "retry": "إعادة المحاولة",
+  "connection_to_api_failed": "فشل الاتصال بالإنترنت، يرجى التحقق من الشبكة",
+  "please_enter_sub_neighborhood": "يرجى كتابة اسم الشارع / الحارة / المربع",
+  "please_select_city": "يرجى اختيار المدينة",
+  "please_select_neighborhood": "يرجى اختيار المديرية",
+  "no_districts_in_zone": "لا توجد مديريات مضافة لهذه المنطقة بعد",
+  "gender": "الجنس",
+  "male": "ذكر",
+  "female": "أنثى",
+  "please_select_gender": "يرجى اختيار الجنس للمتابعة",
   "contact_us": "تواصل معنا",
   "create_new_account": "إنشاء حساب جديد",
   "watch_videos_to_buy_great_products": "شاهد الفيديوهات لشراء منتجات رائعة",
@@ -2262,5 +2271,6 @@
   "parcel_requested": "تم طلب الطرد",
   "parcel_picked_up": "تم استلام الطرد",
   "call_delivery_man": "اتصال بالسائق",
+  "previous": "السابق",
   "failed_to_load_invoice": "تعذر تحميل الفاتورة"
 }

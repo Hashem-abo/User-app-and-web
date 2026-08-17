@@ -415,7 +415,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
                     ),
-                    ResponsiveHelper.isDesktop(context) || keyboardVisible
+                    ResponsiveHelper.isDesktop(context) || keyboardVisible || _pageIndex == 3
                         ? const SizedBox()
                         : Align(
                             alignment: Alignment.bottomCenter,

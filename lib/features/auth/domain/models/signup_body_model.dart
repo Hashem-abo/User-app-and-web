@@ -8,6 +8,7 @@ class SignUpBodyModel {
   String? deviceToken;
   int? guestId;
   String? name;
+  String? gender;
 
   SignUpBodyModel({
     this.fName,
@@ -19,6 +20,7 @@ class SignUpBodyModel {
     this.deviceToken,
     this.guestId,
     this.name,
+    this.gender,
   });
 
   SignUpBodyModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,7 @@ class SignUpBodyModel {
     deviceToken = json['cm_firebase_token'];
     guestId = json['guest_id'];
     name = json['name'];
+    gender = json['gender'];
   }
 
   Map<String, dynamic> toJson() {
@@ -44,6 +47,9 @@ class SignUpBodyModel {
     data['cm_firebase_token'] = deviceToken;
     data['guest_id'] = guestId;
     data['name'] = name;
+    if (gender != null) {
+      data['gender'] = gender;
+    }
     return data;
   }
 }

@@ -9,7 +9,7 @@ abstract class AuthRepositoryInterface extends RepositoryInterface{
   Future<Response> registration(SignUpBodyModel signUpBody);
   Future<Response> login({required String emailOrPhone, required String password, required String loginType, required String fieldType});
   Future<Response> otpLogin({required String phone, required String otp, required String loginType, required String verified});
-  Future<Response> updatePersonalInfo({required String name, required String? phone, required String loginType, required String? email, required String? referCode});
+  Future<Response> updatePersonalInfo({required String name, required String? phone, required String loginType, required String? email, required String? referCode, required String? gender});
   Future<bool> saveUserToken(String token, {bool alreadyInApp = false});
   Future<Response> updateToken({String notificationDeviceToken = ''});
   Future<bool> saveSharedPrefGuestId(String id);
