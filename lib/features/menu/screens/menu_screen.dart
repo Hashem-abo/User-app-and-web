@@ -60,12 +60,10 @@ class _MenuScreenState extends State<MenuScreen> {
             child: Column(
               children: [
                 AppBar(
+                  surfaceTintColor: Colors.transparent,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  leading: IconButton(
-                    onPressed: () => Get.offAllNamed(RouteHelper.getInitialRoute()),
-                    icon: Icon(Icons.arrow_back, color: Theme.of(context).textTheme.bodyLarge?.color),
-                  ),
+                  leading: null,
                   title: Text(
                     'my_account'.tr,
                     style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge?.color),
@@ -231,7 +229,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault),
                   child: Text(
-                    'general'.tr,
+                    'نشاطي'.tr,
                     style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).disabledColor),
                   ),
                 ),
@@ -240,13 +238,11 @@ class _MenuScreenState extends State<MenuScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
                     boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
                     children: [
-                      MenuButton(icon: 'assets/svg/icons/linear/user-edit.svg', title: 'edit_profile'.tr, route: RouteHelper.getUpdateProfileRoute()),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/shopping-cart.svg', title: 'my_carts'.tr, route: RouteHelper.getMyCartsRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/heart.svg', title: 'favourite'.tr, route: RouteHelper.getFavouriteScreen()),
@@ -254,6 +250,49 @@ class _MenuScreenState extends State<MenuScreen> {
                       MenuButton(icon: 'assets/svg/icons/linear/shop.svg', title: 'followed_stores'.tr, route: RouteHelper.getFollowedStoresRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/my-order.svg', title: 'orders'.tr, route: RouteHelper.getOrderRoute()),
+                      const Divider(height: 1, indent: 20, endIndent: 20),
+                      MenuButton(icon: 'assets/svg/icons/linear/message.svg', title: 'my_questions'.tr, onTap: () {
+                        if(AuthHelper.isLoggedIn()) {
+                          Get.toNamed(RouteHelper.getMyQuestionsRoute());
+                        } else {
+                          Get.bottomSheet(const LoginSuggestionBottomSheet(), isScrollControlled: true);
+                        }
+                      }),
+                      const Divider(height: 1, indent: 20, endIndent: 20),
+                      MenuButton(icon: 'assets/svg/icons/linear/messages.svg', title: 'live_chat'.tr, route: RouteHelper.getConversationRoute()),
+                      const Divider(height: 1, indent: 20, endIndent: 20),
+                      MenuButton(icon: 'assets/svg/icons/linear/user-tick.svg', title: 'my_reviews'.tr, onTap: () {
+                        if(AuthHelper.isLoggedIn()) {
+                          Get.toNamed(RouteHelper.getUserReviewRoute());
+                        } else {
+                          Get.bottomSheet(const LoginSuggestionBottomSheet(), isScrollControlled: true);
+                        }
+                      }),
+                    ],
+                  ),
+                )
+
+              ]),
+
+Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault),
+                  child: Text(
+                    'basic_info'.tr,
+                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).disabledColor),
+                  ),
+                ),
+
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                  ),
+                  child: Column(
+                    children: [
+                      MenuButton(icon: 'assets/svg/icons/linear/user-edit.svg', title: 'edit_profile'.tr, route: RouteHelper.getUpdateProfileRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/location.svg', title: 'my_address'.tr, route: RouteHelper.getAddressRoute()),
                       if(Get.find<SplashController>().proStaus) ...[
@@ -264,22 +303,6 @@ class _MenuScreenState extends State<MenuScreen> {
                       // MenuButton(icon: Images.location, title: 'select_zone'.tr, onTap: () {
                       //   Get.bottomSheet(const ZoneSelectionBottomSheet(), isScrollControlled: true);
                       // }),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: 'assets/svg/icons/linear/message.svg', title: 'my_questions'.tr, onTap: () {
-                        if(AuthHelper.isLoggedIn()) {
-                          Get.toNamed(RouteHelper.getMyQuestionsRoute());
-                        } else {
-                          Get.bottomSheet(const LoginSuggestionBottomSheet(), isScrollControlled: true);
-                        }
-                      }),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: 'assets/svg/icons/linear/user-tick.svg', title: 'my_reviews'.tr, onTap: () {
-                        if(AuthHelper.isLoggedIn()) {
-                          Get.toNamed(RouteHelper.getUserReviewRoute());
-                        } else {
-                          Get.bottomSheet(const LoginSuggestionBottomSheet(), isScrollControlled: true);
-                        }
-                      }),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       if(Get.find<SplashController>().module?.moduleType == 'services') ...[
                         MenuButton(icon: 'assets/svg/icons/linear/document-text.svg', title: 'my_quotations'.tr, onTap: () {
@@ -312,7 +335,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
                     boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
@@ -348,7 +371,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
                     boxShadow: [BoxShadow(color: Colors.black.withAlpha(12), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
@@ -374,7 +397,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault),
                   child: Text(
-                    'help_and_support'.tr,
+                    'more'.tr,
                     style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).disabledColor),
                   ),
                 ),
@@ -383,35 +406,14 @@ class _MenuScreenState extends State<MenuScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
                     boxShadow: [BoxShadow(color: Colors.black.withAlpha(12), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
                     children: [
-                      MenuButton(icon: 'assets/svg/icons/linear/messages.svg', title: 'live_chat'.tr, route: RouteHelper.getConversationRoute()),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/24-support.svg', title: 'help_and_support'.tr, route: RouteHelper.getSupportRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: 'assets/svg/icons/linear/buildings.svg', title: 'about_us'.tr, route: RouteHelper.getHtmlRoute('about-us')),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: 'assets/svg/icons/linear/document-text.svg', title: 'terms_conditions'.tr, route: RouteHelper.getHtmlRoute('terms-and-condition')),
-                      const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: 'assets/svg/icons/linear/document-text.svg', title: 'privacy_policy'.tr, route: RouteHelper.getHtmlRoute('privacy-policy')),
- 
-                      if(Get.find<SplashController>().configModel!.refundPolicyStatus == 1) ...[
-                        const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: 'assets/svg/icons/linear/return.svg', title: 'refund_policy'.tr, route: RouteHelper.getHtmlRoute('refund-policy')),
-                      ],
- 
-                      if(Get.find<SplashController>().configModel!.cancellationPolicyStatus == 1) ...[
-                        const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.cancelationIcon, title: 'cancellation_policy'.tr, route: RouteHelper.getHtmlRoute('cancellation-policy')),
-                      ],
- 
-                      if(Get.find<SplashController>().configModel!.shippingPolicyStatus == 1) ...[
-                        const Divider(height: 1, indent: 20, endIndent: 20),
-                        MenuButton(icon: Images.shippingIcon, title: 'shipping_policy'.tr, route: RouteHelper.getHtmlRoute('shipping-policy')),
-                      ],
+                      MenuButton(icon: 'assets/svg/icons/linear/info.svg', title: 'عن التطبيق'.tr, route: RouteHelper.getHtmlRoute('about-us')),
                     ],
                   ),
                 )

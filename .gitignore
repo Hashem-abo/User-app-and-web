@@ -57,3 +57,4 @@ build/
 
 # Osama edit this
 android/build.gradle.kts
+PROJECT_DOCUMENTATION_AR.md

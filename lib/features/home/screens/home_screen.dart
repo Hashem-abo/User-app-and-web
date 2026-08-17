@@ -635,38 +635,26 @@ class _HomeScreenState extends State<HomeScreen>
                                                                 ),
 
                                                                 // أيقونة الكاميرا بخلفية شفافة داخل الحقل
-                                                                Container(
-                                                                  decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                                                    color: Theme.of(context).primaryColor.withAlpha(30)
-                                                                  ),
-                                                                  width: 40,
-                                                                  height: 40,
-                                                                  child:
-                                                                      IconButton(
-                                                                    tooltip:
-                                                                        'البحث باستخدام صورة',
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    splashRadius:
-                                                                        20,
-
-                                                                    // ضع هنا دالة البحث بالصورة عند إضافتها
-                                                                    onPressed:
-                                                                        () {
-                                                                      Get.toNamed(
-                                                                          RouteHelper
-                                                                              .getSearchRoute());
-                                                                    },
-
-                                                                    icon:
-                                                                        Icon(
-                                                                      Icons
-                                                                          .camera_alt_rounded,
-                                                                      size: 23,
-                                                                      color: Theme.of(context).primaryColor,
+                                                                InkWell(
+                                                                  onTap: () {
+                                                                        Get.toNamed(
+                                                                            RouteHelper
+                                                                                .getSearchRoute());
+                                                                      },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                                                      color: Theme.of(context).primaryColor.withAlpha(30)
                                                                     ),
+                                                                    width: 40,
+                                                                    height: 40,
+                                                                    child:
+                                                                        Icon(
+                                                                        Icons
+                                                                            .camera_alt_rounded,
+                                                                        size: 23,
+                                                                        color: Theme.of(context).primaryColor,
+                                                                      ),
                                                                   ),
                                                                 ),
                                                               ],

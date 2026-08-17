@@ -11,13 +11,17 @@ import 'package:sixam_mart/features/language/controllers/language_controller.dar
 import 'package:sixam_mart/features/language/widgets/language_bottom_sheet_widget.dart';
 import 'package:sixam_mart/features/profile/widgets/notification_status_change_bottom_sheet.dart';
 import 'package:sixam_mart/features/profile/widgets/profile_button_widget.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
+
+import '../../menu/widgets/menu_button.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -54,7 +58,8 @@ class _SettingPageState extends State<SettingPage> {
     double totalSize = 0;
     try {
       if (await dir.exists()) {
-        await for (final FileSystemEntity entity in dir.list(recursive: true, followLinks: false)) {
+        await for (final FileSystemEntity entity
+            in dir.list(recursive: true, followLinks: false)) {
           try {
             if (entity is File && await entity.exists()) {
               totalSize += await entity.length();
@@ -74,7 +79,8 @@ class _SettingPageState extends State<SettingPage> {
     try {
       final tempDir = await getTemporaryDirectory();
       if (await tempDir.exists()) {
-        await for (final FileSystemEntity entity in tempDir.list(recursive: false, followLinks: false)) {
+        await for (final FileSystemEntity entity
+            in tempDir.list(recursive: false, followLinks: false)) {
           try {
             if (entity is File) {
               await entity.delete();
@@ -99,17 +105,23 @@ class _SettingPageState extends State<SettingPage> {
     bool isLoggedIn = AuthHelper.isLoggedIn();
     return Scaffold(
       appBar: CustomAppBar(title: 'settings'.tr),
-      endDrawer: const MenuDrawer(), endDrawerEnableOpenDragGesture: false,
+      endDrawer: const MenuDrawer(),
+      endDrawerEnableOpenDragGesture: false,
       body: SingleChildScrollView(
         padding: EdgeInsets.all(Dimensions.paddingSizeDefault),
         child: Column(children: [
-
-          ProfileButtonWidget(icon: Icons.language, title: 'language'.tr, languageName: AppConstants.languages[Get.find<LocalizationController>().selectedLanguageIndex].languageName, onTap: () {
-            _manageLanguageFunctionality();
-          }),
+          ProfileButtonWidget(
+              icon: Icons.language,
+              title: 'language'.tr,
+              languageName: AppConstants
+                  .languages[
+                      Get.find<LocalizationController>().selectedLanguageIndex]
+                  .languageName,
+              onTap: () {
+                _manageLanguageFunctionality();
+              }),
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          
           // GetBuilder<ThemeController>(builder: (themeController) {
           //   return Column(children: [
           //     Container(
@@ -387,37 +399,48 @@ class _SettingPageState extends State<SettingPage> {
           //   ]);
           // }),
 
-          GetBuilder<ThemeController>(
-            builder: (themeController) {
-              return ProfileButtonWidget(icon: Icons.tonality_outlined, title: 'dark_mode'.tr, isButtonActive: themeController.darkTheme, onTap: () {
-                themeController.toggleTheme();
-              });
-            }
-          ),
+          GetBuilder<ThemeController>(builder: (themeController) {
+            return ProfileButtonWidget(
+                icon: Icons.tonality_outlined,
+                title: 'dark_mode'.tr,
+                isButtonActive: themeController.darkTheme,
+                onTap: () {
+                  themeController.toggleTheme();
+                });
+          }),
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          isLoggedIn ? GetBuilder<AuthController>(builder: (authController) {
-            return ProfileButtonWidget(
-              icon: Icons.notifications, title: 'notification'.tr,
-              isButtonActive: authController.notification,
-              onTap: () {
-                Get.bottomSheet(const NotificationStatusChangeBottomSheet());
-              },
-            );
-          }) : const SizedBox(),
+          isLoggedIn
+              ? GetBuilder<AuthController>(builder: (authController) {
+                  return ProfileButtonWidget(
+                    icon: Icons.notifications,
+                    title: 'notification'.tr,
+                    isButtonActive: authController.notification,
+                    onTap: () {
+                      Get.bottomSheet(
+                          const NotificationStatusChangeBottomSheet());
+                    },
+                  );
+                })
+              : const SizedBox(),
           SizedBox(height: isLoggedIn ? Dimensions.paddingSizeSmall : 0),
 
-          isLoggedIn ? GetBuilder<ProfileController>(builder: (profileController) {
-            return ProfileButtonWidget(
-              icon: Icons.contacts_outlined,
-              title: 'discoverable_by_contacts'.tr,
-              isButtonActive: profileController.userInfoModel?.isDiscoverable ?? true,
-              onTap: () {
-                bool currentStatus = profileController.userInfoModel?.isDiscoverable ?? true;
-                profileController.toggleDiscoverability(!currentStatus);
-              },
-            );
-          }) : const SizedBox(),
+          isLoggedIn
+              ? GetBuilder<ProfileController>(builder: (profileController) {
+                  return ProfileButtonWidget(
+                    icon: Icons.contacts_outlined,
+                    title: 'discoverable_by_contacts'.tr,
+                    isButtonActive:
+                        profileController.userInfoModel?.isDiscoverable ?? true,
+                    onTap: () {
+                      bool currentStatus =
+                          profileController.userInfoModel?.isDiscoverable ??
+                              true;
+                      profileController.toggleDiscoverability(!currentStatus);
+                    },
+                  );
+                })
+              : const SizedBox(),
           SizedBox(height: isLoggedIn ? Dimensions.paddingSizeSmall : 0),
 
           ProfileButtonWidget(
@@ -425,50 +448,123 @@ class _SettingPageState extends State<SettingPage> {
             title: 'clear_cache'.tr,
             trailingText: _cacheSize,
             onTap: () {
-              Get.dialog(ConfirmationDialog(
-                icon: Images.warning,
-                description: 'delete_cached_images_alert'.tr,
-                isLogOut: false,
-                onYesPressed: () {
-                  Get.back();
-                  _clearCache();
-                },
-              ), useSafeArea: false);
+              Get.dialog(
+                  ConfirmationDialog(
+                    icon: Images.warning,
+                    description: 'delete_cached_images_alert'.tr,
+                    isLogOut: false,
+                    onYesPressed: () {
+                      Get.back();
+                      _clearCache();
+                    },
+                  ),
+                  useSafeArea: false);
             },
           ),
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
+          Container(
+            margin: const EdgeInsets.symmetric(
+                horizontal: Dimensions.paddingSizeDefault,
+                vertical: Dimensions.paddingSizeExtraSmall),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withAlpha(12),
+                    blurRadius: 5,
+                    spreadRadius: 1)
+              ],
+            ),
+            child: Column(
+              children: [
+                MenuButton(
+                    icon: 'assets/svg/icons/linear/document-text.svg',
+                    title: 'terms_conditions'.tr,
+                    route: RouteHelper.getHtmlRoute('terms-and-condition')),
+                const Divider(height: 1, indent: 20, endIndent: 20),
+                MenuButton(
+                    icon: 'assets/svg/icons/linear/document-text.svg',
+                    title: 'privacy_policy'.tr,
+                    route: RouteHelper.getHtmlRoute('privacy-policy')),
+                if (Get.find<SplashController>()
+                        .configModel!
+                        .refundPolicyStatus ==
+                    1) ...[
+                  const Divider(height: 1, indent: 20, endIndent: 20),
+                  MenuButton(
+                      icon: 'assets/svg/icons/linear/return.svg',
+                      title: 'refund_policy'.tr,
+                      route: RouteHelper.getHtmlRoute('refund-policy')),
+                ],
+                if (Get.find<SplashController>()
+                        .configModel!
+                        .cancellationPolicyStatus ==
+                    1) ...[
+                  const Divider(height: 1, indent: 20, endIndent: 20),
+                  MenuButton(
+                      icon: Images.cancelationIcon,
+                      title: 'cancellation_policy'.tr,
+                      route: RouteHelper.getHtmlRoute('cancellation-policy')),
+                ],
+                if (Get.find<SplashController>()
+                        .configModel!
+                        .shippingPolicyStatus ==
+                    1) ...[
+                  const Divider(height: 1, indent: 20, endIndent: 20),
+                  MenuButton(
+                      icon: Images.shippingIcon,
+                      title: 'shipping_policy'.tr,
+                      route: RouteHelper.getHtmlRoute('shipping-policy')),
+                ],
+              ],
+            ),
+          ),
+
           SizedBox(height: isLoggedIn ? Dimensions.paddingSizeLarge : 0),
 
           // Danger Section
-          if(isLoggedIn) ...[
+          if (isLoggedIn) ...[
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
               InkWell(
                 onTap: () {
-                  Get.dialog(ConfirmationDialog(icon: Images.support,
-                    title: 'are_you_sure_to_delete_account'.tr,
-                    description: 'it_will_remove_your_all_information'.tr, isLogOut: true,
-                    onYesPressed: () => Get.find<ProfileController>().deleteUser(),
-                  ), useSafeArea: false);
+                  Get.dialog(
+                      ConfirmationDialog(
+                        icon: Images.support,
+                        title: 'are_you_sure_to_delete_account'.tr,
+                        description: 'it_will_remove_your_all_information'.tr,
+                        isLogOut: true,
+                        onYesPressed: () =>
+                            Get.find<ProfileController>().deleteUser(),
+                      ),
+                      useSafeArea: false);
                 },
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraSmall),
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: Dimensions.paddingSizeDefault,
+                      vertical: Dimensions.paddingSizeExtraSmall),
                   decoration: BoxDecoration(
                     color: Colors.red,
-                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    borderRadius:
+                        BorderRadius.circular(Dimensions.radiusDefault),
                   ),
                   child: ListTile(
                     leading: Icon(
-                      Directionality.of(context) == TextDirection.rtl ? Icons.arrow_back_ios : Icons.arrow_forward_ios,
+                      Directionality.of(context) == TextDirection.rtl
+                          ? Icons.arrow_back_ios
+                          : Icons.arrow_forward_ios,
                       size: 16,
                       color: Colors.white,
                     ),
                     title: Text(
                       'delete_account'.tr,
-                      style: robotoMedium.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeDefault),
+                      style: robotoMedium.copyWith(
+                          color: Colors.white,
+                          fontSize: Dimensions.fontSizeDefault),
                     ),
-                    trailing: const Icon(Icons.delete_outline, color: Colors.white),
+                    trailing:
+                        const Icon(Icons.delete_outline, color: Colors.white),
                   ),
                 ),
               ),
@@ -477,11 +573,14 @@ class _SettingPageState extends State<SettingPage> {
           ],
 
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('${'version'.tr}:', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+            Text('${'version'.tr}:',
+                style: robotoRegular.copyWith(
+                    fontSize: Dimensions.fontSizeExtraSmall)),
             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-            Text(AppConstants.appVersion.toStringAsFixed(1), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+            Text(AppConstants.appVersion.toStringAsFixed(1),
+                style: robotoMedium.copyWith(
+                    fontSize: Dimensions.fontSizeExtraSmall)),
           ]),
-
         ]),
       ),
     );
@@ -492,17 +591,23 @@ class _SettingPageState extends State<SettingPage> {
     Get.find<LocalizationController>().searchSelectedLanguage();
 
     showModalBottomSheet(
-      isScrollControlled: true, useRootNavigator: true, context: Get.context!,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      context: Get.context!,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(Dimensions.radiusExtraLarge), topRight: Radius.circular(Dimensions.radiusExtraLarge)),
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(Dimensions.radiusExtraLarge),
+            topRight: Radius.circular(Dimensions.radiusExtraLarge)),
       ),
       builder: (context) {
         return ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8),
           child: const LanguageBottomSheetWidget(),
         );
       },
-    ).then((value) => Get.find<LocalizationController>().setLanguage(Get.find<LocalizationController>().getCacheLocaleFromSharedPref()));
+    ).then((value) => Get.find<LocalizationController>().setLanguage(
+        Get.find<LocalizationController>().getCacheLocaleFromSharedPref()));
   }
 }
