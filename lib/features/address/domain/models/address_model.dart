@@ -49,6 +49,9 @@ class AddressModel {
     longitude = json['longitude']?.toString();
     zoneId = (json['zone_id'] != null && json['zone_id'] != 'null') ? int.parse(json['zone_id'].toString()) : null;
     zoneIds = json['zone_ids']?.cast<int>();
+    if ((zoneIds == null || zoneIds!.isEmpty) && zoneId != null) {
+      zoneIds = [zoneId!];
+    }
     method = json['_method'];
     contactPersonName = json['contact_person_name'];
     streetNumber = json['road'];

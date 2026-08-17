@@ -10,6 +10,9 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+
 class RecommendedStoreItemWidget extends StatelessWidget {
   final Item item;
   final int index;
@@ -83,16 +86,26 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                     : Alignment.topLeft,
                 child: GetBuilder<FavouriteController>(builder: (favouriteController) {
                   bool isWished = favouriteController.wishItemIdList.contains(item.id);
-                  return Container(
-                    width: 30, height: 30,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadiusDirectional.only(
-                        bottomEnd: Radius.circular(Dimensions.radiusDefault), 
-                        topStart: Radius.circular(Dimensions.radiusDefault) 
-                      ).resolve(Directionality.of(context)),
+                  return InkWell(
+                    onTap: () {
+                      if (AuthHelper.isLoggedIn()) {
+                        isWished ? favouriteController.removeFromFavouriteList(item.id, false)
+                            : favouriteController.addToFavouriteList(item, null, false);
+                      } else {
+                        showCustomSnackBar('you_are_not_logged_in'.tr);
+                      }
+                    },
+                    child: Container(
+                      width: 30, height: 30,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadiusDirectional.only(
+                          bottomEnd: Radius.circular(Dimensions.radiusDefault), 
+                          topStart: Radius.circular(Dimensions.radiusDefault) 
+                        ).resolve(Directionality.of(context)),
+                      ),
+                      child: Icon(isWished ? Icons.favorite : Icons.favorite_border, color: Colors.white, size: 18),
                     ),
-                    child: Icon(isWished ? Icons.favorite : Icons.favorite_border, color: Colors.white, size: 18),
                   );
                 }),
               ),
@@ -136,7 +149,7 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                          // Current Price
                         Text(
                           PriceConverter.convertPrice(item.price, discount: discount, discountType: discountType),
-                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor), textDirection: TextDirection.ltr, 
+                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).primaryColor), textDirection: TextDirection.ltr, 
                         ),
                         
                         Row(
@@ -146,7 +159,7 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                               Text(
                                 PriceConverter.convertPrice(item.price),
                                 style: robotoMedium.copyWith(
-                                  fontSize: Dimensions.fontSizeSmall, 
+                                  fontSize: Dimensions.fontSizeExtraSmall, 
                                   color: Theme.of(context).disabledColor,
                                   decoration: TextDecoration.lineThrough,
                                 ), textDirection: TextDirection.ltr,
@@ -157,7 +170,7 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                              // Discount Percentage
                             if(discount > 0) Text(
                               '${discountPercentage.toStringAsFixed(0)}% ${'off'.tr}',
-                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor), 
+                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor), 
                             ),
                           ],
                         )

@@ -219,17 +219,17 @@ class TopSection extends StatelessWidget {
 
               (storeId != null && (cartList == null || cartList!.isEmpty)) ? DeliveryOptionButtonWidget(
                 value: 'delivery', title: 'home_delivery'.tr, charge: charge,
-                isFree: checkoutController.store!.freeDelivery, fromWeb: true, total: total,
+                isFree: checkoutController.store?.freeDelivery ?? false, fromWeb: true, total: total,
                 deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
               ) : SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
-                Get.find<SplashController>().configModel!.homeDeliveryStatus == 1 && checkoutController.store!.delivery! ? DeliveryOptionButtonWidget(
+                (Get.find<SplashController>().configModel?.homeDeliveryStatus == 1 && (checkoutController.store?.delivery ?? true)) ? DeliveryOptionButtonWidget(
                   value: 'delivery', title: 'home_delivery'.tr, charge: charge,
-                  isFree: checkoutController.store!.freeDelivery,  fromWeb: true, total: total,
+                  isFree: checkoutController.store?.freeDelivery ?? false,  fromWeb: true, total: total,
                   deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
                 ) : const SizedBox(),
                 const SizedBox(width: Dimensions.paddingSizeDefault),
 
-                Get.find<SplashController>().configModel!.takeawayStatus == 1 && checkoutController.store!.takeAway! ? DeliveryOptionButtonWidget(
+                (Get.find<SplashController>().configModel?.takeawayStatus == 1 && (checkoutController.store?.takeAway ?? true)) ? DeliveryOptionButtonWidget(
                   value: 'take_away', title: 'take_away'.tr, charge: deliveryCharge, isFree: true,  fromWeb: true, total: total,
                   deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
                 ) : const SizedBox(),
@@ -274,12 +274,12 @@ class TopSection extends StatelessWidget {
         SizedBox(height: !takeAway ? isDesktop ? Dimensions.paddingSizeLarge : Dimensions.paddingSizeSmall : 0),
 
         ///Create Account with existing info
-        isGuestLoggedIn && Get.find<SplashController>().configModel!.centralizeLoginSetup!.manualLoginStatus! &&
+        isGuestLoggedIn && (Get.find<SplashController>().configModel?.centralizeLoginSetup?.manualLoginStatus ?? false) &&
         (!takeAway ? checkoutController.guestAddress != null : true) ? GuestCreateAccount(
           guestPasswordController: guestPasswordController, guestConfirmPasswordController: guestConfirmPasswordController,
           guestPasswordNode: guestPasswordNode, guestConfirmPasswordNode: guestConfirmPasswordNode,
         ) : const SizedBox(),
-        SizedBox(height: isGuestLoggedIn && Get.find<SplashController>().configModel!.centralizeLoginSetup!.manualLoginStatus! ? Dimensions.paddingSizeSmall : 0),
+        SizedBox(height: isGuestLoggedIn && (Get.find<SplashController>().configModel?.centralizeLoginSetup?.manualLoginStatus ?? false) ? Dimensions.paddingSizeSmall : 0),
 
         ///delivery instruction
         // !takeAway ? isDesktop ? const WebDeliveryInstructionView() : const DeliveryInstructionView() : const SizedBox(),

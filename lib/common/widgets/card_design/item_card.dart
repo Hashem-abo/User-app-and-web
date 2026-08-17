@@ -487,7 +487,7 @@ class _ItemCardState extends State<ItemCard> {
                                       const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                       Text(
                                         PriceConverter.convertPrice(finalPrice),
-                                        style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
+                                        style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
                                       ),
                                     ],
                                   ),
@@ -817,7 +817,7 @@ class _ItemCardState extends State<ItemCard> {
                                     child: Text(
                                       PriceConverter.convertPrice(Get.find<ItemController>().getStartingPrice(widget.item!)),
                                       style: robotoRegular.copyWith(
-                                        fontSize: Dimensions.fontSizeDefault,
+                                        fontSize: Dimensions.fontSizeSmall,
                                         color: Theme.of(context).disabledColor.withOpacity(0.6),
                                         decoration: TextDecoration.lineThrough,
                                       ),
@@ -845,7 +845,7 @@ class _ItemCardState extends State<ItemCard> {
                                             TextSpan(
                                               text: currencySymbol,
                                               style: robotoMedium.copyWith(
-                                                fontSize: Dimensions.fontSizeSmall, 
+                                                fontSize: Dimensions.fontSizeExtraSmall, 
                                                 color: Theme.of(context).primaryColor,
                                               ),
                                             ),
@@ -853,7 +853,7 @@ class _ItemCardState extends State<ItemCard> {
                                           TextSpan(
                                             text: formattedPrice,
                                             style: robotoBlack.copyWith(
-                                              fontSize: 16, // Slightly larger for that "Modern Bold" look
+                                              fontSize: 14, // Slightly larger for that "Modern Bold" look
                                               color: Theme.of(context).primaryColor,
                                               letterSpacing: -0.5, // Tighter letters look more modern
                                             ),
@@ -863,7 +863,7 @@ class _ItemCardState extends State<ItemCard> {
                                             TextSpan(
                                               text: ' $currencySymbol',
                                               style: robotoMedium.copyWith(
-                                                fontSize: Dimensions.fontSizeSmall, 
+                                                fontSize: Dimensions.fontSizeExtraSmall, 
                                                 color: Theme.of(context).primaryColor,
                                               ),
                                             ),

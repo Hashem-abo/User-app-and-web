@@ -425,9 +425,6 @@ class Variation {
     data['type'] = type;
     data['price'] = price;
     data['stock'] = stock;
-    if (imagesFullUrl != null) {
-      data['images_full_url'] = imagesFullUrl;
-    }
     return data;
   }
 }
@@ -540,4 +537,4 @@ class VariationValue {
     data['isSelected'] = isSelected;
     return data;
   }
-}
+}

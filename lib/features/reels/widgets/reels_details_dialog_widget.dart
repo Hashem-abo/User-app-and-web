@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/api/api_client.dart';
@@ -1002,6 +1003,36 @@ class _ReelLikeViewStats extends StatelessWidget {
               isStatsLoading ? '0' : ReelModel.compactCount(views),
               style: robotoRegular.copyWith(color: textColor, fontSize: Dimensions.fontSizeExtraSmall),
             ),
+            const SizedBox(height: 18),
+            InkWell(
+              onTap: () {
+                String videoLink = reel.resolvedVideoUrl.isNotEmpty
+                    ? reel.resolvedVideoUrl
+                    : '${AppConstants.webHostedUrl}/reels?id=${reel.reelId}';
+                String shareText = '${reel.resolvedTitle}\n${reel.resolvedSubtitle}\n\n🎬 شاهد الفيديو عبر الرابط:\n$videoLink';
+                Share.share(shareText);
+              },
+              customBorder: const CircleBorder(),
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: Transform.scale(
+                    scaleX: -1,
+                    child: Icon(
+                      Icons.reply_rounded,
+                      color: iconColor,
+                      size: 28,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            // Text(
+            //   'share'.tr == 'share' ? 'مشاركة' : 'share'.tr,
+            //   style: robotoMedium.copyWith(color: textColor, fontSize: Dimensions.fontSizeExtraSmall),
+            // ),
           ],
         );
       },

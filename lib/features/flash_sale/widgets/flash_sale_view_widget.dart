@@ -34,6 +34,7 @@ class _FlashSaleViewWidgetState extends State<FlashSaleViewWidget> {
 
       return flashSaleController.flashSaleModel != null &&
               flashSaleController.flashSaleModel!.activeProducts != null &&
+              flashSaleController.flashSaleModel!.activeProducts!.isNotEmpty &&
               flashSaleController.duration!.inSeconds > 1
           ? Container(
               width: Get.width,

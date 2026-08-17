@@ -56,6 +56,7 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
     }
     Get.find<search.SearchController>().getHistoryList();
     if(widget.queryText!.isNotEmpty) {
+      _searchController.text = widget.queryText!;
       _actionSearch(true, widget.queryText, true);
     }
   }
@@ -194,7 +195,7 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                 ),
               ) : const SizedBox(),
 
-              widget.queryText!.isNotEmpty ? const SizedBox() : Center(child: ResponsiveHelper.isDesktop(context) ? const SizedBox() : Container(
+              Center(child: ResponsiveHelper.isDesktop(context) ? const SizedBox() : Container(
                 width: Dimensions.webMaxWidth,
                 decoration: BoxDecoration(
                   color: Get.find<ThemeController>().darkTheme ? Colors.black12 : Theme.of(context).cardColor,

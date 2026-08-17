@@ -79,6 +79,9 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
             if (config.active == false) return const SizedBox();
             
             Widget widget = _buildWidget(context, config);
+            if (widget is SizedBox && widget.width == null && widget.height == null && widget.child == null) {
+              return const SizedBox();
+            }
 
             Color? bgColor = (config.backgroundColor != null && config.backgroundColor!.startsWith('#') && config.backgroundColor!.length == 7) 
                 ? Color(int.parse(config.backgroundColor!.replaceFirst('#', '0xff'))) 
@@ -94,14 +97,20 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
       );
     } else {
       List<Widget> children = [];
-      children.add(Container(
-        color: adsBgColor,
-        child: AdsBannerWidget(module: module),
-      ));
+      Widget adsWidget = AdsBannerWidget(module: module);
+      if (adsWidget is! SizedBox || adsWidget.width != null || adsWidget.height != null || adsWidget.child != null) {
+        children.add(Container(
+          color: adsBgColor,
+          child: adsWidget,
+        ));
+      }
 
       for (var config in module.layoutConfig!) {
         if (config.active == false) continue;
         Widget widget = _buildWidget(context, config);
+        if (widget is SizedBox && widget.width == null && widget.height == null && widget.child == null) {
+          continue;
+        }
         Color? bgColor = (config.backgroundColor != null && config.backgroundColor!.startsWith('#') && config.backgroundColor!.length == 7) 
             ? Color(int.parse(config.backgroundColor!.replaceFirst('#', '0xff'))) 
             : null;

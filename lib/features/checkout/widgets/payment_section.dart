@@ -110,7 +110,7 @@ class PaymentSection extends StatelessWidget {
                       checkoutController.paymentMethodIndex == 0 ? '${'cash_on_delivery'.tr} ${checkoutController.isPartialPay ? '(${'partial'.tr})' : ''}'
                           : checkoutController.paymentMethodIndex == 1 && !checkoutController.isPartialPay ? 'wallet_payment'.tr
                           : checkoutController.paymentMethodIndex == 2 ? '${'digital_payment'.tr} (${checkoutController.digitalPaymentName?.replaceAll('_', ' ').toTitleCase() ?? ''} - ${checkoutController.isPartialPay ? 'partial'.tr : ''})'
-                          : checkoutController.paymentMethodIndex == 3 ? '${'offline_payment'.tr}(${checkoutController.offlineMethodList![checkoutController.selectedOfflineBankIndex].methodName} - ${checkoutController.isPartialPay ? 'partial'.tr : ''})'
+                          : (checkoutController.paymentMethodIndex == 3 && checkoutController.offlineMethodList != null && checkoutController.offlineMethodList!.isNotEmpty && checkoutController.selectedOfflineBankIndex < checkoutController.offlineMethodList!.length) ? '${'offline_payment'.tr}(${checkoutController.offlineMethodList![checkoutController.selectedOfflineBankIndex].methodName} - ${checkoutController.isPartialPay ? 'partial'.tr : ''})'
                           : !ResponsiveHelper.isDesktop(context) ? 'select_payment_method'.tr : 'add_payment_method'.tr,
                       style: robotoMedium.copyWith(
                         fontSize: Dimensions.fontSizeSmall,

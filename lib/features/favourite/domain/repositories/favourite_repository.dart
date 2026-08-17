@@ -28,7 +28,7 @@ class FavouriteRepository implements FavouriteRepositoryInterface<ResponseModel>
   @override
   Future<ResponseModel> delete(int? id, {bool isStore = false}) async {
     ResponseModel responseModel;
-    Response response = await apiClient.deleteData('${AppConstants.removeWishListUri}${isStore ? 'store_id=' : 'item_id='}$id', handleError: false);
+    Response response = await apiClient.postData('${AppConstants.removeWishListUri}${isStore ? 'store_id=' : 'item_id='}$id', isStore ? {'store_id': id} : {'item_id': id}, handleError: false);
     if (response.statusCode == 200) {
       responseModel = ResponseModel(true, response.body['message']);
     } else {

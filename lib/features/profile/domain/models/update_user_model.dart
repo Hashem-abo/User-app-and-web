@@ -8,8 +8,9 @@ class UpdateUserModel {
   String? verificationOn;
   String? verificationMedium;
   bool? isAnonymous;
+  String? gender;
 
-  UpdateUserModel({this.name, this.email, this.phone, this.otp, this.buttonType, this.sessionInfo, this.verificationOn, this.verificationMedium, this.isAnonymous});
+  UpdateUserModel({this.name, this.email, this.phone, this.otp, this.buttonType, this.sessionInfo, this.verificationOn, this.verificationMedium, this.isAnonymous, this.gender});
 
   UpdateUserModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];
@@ -21,6 +22,7 @@ class UpdateUserModel {
     verificationOn = json['verification_on'];
     verificationMedium = json['verification_medium'];
     isAnonymous = json['is_anonymous'] == 1 || json['is_anonymous'] == true;
+    gender = json['gender'];
   }
 
   Map<String, String> toJson() {
@@ -41,6 +43,9 @@ class UpdateUserModel {
     }
     if (isAnonymous != null) {
       data['is_anonymous'] = isAnonymous.toString();
+    }
+    if (gender != null) {
+      data['gender'] = gender!;
     }
     return data;
   }

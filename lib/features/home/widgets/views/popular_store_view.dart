@@ -33,36 +33,35 @@ class _PopularStoreViewState extends State<PopularStoreView> {
       child: GetBuilder<StoreController>(builder: (storeController) {
         List<Store>? storeList = storeController.popularStoreList;
 
-          return Column(children: [
-            Padding(
-              padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeDefault),
-              child: TitleWidget(
-                title: 'popular_stores'.tr,
-                onTap: () => Get.toNamed(RouteHelper.getAllStoreRoute('popular')),
-              ),
+        return (storeList != null && storeList.isEmpty) ? const SizedBox() : (storeList != null ? Column(children: [
+          Padding(
+            padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeDefault),
+            child: TitleWidget(
+              title: 'popular_stores'.tr,
+              onTap: () => Get.toNamed(RouteHelper.getAllStoreRoute('popular')),
             ),
+          ),
 
-            SizedBox(
-              height: 205, // ahmed: Increased height for new card design
-              child: storeList != null ? ListView.builder(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                itemCount: storeList.length,
-                padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeExtraSmall),
-                    child: PopularStoreCard(
-                      store: storeList[index],
-                    ),
-                  );
-                },
-              ) : const PopularStoreShimmer(),
+          SizedBox(
+            height: 205, // ahmed: Increased height for new card design
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: storeList.length,
+              padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeExtraSmall),
+                  child: PopularStoreCard(
+                    store: storeList[index],
+                  ),
+                );
+              },
             ),
+          ),
 
-          ]);
-        }
-      ),
+        ]) : const PopularStoreShimmer());
+      }),
     );
   }
 }

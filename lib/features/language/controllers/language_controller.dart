@@ -7,6 +7,8 @@ import 'package:sixam_mart/features/home/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/language/domain/service/language_service_interface.dart';
+import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 
 class LocalizationController extends GetxController implements GetxService {
   final LanguageServiceInterface languageServiceInterface;
@@ -45,6 +47,16 @@ class LocalizationController extends GetxController implements GetxService {
     // Force refresh module list on language change
     Get.find<SplashController>().getModules(headers: {'Content-Type': 'application/json; charset=UTF-8', AppConstants.localizationKey: Get.find<LocalizationController>().locale.languageCode});
 
+
+    // Force refresh notification list on language change
+    try {
+      if (Get.isRegistered<NotificationController>()) {
+        Get.find<NotificationController>().clearNotification();
+        if (AuthHelper.isLoggedIn()) {
+          Get.find<NotificationController>().getNotificationList(true);
+        }
+      }
+    } catch (_) {}
 
     update();
   }

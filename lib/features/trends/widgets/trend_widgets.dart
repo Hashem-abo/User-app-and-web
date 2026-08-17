@@ -514,14 +514,14 @@ class TrendProductCard extends StatelessWidget {
                     children: [
                       Text(
                         PriceConverter.convertPrice(finalPrice),
-                        style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeDefault),
+                        style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
                       ),
                       if (discount != null && discount > 0) ...[
                         const SizedBox(width: 6),
                         Text(
                           PriceConverter.convertPrice(priceValue),
                           style: robotoRegular.copyWith(
-                            fontSize: Dimensions.fontSizeExtraSmall,
+                            fontSize: Dimensions.fontSizeOverSmall,
                             color: Theme.of(context).disabledColor.withOpacity(0.6),
                             decoration: TextDecoration.lineThrough,
                           ),

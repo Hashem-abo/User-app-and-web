@@ -20,6 +20,8 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
   final double collapsedHeight;
   final Widget? searchBar; // ahmed: Optional search bar content
   final double searchBarHeight;
+  final ScrollController? expandedScrollController;
+  final ScrollController? collapsedScrollController;
 
   final double paddingTop; // ahmed: padding top from media query
 
@@ -35,34 +37,18 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
     this.searchBar,
     this.searchBarHeight = 120,
     this.paddingTop = 0, // ahmed: new parameter
+    this.expandedScrollController,
+    this.collapsedScrollController,
   });
 
   @override
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
-    // Calculate percent based on the shrinkable part only (the module part)
+    // Calculating offsets inside delegate build is no longer necessary as it is managed by persistent controllers.
+
     double shrinkableAmount = maxExtent - minExtent;
     double percent = (shrinkOffset / shrinkableAmount).clamp(0.0, 1.0);
     bool isCollapsed = percent > 0.5;
-
-    double expandedInitialOffset = 0;
-    double collapsedInitialOffset = 0;
-    if (splashController.module != null &&
-        splashController.moduleList != null) {
-      int selectedIndex = splashController.moduleList!.indexWhere((m) =>
-          m.id == splashController.module!.id ||
-          (m.moduleType != null &&
-              m.moduleType == splashController.module!.moduleType));
-      if (selectedIndex > 0) {
-        for (int i = 0; i < selectedIndex; i++) {
-          double buttonWidth =
-              splashController.moduleList![i].moduleButtonWidth ?? 65;
-          expandedInitialOffset += buttonWidth + Dimensions.paddingSizeLarge;
-          collapsedInitialOffset +=
-              115.0; // Approximation for collapsed chip width
-        }
-      }
-    }
 
     return Container(
       color: Theme.of(context).colorScheme.surface, // Base color
@@ -114,14 +100,11 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                           opacity: (1 - percent).clamp(0.0, 1.0),
                           child: SingleChildScrollView(
                             physics: const NeverScrollableScrollPhysics(),
-                            child: ScrollControllerProvider(
-                              initialScrollOffset: expandedInitialOffset,
-                              builder: (context, scrollController) {
-                                return SizedBox(
-                                  height: expandedHeight,
-                                  child: ListView.builder(
-                                    controller: scrollController,
-                                    scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: expandedHeight,
+                              child: ListView.builder(
+                                controller: expandedScrollController,
+                                scrollDirection: Axis.horizontal,
                                     padding: const EdgeInsets.only(
                                         left: Dimensions.paddingSizeSmall,
                                         right: Dimensions.paddingSizeSmall,
@@ -389,28 +372,23 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                       );
                                     },
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
 
                       // Collapsed View (Text Chips)
-                      IgnorePointer(
+                       IgnorePointer(
                         ignoring: !isCollapsed,
                         child: Opacity(
                           opacity: percent.clamp(0.0, 1.0),
                           child: Align(
                             alignment: Alignment.centerLeft,
-                            child: ScrollControllerProvider(
-                              initialScrollOffset: collapsedInitialOffset,
-                              builder: (context, scrollController) {
-                                return SizedBox(
-                                  height: collapsedHeight,
-                                  child: ListView.builder(
-                                    controller: scrollController,
-                                    scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              height: collapsedHeight,
+                              child: ListView.builder(
+                                controller: collapsedScrollController,
+                                scrollDirection: Axis.horizontal,
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: Dimensions.paddingSizeSmall,
                                         vertical: 10),
@@ -454,12 +432,10 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                       );
                                     },
                                   ),
-                                );
-                              },
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -502,11 +478,8 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                           Icon(Icons.location_on,
                                               size: 20, color: fontColor),
                                           Text(
-                                            AuthHelper.isLoggedIn()
-                                                ? AddressHelper
-                                                        .getUserAddressFromSharedPref()!
-                                                    .addressType!
-                                                    .tr
+                                            (AddressHelper.getUserAddressFromSharedPref() != null && AddressHelper.getUserAddressFromSharedPref()!.addressType != null)
+                                                ? AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr
                                                 : 'your_location'.tr,
                                             style: robotoBold.copyWith(
                                                 color: fontColor,
@@ -517,9 +490,7 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                           ),
                                           Flexible(
                                             child: Text(
-                                              AddressHelper
-                                                      .getUserAddressFromSharedPref()!
-                                                  .address!,
+                                              AddressHelper.getUserAddressFromSharedPref()?.address ?? 'select_location'.tr,
                                               style: robotoBold.copyWith(
                                                   color: fontColor,
                                                   fontSize:
@@ -568,10 +539,14 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
   bool shouldRebuild(ModuleStickyDelegate oldDelegate) {
     return oldDelegate.searchBar != searchBar ||
         oldDelegate.searchBarHeight != searchBarHeight ||
+        oldDelegate.expandedHeight != expandedHeight ||
+        oldDelegate.collapsedHeight != collapsedHeight ||
         oldDelegate.showLocationHeader !=
             showLocationHeader || // Check if module type changed
         oldDelegate.locationHeaderFontColor != locationHeaderFontColor ||
         oldDelegate.paddingTop != paddingTop ||
+        oldDelegate.expandedScrollController != expandedScrollController ||
+        oldDelegate.collapsedScrollController != collapsedScrollController ||
         oldDelegate.splashController != splashController;
   }
 }

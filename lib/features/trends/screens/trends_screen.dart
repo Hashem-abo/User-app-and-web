@@ -35,7 +35,10 @@ class _TrendsScreenState extends State<TrendsScreen> {
         bool hasItems = hasHashtags && (trendsController.hashtags![trendsController.selectedHashtagIndex].items?.isNotEmpty ?? false);
 
         return SingleChildScrollView(
-          padding: EdgeInsets.only(bottom: Platform.isIOS ? 80.0 : 65.0),
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top + Dimensions.paddingSizeDefault,
+            bottom: Platform.isIOS ? 80.0 : 65.0,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

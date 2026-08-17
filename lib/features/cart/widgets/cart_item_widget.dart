@@ -269,7 +269,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                         Text(
                           '${PriceConverter.convertPrice(startingPrice, discount: discount, discountType: discountType)}'
                               '${endingPrice!= null ? ' - ${PriceConverter.convertPrice(endingPrice, discount: discount, discountType: discountType)}' : ''}',
-                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
+                          style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.ltr,
                         ),
                         SizedBox(width: discount! > 0 ? Dimensions.paddingSizeExtraSmall : 0),
 
@@ -279,7 +279,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                           textDirection: TextDirection.ltr,
                           style: robotoRegular.copyWith(
                             color: Theme.of(context).disabledColor, decoration: TextDecoration.lineThrough,
-                            fontSize: Dimensions.fontSizeExtraSmall,
+                            fontSize: Dimensions.fontSizeOverSmall,
                           ),
                         ) : const SizedBox(),
                       ]),

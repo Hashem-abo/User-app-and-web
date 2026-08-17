@@ -95,7 +95,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
     _cameraPosition = CameraPosition(
       target: _initialPosition,
       zoom: _currentZoomLevel,
-      tilt: 60.0, // 3D perspective
+      tilt: 0.0,
     );
 
     _updateDraggableMarker(_initialPosition);
@@ -137,7 +137,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
             _cameraPosition = CameraPosition(
               target: newPosition,
               zoom: _currentZoomLevel,
-              tilt: 60.0,
+              tilt: 0.0,
             );
             _idleDebouncer.run(() {
               if (!mounted) return;
@@ -234,19 +234,21 @@ class _PickMapScreenState extends State<PickMapScreen> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                  child: GoogleMap(
-                    mapType: _currentMapType,
-                    markers: _markers,
-                    initialCameraPosition: CameraPosition(
-                      target: widget.fromAddAddress
-                          ? LatLng(
-                              locationController.position.latitude,
-                              locationController.position.longitude,
-                            )
-                          : _initialPosition,
-                      zoom: _currentZoomLevel,
-                      tilt: 60.0,
-                    ),
+                    child: GoogleMap(
+                      mapType: _currentMapType,
+                      markers: _markers,
+                      tiltGesturesEnabled: false,
+                      buildingsEnabled: false,
+                      initialCameraPosition: CameraPosition(
+                        target: widget.fromAddAddress
+                            ? LatLng(
+                                locationController.position.latitude,
+                                locationController.position.longitude,
+                              )
+                            : _initialPosition,
+                        zoom: _currentZoomLevel,
+                        tilt: 0.0,
+                      ),
                     minMaxZoomPreference: const MinMaxZoomPreference(0, 20),
                     myLocationButtonEnabled: false,
                     onMapCreated: (GoogleMapController mapController) async {
@@ -270,7 +272,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                     onTap: (LatLng position) {
                       _updateDraggableMarker(position);
                       locationController.updatePosition(
-                        CameraPosition(target: position, zoom: _currentZoomLevel, tilt: 60.0),
+                        CameraPosition(target: position, zoom: _currentZoomLevel, tilt: 0.0),
                         false,
                       );
                     },
@@ -367,6 +369,8 @@ class _PickMapScreenState extends State<PickMapScreen> {
         GoogleMap(
           mapType: _currentMapType,
           markers: _markers,
+          tiltGesturesEnabled: false,
+          buildingsEnabled: false,
           initialCameraPosition: CameraPosition(
             target: widget.fromAddAddress
                 ? LatLng(
@@ -375,7 +379,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                   )
                 : _initialPosition,
             zoom: _currentZoomLevel,
-            tilt: 60.0,
+            tilt: 0.0,
           ),
           minMaxZoomPreference: const MinMaxZoomPreference(0, 20),
           myLocationButtonEnabled: false,
@@ -394,7 +398,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
           onTap: (LatLng position) {
             _updateDraggableMarker(position);
             locationController.updatePosition(
-              CameraPosition(target: position, zoom: _currentZoomLevel, tilt: 60.0),
+              CameraPosition(target: position, zoom: _currentZoomLevel, tilt: 0.0),
               false,
             );
           },

@@ -61,6 +61,8 @@ import 'package:sixam_mart/features/home/widgets/module_sticky_delegate.dart'; /
 import 'package:sixam_mart/features/home/widgets/views/national_products_view.dart'; // + ahmed
 import 'package:sixam_mart/features/home/widgets/views/national_products_filter_widget.dart'; // + ahmed
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
+import 'package:sixam_mart/features/store/widgets/prescription_store_bottom_sheet_widget.dart';
+import 'package:sixam_mart/common/widgets/custom_bottom_sheet_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -221,6 +223,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
+  late final ScrollController _expandedModuleController;
+  late final ScrollController _collapsedModuleController;
+  bool _isSyncing = false;
   bool _showBackToTop = false;
   bool searchBgShow = false;
   final GlobalKey _headerKey = GlobalKey();
@@ -228,6 +233,8 @@ class _HomeScreenState extends State<HomeScreen>
   int _currentHintIndex = 0;
   final bool _firstTimeSubModuleLoaded = true;
   int? _currentModuleId;
+  final GlobalKey _exploreFilterKey = GlobalKey();
+  double _appBarRatio = 1.0;
 
   @override
   bool get wantKeepAlive => true;
@@ -235,6 +242,37 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+
+    _expandedModuleController = ScrollController();
+    _collapsedModuleController = ScrollController();
+
+    _expandedModuleController.addListener(() {
+      if (_isSyncing) return;
+      _isSyncing = true;
+      if (_collapsedModuleController.hasClients && _expandedModuleController.hasClients) {
+        double maxExpanded = _expandedModuleController.position.maxScrollExtent;
+        double maxCollapsed = _collapsedModuleController.position.maxScrollExtent;
+        if (maxExpanded > 0) {
+          double ratio = _expandedModuleController.offset / maxExpanded;
+          _collapsedModuleController.jumpTo((ratio * maxCollapsed).clamp(0.0, maxCollapsed));
+        }
+      }
+      _isSyncing = false;
+    });
+
+    _collapsedModuleController.addListener(() {
+      if (_isSyncing) return;
+      _isSyncing = true;
+      if (_expandedModuleController.hasClients && _collapsedModuleController.hasClients) {
+        double maxExpanded = _expandedModuleController.position.maxScrollExtent;
+        double maxCollapsed = _collapsedModuleController.position.maxScrollExtent;
+        if (maxCollapsed > 0) {
+          double ratio = _collapsedModuleController.offset / maxCollapsed;
+          _expandedModuleController.jumpTo((ratio * maxExpanded).clamp(0.0, maxExpanded));
+        }
+      }
+      _isSyncing = false;
+    });
 
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (mounted) {
@@ -262,6 +300,35 @@ class _HomeScreenState extends State<HomeScreen>
       } else {
         if (_showBackToTop) {
           setState(() => _showBackToTop = false);
+        }
+      }
+      bool isAggregatedModule = Get.find<SplashController>().module?.showNationalProducts ?? false;
+      if (isAggregatedModule) {
+        final context = _exploreFilterKey.currentContext;
+        if (context != null) {
+          final renderBox = context.findRenderObject() as RenderBox?;
+          if (renderBox != null) {
+            final position = renderBox.localToGlobal(Offset.zero);
+            double paddingTop = MediaQuery.of(context).padding.top;
+            double appBarBottom = 60.0 + 50.0 + paddingTop;
+            double distance = position.dy - appBarBottom;
+            double ratio = 1.0;
+            if (distance < 0) {
+              double overlap = -distance;
+              ratio = ((50.0 - overlap) / 50.0).clamp(0.0, 1.0);
+            }
+            if (ratio != _appBarRatio) {
+              setState(() {
+                _appBarRatio = ratio;
+              });
+            }
+          }
+        }
+      } else {
+        if (_appBarRatio != 1.0) {
+          setState(() {
+            _appBarRatio = 1.0;
+          });
         }
       }
 
@@ -306,9 +373,36 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
+    _expandedModuleController.dispose();
+    _collapsedModuleController.dispose();
     super.dispose();
     _scrollController.dispose();
     _timer?.cancel();
+  }
+
+  void _scrollToSelectedModule(SplashController splashController) {
+    if (splashController.module != null && splashController.moduleList != null) {
+      int selectedIndex = splashController.moduleList!.indexWhere((m) =>
+          m.id == splashController.module!.id ||
+          (m.moduleType != null && m.moduleType == splashController.module!.moduleType));
+      if (selectedIndex >= 0) {
+        double expandedOffset = 0;
+        for (int i = 0; i < selectedIndex; i++) {
+          double buttonWidth = splashController.moduleList![i].moduleButtonWidth ?? 65;
+          expandedOffset += buttonWidth + Dimensions.paddingSizeSmall;
+        }
+        double collapsedOffset = selectedIndex * 112.0; // 100 width + 12 padding
+
+        _isSyncing = true;
+        if (_expandedModuleController.hasClients) {
+          _expandedModuleController.jumpTo(expandedOffset.clamp(0.0, _expandedModuleController.position.maxScrollExtent));
+        }
+        if (_collapsedModuleController.hasClients) {
+          _collapsedModuleController.jumpTo(collapsedOffset.clamp(0.0, _collapsedModuleController.position.maxScrollExtent));
+        }
+        _isSyncing = false;
+      }
+    }
   }
 
   void _showReferBottomSheet() {
@@ -362,6 +456,7 @@ class _HomeScreenState extends State<HomeScreen>
       int? newModuleId = splashController.module?.id;
       if (newModuleId != _currentModuleId) {
         _currentModuleId = newModuleId;
+        _appBarRatio = 1.0;
         if (newModuleId != null) {
           double offset =
               Get.find<HomeController>().getScrollOffset(newModuleId);
@@ -369,6 +464,7 @@ class _HomeScreenState extends State<HomeScreen>
             if (_scrollController.hasClients) {
               _scrollController.jumpTo(offset);
             }
+            _scrollToSelectedModule(splashController);
           });
         }
       }
@@ -482,16 +578,20 @@ class _HomeScreenState extends State<HomeScreen>
 
                             !showMobileModule && !isTaxi
                                 ? SliverPersistentHeader(
+                                    key: ValueKey(isAggregatedModule ? 'header_explore' : 'header_default'),
                                     pinned: true,
+                                    floating: false,
                                     delegate: ModuleStickyDelegate(
                                       splashController: splashController,
-                                      expandedHeight: 115,
-                                      collapsedHeight: 60,
-                                      paddingTop: MediaQuery.of(context)
-                                          .padding
-                                          .top, // + ahmed
-                                      searchBarHeight: 50,
-                                      searchBar: Center(
+                                      expandedHeight: isAggregatedModule ? (115.0 * _appBarRatio) : 115.0,
+                                      collapsedHeight: isAggregatedModule ? (60.0 * _appBarRatio) : 60.0,
+                                      expandedScrollController: _expandedModuleController,
+                                      collapsedScrollController: _collapsedModuleController,
+                                      paddingTop: isAggregatedModule ? (MediaQuery.of(context).padding.top * _appBarRatio) : MediaQuery.of(context).padding.top, // + ahmed
+                                      searchBarHeight: isAggregatedModule ? (50.0 * _appBarRatio) : 50.0,
+                                      searchBar: isAggregatedModule && _appBarRatio == 0.0 ? const SizedBox() : Opacity(
+                                        opacity: isAggregatedModule ? _appBarRatio : 1.0,
+                                        child: Center(
                                           child: isParcel
                                               ? const SizedBox()
                                               : Container(
@@ -507,9 +607,14 @@ class _HomeScreenState extends State<HomeScreen>
                                                     children: [
                                                       Expanded(
                                                         child: InkWell(
-                                                          onTap: () => Get
-                                                              .toNamed(RouteHelper
-                                                                  .getSearchRoute()),
+                                                          onTap: () {
+                                                            String currentHint = (Get.find<SplashController>().module?.searchHints?.isNotEmpty ?? false)
+                                                                ? Get.find<SplashController>().module!.searchHints![_currentHintIndex % Get.find<SplashController>().module!.searchHints!.length]
+                                                                : (Get.find<CategoryController>().categoryList?.isNotEmpty ?? false)
+                                                                    ? Get.find<CategoryController>().categoryList![_currentHintIndex % Get.find<CategoryController>().categoryList!.length].name!
+                                                                    : '';
+                                                            Get.toNamed(RouteHelper.getSearchRoute(queryText: currentHint));
+                                                          },
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(
@@ -735,7 +840,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                       ),
                                                     ],
                                                   ),
-                                                )),
+                                                ))),
                                     ),
                                   )
                                 : const SliverToBoxAdapter(),
@@ -864,20 +969,19 @@ class _HomeScreenState extends State<HomeScreen>
                                                   ),
                                           );
                                         }),
-                                      )
+                                     )
                                     : const SizedBox()),
 
-                            // Sticky Header for Aggregated Modules (More) // + ahmed
-                            isAggregatedModule // + ahmed
-                                ? SliverPersistentHeader(
-                                    pinned: true,
-                                    delegate: SliverDelegate(
-                                      height: 90,
-                                      child:
-                                          const NationalProductsFilterWidget(),
-                                    ),
-                                  )
-                                : const SliverToBoxAdapter(),
+                             isAggregatedModule // + ahmed
+                                 ? SliverPersistentHeader(
+                                     pinned: true,
+                                     delegate: SliverDelegate(
+                                       height: 90,
+                                       paddingTop: (1.0 - _appBarRatio) * MediaQuery.of(context).padding.top,
+                                       child: NationalProductsFilterWidget(key: _exploreFilterKey),
+                                     ),
+                                   )
+                                 : const SliverToBoxAdapter(),
 
                             // Aggregated Products View (More view with Infinite Scroll) // + ahmed
                             if (isAggregatedModule) // + ahmed
@@ -955,7 +1059,61 @@ class _HomeScreenState extends State<HomeScreen>
                 bottom: ResponsiveHelper.isDesktop(context) ? 0 : 70),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                if (isPharmacy &&
+                    Get.find<SplashController>().configModel!.moduleConfig!.module!.orderAttachment! &&
+                    Get.find<SplashController>().configModel!.prescriptionStatus! &&
+                    AuthHelper.isLoggedIn() &&
+                    homeController.showFavButton) ...[
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                          blurRadius: 10,
+                          offset: const Offset(2, 2),
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: ResponsiveHelper.isDesktop(context) ? 180 : 150,
+                          height: 30,
+                          child: Center(
+                            child: Text(
+                              'prescription_order'.tr,
+                              textAlign: TextAlign.center,
+                              style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            showCustomBottomSheet(
+                              child: const PrescriptionStoreBottomSheetWidget(),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).primaryColor,
+                              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                            ),
+                            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                            child: Image.asset(Images.prescriptionIcon, height: 25, width: 25),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+                ],
                 if (_showBackToTop) ...[
                   FloatingActionButton(
                     mini: true,
@@ -991,10 +1149,11 @@ class _HomeScreenState extends State<HomeScreen>
 class SliverDelegate extends SliverPersistentHeaderDelegate {
   Widget child;
   double height;
+  double paddingTop;
   Function(bool isPinned)? callback;
   bool isPinned = false;
 
-  SliverDelegate({required this.child, this.height = 50, this.callback});
+  SliverDelegate({required this.child, this.height = 50, this.paddingTop = 0.0, this.callback});
 
   @override
   Widget build(
@@ -1003,19 +1162,23 @@ class SliverDelegate extends SliverPersistentHeaderDelegate {
     if (callback != null) {
       callback!(isPinned);
     }
-    return child;
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      padding: EdgeInsets.only(top: isPinned ? paddingTop : 0),
+      child: child,
+    );
   }
 
   @override
-  double get maxExtent => height;
+  double get maxExtent => height + paddingTop;
 
   @override
-  double get minExtent => height;
+  double get minExtent => height + paddingTop;
 
   @override
   bool shouldRebuild(SliverDelegate oldDelegate) {
-    return oldDelegate.maxExtent != height ||
-        oldDelegate.minExtent != height ||
+    return oldDelegate.maxExtent != (height + paddingTop) ||
+        oldDelegate.minExtent != (height + paddingTop) ||
         child != oldDelegate.child;
   }
 }

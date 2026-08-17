@@ -146,11 +146,24 @@ class SplashRepository implements SplashRepositoryInterface {
   @override
   Future<List<ModuleModel>?> getModules({Map<String, String>? headers, required DataSourceEnum source}) async {
     List<ModuleModel>? moduleList;
-    String cacheId = AppConstants.moduleUri;
+    String? zoneIdHeader = headers?[AppConstants.zoneId] ?? apiClient.getHeader()[AppConstants.zoneId];
+    String cacheId = '${AppConstants.moduleUri}-${zoneIdHeader ?? 'default'}';
+
+    String uri = AppConstants.moduleUri;
+    if (zoneIdHeader != null && zoneIdHeader.isNotEmpty && zoneIdHeader != '[]') {
+      try {
+        List dynamicList = jsonDecode(zoneIdHeader);
+        if (dynamicList.isNotEmpty) {
+          uri = '${AppConstants.moduleUri}?zone_id=${dynamicList[0]}';
+        }
+      } catch (e) {
+        uri = '${AppConstants.moduleUri}?zone_id=$zoneIdHeader';
+      }
+    }
 
     switch(source) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData(AppConstants.moduleUri, headers: headers);
+        Response response = await apiClient.getData(uri, headers: headers);
         debugPrint('--- MODULE API RESPONSE: ${response.body} ---');
         if (response.statusCode == 200) {
           moduleList = [];

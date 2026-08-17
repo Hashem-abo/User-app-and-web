@@ -150,32 +150,40 @@ class _MenuScreenState extends State<MenuScreen> {
                       const SizedBox(width: Dimensions.paddingSizeSmall),
                       
                       // Left side: Status tags or Login button (will be on the left in RTL)
-                      isLoggedIn ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.end, // Aligns to left edge in RTL
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              if (profileController.userInfoModel?.refCode != null) {
-                                Clipboard.setData(ClipboardData(text: profileController.userInfoModel!.refCode!));
-                                showCustomSnackBar('referral_code_copied'.tr, isError: false);
-                              }
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(profileController.userInfoModel?.refCode ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                                const SizedBox(width: 5),
-                                Icon(Icons.copy, size: 12, color: Theme.of(context).disabledColor),
-                              ],
+                      isLoggedIn ? Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end, // Aligns to left edge in RTL
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                if (profileController.userInfoModel?.refCode != null) {
+                                  Clipboard.setData(ClipboardData(text: profileController.userInfoModel!.refCode!));
+                                  showCustomSnackBar('referral_code_copied'.tr, isError: false);
+                                }
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      profileController.userInfoModel?.refCode ?? '',
+                                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                                      maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Icon(Icons.copy, size: 12, color: Theme.of(context).disabledColor),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            AddressHelper.getUserAddressFromSharedPref()?.address ?? 'صنعاء',
-                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                            maxLines: 1, overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                            const SizedBox(height: 5),
+                            Text(
+                              AddressHelper.getUserAddressFromSharedPref()?.address ?? 'صنعاء',
+                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
                       ) : InkWell(
                         onTap: () async {
                           if(!ResponsiveHelper.isDesktop(context)) {
@@ -295,6 +303,16 @@ Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       MenuButton(icon: 'assets/svg/icons/linear/user-edit.svg', title: 'edit_profile'.tr, route: RouteHelper.getUpdateProfileRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/location.svg', title: 'my_address'.tr, route: RouteHelper.getAddressRoute()),
+                      if(Get.find<SplashController>().configModel?.monthlyOrderRemainder == 1) ...[
+                        const Divider(height: 1, indent: 20, endIndent: 20),
+                        MenuButton(icon: 'assets/svg/icons/linear/my-order.svg', title: 'my_items'.tr, onTap: () {
+                          if(AuthHelper.isLoggedIn()) {
+                            Get.toNamed(RouteHelper.getMyItemsRoute());
+                          } else {
+                            Get.bottomSheet(const LoginSuggestionBottomSheet(), isScrollControlled: true);
+                          }
+                        }),
+                      ],
                       if(Get.find<SplashController>().proStaus) ...[
                         const Divider(height: 1, indent: 20, endIndent: 20),
                         MenuButton(icon: 'assets/svg/icons/linear/crown.svg', title: 'my_subscription'.tr, route: RouteHelper.getSubscriptionPlanRoute()),
@@ -505,7 +523,10 @@ Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
                   child: Text(
                     isAmount ? PriceConverter.convertPrice(value, forMenuWallet: true) : value.toStringAsFixed(0),
-                    style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
+                    style: robotoBold.copyWith(
+                      fontSize: (title == 'my_balance'.tr || isAmount) ? Dimensions.fontSizeSmall : Dimensions.fontSizeSmall,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                 ),
                 Padding(

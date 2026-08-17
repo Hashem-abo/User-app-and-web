@@ -14,11 +14,15 @@ class AppConstants {
   static const List<String> fontFamilies = ['Roboto', 'Cairo', 'Tajawal', 'Rubik', 'DINNextLTArabic', 'NeoSansArabic', 'SomarSans','KOSans'];
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
+  // static const String webHostedUrl = 'http://192.168.100.125';
   static const String webHostedUrl = 'https://t.directplace.store';
+
   static const bool useReactWebsite = false;
   static const String googleServerClientId = '72955669368-ak9ou1maimkatvlngk39s815qc2vql19.apps.googleusercontent.com';
 
+  // static const String baseUrl = 'http://192.168.100.125/adminold';
   static const String baseUrl = 'https://ta.directplace.store';
+
   static const String categoryUri = '/api/v1/categories';
   static const String homepageUri = '/api/v1/homepage';
   static const String categoryDetailsUri = '/api/v1/categories/details/';
@@ -383,8 +387,8 @@ class AppConstants {
   static List<LanguageModel> languages = [
     LanguageModel(imageUrl: Images.arabic, languageName: 'عربى', countryCode: 'SA', languageCode: 'ar'),
     LanguageModel(imageUrl: Images.english, languageName: 'English', countryCode: 'US', languageCode: 'en'),
-    LanguageModel(imageUrl: Images.spanish, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
-    LanguageModel(imageUrl: Images.bengali, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),
+    // LanguageModel(imageUrl: Images.spanish, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
+    // LanguageModel(imageUrl: Images.bengali, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),
   ];
 
   static List<String> joinDropdown = [
@@ -427,4 +431,8 @@ class AppConstants {
   static const String hourly = 'hourly';
   static const String distanceWise = 'distance_wise';
   static const String dayWise = 'day_wise';
+// credit
+  static const String customerCreditAccountsUri = '/api/v1/customer/credit/accounts';
+  static const String customerCreditValidateCheckoutUri = '/api/v1/customer/credit/checkout-validate';
+ static const String customerCreditRepayUri = '/api/v1/customer/credit/repay';
 }

@@ -181,7 +181,7 @@ class OrderRepository implements OrderRepositoryInterface {
 
   @override
   Future<Response> removeMonthlyOrder(int id) async {
-    return await apiClient.deleteData('${AppConstants.monthlyOrderRemoveUri}?id=$id');
+    return await apiClient.postData('${AppConstants.monthlyOrderRemoveUri}?id=$id', {});
   }
 
   @override

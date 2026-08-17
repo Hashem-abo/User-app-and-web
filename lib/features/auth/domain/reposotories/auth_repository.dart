@@ -79,7 +79,7 @@ class AuthRepository implements AuthRepositoryInterface{
   }
 
   @override
-  Future<Response> updatePersonalInfo({required String name, required String? phone, required String loginType, required String? email, required String? referCode}) async {
+  Future<Response> updatePersonalInfo({required String name, required String? phone, required String loginType, required String? email, required String? referCode, required String? gender}) async {
     Map<String, String> data = {
       "login_type": loginType,
       "name": name,
@@ -90,6 +90,9 @@ class AuthRepository implements AuthRepositoryInterface{
     }
     if(email != null && email.isNotEmpty) {
       data.addAll({"email": email});
+    }
+    if(gender != null && gender.isNotEmpty) {
+      data.addAll({"gender": gender});
     }
     return await apiClient.postData(AppConstants.personalInformationUri, data, handleError: false);
   }

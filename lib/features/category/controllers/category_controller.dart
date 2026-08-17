@@ -137,6 +137,7 @@ class CategoryController extends GetxController implements GetxService {
     _subCategoryList = null;
     _categoryItemList = null;
     _subSubCategoryList = null; // Reset sub-sub categories
+    update();
     List<CategoryModel>? subCategoryList = await categoryServiceInterface.getSubCategoryList(categoryID);
     if (subCategoryList != null) {
       _subCategoryList= [];
@@ -146,6 +147,7 @@ class CategoryController extends GetxController implements GetxService {
         getSubSubCategoryList(_subCategoryList![0].id.toString());
       }
     }
+    update();
   }
 
   void getSubSubCategoryList(String? categoryID) async {

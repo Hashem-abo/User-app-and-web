@@ -1,3 +1,5 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class ZoneResponseModel {
   final bool _isSuccess;
   final List<int> _zoneIds;
@@ -23,6 +25,8 @@ class ZoneData {
   bool? digitalPayment;
   bool? offlinePayment;
   List<Modules>? modules;
+  List<LatLng>? formatedCoordinates;
+  List<String>? districts;
 
   ZoneData({
     this.id,
@@ -32,6 +36,8 @@ class ZoneData {
     this.digitalPayment,
     this.offlinePayment,
     this.modules,
+    this.formatedCoordinates,
+    this.districts,
   });
 
   ZoneData.fromJson(Map<String, dynamic> json) {
@@ -47,6 +53,21 @@ class ZoneData {
         modules!.add(Modules.fromJson(v));
       });
     }
+    if (json['formated_coordinates'] != null) {
+      formatedCoordinates = [];
+      json['formated_coordinates'].forEach((v) {
+        formatedCoordinates!.add(LatLng(
+          double.parse(v['lat'].toString()),
+          double.parse(v['lng'].toString()),
+        ));
+      });
+    }
+    if (json['districts'] != null) {
+      districts = [];
+      json['districts'].forEach((v) {
+        districts!.add(v.toString());
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -59,6 +80,12 @@ class ZoneData {
     data['offline_payment'] = offlinePayment;
     if (modules != null) {
       data['modules'] = modules!.map((v) => v.toJson()).toList();
+    }
+    if (formatedCoordinates != null) {
+      data['formated_coordinates'] = formatedCoordinates!.map((v) => {'lat': v.latitude, 'lng': v.longitude}).toList();
+    }
+    if (districts != null) {
+      data['districts'] = districts;
     }
     return data;
   }

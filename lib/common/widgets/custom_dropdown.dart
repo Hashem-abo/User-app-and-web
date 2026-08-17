@@ -69,6 +69,12 @@ class CustomDropdownState<T> extends State<CustomDropdown<T?>>
   }
 
   @override
+  void didUpdateWidget(CustomDropdown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _currentIndex = -1;
+  }
+
+  @override
   Widget build(BuildContext context) {
     var style = widget.dropdownButtonStyle;
     // link the overlay to the button

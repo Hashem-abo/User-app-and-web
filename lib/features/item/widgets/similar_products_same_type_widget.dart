@@ -33,7 +33,7 @@ class SimilarProductsSameTypeWidget extends StatelessWidget {
                 Text('similar_products'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
                 SizedBox(
-                  height: 400,
+                  height: 285,
                   child: itemController.sameTypeProductList != null ? ListView.builder(
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),

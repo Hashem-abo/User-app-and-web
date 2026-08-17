@@ -42,6 +42,7 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
   GlobalKey<FormState>? _formKeyInfo;
 
   bool _isSocial = false;
+  String? _selectedGender;
 
   @override
   void initState() {
@@ -150,6 +151,72 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
                 ) : const SizedBox(),
                 SizedBox(height: (Get.find<SplashController>().configModel!.refEarningStatus == 1 ) ? Dimensions.paddingSizeExtraOverLarge : 0),
 
+                // Gender Selection
+                const SizedBox(height: Dimensions.paddingSizeExtraLarge),
+                Row(children: [
+                  Text(
+                    'gender'.tr,
+                    style: robotoRegular.copyWith(
+                        fontSize: Dimensions.fontSizeDefault,
+                        color: Theme.of(context).secondaryHeaderColor),
+                  ),
+                ]),
+                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                Row(children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedGender = 'male';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          color: _selectedGender == 'male' ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.male, color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
+                            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                            Text('male'.tr, style: robotoMedium.copyWith(color: _selectedGender == 'male' ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeDefault),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedGender = 'female';
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                        decoration: BoxDecoration(
+                          color: _selectedGender == 'female' ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(15),
+                          border: Border.all(color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.female, color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
+                            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                            Text('female'.tr, style: robotoMedium.copyWith(color: _selectedGender == 'female' ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyLarge!.color)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ]),
+                const SizedBox(height: Dimensions.paddingSizeExtraLarge),
+
                 GetBuilder<AuthController>(builder: (authController) {
                   return CustomButton(
                     height: ResponsiveHelper.isDesktop(context) ? 50 : null,
@@ -161,6 +228,10 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
                     isLoading: authController.isLoading,
                     onPressed: () async {
                       if(_formKeyInfo!.currentState!.validate()) {
+                        if (_selectedGender == null) {
+                          showCustomSnackBar('please_select_gender'.tr);
+                          return;
+                        }
 
                         if(widget.phone == null || widget.phone!.isEmpty) {
                           String numberWithCountryCode =  _countryDialCode! + _phoneController.text.trim();
@@ -194,7 +265,7 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
     authController.updatePersonalInfo(
       name: name.isNotEmpty ? name : widget.name, phone: (widget.phone != null && widget.phone!.isNotEmpty) ?  widget.phone : numberWithCountryCode,
       loginType: widget.loginType, email: widget.email ?? _emailController.text.trim(),
-      referCode: _referCodeController.text.trim(),
+      referCode: _referCodeController.text.trim(), gender: _selectedGender,
     ).then((response) {
       if(response.isSuccess) {
         // if(widget.backFromThis && AddressHelper.getUserAddressFromSharedPref() != null) {

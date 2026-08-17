@@ -28,6 +28,7 @@ class UserInfoModel {
   bool? isDiscoverable;
   bool? proStatus;
   ProSubscription? proSubscription;
+  String? gender;
 
   UserInfoModel({
     this.id,
@@ -57,6 +58,7 @@ class UserInfoModel {
     this.isDiscoverable,
     this.proStatus,
     this.proSubscription,
+    this.gender,
   });
 
   UserInfoModel.fromJson(Map<String, dynamic> json) {
@@ -94,6 +96,7 @@ class UserInfoModel {
     isDiscoverable = json['is_discoverable'] == 1 || json['is_discoverable'] == true;
     proStatus = json['pro_status'] == 1 || json['pro_status'] == true;
     proSubscription = json['pro_subscription'] != null ? ProSubscription.fromJson(json['pro_subscription']) : null;
+    gender = json['gender'];
   }
 
   Map<String, dynamic> toJson() {
@@ -128,6 +131,7 @@ class UserInfoModel {
     if (proSubscription != null) {
       data['pro_subscription'] = proSubscription!.toJson();
     }
+    data['gender'] = gender;
     return data;
   }
 }

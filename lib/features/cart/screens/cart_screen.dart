@@ -515,7 +515,14 @@ class _CartScreenState extends State<CartScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: CustomAppBar(
         title: 'my_cart'.tr,
-        backButton: (ResponsiveHelper.isDesktop(context) || !widget.fromNav),
+        backButton: true,
+        onBackPressed: () {
+          if (Navigator.canPop(context)) {
+            Get.back();
+          } else {
+            Get.offAllNamed(RouteHelper.getInitialRoute());
+          }
+        },
         titleWidget: GetBuilder<CartController>(builder: (cartController) {
           List<ModuleModel>? moduleList = Get.find<SplashController>().moduleList;
 
@@ -1142,7 +1149,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
 
               SizedBox(
-                height: (ModuleHelper.getModule()?.moduleType == 'food') ? 230 : 380,
+                height: (ModuleHelper.getModule()?.moduleType == 'food') ? 230 : 290,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: suggestedItems.length,
@@ -1201,10 +1208,7 @@ class CheckoutButton extends StatelessWidget {
 
     return Container(
       width: Dimensions.webMaxWidth,
-      padding: EdgeInsets.only(
-        top: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-        bottom: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeSmall : 110,
-      ),
+      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
@@ -1319,17 +1323,22 @@ class CheckoutButton extends StatelessWidget {
 
                                 if (Get.find<SplashController>().module == null) {
                                   int i = 0;
-                                  for (i = 0; i < Get.find<SplashController>().moduleList!.length; i++) {
-                                    if (cartController.cartList.isNotEmpty && cartController.cartList[0].item!.moduleId == Get.find<SplashController>().moduleList![i].id) {
-                                      break;
+                                  List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
+                                  if (mList != null) {
+                                    for (i = 0; i < mList.length; i++) {
+                                      if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
+                                        break;
+                                      }
+                                    }
+                                    if (i < mList.length) {
+                                      Get.find<SplashController>().switchModule(i, true);
                                     }
                                   }
-                                  Get.find<SplashController>().switchModule(i, true);
                                 }
                                 Get.find<CouponController>().removeCouponData(false);
 
                                 if (isFoodOrGrocery && selectedStoreId != null) {
-                                  List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item!.storeId == selectedStoreId).toList();
+                                  List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
                                   Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
                                     fromCart: false,
                                     cartList: filteredCartList,
@@ -1345,17 +1354,22 @@ class CheckoutButton extends StatelessWidget {
                       } else {
                         if (Get.find<SplashController>().module == null) {
                           int i = 0;
-                          for (i = 0; i < Get.find<SplashController>().moduleList!.length; i++) {
-                            if (cartController.cartList[0].item!.moduleId == Get.find<SplashController>().moduleList![i].id) {
-                              break;
+                          List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
+                          if (mList != null) {
+                            for (i = 0; i < mList.length; i++) {
+                              if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
+                                break;
+                              }
+                            }
+                            if (i < mList.length) {
+                              Get.find<SplashController>().switchModule(i, true);
                             }
                           }
-                          Get.find<SplashController>().switchModule(i, true);
                         }
                         Get.find<CouponController>().removeCouponData(false);
                         
                         if (isFoodOrGrocery && selectedStoreId != null) {
-                          List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item!.storeId == selectedStoreId).toList();
+                          List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
                           
                           Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
                             fromCart: false,

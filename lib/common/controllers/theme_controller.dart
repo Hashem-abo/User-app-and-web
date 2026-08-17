@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:sixam_mart/theme/light_theme.dart';
 import 'package:sixam_mart/theme/dark_theme.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 
 class ThemeController extends GetxController implements GetxService {
   final SharedPreferences sharedPreferences;
@@ -43,7 +44,31 @@ class ThemeController extends GetxController implements GetxService {
   String get darkMap => _darkMap;
 
   String _fontFamily = 'Tajawal';
-  String get fontFamily => _fontFamily;
+  String get fontFamily {
+    if (Get.isRegistered<SplashController>()) {
+      final splashController = Get.find<SplashController>();
+      if (splashController.module != null && splashController.module!.fontFamily != null && splashController.module!.fontFamily!.isNotEmpty) {
+        return getFormattedFontFamily(splashController.module!.fontFamily!);
+      }
+    }
+    return _fontFamily;
+  }
+
+  String getFormattedFontFamily(String font) {
+    String lower = font.trim().toLowerCase();
+    if (lower == 'tajawal') return 'Tajawal';
+    if (lower == 'cairo') return 'Cairo';
+    if (lower == 'roboto') return 'Roboto';
+    if (lower == 'rubik') return 'Rubik';
+    if (lower == 'dinnextltarabic' || lower == 'din next' || lower == 'din next lt arabic') return 'DINNextLTArabic';
+    if (lower == 'neosansarabic' || lower == 'neo sans' || lower == 'neo sans arabic') return 'NeoSansArabic';
+    if (lower == 'somarsans' || lower == 'somar sans' || lower == 'somar') return 'SomarSans';
+    if (lower == 'kosans' || lower == 'ko sans') return 'KOSans';
+    if (lower.isNotEmpty) {
+      return lower[0].toUpperCase() + lower.substring(1);
+    }
+    return font;
+  }
 
   String _lightMapTaxi = '[]';
   String get lightMapTaxi => _lightMapTaxi;

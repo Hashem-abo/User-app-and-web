@@ -259,7 +259,7 @@ class ItemWidget extends StatelessWidget {
                           ]) : Row(children: [
                             Flexible(child: Text(
                               PriceConverter.convertPrice(item!.price, discount: discount, discountType: discountType),
-                              style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
+                              style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.ltr,
                               maxLines: 1, overflow: TextOverflow.ellipsis,
                             )),
                             SizedBox(width: discount! > 0 ? Dimensions.paddingSizeExtraSmall : 0),
@@ -267,7 +267,7 @@ class ItemWidget extends StatelessWidget {
                             discount > 0 ? Flexible(child: Text(
                               PriceConverter.convertPrice(item!.price),
                               style: robotoMedium.copyWith(
-                                fontSize: Dimensions.fontSizeExtraSmall,
+                                fontSize: Dimensions.fontSizeOverSmall,
                                 color: Theme.of(context).disabledColor,
                                 decoration: TextDecoration.lineThrough,
                               ), textDirection: TextDirection.ltr,

@@ -9,6 +9,8 @@ import 'package:sixam_mart/api/api_checker.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/common/models/error_response.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
+import 'package:sixam_mart/features/location/controllers/location_controller.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:get/get.dart';
@@ -50,6 +52,19 @@ class ApiClient extends GetxService {
 
   Map<String, String> updateHeader(String? token, List<int>? zoneIDs, List<int>? operationIds, String? languageCode, int? moduleID, String? latitude, String? longitude, {bool setHeader = true}) {
     Map<String, String> header = {};
+
+    AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
+    if (userAddress != null && (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('\u200b\u200b\u200b')))) {
+      latitude = '0';
+      longitude = '0';
+    }
+    if ((zoneIDs == null || zoneIDs.isEmpty) && userAddress != null) {
+      if (userAddress.zoneIds != null && userAddress.zoneIds!.isNotEmpty) {
+        zoneIDs = userAddress.zoneIds;
+      } else if (userAddress.zoneId != null) {
+        zoneIDs = [userAddress.zoneId!];
+      }
+    }
 
     if(moduleID != null || sharedPreferences.getString(AppConstants.cacheModuleId) != null) {
       header.addAll({AppConstants.moduleId: '${moduleID ?? ModuleModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.cacheModuleId)!)).id}'});

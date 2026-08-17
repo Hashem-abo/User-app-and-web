@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
 import 'package:sixam_mart/features/location/widgets/module_dialog_widget.dart';
 import 'package:sixam_mart/features/rental_module/rental_cart_screen/controllers/taxi_cart_controller.dart';
+import 'package:sixam_mart/common/enums/data_source_enum.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -184,12 +186,18 @@ class LocationController extends GetxController implements GetxService {
     _inZone = true;
     _isManualZone = true;
     
+    Get.find<SharedPreferences>().setBool('is_manual_zone', true);
+    
     AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
     address ??= AddressModel(latitude: '0', longitude: '0', address: 'Manual Zone');
     address.zoneId = zoneId;
     address.zoneIds = [zoneId];
+    address.house = 'manual';
     await AddressHelper.saveUserAddressInSharedPref(address);
     
+    Get.find<SplashController>().setModuleList(null);
+    await Get.find<SplashController>().getModules(dataSource: DataSourceEnum.client);
+
     update();
     Get.offAllNamed(RouteHelper.getInitialRoute());
   }
@@ -221,7 +229,15 @@ class LocationController extends GetxController implements GetxService {
   }
 
   Future<void> syncZoneData() async {
-    if (_isManualZone) {
+    final userAddress = AddressHelper.getUserAddressFromSharedPref();
+    bool isManual = Get.find<SharedPreferences>().getBool('is_manual_zone') ?? false;
+    if (userAddress != null) {
+      if (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('\u200b\u200b\u200b'))) {
+        isManual = true;
+      }
+    }
+
+    if (_isManualZone || isManual) {
       return;
     }
     bool hasInternet = await checkInternet();
@@ -280,6 +296,19 @@ class LocationController extends GetxController implements GetxService {
   }
 
   void saveAddressAndNavigate(AddressModel? address, bool fromSignUp, String? route, bool canRoute, bool isDesktop) {
+    if (address != null) {
+      bool isManual = false;
+      if (address.house == 'manual' || address.latitude == '0' || (address.address != null && address.address!.contains('\u200b\u200b\u200b'))) {
+        isManual = true;
+      }
+      if (isManual) {
+        Get.find<SharedPreferences>().setBool('is_manual_zone', true);
+        autoNavigate(address, fromSignUp, route, canRoute, isDesktop);
+        return;
+      }
+    }
+
+    Get.find<SharedPreferences>().setBool('is_manual_zone', false);
     _prepareZoneData(address!, fromSignUp, route, canRoute, isDesktop);
   }
 
@@ -337,12 +366,11 @@ class LocationController extends GetxController implements GetxService {
     await _handleTaxiModuleCart(address);
 
     await AddressHelper.saveUserAddressInSharedPref(address);
+    Get.find<SplashController>().setModule(null);
+    Get.find<SplashController>().setModuleList(null);
+    await Get.find<SplashController>().getModules(dataSource: DataSourceEnum.client);
+    await Get.find<SplashController>().getConfigData();
     if(AuthHelper.isLoggedIn()) {
-      if(Get.find<SplashController>().module != null) {
-        await Get.find<FavouriteController>().getFavouriteList();
-      } else {
-        Get.find<SplashController>().getConfigData();
-      }
       Get.find<AuthController>().updateZone();
     }
     HomeScreen.loadData(true);
@@ -477,20 +505,29 @@ class LocationController extends GetxController implements GetxService {
       Get.back();
       locationServiceInterface.authorizeNavigation(page, Get.find<AddressController>().addressList, mapController, offNamed: offNamed, offAll: offAll);
     }else {
-      // locationServiceInterface.defaultNavigation(page, mapController);
-      if(ResponsiveHelper.isDesktop(Get.context)) {
-        showGeneralDialog(context: Get.context!, pageBuilder: (_,__,___) {
-          return SizedBox(
-            height: Get.context!.height * 0.75, width: 300,
-            child: PickMapScreen(
-              fromSignUp: (page == RouteHelper.signUp),
-              canRoute: false, fromAddAddress: false, route: null,
-              googleMapController: mapController,
-            ),
-          );
-        });
+      if(fromHome) {
+        if(offNamed) {
+          Get.offNamed(RouteHelper.getAccessLocationRoute(page));
+        } else if(offAll) {
+          Get.offAllNamed(RouteHelper.getAccessLocationRoute(page));
+        } else {
+          Get.toNamed(RouteHelper.getAccessLocationRoute(page));
+        }
       } else {
-        _checkPermission(page);
+        if(ResponsiveHelper.isDesktop(Get.context)) {
+          showGeneralDialog(context: Get.context!, pageBuilder: (_,__,___) {
+            return SizedBox(
+              height: Get.context!.height * 0.75, width: 300,
+              child: PickMapScreen(
+                fromSignUp: (page == RouteHelper.signUp),
+                canRoute: false, fromAddAddress: false, route: null,
+                googleMapController: mapController,
+              ),
+            );
+          });
+        } else {
+          _checkPermission(page);
+        }
       }
     }
   }

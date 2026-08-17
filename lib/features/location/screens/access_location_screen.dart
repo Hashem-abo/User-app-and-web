@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/location/screens/pick_map_screen.dart';
 import 'package:sixam_mart/features/location/screens/web_landing_page.dart';
+import 'package:sixam_mart/features/location/widgets/dropdown_location_bottom_sheet.dart';
 
 class AccessLocationScreen extends StatefulWidget {
   final bool fromSignUp;
@@ -222,6 +223,34 @@ class BottomButton extends StatelessWidget {
             child: Icon(Icons.map, color: Theme.of(context).primaryColor),
           ),
           Text('set_from_map'.tr, textAlign: TextAlign.center, style: robotoBold.copyWith(
+            color: Theme.of(context).primaryColor,
+            fontSize: Dimensions.fontSizeLarge,
+          )),
+        ]),
+      ),
+      const SizedBox(height: Dimensions.paddingSizeSmall),
+
+      TextButton(
+        style: TextButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            side: BorderSide(width: 1, color: Theme.of(context).primaryColor),
+            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+          ),
+          minimumSize: const Size(Dimensions.webMaxWidth, 50),
+          padding: EdgeInsets.zero,
+        ),
+        onPressed: () {
+          Get.bottomSheet(
+            DropdownLocationBottomSheet(fromSignUp: fromSignUp, route: route),
+            isScrollControlled: true,
+          );
+        },
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Padding(
+            padding: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
+            child: Icon(Icons.list_alt, color: Theme.of(context).primaryColor),
+          ),
+          Text('select_via_dropdown'.tr, textAlign: TextAlign.center, style: robotoBold.copyWith(
             color: Theme.of(context).primaryColor,
             fontSize: Dimensions.fontSizeLarge,
           )),

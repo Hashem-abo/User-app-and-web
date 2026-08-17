@@ -64,7 +64,7 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
   }
 
   Future<bool> _removeCartItemOnline(int cartId) async {
-    Response response = await apiClient.deleteData('${AppConstants.removeItemCartUri}?cart_id=$cartId${!AuthHelper.isLoggedIn() ? '&guest_id=${AuthHelper.getGuestId()}' : ''}');
+    Response response = await apiClient.postData('${AppConstants.removeItemCartUri}?cart_id=$cartId${!AuthHelper.isLoggedIn() ? '&guest_id=${AuthHelper.getGuestId()}' : ''}', {});
     return (response.statusCode == 200);
   }
 
@@ -74,8 +74,9 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
       customHeaders = Map<String, String>.from(apiClient.getHeader());
       customHeaders[AppConstants.moduleId] = '$moduleId';
     }
-    Response response = await apiClient.deleteData(
+    Response response = await apiClient.postData(
       '${AppConstants.removeAllCartUri}${!AuthHelper.isLoggedIn() ? '?guest_id=${AuthHelper.getGuestId()}' : ''}',
+      {},
       headers: customHeaders,
     );
     return (response.statusCode == 200);

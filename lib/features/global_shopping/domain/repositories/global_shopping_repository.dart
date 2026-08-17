@@ -52,12 +52,12 @@ class GlobalShoppingRepository implements GlobalShoppingRepositoryInterface {
 
   @override
   Future<Response> removeFromCart(int cartItemId) async {
-    return await apiClient.deleteData('/api/v1/global-shopping/cart/remove/$cartItemId');
+    return await apiClient.postData('/api/v1/global-shopping/cart/remove/$cartItemId', {});
   }
 
   @override
   Future<Response> clearCart(String guestId) async {
-    return await apiClient.deleteData('/api/v1/global-shopping/cart/clear', headers: _withGuestHeader(guestId));
+    return await apiClient.postData('/api/v1/global-shopping/cart/clear', {}, headers: _withGuestHeader(guestId));
   }
 
   @override

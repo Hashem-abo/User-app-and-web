@@ -155,25 +155,12 @@ class LocationService implements LocationServiceInterface{
 
   @override
   Future<void> authorizeNavigation(String page, List<AddressModel>? addressList, GoogleMapController? mapController, {bool offNamed = false, bool offAll = false}) async {
-    if(addressList != null && addressList.isEmpty) {
-      if(ResponsiveHelper.isDesktop(Get.context)) {
-        showGeneralDialog(context: Get.context!, pageBuilder: (_,__,___) {
-          return SizedBox(
-            height: 300, width: 300,
-            child: PickMapScreen(fromSignUp: (page == RouteHelper.signUp), canRoute: false, fromAddAddress: false, route: null, googleMapController: mapController),
-          );
-        });
-      } else {
-        Get.toNamed(RouteHelper.getPickMapRoute(page, false));
-      }
+    if(offNamed) {
+      Get.offNamed(RouteHelper.getAccessLocationRoute(page));
+    } else if(offAll) {
+      Get.offAllNamed(RouteHelper.getAccessLocationRoute(page));
     } else {
-      if(offNamed) {
-        Get.offNamed(RouteHelper.getAccessLocationRoute(page));
-      } else if(offAll) {
-        Get.offAllNamed(RouteHelper.getAccessLocationRoute(page));
-      } else {
-        Get.toNamed(RouteHelper.getAccessLocationRoute(page));
-      }
+      Get.toNamed(RouteHelper.getAccessLocationRoute(page));
     }
   }
 

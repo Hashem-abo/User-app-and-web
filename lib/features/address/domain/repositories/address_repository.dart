@@ -70,7 +70,7 @@ class AddressRepository implements AddressRepositoryInterface<AddressModel> {
   }
 
   Future<ResponseModel> _updateAddress(Map<String, dynamic> addressBody, int? addressId) async {
-    Response response = await apiClient.putData('${AppConstants.updateAddressUri}$addressId', addressBody);
+    Response response = await apiClient.postData('${AppConstants.updateAddressUri}$addressId', addressBody);
     if (response.statusCode == 200) {
       return ResponseModel(true, response.body["message"]);
     } else {

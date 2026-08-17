@@ -65,11 +65,12 @@ class AddressController extends GetxController implements GetxService {
 
   Future<ResponseModel> _processSuccessResponse(ResponseModel responseModel, bool fromCheckout, int? storeZoneId) async {
     if (responseModel.isSuccess) {
-      if(fromCheckout && !responseModel.zoneIds!.contains(storeZoneId)) {
+      int? targetStoreZoneId = storeZoneId ?? (Get.isRegistered<CheckoutController>() ? Get.find<CheckoutController>().store?.zoneId : null);
+      if(fromCheckout && targetStoreZoneId != null && responseModel.zoneIds != null && !responseModel.zoneIds!.contains(targetStoreZoneId)) {
         responseModel = ResponseModel(false, (Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'your_selected_location_is_from_different_zone'.tr : 'your_selected_location_is_from_different_zone_store'.tr));
       }else {
         await getAddressList();
-        Get.find<CheckoutController>().setAddressIndex(1);
+        Get.find<CheckoutController>().setAddressIndex(0);
         responseModel = ResponseModel(true, responseModel.message);
       }
     }

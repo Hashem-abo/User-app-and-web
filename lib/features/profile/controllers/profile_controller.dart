@@ -175,6 +175,7 @@ class ProfileController extends GetxController implements GetxService {
         email: _userInfoModel!.email,
         phone: _userInfoModel!.phone,
         isAnonymous: newStatus,
+        buttonType: 'profile',
       );
       
       String token = Get.find<AuthController>().getUserToken();

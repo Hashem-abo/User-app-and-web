@@ -1,10 +1,9 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sixam_mart/features/checkout/widgets/add_address_options_bottom_sheet.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -40,19 +39,11 @@ class GuestDeliveryAddress extends StatelessWidget {
           const Spacer(),
 
           takeAway ? const SizedBox() : InkWell(
-            onTap: () async {
-              String? previousGuestAddress = checkoutController.guestAddress?.address;
-              var address = await Get.toNamed(RouteHelper.getEditAddressRoute(checkoutController.guestAddress, fromGuest: true));
-
-              if(address != null) {
-                checkoutController.setGuestAddress(address);
-                if(previousGuestAddress != address.deliveryAddress) {
-                  checkoutController.getDistanceInKM(
-                    LatLng(double.parse(address.latitude), double.parse(address.longitude)),
-                    LatLng(double.parse(checkoutController.store!.latitude!), double.parse(checkoutController.store!.longitude!)),
-                  );
-                }
-              }
+            onTap: () {
+              Get.bottomSheet(
+                AddAddressOptionsBottomSheet(checkoutController: checkoutController),
+                isScrollControlled: true,
+              );
             },
             child: Image.asset(Images.editDelivery, height: 20, width: 20, color: Theme.of(context).primaryColor),
           ),
@@ -102,14 +93,19 @@ class GuestDeliveryAddress extends StatelessWidget {
           // const SizedBox(height: Dimensions.paddingSizeLarge),
 
         ]) : checkoutController.guestAddress == null ? InkWell(
-          onTap: (){},
+          onTap: () {
+            Get.bottomSheet(
+              AddAddressOptionsBottomSheet(checkoutController: checkoutController),
+              isScrollControlled: true,
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeLarge),
             child: Column(children: [
-              Image.asset(Images.truck, height: 20, width: 20, color: Theme.of(context).disabledColor),
+              Image.asset(Images.truck, height: 20, width: 20, color: Theme.of(context).primaryColor),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              Text('please_update_your_delivery_info'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).disabledColor)),
+              Text('please_update_your_delivery_info'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).primaryColor)),
             ]),
           ),
         ) : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -124,27 +120,44 @@ class GuestDeliveryAddress extends StatelessWidget {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
               Image.asset(Images.guestLocationIcon, height: 15, color: Theme.of(context).primaryColor),
-              Text(' ${checkoutController.guestAddress!.addressType!.tr}:', style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
+              Text(' ${(checkoutController.guestAddress?.addressType ?? 'others').tr}:', style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
               const SizedBox(width: Dimensions.paddingSizeSmall),
 
               Flexible(child: Text(
-                checkoutController.guestAddress!.address!,
+                checkoutController.guestAddress?.address ?? '',
                 style: robotoRegular, maxLines: 1, overflow: TextOverflow.ellipsis,
               )),
             ]),
           ),
+          const SizedBox(height: Dimensions.paddingSizeDefault),
+
+          CustomTextField(
+            labelText: 'contact_person_number'.tr,
+            titleText: 'write_number'.tr,
+            controller: guestNumberTextEditingController,
+            focusNode: guestNumberNode,
+            inputType: TextInputType.phone,
+            isPhone: true,
+            onCountryChanged: (CountryCode countryCode) {
+              checkoutController.countryDialCode = countryCode.dialCode;
+            },
+            countryDialCode: checkoutController.countryDialCode ?? Get.find<LocalizationController>().locale.countryCode,
+          ),
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          addressInfo('name'.tr, checkoutController.guestAddress!.contactPersonName!),
-          addressInfo('phone'.tr, checkoutController.guestAddress!.contactPersonNumber!),
-          addressInfo('email'.tr, checkoutController.guestAddress!.email!),
+          if (checkoutController.guestAddress?.contactPersonName != null && checkoutController.guestAddress!.contactPersonName!.isNotEmpty)
+            addressInfo('name'.tr, checkoutController.guestAddress!.contactPersonName!),
+          if (checkoutController.guestAddress?.contactPersonNumber != null && checkoutController.guestAddress!.contactPersonNumber!.isNotEmpty && checkoutController.guestAddress!.contactPersonNumber != '0000000000')
+            addressInfo('phone'.tr, checkoutController.guestAddress!.contactPersonNumber!),
+          if (checkoutController.guestAddress?.email != null && checkoutController.guestAddress!.email!.isNotEmpty)
+            addressInfo('email'.tr, checkoutController.guestAddress!.email!),
 
           Row(mainAxisSize: MainAxisSize.min, spacing: Dimensions.paddingSizeLarge, children: [
-            if(checkoutController.guestAddress!.streetNumber != null && checkoutController.guestAddress!.streetNumber!.isNotEmpty)
+            if(checkoutController.guestAddress?.streetNumber != null && checkoutController.guestAddress!.streetNumber!.isNotEmpty)
               Flexible(child: addressInfo('street'.tr, checkoutController.guestAddress!.streetNumber!)),
-            if(checkoutController.guestAddress!.house != null && checkoutController.guestAddress!.house!.isNotEmpty)
+            if(checkoutController.guestAddress?.house != null && checkoutController.guestAddress!.house!.isNotEmpty)
               Flexible(child: addressInfo('house'.tr, checkoutController.guestAddress!.house!)),
-            if(checkoutController.guestAddress!.floor != null && checkoutController.guestAddress!.floor!.isNotEmpty)
+            if(checkoutController.guestAddress?.floor != null && checkoutController.guestAddress!.floor!.isNotEmpty)
               Flexible(child: addressInfo('floor'.tr, checkoutController.guestAddress!.floor!)),
           ]),
 
