@@ -586,7 +586,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
             const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
             // Footer Buttons
-            ElevatedButton(
+            /*ElevatedButton(
               onPressed: () {
                 Get.toNamed(RouteHelper.getChatRoute(
                   notificationBody: NotificationBodyModel(restaurantId: track!.store!.id, orderId: int.parse(widget.orderID!)),
@@ -605,7 +605,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
               ),
               child: Text('contact_seller'.tr, style: robotoBold.copyWith(color: Colors.white)),
             ),
-            const SizedBox(height: Dimensions.paddingSizeSmall),
+            const SizedBox(height: Dimensions.paddingSizeSmall),*/
 
             ElevatedButton(
               onPressed: () {

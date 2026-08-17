@@ -2092,5 +2092,7 @@
   "parcel_requested": "Parcel Requested",
   "parcel_picked_up": "Parcel Picked Up",
   "call_delivery_man": "Call Driver",
+  "please_setup_your_delivery_address_first": "Please setup your delivery address first",
+  "delivery_address_is_not_valid_for_the_selected_zone": "Delivery address is not valid for the selected zone",
   "failed_to_load_invoice": "Failed to load the invoice"
 }

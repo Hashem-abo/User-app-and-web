@@ -1149,7 +1149,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
 
               SizedBox(
-                height: (ModuleHelper.getModule()?.moduleType == 'food') ? 230 : 380,
+                height: (ModuleHelper.getModule()?.moduleType == 'food') ? 230 : 290,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: suggestedItems.length,
