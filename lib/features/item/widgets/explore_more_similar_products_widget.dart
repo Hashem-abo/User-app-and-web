@@ -296,7 +296,7 @@ class _ExploreMoreSimilarProductsWidgetState extends State<ExploreMoreSimilarPro
               key: PageStorageKey<String>('explore_grid_$categoryId'),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 0.45,
+                childAspectRatio: 0.58,
                 mainAxisSpacing: Dimensions.paddingSizeSmall,
                 crossAxisSpacing: Dimensions.paddingSizeSmall,
               ),
