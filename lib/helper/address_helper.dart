@@ -7,7 +7,54 @@ import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
+import 'package:sixam_mart/features/location/controllers/location_controller.dart';
+
 class AddressHelper {
+
+  static String formatAddressWithZone(AddressModel? address) {
+    if (address == null || address.address == null || address.address!.trim().isEmpty) {
+      return 'select_location'.tr;
+    }
+
+    String rawAddress = address.address!.trim();
+
+    String zoneName = '';
+    if (address.zoneData != null && address.zoneData!.isNotEmpty && address.zoneData!.first.name != null) {
+      zoneName = address.zoneData!.first.name!.trim();
+    }
+
+    if (zoneName.isEmpty && Get.isRegistered<LocationController>()) {
+      LocationController locController = Get.find<LocationController>();
+      if (locController.zoneList != null && locController.zoneList!.isNotEmpty) {
+        for (var z in locController.zoneList!) {
+          if (z.id == address.zoneId) {
+            zoneName = z.name?.trim() ?? '';
+            break;
+          }
+        }
+      }
+    }
+
+    if (zoneName.isNotEmpty) {
+      if (rawAddress.startsWith(zoneName)) {
+        if (rawAddress == zoneName) {
+          return zoneName;
+        }
+        if (rawAddress.startsWith('$zoneName - ')) {
+          return rawAddress;
+        }
+        if (rawAddress.startsWith('$zoneName,') || rawAddress.startsWith('$zoneName ')) {
+          String rest = rawAddress.substring(zoneName.length).replaceAll(RegExp(r'^[\s,\-]+'), '');
+          return rest.isNotEmpty ? '$zoneName - $rest' : zoneName;
+        }
+        return rawAddress;
+      } else {
+        return '$zoneName - $rawAddress';
+      }
+    }
+
+    return rawAddress;
+  }
 
   static Future<bool> saveUserAddressInSharedPref(AddressModel address) async {
     SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
@@ -16,6 +63,11 @@ class AddressHelper {
       zoneIds = [address.zoneId!];
       address.zoneIds = zoneIds;
     }
+
+    if (address.address != null && address.address!.isNotEmpty) {
+      address.address = formatAddressWithZone(address);
+    }
+
     String userAddress = jsonEncode(address.toJson());
     Get.find<ApiClient>().updateHeader(
       sharedPreferences.getString(AppConstants.token),

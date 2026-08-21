@@ -174,21 +174,11 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                 Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Stack(
                     children: [
-                      ColorFiltered(
-                        colorFilter: widget.isAvailable
-                            ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
-                            : const ColorFilter.matrix(<double>[
-                          0.2126, 0.7152, 0.0722, 0, 0,
-                          0.2126, 0.7152, 0.0722, 0, 0,
-                          0.2126, 0.7152, 0.0722, 0, 0,
-                          0,      0,      0,      1, 0,
-                        ]),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                          child: CustomImage(
-                            image: '${widget.cart.item!.imageFullUrl}',
-                            height: ResponsiveHelper.isDesktop(context) ? 100 : 90, width: ResponsiveHelper.isDesktop(context) ? 100 : 90, fit: BoxFit.cover,
-                          ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                        child: CustomImage(
+                          image: '${widget.cart.item!.imageFullUrl}',
+                          height: ResponsiveHelper.isDesktop(context) ? 100 : 90, width: ResponsiveHelper.isDesktop(context) ? 100 : 90, fit: BoxFit.cover,
                         ),
                       ),
                       widget.isAvailable ? const SizedBox() : Positioned(
@@ -206,10 +196,22 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                       if(!widget.isAvailable)
-                        Text(
-                          'not_available_now'.tr == 'not_available_now' ? 'غير متوفر الآن' : 'not_available_now'.tr,
-                          style: robotoRegular.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeOverSmall),
-                        ),
+                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                          Text(
+                            'not_available_now'.tr == 'not_available_now' ? 'غير متوفر الآن' : 'not_available_now'.tr,
+                            style: robotoRegular.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeOverSmall),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Get.find<CartController>().removeFromCart(widget.cartIndex, item: widget.cart.item);
+                            },
+                            child: Row(children: [
+                              Icon(CupertinoIcons.delete, color: Theme.of(context).colorScheme.error, size: 14),
+                              const SizedBox(width: 2),
+                              Text('delete'.tr, style: robotoMedium.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeOverSmall)),
+                            ]),
+                          ),
+                        ]),
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Flexible(
                           child: Text(
@@ -371,33 +373,62 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                             isIncrement: true,
                             color: cartController.isLoading ? Theme.of(context).disabledColor : null,
                           ),
-                        ]) : InkWell(
-                          onTap: () {
-                            Get.find<CartController>().setCartIndexToReplace(widget.cartIndex);
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (con) => ShowAlternativesBottomSheet(item: widget.cart.item!, cartIndex: widget.cartIndex),
-                            ).then((value) {
-                              Get.find<CartController>().setCartIndexToReplace(null);
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: 5),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: Row(mainAxisSize: MainAxisSize.min, children: [
-                              Text(
-                                'show_alternatives'.tr == 'show_alternatives' ? 'عرض البدائل' : 'show_alternatives'.tr,
-                                style: robotoMedium.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeExtraSmall),
+                        ]) : Wrap(
+                          spacing: Dimensions.paddingSizeExtraSmall,
+                          runSpacing: Dimensions.paddingSizeExtraSmall,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          alignment: WrapAlignment.end,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                Get.find<CartController>().removeFromCart(widget.cartIndex, item: widget.cart.item);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.error.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                  border: Border.all(color: Theme.of(context).colorScheme.error),
+                                ),
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  Icon(CupertinoIcons.delete, color: Theme.of(context).colorScheme.error, size: 14),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'delete'.tr,
+                                    style: robotoMedium.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeExtraSmall),
+                                  ),
+                                ]),
                               ),
-                              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                              const Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 14),
-                            ]),
-                          ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Get.find<CartController>().setCartIndexToReplace(widget.cartIndex);
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (con) => ShowAlternativesBottomSheet(item: widget.cart.item!, cartIndex: widget.cartIndex),
+                                ).then((value) {
+                                  Get.find<CartController>().setCartIndexToReplace(null);
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  Text(
+                                    'show_alternatives'.tr == 'show_alternatives' ? 'عرض البدائل' : 'show_alternatives'.tr,
+                                    style: robotoMedium.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeExtraSmall),
+                                  ),
+                                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                  const Icon(Icons.shopping_cart_outlined, color: Colors.white, size: 14),
+                                ]),
+                              ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: Dimensions.paddingSizeSmall),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
@@ -60,8 +61,12 @@ class CartCountView extends StatelessWidget {
 
             InkWell(
               onTap: cartController.isLoading ? null : () {
-                cartController.setDirectlyAddToCartIndex(index);
-                cartController.setQuantity(true, cartIndex, cartController.cartList[cartIndex].stock, cartController.cartList[cartIndex].quantityLimit);
+                if (item.quantityLimit != null && item.quantityLimit != 0 && cartQty >= item.quantityLimit!) {
+                  showCustomSnackBar('${'maximum_quantity_limit'.tr} ${item.quantityLimit}');
+                } else {
+                  cartController.setDirectlyAddToCartIndex(index);
+                  cartController.setQuantity(true, cartIndex, cartController.cartList[cartIndex].stock, cartController.cartList[cartIndex].quantityLimit);
+                }
               },
               child: Container(
                 decoration: BoxDecoration(

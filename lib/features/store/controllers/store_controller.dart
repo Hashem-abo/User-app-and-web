@@ -33,30 +33,62 @@ import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.da
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 
+import 'package:sixam_mart/features/address/domain/models/address_model.dart';
+
 class StoreController extends GetxController implements GetxService {
   final StoreServiceInterface storeServiceInterface;
   StoreController({required this.storeServiceInterface});
 
+  List<Store>? _filterStoresByZone(List<Store>? list) {
+    if (list == null) return null;
+    AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
+    int? activeZoneId = address?.zoneId;
+    if (activeZoneId == null || activeZoneId == 0) return list;
+    return list.where((store) {
+      if (store.zoneId == null || store.zoneId == 0) return true;
+      return store.zoneId == activeZoneId || (address != null && address.zoneIds != null && address.zoneIds!.contains(store.zoneId));
+    }).toList();
+  }
+
   StoreModel? _storeModel;
-  StoreModel? get storeModel => _storeModel;
+  StoreModel? get storeModel {
+    if (_storeModel == null || _storeModel!.stores == null) return _storeModel;
+    List<Store> filteredStores = _filterStoresByZone(_storeModel!.stores!) ?? [];
+    return StoreModel(
+      totalSize: filteredStores.length,
+      limit: _storeModel!.limit,
+      offset: _storeModel!.offset,
+      stores: filteredStores,
+    );
+  }
 
   List<Store>? _popularStoreList;
-  List<Store>? get popularStoreList => _popularStoreList;
+  List<Store>? get popularStoreList => _filterStoresByZone(_popularStoreList);
 
   List<Store>? _latestStoreList;
-  List<Store>? get latestStoreList => _latestStoreList;
+  List<Store>? get latestStoreList => _filterStoresByZone(_latestStoreList);
 
   List<Store>? _topOfferStoreList;
-  List<Store>? get topOfferStoreList => _topOfferStoreList;
+  List<Store>? get topOfferStoreList => _filterStoresByZone(_topOfferStoreList);
 
   List<Store>? _featuredStoreList;
-  List<Store>? get featuredStoreList => _featuredStoreList;
+  List<Store>? get featuredStoreList => _filterStoresByZone(_featuredStoreList);
 
   List<Store>? _visitAgainStoreList;
-  List<Store>? get visitAgainStoreList => _visitAgainStoreList;
+  List<Store>? get visitAgainStoreList => _filterStoresByZone(_visitAgainStoreList);
 
   Store? _store;
   Store? get store => _store;
+
+  void clearStoreLists() {
+    _popularStoreList = null;
+    _latestStoreList = null;
+    _topOfferStoreList = null;
+    _featuredStoreList = null;
+    _visitAgainStoreList = null;
+    _storeModel = null;
+    update();
+  }
 
   ItemModel? _storeItemModel;
   ItemModel? get storeItemModel => _storeItemModel;

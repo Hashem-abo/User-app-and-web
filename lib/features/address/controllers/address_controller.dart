@@ -4,6 +4,7 @@ import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/address/domain/services/address_service_interface.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
 
 class AddressController extends GetxController implements GetxService {
   final AddressServiceInterface addressServiceInterface;
@@ -22,6 +23,10 @@ class AddressController extends GetxController implements GetxService {
     _isLoading = true;
     update();
     ResponseModel responseModel = await addressServiceInterface.addAddress(addressModel);
+    if (responseModel.isSuccess) {
+      await AddressHelper.saveUserAddressInSharedPref(addressModel);
+      await getAddressList();
+    }
     responseModel = await _processSuccessResponse(responseModel, fromCheckout, storeZoneId);
     _isLoading = false;
     update();

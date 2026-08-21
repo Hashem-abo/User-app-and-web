@@ -1,18 +1,19 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart';
 import 'package:sixam_mart/features/cart/domain/services/cart_service_interface.dart';
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
-import 'package:sixam_mart/features/home/screens/home_screen.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
+import 'package:sixam_mart/features/address/domain/models/address_model.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 
 class CartController extends GetxController implements GetxService {
@@ -23,7 +24,22 @@ class CartController extends GetxController implements GetxService {
   Timer? _noteTimer;
 
   List<CartModel> _cartList = [];
-  List<CartModel> get cartList => _cartList;
+  List<CartModel> get cartList {
+    AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
+    int? activeZoneId = address?.zoneId;
+    if (activeZoneId == null || activeZoneId == 0) {
+      return _cartList;
+    }
+    return _cartList.where((cartItem) {
+      if (cartItem.item == null) return true;
+      int? itemZoneId = cartItem.item!.zoneId;
+      if ((itemZoneId == null || itemZoneId == 0) && cartItem.item!.storeDetails != null) {
+        itemZoneId = cartItem.item!.storeDetails!['zone_id'];
+      }
+      if (itemZoneId == null || itemZoneId == 0) return true;
+      return itemZoneId == activeZoneId || (address != null && address.zoneIds != null && address.zoneIds!.contains(itemZoneId));
+    }).toList();
+  }
 
   double _subTotal = 0;
   double get subTotal => _subTotal;
@@ -58,6 +74,65 @@ class CartController extends GetxController implements GetxService {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _isAddToCartLoading = false;
+  bool get isAddToCartLoading => _isAddToCartLoading;
+
+  final Set<int> _addingCartItemIds = {};
+  Set<int> get addingCartItemIds => _addingCartItemIds;
+
+  bool isItemAdding(int? itemId) {
+    if (itemId == null) return _isAddToCartLoading;
+    return _addingCartItemIds.contains(itemId);
+  }
+
+  String _getVariationKey(CartModel cart) {
+    StringBuffer key = StringBuffer();
+    key.write('item_${cart.item?.id}_');
+
+    if (cart.variation != null && cart.variation!.isNotEmpty) {
+      for (var v in cart.variation!) {
+        key.write('v_${v.type?.replaceAll(' ', '').toLowerCase()}_');
+      }
+    }
+
+    if (cart.foodVariations != null && cart.foodVariations!.isNotEmpty) {
+      for (int i = 0; i < cart.foodVariations!.length; i++) {
+        key.write('fv_$i:');
+        for (int j = 0; j < cart.foodVariations![i].length; j++) {
+          if (cart.foodVariations![i][j] == true) {
+            key.write('$j,');
+          }
+        }
+      }
+    }
+
+    if (cart.addOnIds != null && cart.addOnIds!.isNotEmpty) {
+      for (var addon in cart.addOnIds!) {
+        key.write('addon_${addon.id}_q${addon.quantity}_');
+      }
+    }
+
+    return key.toString();
+  }
+
+  List<CartModel> _deduplicateCartList(List<CartModel> list) {
+    List<CartModel> result = [];
+    for (var item in list) {
+      String itemKey = _getVariationKey(item);
+      int index = result.indexWhere((existing) {
+        if (existing.id != null && item.id != null && existing.id == item.id) return true;
+        return _getVariationKey(existing) == itemKey;
+      });
+
+      if (index != -1) {
+        result[index].quantity = (result[index].quantity ?? 1) + (item.quantity ?? 1);
+      } else {
+        result.add(item);
+      }
+    }
+    return result;
+  }
 
   bool _needExtraPackage = true;
   bool get needExtraPackage => _needExtraPackage;
@@ -336,6 +411,16 @@ class CartController extends GetxController implements GetxService {
     return cartServiceInterface.existAnotherStoreItem(storeID, moduleId, _cartList);
   }
 
+  void filterCartForModuleLocal(int? targetModuleId) {
+    if (targetModuleId != null) {
+      _cartList.removeWhere((c) => c.item != null && c.item!.moduleId != targetModuleId);
+    } else {
+      _cartList = [];
+    }
+    calculationCart();
+    update();
+  }
+
   void setCurrentIndex(int index, bool notify) {
     _currentIndex = index;
     if(notify) {
@@ -344,36 +429,100 @@ class CartController extends GetxController implements GetxService {
   }
 
   Future<bool> addToCartOnline(OnlineCart onlineCart, CartModel cartModel) async {
-    if (_cartIndexToReplace != null && _cartIndexToReplace! < _cartList.length) {
-      int index = _cartIndexToReplace!;
-      _cartIndexToReplace = null;
-      await removeFromCart(index);
+    int? itemId = cartModel.item?.id;
+    if (itemId != null && _addingCartItemIds.contains(itemId)) {
+      return false; // DEBOUNCE: Prevent duplicate request while item is being added!
     }
-    
-    // Optimistic update
-    _cartList.add(cartModel);
-    calculationCart();
+
+    if (itemId != null) {
+      _addingCartItemIds.add(itemId);
+    }
+    _isAddToCartLoading = true;
     update();
 
-    bool success = false;
-    List<OnlineCartModel>? onlineCartList = await cartServiceInterface.addToCartOnline(onlineCart);
-    if(onlineCartList != null) {
-      _cartList = [];
-      _cartList.addAll(cartServiceInterface.formatOnlineCartToLocalCart(onlineCartModel: onlineCartList));
-      cartServiceInterface.addSharedPrefCartList(_cartList);
-      calculationCart();
-      success = true;
-      _checkAndSwitchModule(cartModel.item!.moduleId);
-    } else {
-      _cartList.remove(cartModel);
+    try {
+      if (cartModel.item != null && cartModel.item!.id != null) {
+        int totalCartQty = 0;
+        for (var c in _cartList) {
+          if (c.item != null && c.item!.id == cartModel.item!.id) {
+            totalCartQty += (c.quantity ?? 0);
+          }
+        }
+        int? stock = cartModel.stock ?? cartModel.item!.stock;
+        bool isFood = cartModel.item!.moduleType == 'food';
+        bool moduleStock = Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!;
+        if (!isFood && moduleStock && stock != null && (totalCartQty + (cartModel.quantity ?? 1)) > stock) {
+          showCustomSnackBar('out_of_stock'.tr);
+          return false;
+        }
+        int? limit = cartModel.item!.quantityLimit ?? cartModel.quantityLimit;
+        if (limit != null && limit != 0 && (totalCartQty + (cartModel.quantity ?? 1)) > limit) {
+          showCustomSnackBar('${'maximum_quantity_limit'.tr} $limit');
+          return false;
+        }
+      }
+
+      if (_cartIndexToReplace != null && _cartIndexToReplace! < _cartList.length) {
+        int index = _cartIndexToReplace!;
+        _cartIndexToReplace = null;
+        await removeFromCart(index);
+      }
+      
+      // Optimistic update
+      _cartList.add(cartModel);
+      _cartList = _deduplicateCartList(_cartList);
       calculationCart();
       update();
-    }
 
-    return success;
+      bool success = false;
+      List<OnlineCartModel>? onlineCartList = await cartServiceInterface.addToCartOnline(onlineCart);
+      if(onlineCartList != null) {
+        _cartList = [];
+        List<CartModel> rawList = cartServiceInterface.formatOnlineCartToLocalCart(onlineCartModel: onlineCartList);
+        _cartList.addAll(_deduplicateCartList(rawList));
+        cartServiceInterface.addSharedPrefCartList(_cartList);
+        calculationCart();
+        success = true;
+        _checkAndSwitchModule(cartModel.item!.moduleId);
+      } else {
+        _cartList.remove(cartModel);
+        calculationCart();
+        update();
+      }
+
+      return success;
+    } finally {
+      if (itemId != null) {
+        _addingCartItemIds.remove(itemId);
+      }
+      _isAddToCartLoading = false;
+      update();
+    }
   }
 
   Future<bool> updateCartOnline(OnlineCart onlineCart, CartModel cartModel, {bool notify = true}) async {
+    if (cartModel.item != null && cartModel.item!.id != null) {
+      int totalCartQtyOtherVariations = 0;
+      for (var c in _cartList) {
+        if (c.id == onlineCart.cartId) continue;
+        if (c.item != null && c.item!.id == cartModel.item!.id) {
+          totalCartQtyOtherVariations += (c.quantity ?? 0);
+        }
+      }
+      int? stock = cartModel.stock ?? cartModel.item!.stock;
+      bool isFood = cartModel.item!.moduleType == 'food';
+      bool moduleStock = Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!;
+      if (!isFood && moduleStock && stock != null && (totalCartQtyOtherVariations + (cartModel.quantity ?? 1)) > stock) {
+        showCustomSnackBar('out_of_stock'.tr);
+        return false;
+      }
+      int? limit = cartModel.item!.quantityLimit ?? cartModel.quantityLimit;
+      if (limit != null && limit != 0 && (totalCartQtyOtherVariations + (cartModel.quantity ?? 1)) > limit) {
+        showCustomSnackBar('${'maximum_quantity_limit'.tr} $limit');
+        return false;
+      }
+    }
+
     // Optimistic update: replace old item with new one
     int index = _cartList.indexWhere((element) => element.id == onlineCart.cartId);
     CartModel? oldCartModel;

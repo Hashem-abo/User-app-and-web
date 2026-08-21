@@ -35,6 +35,14 @@ class OrderController extends GetxController implements GetxService {
   OrderModel? _trackModel;
   OrderModel? get trackModel => _trackModel;
 
+  void clearPrevOrderData({bool notify = false}) {
+    _trackModel = null;
+    _orderDetails = null;
+    if(notify) {
+      update();
+    }
+  }
+
   ResponseModel? _responseModel;
   ResponseModel? get responseModel => _responseModel;
 

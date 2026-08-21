@@ -1,3 +1,4 @@
+import 'package:sixam_mart/common/widgets/cart_count_view.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
@@ -203,35 +204,39 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                     ] else const SizedBox(),
 
                     // Add to Cart Button (Details)
-                    InkWell(
-                      onTap: () {
-                          Get.find<ItemController>().navigateToItemPage(item, context, inStore: true, isCampaign: false);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: BorderRadius.circular(50), 
-                        ),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [ 
-                          
-                          // Custom White Circle Icon - Moved to Start (Right in RTL)
-                          Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
+                    CartCountView(
+                      item: item,
+                      index: index,
+                      child: InkWell(
+                        onTap: () {
+                          Get.find<ItemController>().itemDirectlyAddToCart(item, context, inStore: true, isCampaign: false);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(50), 
+                          ),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [ 
+                            
+                            // Custom White Circle Icon - Moved to Start (Right in RTL)
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.shopping_cart_outlined, color: Theme.of(context).primaryColor, size: 14),
                             ),
-                            child: Icon(Icons.shopping_cart_outlined, color: Theme.of(context).primaryColor, size: 14),
-                          ),
-                          
-                          const SizedBox(width: 6),
+                            
+                            const SizedBox(width: 6),
 
-                          Text(
-                            'add_to_cart'.tr, 
-                            style: robotoRegular.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeSmall),
-                          ),
-                        ]),
+                            Text(
+                              'add_to_cart'.tr, 
+                              style: robotoRegular.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeSmall),
+                            ),
+                          ]),
+                        ),
                       ),
                     ),
                   ],

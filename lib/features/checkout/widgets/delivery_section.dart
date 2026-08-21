@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sixam_mart/common/widgets/address_widget.dart';
+import 'package:sixam_mart/features/address/controllers/address_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
+import 'package:sixam_mart/features/location/controllers/location_controller.dart';
+import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_dropdown.dart';
@@ -108,33 +111,62 @@ class DeliverySection extends StatelessWidget {
             Positioned.fill(
               child: Align(
                 alignment: Alignment.centerRight,
-                child: PopupMenuButton(
+                child: PopupMenuButton<int>(
                     position: PopupMenuPosition.under,
                     icon: const Icon(Icons.keyboard_arrow_down),
-                    onSelected: (value) {},
-                    itemBuilder: (context)  => List.generate(
-                      address.length, (index) => PopupMenuItem(
-                      child: InkWell(
-                        onTap: () {
-                          double? lat = double.tryParse(address[index].latitude ?? '');
-                          double? lng = double.tryParse(address[index].longitude ?? '');
-                          if (lat != null && lng != null && checkoutController.store != null && checkoutController.store!.latitude != null && checkoutController.store!.longitude != null) {
-                            double? storeLat = double.tryParse(checkoutController.store!.latitude!);
-                            double? storeLng = double.tryParse(checkoutController.store!.longitude!);
-                            if (storeLat != null && storeLng != null) {
-                              checkoutController.getDistanceInKM(
-                                LatLng(lat, lng),
-                                LatLng(storeLat, storeLng),
-                              );
-                            }
-                          }
-                          checkoutController.setAddressIndex(index);
-                          int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;
-                          checkoutController.streetNumberController.text = address[addrIndex].streetNumber ?? '';
-                          checkoutController.houseController.text = address[addrIndex].house ?? '';
-                          checkoutController.floorController.text = address[addrIndex].floor ?? '';
-                          Navigator.pop(context);
-                        },
+                    onSelected: (int index) async {
+                      AddressModel selectedAddress = address[index];
+                      if (selectedAddress.latitude != null && selectedAddress.longitude != null) {
+                        ZoneResponseModel zoneResponse = await Get.find<LocationController>().getZone(
+                          selectedAddress.latitude, selectedAddress.longitude, false, updateInAddress: true,
+                        );
+                        if (zoneResponse.isSuccess && zoneResponse.zoneIds.isNotEmpty) {
+                          selectedAddress.zoneId = zoneResponse.zoneIds[0];
+                          selectedAddress.zoneIds = [];
+                          selectedAddress.zoneIds!.addAll(zoneResponse.zoneIds);
+                          selectedAddress.zoneData = [];
+                          selectedAddress.zoneData!.addAll(zoneResponse.zoneData);
+                          selectedAddress.areaIds = [];
+                          selectedAddress.areaIds!.addAll(zoneResponse.areaIds);
+                        }
+                      }
+                      await AddressHelper.saveUserAddressInSharedPref(selectedAddress);
+                      Get.find<LocationController>().setPlaceMark(selectedAddress.address ?? '');
+                      if (AuthHelper.isLoggedIn()) {
+                        Get.find<AuthController>().updateZone();
+                      }
+
+                      int currentPaymentMethod = checkoutController.paymentMethodIndex;
+                      checkoutController.clearPrevData();
+                      if (currentPaymentMethod != -1) {
+                        checkoutController.setPaymentMethod(currentPaymentMethod, isUpdate: false);
+                      } else if (!AuthHelper.isGuestLoggedIn()) {
+                        checkoutController.setPaymentMethod(0, isUpdate: false);
+                      }
+                      checkoutController.setAddressIndex(0);
+                      checkoutController.streetNumberController.text = selectedAddress.streetNumber ?? '';
+                      checkoutController.houseController.text = selectedAddress.house ?? '';
+                      checkoutController.floorController.text = selectedAddress.floor ?? '';
+
+                      double? lat = double.tryParse(selectedAddress.latitude ?? '');
+                      double? lng = double.tryParse(selectedAddress.longitude ?? '');
+                      if (lat != null && lng != null && checkoutController.store != null && checkoutController.store!.latitude != null && checkoutController.store!.longitude != null) {
+                        double? storeLat = double.tryParse(checkoutController.store!.latitude!);
+                        double? storeLng = double.tryParse(checkoutController.store!.longitude!);
+                        if (storeLat != null && storeLng != null) {
+                          await checkoutController.getDistanceInKM(
+                            LatLng(lat, lng),
+                            LatLng(storeLat, storeLng),
+                          );
+                        }
+                      }
+                      checkoutController.update();
+                      Get.find<AddressController>().update();
+                      Get.find<LocationController>().update();
+                    },
+                    itemBuilder: (context) => List.generate(
+                      address.length, (index) => PopupMenuItem<int>(
+                        value: index,
                         child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -170,7 +202,6 @@ class DeliverySection extends StatelessWidget {
                         ),
                       ),
                     )
-                    )
                 ),
               ),
             ),
@@ -184,26 +215,55 @@ class DeliverySection extends StatelessWidget {
               key: ValueKey('checkout_dropdown_${checkoutController.addressIndex}_${address.isNotEmpty ? (address[0].id ?? address[0].address ?? address[0].latitude) : ''}_${address.length}'),
 
               onChange: (int? value, int index) async {
-                double? lat = double.tryParse(address[index].latitude ?? '');
-                double? lng = double.tryParse(address[index].longitude ?? '');
+                AddressModel selectedAddress = address[index];
+                if (selectedAddress.latitude != null && selectedAddress.longitude != null) {
+                  ZoneResponseModel zoneResponse = await Get.find<LocationController>().getZone(
+                    selectedAddress.latitude, selectedAddress.longitude, false, updateInAddress: true,
+                  );
+                  if (zoneResponse.isSuccess && zoneResponse.zoneIds.isNotEmpty) {
+                    selectedAddress.zoneId = zoneResponse.zoneIds[0];
+                    selectedAddress.zoneIds = [];
+                    selectedAddress.zoneIds!.addAll(zoneResponse.zoneIds);
+                    selectedAddress.zoneData = [];
+                    selectedAddress.zoneData!.addAll(zoneResponse.zoneData);
+                    selectedAddress.areaIds = [];
+                    selectedAddress.areaIds!.addAll(zoneResponse.areaIds);
+                  }
+                }
+                await AddressHelper.saveUserAddressInSharedPref(selectedAddress);
+                Get.find<LocationController>().setPlaceMark(selectedAddress.address ?? '');
+                if (AuthHelper.isLoggedIn()) {
+                  Get.find<AuthController>().updateZone();
+                }
+
+                int currentPaymentMethod = checkoutController.paymentMethodIndex;
+                checkoutController.clearPrevData();
+                if (currentPaymentMethod != -1) {
+                  checkoutController.setPaymentMethod(currentPaymentMethod, isUpdate: false);
+                } else if (!AuthHelper.isGuestLoggedIn()) {
+                  checkoutController.setPaymentMethod(0, isUpdate: false);
+                }
+                checkoutController.setAddressIndex(0);
+
+                checkoutController.streetNumberController.text = selectedAddress.streetNumber ?? '';
+                checkoutController.houseController.text = selectedAddress.house ?? '';
+                checkoutController.floorController.text = selectedAddress.floor ?? '';
+
+                double? lat = double.tryParse(selectedAddress.latitude ?? '');
+                double? lng = double.tryParse(selectedAddress.longitude ?? '');
                 if (lat != null && lng != null && checkoutController.store != null && checkoutController.store!.latitude != null && checkoutController.store!.longitude != null) {
                   double? storeLat = double.tryParse(checkoutController.store!.latitude!);
                   double? storeLng = double.tryParse(checkoutController.store!.longitude!);
                   if (storeLat != null && storeLng != null) {
-                    checkoutController.getDistanceInKM(
+                    await checkoutController.getDistanceInKM(
                       LatLng(lat, lng),
                       LatLng(storeLat, storeLng),
                     );
                   }
                 }
-                await AddressHelper.saveUserAddressInSharedPref(address[index]);
-                checkoutController.setAddressIndex(index);
-
-                int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;
-                checkoutController.streetNumberController.text = address[addrIndex].streetNumber ?? '';
-                checkoutController.houseController.text = address[addrIndex].house ?? '';
-                checkoutController.floorController.text = address[addrIndex].floor ?? '';
-
+                checkoutController.update();
+                Get.find<AddressController>().update();
+                Get.find<LocationController>().update();
               },
               dropdownButtonStyle: DropdownButtonStyle(
                 height: 45,

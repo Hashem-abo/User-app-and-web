@@ -14,7 +14,7 @@ class AppConstants {
   static const List<String> fontFamilies = ['Roboto', 'Cairo', 'Tajawal', 'Rubik', 'DINNextLTArabic', 'NeoSansArabic', 'SomarSans','KOSans'];
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
-  // static const String webHostedUrl = 'http://192.168.100.125';
+  //  static const String webHostedUrl = 'http://192.168.100.125';
   static const String webHostedUrl = 'https://t.directplace.store';
 
   static const bool useReactWebsite = false;

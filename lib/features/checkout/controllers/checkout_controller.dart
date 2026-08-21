@@ -28,6 +28,7 @@ import 'package:sixam_mart/features/checkout/widgets/order_successfull_dialog.da
 import 'package:sixam_mart/features/order/domain/services/order_service_interface.dart';
 import 'package:sixam_mart/features/checkout/widgets/partial_pay_dialog_widget.dart';
 import 'package:sixam_mart/features/home/screens/home_screen.dart';
+import 'package:sixam_mart/helper/guest_order_helper.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
@@ -731,7 +732,6 @@ class CheckoutController extends GetxController implements GetxService {
         saveSharedPrefDmTipIndex(selectedTips.toString());
       }
       stopLoader(canUpdate: false);
-      HomeScreen.loadData(true);
       if(paymentMethodIndex == 2 && digitalPaymentName != 'easy_wallet' && digitalPaymentName != 'floosak') {
         if(GetPlatform.isWeb) {
           // Get.back();
@@ -755,6 +755,12 @@ class CheckoutController extends GetxController implements GetxService {
         if(AuthHelper.isLoggedIn()) {
           Get.find<AuthController>().saveEarningPoint(total.toStringAsFixed(0));
         }
+        if(AuthHelper.isGuestLoggedIn()) {
+          int? parsedId = int.tryParse(orderID);
+          if(parsedId != null) {
+            GuestOrderHelper.addGuestOrder(parsedId, contactNumber);
+          }
+        }
         if (ResponsiveHelper.isDesktop(Get.context) && AuthHelper.isLoggedIn()){
           Get.offNamed(RouteHelper.getInitialRoute());
           Future.delayed(const Duration(seconds: 2) , () => Get.dialog(Center(child: SizedBox(height: 350, width : 500, child: OrderSuccessfulDialog(orderID: orderID)))));
@@ -762,6 +768,7 @@ class CheckoutController extends GetxController implements GetxService {
           Get.offNamed(RouteHelper.getOrderSuccessRoute(orderID, contactNumber, createAccount: _isCreateAccount));
         }
       }
+      Future.microtask(() => HomeScreen.loadData(true));
       clearPrevData();
       Get.find<CouponController>().removeCouponData(false);
       updateTips(

@@ -21,6 +21,7 @@ import 'package:sixam_mart/common/widgets/not_available_widget.dart';
 import 'package:sixam_mart/common/widgets/organic_tag.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
+import 'package:sixam_mart/helper/item_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -60,10 +61,12 @@ class WebItemWidget extends StatelessWidget {
       isAvailable = DateConverter.isAvailable(item!.availableTimeStarts, item!.availableTimeEnds);
     }
 
+    bool isEntirelyOutOfStock = !isStore && item != null && ItemHelper.isItemEntirelyOutOfStock(item);
+
     return TextHover(
       builder: (hovered) {
         return InkWell(
-          onTap: () {
+          onTap: isEntirelyOutOfStock ? null : () {
             if(isStore) {
               if(store != null) {
                 if(isFeatured && Get.find<SplashController>().moduleList != null) {
@@ -94,8 +97,10 @@ class WebItemWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
           child: OnHover(
             isItem: true,
-            child: Stack(
-              children: [
+            child: Opacity(
+              opacity: isEntirelyOutOfStock ? 0.55 : 1.0,
+              child: Stack(
+                children: [
                 Container(
                   margin: ResponsiveHelper.isDesktop(context) ? null : const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
                   decoration: BoxDecoration(
@@ -110,11 +115,32 @@ class WebItemWidget extends StatelessWidget {
                       Stack(children: [
                         ClipRRect(
                           borderRadius: const BorderRadius.only(topLeft: Radius.circular(Dimensions.radiusSmall), topRight: Radius.circular(Dimensions.radiusSmall)),
-                          child: CustomImage(
-                            isHovered: hovered,
-                            image: '${isStore ? store != null ? store!.logoFullUrl : '' : item!.imageFullUrl}',
-                            height: desktop ? 140 : length == null ? 100 : 65, width: desktop ? isStore ? 275 : 300 : 80, fit: BoxFit.cover,
-                          ),
+                          child: Stack(children: [
+                            CustomImage(
+                              isHovered: hovered,
+                              image: '${isStore ? store != null ? store!.logoFullUrl : '' : item!.imageFullUrl}',
+                              height: desktop ? 140 : length == null ? 100 : 65, width: desktop ? isStore ? 275 : 300 : 80, fit: BoxFit.cover,
+                            ),
+
+                            if (isEntirelyOutOfStock)
+                              Positioned(
+                                top: 14,
+                                right: -28,
+                                child: Transform.rotate(
+                                  angle: 0.785398,
+                                  child: Container(
+                                    width: 110,
+                                    padding: const EdgeInsets.symmetric(vertical: 3),
+                                    color: Colors.redAccent.shade700,
+                                    child: Text(
+                                      'out_of_stock'.tr,
+                                      style: robotoBold.copyWith(color: Colors.white, fontSize: 8),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ]),
                         ),
 
                         DiscountTag(
@@ -134,6 +160,8 @@ class WebItemWidget extends StatelessWidget {
                         ),
 
                         isAvailable ? const SizedBox() : NotAvailableWidget(isStore: isStore),
+
+                        const SizedBox(),
                       ]),
                       const SizedBox(width: Dimensions.paddingSizeSmall),
 
@@ -251,7 +279,8 @@ class WebItemWidget extends StatelessWidget {
               ],
             ),
           ),
-        );
+        ),
+      );
       }
     );
   }

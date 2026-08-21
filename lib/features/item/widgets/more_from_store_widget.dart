@@ -33,7 +33,7 @@ class MoreFromStoreWidget extends StatelessWidget {
                 Text('more_from_store'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
                 SizedBox(
-                  height: 285,
+                  height: 295,
                   child: itemController.storeProductList != null ? ListView.builder(
                     scrollDirection: Axis.horizontal,
                     physics: const BouncingScrollPhysics(),

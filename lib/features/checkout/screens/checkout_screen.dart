@@ -150,9 +150,9 @@ class CheckoutScreenState extends State<CheckoutScreen> {
       notify: false,
     );
     Get.find<CheckoutController>().getOfflineMethodList();
-    Get.find<CheckoutController>().initCheckoutData(
-      Get.find<CartController>().cartList[0].item!.storeId,
-    );
+    // Get.find<CheckoutController>().initCheckoutData(
+    //   Get.find<CartController>().cartList[0].item!.storeId,
+    // );
     if (AuthHelper.isLoggedIn()) {
       Get.find<ProController>().getProActiveOffer(moduleType: Get.find<SplashController>().module?.moduleType);
     }
@@ -207,11 +207,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
         _isDigitalPaymentActive = _checkDigitalPaymentActive(store: checkoutController.store);
         _isOfflinePaymentActive = (Get.find<SplashController>().configModel?.offlinePaymentStatus ?? false) && _checkZoneOfflinePaymentOnOff(addressModel: AddressHelper.getUserAddressFromSharedPref(), checkoutController: checkoutController);
 
-        if(checkoutController.isFirstTimeCodActive && (_isCashOnDeliveryActive ?? false)){
+        if(checkoutController.isFirstTimeCodActive && (_isCashOnDeliveryActive ?? false) && !AuthHelper.isGuestLoggedIn()){
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if(checkoutController.isFirstTimeCodActive) {
               checkoutController.setPaymentMethod(0);
             }
+          });
+        }
+        if(AuthHelper.isGuestLoggedIn() && checkoutController.paymentMethodIndex == 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            checkoutController.setPaymentMethod(-1, isUpdate: false);
           });
         }
 
@@ -374,7 +379,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
           total = total - referralDiscount - proDiscount - proDeliveryDiscount + saverDeliveryAdjustment;
 
-          if(widget.storeId != null){
+          if(widget.storeId != null && !AuthHelper.isGuestLoggedIn()){
             WidgetsBinding.instance.addPostFrameCallback((_) {
               checkoutController.setPaymentMethod(0, isUpdate: false);
             });
@@ -640,6 +645,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 showCustomSnackBar('no_payment_method_found'.tr);
               }
             }
+          } else if(AuthHelper.isGuestLoggedIn() && checkoutController.paymentMethodIndex == 0) {
+            showCustomSnackBar('cash_on_delivery_is_not_available_for_guest_user'.tr == 'cash_on_delivery_is_not_available_for_guest_user'
+                ? 'الدفع عند الاستلام غير متاح للزوار، يرجى تسجيل الدخول أو اختيار طريقة دفع أخرى'
+                : 'cash_on_delivery_is_not_available_for_guest_user'.tr);
           } else if(orderAmount < checkoutController.store!.minimumOrder! && widget.storeId == null) {
             showCustomSnackBar('${'minimum_order_amount_is'.tr} ${checkoutController.store!.minimumOrder}');
           }else if(checkoutController.tipController.text.isNotEmpty && checkoutController.tipController.text != 'not_now' && double.parse(checkoutController.tipController.text.trim()) < 0) {
@@ -879,11 +888,12 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   Pivot? _getModuleData({required Store? store}) {
     Pivot? moduleData;
     int? currentModuleId = Get.find<SplashController>().module?.id;
-    if(store != null && AddressHelper.getUserAddressFromSharedPref()?.zoneData != null && currentModuleId != null) {
-      for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
+    AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
+    if(store != null && userAddress?.zoneData != null && currentModuleId != null) {
+      for(ZoneData zData in userAddress!.zoneData!) {
         if (zData.modules != null) {
           for(Modules m in zData.modules!) {
-            if(m.id == currentModuleId && m.pivot != null && m.pivot!.zoneId == store.zoneId) {
+            if(m.id == currentModuleId && m.pivot != null && (m.pivot!.zoneId == store.zoneId || zData.id == store.zoneId)) {
               moduleData = m.pivot;
               break;
             }
@@ -895,11 +905,23 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   bool _checkCODActive({required Store? store}) {
+    if (AuthHelper.isGuestLoggedIn()) {
+      return false;
+    }
     bool isCashOnDeliveryActive = false;
-    if(store != null && AddressHelper.getUserAddressFromSharedPref()?.zoneData != null){
-      for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-        if(zData.id == store.zoneId) {
-          isCashOnDeliveryActive = (zData.cashOnDelivery ?? false) && (Get.find<SplashController>().configModel?.cashOnDelivery ?? false);
+    AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
+    if(store != null && userAddress != null){
+      if (userAddress.zoneData != null && userAddress.zoneData!.isNotEmpty) {
+        for(ZoneData zData in userAddress.zoneData!) {
+          if(zData.id == store.zoneId || (userAddress.zoneId == store.zoneId) || (userAddress.zoneIds != null && userAddress.zoneIds!.contains(store.zoneId))) {
+            isCashOnDeliveryActive = (zData.cashOnDelivery ?? true) && (Get.find<SplashController>().configModel?.cashOnDelivery ?? false);
+            break;
+          }
+        }
+      } else {
+        bool inZone = (userAddress.zoneId != null && userAddress.zoneId == store.zoneId) || (userAddress.zoneIds != null && userAddress.zoneIds!.contains(store.zoneId));
+        if (inZone) {
+          isCashOnDeliveryActive = (Get.find<SplashController>().configModel?.cashOnDelivery ?? false);
         }
       }
     }
@@ -908,10 +930,19 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
   bool _checkDigitalPaymentActive({required Store? store}) {
     bool isDigitalPaymentActive = false;
-    if(store != null && AddressHelper.getUserAddressFromSharedPref()?.zoneData != null){
-      for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-        if(zData.id == store.zoneId) {
-          isDigitalPaymentActive = (zData.digitalPayment ?? false) && (Get.find<SplashController>().configModel?.digitalPayment ?? false);
+    AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
+    if(store != null && userAddress != null){
+      if (userAddress.zoneData != null && userAddress.zoneData!.isNotEmpty) {
+        for(ZoneData zData in userAddress.zoneData!) {
+          if(zData.id == store.zoneId || (userAddress.zoneId == store.zoneId) || (userAddress.zoneIds != null && userAddress.zoneIds!.contains(store.zoneId))) {
+            isDigitalPaymentActive = (zData.digitalPayment ?? true) && (Get.find<SplashController>().configModel?.digitalPayment ?? false);
+            break;
+          }
+        }
+      } else {
+        bool inZone = (userAddress.zoneId != null && userAddress.zoneId == store.zoneId) || (userAddress.zoneIds != null && userAddress.zoneIds!.contains(store.zoneId));
+        if (inZone) {
+          isDigitalPaymentActive = (Get.find<SplashController>().configModel?.digitalPayment ?? false);
         }
       }
     }
@@ -1397,8 +1428,15 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
   double _calculateDeliveryCharge({required Store? store, required AddressModel address, required double? distance, required double? extraCharge, required double orderAmount,
     required String orderType, double? surgePrice, String? surgePriceType}) {
+    if (orderType != 'take_away' && (distance == null || distance == -1) && Get.find<CheckoutController>().storeDistances.isEmpty) {
+      return -1;
+    }
+
     List<Store>? stores = Get.find<CheckoutController>().stores;
-    if (stores != null && stores.isNotEmpty && Get.find<CheckoutController>().storeDistances.isNotEmpty) {
+    if (stores != null && stores.isNotEmpty) {
+      if (orderType != 'take_away' && Get.find<CheckoutController>().storeDistances.length < stores.length) {
+        return -1;
+      }
       double totalBaseDeliveryCharge = 0;
       bool anyStoreRequiresDelivery = false;
       for (Store s in stores) {
@@ -1455,9 +1493,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     required double couponDiscount, required bool taxIncluded, required double tax,
     required String orderType, required double tips, required double additionalCharge, required double extraPackagingCharge,
   }) {
+    double validDeliveryCharge = deliveryCharge > 0 ? deliveryCharge : 0;
 
     return PriceConverter.toFixed(
-        subTotal + deliveryCharge - discount- couponDiscount + (taxIncluded ? 0 : tax)
+        subTotal + validDeliveryCharge - discount- couponDiscount + (taxIncluded ? 0 : tax)
             + ((orderType != 'take_away' && Get.find<SplashController>().configModel!.dmTipsStatus == 1) ? tips : 0)
             + additionalCharge + extraPackagingCharge
     );

@@ -25,6 +25,7 @@ import 'package:sixam_mart/common/widgets/not_available_widget.dart';
 import 'package:sixam_mart/common/widgets/organic_tag.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:sixam_mart/common/widgets/store_verified_avatar.dart';
+import 'package:sixam_mart/helper/item_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -69,6 +70,8 @@ class ItemWidget extends StatelessWidget {
       isAvailable = DateConverter.isAvailable(item!.availableTimeStarts, item!.availableTimeEnds);
     }
 
+    bool isEntirelyOutOfStock = !isStore && item != null && ItemHelper.isItemEntirelyOutOfStock(item);
+
     return Stack(
       children: [
         Container(
@@ -79,7 +82,7 @@ class ItemWidget extends StatelessWidget {
             boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
           ),
           child: CustomInkWell(
-            onTap: () {
+            onTap: isEntirelyOutOfStock ? null : () {
               if(isStore) {
                 if(store != null) {
                   if(isFeatured && Get.find<SplashController>().moduleList != null) {
@@ -111,7 +114,9 @@ class ItemWidget extends StatelessWidget {
             padding: ResponsiveHelper.isDesktop(context) ? EdgeInsets.all(fromCartSuggestion ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall) : const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
             child: TextHover(
               builder: (hovered) {
-                return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                return Opacity(
+                  opacity: isEntirelyOutOfStock ? 0.55 : 1.0,
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
 
                   Expanded(child: Padding(
                     padding: EdgeInsets.symmetric(vertical: desktop ? 0 : Dimensions.paddingSizeExtraSmall),
@@ -120,11 +125,32 @@ class ItemWidget extends StatelessWidget {
                       Stack(children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                          child: CustomImage(
-                            isHovered: hovered,
-                            image: '${isStore ? store != null ? store!.logoFullUrl : '' : item!.imageFullUrl}',
-                            height: imageHeight ?? (desktop ? 120 : length == null ? 100 : 90), width: imageWidth ?? (desktop ? 120 : 90), fit: BoxFit.cover,
-                          ),
+                          child: Stack(children: [
+                            CustomImage(
+                              isHovered: hovered,
+                              image: '${isStore ? store != null ? store!.logoFullUrl : '' : item!.imageFullUrl}',
+                              height: imageHeight ?? (desktop ? 120 : length == null ? 100 : 90), width: imageWidth ?? (desktop ? 120 : 90), fit: BoxFit.cover,
+                            ),
+
+                            if (isEntirelyOutOfStock)
+                              Positioned(
+                                top: 12,
+                                right: -25,
+                                child: Transform.rotate(
+                                  angle: 0.785398,
+                                  child: Container(
+                                    width: 90,
+                                    padding: const EdgeInsets.symmetric(vertical: 2),
+                                    color: Colors.redAccent.shade700,
+                                    child: Text(
+                                      'out_of_stock'.tr,
+                                      style: robotoBold.copyWith(color: Colors.white, fontSize: 8),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ]),
                         ),
 
                         (isStore || isCornerTag!) ? DiscountTag(
@@ -135,6 +161,8 @@ class ItemWidget extends StatelessWidget {
                         !isStore ? OrganicTag(item: item!, placeInImage: true) : const SizedBox(),
 
                         isAvailable ? const SizedBox() : NotAvailableWidget(isStore: isStore),
+
+                        const SizedBox(),
 
                         Positioned(
                           top: 5, left: 5,
@@ -293,8 +321,9 @@ class ItemWidget extends StatelessWidget {
                     ]),
                   )),
 
-                ]);
-              }
+                ]),
+              );
+            },
             ),
           ),
         ),

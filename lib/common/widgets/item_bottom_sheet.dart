@@ -141,8 +141,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
 
        //   print('=======variationType: $variationType // ${item.variations}');
           for (Variation variations in item.variations!) {
-          //  print('=======variation: ${variations.type} == $variationType');
-            if (variations.type == variationType) {
+            if (variations.type?.replaceAll(' ', '').toLowerCase() == variationType.replaceAll(' ', '').toLowerCase()) {
               price = variations.price;
               variation = variations;
               stock = variations.stock;
@@ -445,33 +444,52 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                     SafeArea(
                       child: Row(children: [
                         // Quantity
-                        Row(children: [
-                          QuantityButton(
-                            onTap: () {
-                              if (itemController.quantity! > 1) {
-                                itemController.setQuantity(false, stock, item.quantityLimit, getxSnackBar: true);
-                              }
-                            },
-                            isIncrement: false,
-                            fromSheet: true,
-                          ),
-                          Text(itemController.quantity.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                          QuantityButton(
-                            onTap: () => itemController.setQuantity(true, stock, item.quantityLimit, getxSnackBar: true),
-                            isIncrement: true,
-                            fromSheet: true,
-                          ),
-                        ]),
-                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                        Builder(builder: (context) {
+                          int totalCartQtyOtherVariations = 0;
+                          List<CartModel> currentCartList = Get.find<CartController>().cartList;
+                          int? currentCartIndex = widget.cart != null ? Get.find<CartController>().cartList.indexOf(widget.cart!) : (itemController.cartIndex != -1 ? itemController.cartIndex : null);
+                          for (int i = 0; i < currentCartList.length; i++) {
+                            if (currentCartIndex != null && i == currentCartIndex) continue;
+                            if (currentCartList[i].item != null && currentCartList[i].item!.id == item.id) {
+                              totalCartQtyOtherVariations += (currentCartList[i].quantity ?? 0);
+                            }
+                          }
+                          bool isLimitReached = (item.quantityLimit != null && item.quantityLimit != 0 && totalCartQtyOtherVariations >= item.quantityLimit!)
+                              || (stock != null && stock <= 0)
+                              || (stock != null && Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && totalCartQtyOtherVariations >= stock);
+
+                          if (isLimitReached) return const SizedBox();
+
+                          return Row(children: [
+                            Row(children: [
+                              QuantityButton(
+                                onTap: () {
+                                  if (itemController.quantity! > 1) {
+                                    itemController.setQuantity(false, stock, item.quantityLimit, getxSnackBar: true);
+                                  }
+                                },
+                                isIncrement: false,
+                                fromSheet: true,
+                              ),
+                              Text(itemController.quantity.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                              QuantityButton(
+                                onTap: () => itemController.setQuantity(true, stock, item.quantityLimit, getxSnackBar: true),
+                                isIncrement: true,
+                                fromSheet: true,
+                              ),
+                            ]),
+                            const SizedBox(width: Dimensions.paddingSizeSmall),
+                          ]);
+                        }),
 
                         Expanded(child: GetBuilder<CartController>(builder: (cartController) {
                           return CustomButton(
                             width: ResponsiveHelper.isDesktop(context) ? MediaQuery.of(context).size.width / 2.0 : null,
-                            isLoading: cartController.isLoading,
-                            buttonText: (Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && stock! <= 0)
+                            isLoading: cartController.isLoading || cartController.isItemAdding(item.id),
+                            buttonText: (stock != null && stock! <= 0)
                                 ? 'out_of_stock'.tr : widget.isCampaign ? 'order_now'.tr
-                                : (widget.cart != null || itemController.cartIndex != -1) ? 'update_in_cart'.tr : 'add_to_cart'.tr,
-                            onPressed: (Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && stock! <= 0) ? null : () async {
+                                : (itemController.cartIndex != -1) ? 'update_in_cart'.tr : 'add_to_cart'.tr,
+                            onPressed: (stock != null && stock! <= 0) ? null : () async {
                               String? invalid;
                               if(_newVariation) {
                                 for(int index=0; index<item.foodVariations!.length; index++) {
@@ -502,6 +520,21 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                               if(invalid != null) {
                                 showCustomSnackBar(invalid, getXSnackBar: true);
                               }else {
+                                int totalCartQtyOtherVariations = 0;
+                                List<CartModel> currentCartList = Get.find<CartController>().cartList;
+                                int? currentCartIndex = itemController.cartIndex != -1 ? itemController.cartIndex : null;
+                                for (int i = 0; i < currentCartList.length; i++) {
+                                  if (currentCartIndex != null && i == currentCartIndex) continue;
+                                  if (currentCartList[i].item != null && currentCartList[i].item!.id == item.id) {
+                                    totalCartQtyOtherVariations += (currentCartList[i].quantity ?? 0);
+                                  }
+                                }
+
+                                if (item.quantityLimit != null && item.quantityLimit != 0 && (totalCartQtyOtherVariations + itemController.quantity!) > item.quantityLimit!) {
+                                  showCustomSnackBar('${'maximum_quantity_limit'.tr} ${item.quantityLimit}', getXSnackBar: true);
+                                  return;
+                                }
+
                                 CartModel cartModel = CartModel(
                                     id: null, price: price, discountedPrice: priceWithDiscountAndAddons, variation: variation != null ? [variation] : [], foodVariations: itemController.selectedVariations,
                                     discountAmount: (price! - PriceConverter.convertWithDiscount(price, discount, discountType)!),
@@ -517,7 +550,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
 
                                 print('=======variation: $variation');
                                 OnlineCart onlineCart = OnlineCart(
-                                  cartId: (widget.cart != null || itemController.cartIndex != -1) ? widget.cart?.id ?? cartController.cartList[itemController.cartIndex].id : null,
+                                  cartId: itemController.cartIndex != -1 ? cartController.cartList[itemController.cartIndex].id : null,
                                   itemId: item.id, itemCampaignId: widget.isCampaign ? item.id : null,
                                   price: priceWithDiscountAndAddons.toString(), variant: '',
                                   variation: variation != null ? [variation] : null,
@@ -532,9 +565,9 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                   ));
                                 }else {
                                   if (Get.find<CartController>().existAnotherStoreItem(
-                                    cartModel.item!.storeId, Get.find<SplashController>().module != null
-                                      ? Get.find<SplashController>().module!.id : Get.find<SplashController>().cacheModule!.id,
-                                  )) {
+                                     cartModel.item!.storeId, cartModel.item!.moduleId ?? (Get.find<SplashController>().module != null
+                                       ? Get.find<SplashController>().module!.id : Get.find<SplashController>().cacheModule!.id),
+                                   )) {
                                     Get.dialog(ConfirmationDialog(
                                       icon: Images.warning,
                                       title: 'are_you_sure_to_reset'.tr,
@@ -553,7 +586,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                       },
                                     ), barrierDismissible: false);
                                   } else {
-                                    if(widget.cart != null || itemController.cartIndex != -1){
+                                    if(itemController.cartIndex != -1){
                                       Get.find<CartController>().updateCartOnline(onlineCart, cartModel);
                                       Get.back();
                                     } else {

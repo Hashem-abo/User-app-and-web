@@ -29,6 +29,8 @@ import 'package:sixam_mart/helper/module_icon_helper.dart';
 import 'package:sixam_mart/helper/color_converter.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import 'package:sixam_mart/helper/item_helper.dart';
+
 class ItemCard extends StatefulWidget {
   final Item? item;
   final Store? store;
@@ -117,6 +119,8 @@ class _ItemCardState extends State<ItemCard> {
        isAvailable = widget.store!.open == 1 && (widget.store!.active ?? false);
     }
 
+    bool isEntirelyOutOfStock = ItemHelper.isItemEntirelyOutOfStock(widget.item);
+
     return OnHover(
       isItem: true,
       child: Stack(children: [
@@ -128,7 +132,7 @@ class _ItemCardState extends State<ItemCard> {
             color: Theme.of(context).cardColor,
           ),
           child: CustomInkWell(
-            onTap: () {
+            onTap: isEntirelyOutOfStock ? null : () {
                if(widget.item != null) {
                  Get.find<ItemController>().navigateToItemPage(widget.item, context, isCampaign: widget.isCampaign);
                } else if(widget.store != null) {
@@ -142,7 +146,9 @@ class _ItemCardState extends State<ItemCard> {
             radius: Dimensions.radiusLarge,
             child: TextHover(
               builder: (isHovered) {
-                return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                return Opacity(
+                  opacity: isEntirelyOutOfStock ? 0.55 : 1.0,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Expanded(
                     flex: widget.isFood ? 6 : 7,
                     child: Stack(children: [
@@ -155,55 +161,83 @@ class _ItemCardState extends State<ItemCard> {
                             bottomLeft: Radius.circular(widget.isPopularItem ? Dimensions.radiusLarge : 0),
                             bottomRight: Radius.circular(widget.isPopularItem ? Dimensions.radiusLarge : 0),
                           ),
-                          child: (widget.item != null && widget.item!.imagesFullUrl != null && widget.item!.imagesFullUrl!.length > 1) ? Stack(
+                          child: Stack(
                             children: [
-                              CarouselSlider.builder(
-                                carouselController: _carouselController,
-                                itemCount: widget.item!.imagesFullUrl!.length,
-                                options: CarouselOptions(
-                                  viewportFraction: 1,
-                                  autoPlay: false,
-                                  enlargeCenterPage: false,
-                                  height: double.infinity,
-                                  onPageChanged: (index, reason) {
-                                    setState(() {
-                                      _currentImageIndex = index;
-                                    });
-                                  },
-                                ),
-                                itemBuilder: (context, index, realIndex) {
-                                  return CustomImage(
-                                    isHovered: isHovered,
-                                    placeholder: Images.defultImage,
-                                    image: widget.item!.imagesFullUrl![index],
-                                    fit: BoxFit.cover, width: double.infinity, height: double.infinity,
-                                  );
-                                },
-                              ),
-
-                              Positioned(
-                                bottom: 5, left: 0, right: 0,
-                                child: Center(
-                                  child: AnimatedSmoothIndicator(
-                                    activeIndex: _currentImageIndex,
-                                    count: widget.item!.imagesFullUrl!.length,
-                                    effect: ExpandingDotsEffect(
-                                      dotHeight: 5, dotWidth: 5,
-                                      activeDotColor: Theme.of(context).primaryColor,
-                                      dotColor: Theme.of(context).disabledColor.withOpacity(0.5),
+                              (widget.item != null && widget.item!.imagesFullUrl != null && widget.item!.imagesFullUrl!.length > 1) ? Stack(
+                                children: [
+                                  CarouselSlider.builder(
+                                    carouselController: _carouselController,
+                                    itemCount: widget.item!.imagesFullUrl!.length,
+                                    options: CarouselOptions(
+                                      viewportFraction: 1,
+                                      autoPlay: false,
+                                      enlargeCenterPage: false,
+                                      height: double.infinity,
+                                      onPageChanged: (index, reason) {
+                                        setState(() {
+                                          _currentImageIndex = index;
+                                        });
+                                      },
                                     ),
-                                    onDotClicked: (index) {
-                                      _carouselController.animateToPage(index);
+                                    itemBuilder: (context, index, realIndex) {
+                                      return CustomImage(
+                                        isHovered: isHovered,
+                                        placeholder: Images.defultImage,
+                                        image: widget.item!.imagesFullUrl![index],
+                                        fit: BoxFit.cover, width: double.infinity, height: double.infinity,
+                                      );
                                     },
                                   ),
-                                ),
+
+                                  Positioned(
+                                    bottom: 5, left: 0, right: 0,
+                                    child: Center(
+                                      child: AnimatedSmoothIndicator(
+                                        activeIndex: _currentImageIndex,
+                                        count: widget.item!.imagesFullUrl!.length,
+                                        effect: ExpandingDotsEffect(
+                                          dotHeight: 5, dotWidth: 5,
+                                          activeDotColor: Theme.of(context).primaryColor,
+                                          dotColor: Theme.of(context).disabledColor.withOpacity(0.5),
+                                        ),
+                                        onDotClicked: (index) {
+                                          _carouselController.animateToPage(index);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ) : CustomImage(
+                                isHovered: isHovered,
+                                placeholder: Images.defultImage,
+                                image: widget.item != null ? '${widget.item!.imageFullUrl}' : '${widget.store!.coverPhotoFullUrl}',
+                                fit: BoxFit.cover, width: double.infinity, height: double.infinity,
                               ),
+
+                              if (isEntirelyOutOfStock)
+                                Positioned(
+                                  top: 14,
+                                  right: -28,
+                                  child: Transform.rotate(
+                                    angle: 0.785398,
+                                    child: Container(
+                                      width: 110,
+                                      padding: const EdgeInsets.symmetric(vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.redAccent.shade700,
+                                        boxShadow: const [
+                                          BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+                                        ],
+                                      ),
+                                      child: Text(
+                                        'out_of_stock'.tr,
+                                        style: robotoBold.copyWith(color: Colors.white, fontSize: 8),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                             ],
-                          ) : CustomImage(
-                            isHovered: isHovered,
-                            placeholder: Images.defultImage,
-                            image: widget.item != null ? '${widget.item!.imageFullUrl}' : '${widget.store!.coverPhotoFullUrl}',
-                            fit: BoxFit.cover, width: double.infinity, height: double.infinity,
                           ),
                         ),
                       ),
@@ -295,22 +329,9 @@ class _ItemCardState extends State<ItemCard> {
 
                       widget.item != null ? OrganicTag(item: widget.item!, placeInImage: true) : const SizedBox(),
 
-                      (widget.item != null && widget.item!.stock != null && widget.item!.stock! < 0) ? Positioned(
-                        bottom: 10, left : 0,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(Dimensions.radiusLarge),
-                              bottomRight: Radius.circular(Dimensions.radiusLarge),
-                            ),
-                          ),
-                          child: Text('out_of_stock'.tr, style: robotoRegular.copyWith(color: Theme.of(context).cardColor, fontSize: Dimensions.fontSizeSmall)),
-                        ),
-                      ) : const SizedBox(),
+                      const SizedBox(),
 
-                     widget.item != null ? Positioned(
+                     (widget.item != null && !isEntirelyOutOfStock) ? Positioned(
                   bottom: 0, 
                   left: 0,
                   child: CartCountView(
@@ -884,9 +905,10 @@ class _ItemCardState extends State<ItemCard> {
                       ]),
                     ),
                   ),
-                ]);
-              },
-            ),
+                 ]),
+               );
+             },
+           ),
           ),
         ),
       ]),

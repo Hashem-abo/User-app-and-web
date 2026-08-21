@@ -52,12 +52,16 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
   final ScrollController scrollController = ScrollController();
 
   void _loadData(BuildContext context, bool reload) async {
-    await Get.find<OrderController>().trackOrder(widget.orderId.toString(), reload ? null : widget.orderModel, false, contactNumber: widget.contactNumber).then((value) {
+    String? contact = (widget.contactNumber != null && widget.contactNumber != 'null' && widget.contactNumber!.isNotEmpty) 
+        ? widget.contactNumber 
+        : Get.find<OrderController>().trackModel?.deliveryAddress?.contactPersonNumber;
+
+    await Get.find<OrderController>().trackOrder(widget.orderId.toString(), reload ? null : widget.orderModel, false, contactNumber: contact).then((value) {
       if(widget.fromOfflinePayment) {
         Future.delayed(const Duration(seconds: 2), () => showAnimatedDialog(Get.context!, OfflineSuccessDialog(orderId: widget.orderId)));
       }
     });
-    Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: widget.contactNumber);
+    Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: contact);
     Get.find<OrderController>().getOrderDetails(widget.orderId.toString());
   }
 
@@ -68,8 +72,10 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    if (Get.find<OrderController>().trackModel?.id != widget.orderId) {
+      Get.find<OrderController>().clearPrevOrderData();
+    }
     _loadData(context, false);
-  //_startApiCall();
   }
 
   @override
@@ -171,37 +177,44 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
             bool showChatPermission = true;
             if(orderController.orderDetails != null  && order != null) {
               parcel = order.orderType == 'parcel';
-              prescriptionOrder = order.prescriptionOrder!;
-              deliveryCharge = order.deliveryCharge!;
-              couponDiscount = order.couponDiscountAmount!;
-              discount = order.storeDiscountAmount! + order.flashAdminDiscountAmount! + order.flashStoreDiscountAmount!;
-              tax = order.totalTaxAmount!;
-              dmTips = order.dmTips!;
-              taxIncluded = order.taxStatus!;
-              additionalCharge = order.additionalCharge!;
-              extraPackagingCharge = order.extraPackagingAmount!;
-              referrerBonusAmount = order.referrerBonusAmount!;
+              prescriptionOrder = order.prescriptionOrder ?? false;
+              deliveryCharge = order.deliveryCharge ?? 0;
+              couponDiscount = order.couponDiscountAmount ?? 0;
+              discount = (order.storeDiscountAmount ?? 0) + (order.flashAdminDiscountAmount ?? 0) + (order.flashStoreDiscountAmount ?? 0);
+              tax = order.totalTaxAmount ?? 0;
+              dmTips = order.dmTips ?? 0;
+              taxIncluded = order.taxStatus ?? false;
+              additionalCharge = order.additionalCharge ?? 0;
+              extraPackagingCharge = order.extraPackagingAmount ?? 0;
+              referrerBonusAmount = order.referrerBonusAmount ?? 0;
               if(prescriptionOrder) {
                 double orderAmount = order.orderAmount ?? 0;
                 itemsPrice = (orderAmount + discount) - ((taxIncluded ? 0 : tax) + deliveryCharge) - additionalCharge;
               } else{
                 for(OrderDetailsModel orderDetails in orderController.orderDetails!) {
-                  for(AddOn addOn in orderDetails.addOns!) {
-                    addOns = addOns + (addOn.price! * addOn.quantity!);
+                  if(orderDetails.addOns != null) {
+                    for(AddOn addOn in orderDetails.addOns!) {
+                      addOns = addOns + ((addOn.price ?? 0) * (addOn.quantity ?? 0));
+                    }
                   }
-                  itemsPrice = itemsPrice + (orderDetails.price! * orderDetails.quantity!);
+                  itemsPrice = itemsPrice + ((orderDetails.price ?? 0) * (orderDetails.quantity ?? 0));
                 }
               }
 
               if(!parcel && order.store != null) {
-                for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-                  if(zData.id == order.store!.zoneId){
-                    _isCashOnDeliveryActive = zData.cashOnDelivery;
-                  }
-                  for(Modules m in zData.modules!) {
-                    if(m.id == order.store!.moduleId) {
-                      _maxCodOrderAmount = m.pivot!.maximumCodOrderAmount;
-                      break;
+                List<ZoneData>? zList = order.deliveryAddress?.zoneData ?? AddressHelper.getUserAddressFromSharedPref()?.zoneData;
+                if(zList != null) {
+                  for(ZoneData zData in zList) {
+                    if(zData.id == order.store!.zoneId){
+                      _isCashOnDeliveryActive = zData.cashOnDelivery;
+                    }
+                    if(zData.modules != null) {
+                      for(Modules m in zData.modules!) {
+                        if(m.id == order.store!.moduleId) {
+                          _maxCodOrderAmount = m.pivot?.maximumCodOrderAmount;
+                          break;
+                        }
+                      }
                     }
                   }
                 }
@@ -226,7 +239,9 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
             double subTotal = itemsPrice + addOns;
             double total = itemsPrice + addOns - discount + (taxIncluded ? 0 : tax) + deliveryCharge - couponDiscount + dmTips + additionalCharge + extraPackagingCharge - referrerBonusAmount;
 
-            return orderController.orderDetails != null && order != null && orderController.trackModel != null ? Column(children: [
+            bool isCurrentOrderData = orderController.orderDetails != null && order != null && orderController.trackModel != null && orderController.trackModel!.id == widget.orderId;
+
+            return isCurrentOrderData ? Column(children: [
 
               isDesktop ? Container(
                 height: 64,

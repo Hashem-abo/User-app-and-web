@@ -5,6 +5,7 @@ import 'package:sixam_mart/features/item/domain/models/basic_medicine_model.dart
 import 'package:sixam_mart/common/models/response_model.dart';
 import 'package:sixam_mart/features/item/domain/models/common_condition_model.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/item/domain/repositories/item_repository_interface.dart';
 import 'package:sixam_mart/features/item/domain/services/item_service_interface.dart';
@@ -228,14 +229,25 @@ class ItemService implements ItemServiceInterface {
   }
 
   @override
-  Future<int> setQuantity(bool isIncrement, bool moduleStock, int? stock, int qty, int? quantityLimit, {bool getxSnackBar = false}) async{
+  Future<int> setQuantity(bool isIncrement, bool moduleStock, int? stock, int qty, int? quantityLimit, {bool getxSnackBar = false, int? itemId, int? cartIndex}) async{
     int quantity = qty;
     if (isIncrement) {
-      if(moduleStock && quantity >= stock!) {
+      int totalCartQtyOtherVariations = 0;
+      if (itemId != null) {
+        List<CartModel> cartList = Get.find<CartController>().cartList;
+        for (int i = 0; i < cartList.length; i++) {
+          if (cartIndex != null && cartIndex != -1 && i == cartIndex) continue;
+          if (cartList[i].item != null && cartList[i].item!.id == itemId) {
+            totalCartQtyOtherVariations += (cartList[i].quantity ?? 0);
+          }
+        }
+      }
+
+      if(moduleStock && (totalCartQtyOtherVariations + quantity + 1) > stock!) {
         showCustomSnackBar('out_of_stock'.tr);
       }else {
-        if(quantityLimit != null ){
-          if(quantity >= quantityLimit && quantityLimit != 0) {
+        if(quantityLimit != null && quantityLimit != 0){
+          if((totalCartQtyOtherVariations + quantity + 1) > quantityLimit) {
             showCustomSnackBar('${'maximum_quantity_limit'.tr} $quantityLimit', getXSnackBar: getxSnackBar);
           } else {
             quantity = quantity + 1;
@@ -245,7 +257,9 @@ class ItemService implements ItemServiceInterface {
         }
       }
     } else {
-      quantity = quantity - 1;
+      if (quantity > 1) {
+        quantity = quantity - 1;
+      }
     }
     return quantity;
   }

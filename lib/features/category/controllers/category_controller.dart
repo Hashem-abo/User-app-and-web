@@ -68,6 +68,8 @@ class CategoryController extends GetxController implements GetxService {
 
   void clearCategoryList() {
     _categoryList = null;
+    _moduleCategoryList.clear();
+    _moduleInterestSelectedList.clear();
     _isCategoryLoaded = false;
   }
 
@@ -79,6 +81,11 @@ class CategoryController extends GetxController implements GetxService {
   Future<void> getCategoryList(bool reload, {bool allCategory = false, DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
     int? currentModuleId = Get.find<SplashController>().module?.id;
     
+    if(reload) {
+      _moduleCategoryList.clear();
+      _moduleInterestSelectedList.clear();
+    }
+
     if(!reload && currentModuleId != null && _moduleCategoryList.containsKey(currentModuleId)) {
       _categoryList = _moduleCategoryList[currentModuleId];
       _interestSelectedList = _moduleInterestSelectedList[currentModuleId];

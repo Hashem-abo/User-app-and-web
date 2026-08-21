@@ -133,11 +133,31 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     super.dispose();
   }
 
+  bool _isVariantImageAt(int index) {
+    if (index >= 0 && index < _imageList.length && widget.item.variations != null) {
+      String? currentUrl = _imageList[index];
+      for (var v in widget.item.variations!) {
+        if (v.imagesFullUrl != null) {
+          for (var img in v.imagesFullUrl!) {
+            if (_isSameImage(img, currentUrl)) return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     bool hasColors = _colorOption != null && _colorOption!.options != null && _colorOption!.options!.isNotEmpty;
     double bottomPadding = MediaQuery.of(context).padding.bottom;
     double bottomBarHeight = 60 + bottomPadding;
+
+    Color? selectedColor;
+    if (hasColors && _colorOption != null && _colorOption!.options != null && _selectedColorIndex < _colorOption!.options!.length) {
+      String colorName = _colorOption!.options![_selectedColorIndex].trim();
+      selectedColor = ColorConverter.getColorFromOption(colorName);
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -145,41 +165,47 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         top: false,
         bottom: false,
         child: GetBuilder<ItemController>(builder: (itemController) {
+          bool isCurrentVariantImage = _isVariantImageAt(itemController.imageIndex);
+
+          Widget galleryWidget = PhotoViewGallery.builder(
+            scrollPhysics: const BouncingScrollPhysics(),
+            backgroundDecoration: const BoxDecoration(color: Colors.black),
+            itemCount: _imageList.length,
+            pageController: _pageController,
+            builder: (BuildContext context, int index) {
+              return PhotoViewGalleryPageOptions(
+                imageProvider: kIsWeb
+                    ? NetworkImage('${AppConstants.baseUrl}/image-proxy?url=${_imageList[index]}')
+                    : NetworkImage('${_imageList[index]}'),
+                initialScale: PhotoViewComputedScale.contained,
+                heroAttributes: PhotoViewHeroAttributes(tag: index.toString()),
+              );
+            },
+            loadingBuilder: (context, event) => Center(
+              child: SizedBox(
+                width: 24.0,
+                height: 24.0,
+                child: CircularProgressIndicator(
+                  value: event == null
+                      ? 0
+                      : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
+                ),
+              ),
+            ),
+            onPageChanged: (int index) {
+              itemController.setImageIndex(index, true);
+              _syncColorIndexForImage(index);
+            },
+          );
+
+          Widget mainViewerArea = galleryWidget;
+
           return Stack(
             children: [
               // 1. Photo View Gallery (Main Immersive Viewer Area)
               Positioned.fill(
-                child: PhotoViewGallery.builder(
-                  scrollPhysics: const BouncingScrollPhysics(),
-                  backgroundDecoration: const BoxDecoration(color: Colors.black),
-                  itemCount: _imageList.length,
-                  pageController: _pageController,
-                  builder: (BuildContext context, int index) {
-                    return PhotoViewGalleryPageOptions(
-                      imageProvider: kIsWeb
-                          ? NetworkImage('${AppConstants.baseUrl}/image-proxy?url=${_imageList[index]}')
-                          : NetworkImage('${_imageList[index]}'),
-                      initialScale: PhotoViewComputedScale.contained,
-                      heroAttributes: PhotoViewHeroAttributes(tag: index.toString()),
-                    );
-                  },
-                  loadingBuilder: (context, event) => Center(
-                    child: SizedBox(
-                      width: 24.0,
-                      height: 24.0,
-                      child: CircularProgressIndicator(
-                        value: event == null
-                            ? 0
-                            : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
-                        valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
-                      ),
-                    ),
-                  ),
-                  onPageChanged: (int index) {
-                    itemController.setImageIndex(index, true);
-                    _syncColorIndexForImage(index);
-                  },
-                ),
+                child: mainViewerArea,
               ),
 
               // 2. Custom High-End Top Overlay Bar (Mockup Layout with top-right icon removed)

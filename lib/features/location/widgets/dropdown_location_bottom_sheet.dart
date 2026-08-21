@@ -807,6 +807,8 @@ class _DropdownLocationBottomSheetState extends State<DropdownLocationBottomShee
                       }
                     }
 
+                    await AddressHelper.saveUserAddressInSharedPref(addressToReturn);
+
                     Get.back(); // Dismiss CustomLoaderWidget dialog
 
                     if (widget.fromCheckout) {

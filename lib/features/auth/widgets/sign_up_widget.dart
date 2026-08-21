@@ -363,7 +363,31 @@ class SignUpWidgetState extends State<SignUpWidget> {
       return;
     } else {
       authController.registration(signUpModel).then((status) async {
-        _handleResponse(status, countryCode);
+        if (status.isSuccess) {
+          _handleResponse(status, countryCode);
+        } else {
+          // Mobile App Fallback: If backend sign up returned error but created the account, attempt auto-login
+          try {
+            String isPhone = ValidateCheck.getValidPhone(countryCode + _phoneController.text.trim(), withCountryCode: true);
+            String phoneOrEmail = isPhone != "" ? isPhone : _emailController.text.trim();
+            String fieldType = isPhone != "" ? 'phone' : 'email';
+
+            ResponseModel loginStatus = await authController.login(
+              emailOrPhone: phoneOrEmail,
+              password: _passwordController.text.trim(),
+              loginType: CentralizeLoginType.manual.name,
+              fieldType: fieldType,
+            );
+
+            if (loginStatus.isSuccess) {
+              _handleResponse(loginStatus, countryCode);
+            } else {
+              showCustomSnackBar(status.message);
+            }
+          } catch (_) {
+            showCustomSnackBar(status.message);
+          }
+        }
       });
     }
   }

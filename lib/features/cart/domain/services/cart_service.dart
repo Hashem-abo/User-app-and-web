@@ -185,10 +185,21 @@ class CartService implements CartServiceInterface {
     int quantity = cartList[cartIndex].quantity!;
     bool isFood = cartList[cartIndex].item!.moduleType == 'food';
     if (isIncrement) {
-      if(!isFood && moduleStock && cartList[cartIndex].quantity! >= stock!) {
+      int totalCartQtyOtherVariations = 0;
+      int? itemId = cartList[cartIndex].item?.id;
+      if (itemId != null) {
+        for (int i = 0; i < cartList.length; i++) {
+          if (i == cartIndex) continue;
+          if (cartList[i].item != null && cartList[i].item!.id == itemId) {
+            totalCartQtyOtherVariations += (cartList[i].quantity ?? 0);
+          }
+        }
+      }
+
+      if(!isFood && moduleStock && (totalCartQtyOtherVariations + quantity + 1) > stock!) {
         showCustomSnackBar('out_of_stock'.tr);
-      }else if(quantityLimit != null){
-        if(quantity >= quantityLimit && quantityLimit != 0) {
+      }else if(quantityLimit != null && quantityLimit != 0){
+        if((totalCartQtyOtherVariations + quantity + 1) > quantityLimit) {
           showCustomSnackBar('${'maximum_quantity_limit'.tr} $quantityLimit');
         } else {
           quantity = quantity + 1;
@@ -300,12 +311,24 @@ class CartService implements CartServiceInterface {
   @override
   int isExistInCart(List<CartModel> cartList, int? itemID, String variationType, bool isUpdate, int? cartIndex) {
     for(int index=0; index<cartList.length; index++) {
-      if(cartList[index].item!.id == itemID && (cartList[index].variation!.isNotEmpty
-          ? cartList[index].variation![0].type == variationType : true)) {
-        if((isUpdate && index == cartIndex)) {
-          return -1;
-        }else {
-          return index;
+      if(cartList[index].item!.id == itemID) {
+        if (variationType.isEmpty) {
+          if (isUpdate && index == cartIndex) {
+            return -1;
+          } else {
+            return index;
+          }
+        }
+        String existingType = (cartList[index].variation != null && cartList[index].variation!.isNotEmpty)
+            ? (cartList[index].variation![0].type ?? '')
+            : '';
+        bool sameVariation = existingType.isEmpty || existingType.replaceAll(' ', '').toLowerCase() == variationType.replaceAll(' ', '').toLowerCase();
+        if (sameVariation) {
+          if (isUpdate && index == cartIndex) {
+            return -1;
+          } else {
+            return index;
+          }
         }
       }
     }
@@ -314,14 +337,15 @@ class CartService implements CartServiceInterface {
 
   @override
   bool existAnotherStoreItem(int? storeID, int? moduleId, List<CartModel> cartList) {
+    if (cartList.isEmpty) return false;
     Set<int> storeIds = {};
     if (storeID != null) storeIds.add(storeID);
 
     for(CartModel cartModel in cartList) {
-      if(cartModel.item!.moduleId != moduleId) {
+      if(cartModel.item != null && cartModel.item!.moduleId != null && moduleId != null && cartModel.item!.moduleId != moduleId) {
         return true; 
       }
-      if (cartModel.item!.storeId != null) {
+      if (cartModel.item != null && cartModel.item!.storeId != null) {
         storeIds.add(cartModel.item!.storeId!);
       }
     }

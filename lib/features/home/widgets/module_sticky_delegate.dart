@@ -7,6 +7,7 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 // import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart'; // + ahmed
+import 'package:sixam_mart/features/location/widgets/zone_selection_bottom_sheet.dart';
 import 'package:sixam_mart/helper/auth_helper.dart'; // + ahmed
 import 'package:sixam_mart/helper/address_helper.dart'; // + ahmed
 // import 'package:sixam_mart/util/images.dart';
@@ -339,10 +340,8 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                               } else if (textPosition ==
                                                   'hide') {
                                                 moduleWidget = Padding(
-                                                  padding: const EdgeInsets
-                                                      .only(
-                                                      bottom: Dimensions
-                                                          .paddingSizeSmall),
+                                                  padding: const EdgeInsets.only(
+                                                      bottom: 2),
                                                   child: imageContainer,
                                                 );
                                               } else {
@@ -389,9 +388,11 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                               child: ListView.builder(
                                 controller: collapsedScrollController,
                                 scrollDirection: Axis.horizontal,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: Dimensions.paddingSizeSmall,
-                                        vertical: 10),
+                                    padding: const EdgeInsets.only(
+                                        left: Dimensions.paddingSizeSmall,
+                                        right: Dimensions.paddingSizeSmall,
+                                        top: 6,
+                                        bottom: 2),
                                     physics: const BouncingScrollPhysics(),
                                     itemCount:
                                         splashController.moduleList?.length ??
@@ -455,57 +456,110 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                       child: SingleChildScrollView(
                         // Avoid overflow errors
                         physics: const NeverScrollableScrollPhysics(),
-                        child: Center(
-                          child: InkWell(
-                            onTap: () => Get.find<LocationController>()
-                                .navigateToLocationScreen('home'),
-                            child: GetBuilder<LocationController>(
-                                builder: (locationController) {
-                              Color? fontColor = locationHeaderFontColor != null
-                                  ? Color(int.parse(locationHeaderFontColor!
-                                      .replaceFirst('#', '0xff')))
-                                  : Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge!
-                                      .color;
-                              return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                        spacing:
-                                            Dimensions.paddingSizeExtraSmall,
-                                        children: [
-                                          Icon(Icons.location_on,
-                                              size: 20, color: fontColor),
-                                          Text(
-                                            (AddressHelper.getUserAddressFromSharedPref() != null && AddressHelper.getUserAddressFromSharedPref()!.addressType != null)
-                                                ? AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr
-                                                : 'your_location'.tr,
-                                            style: robotoBold.copyWith(
-                                                color: fontColor,
-                                                fontSize:
-                                                    Dimensions.fontSizeLarge),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              AddressHelper.getUserAddressFromSharedPref()?.address ?? 'select_location'.tr,
-                                              style: robotoBold.copyWith(
-                                                  color: fontColor,
-                                                  fontSize:
-                                                      Dimensions.fontSizeLarge),
+                        child: GetBuilder<LocationController>(
+                            builder: (locationController) {
+                          Color? fontColor = locationHeaderFontColor != null
+                              ? Color(int.parse(locationHeaderFontColor!
+                                  .replaceFirst('#', '0xff')))
+                              : Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .color;
+
+                          String currentZoneName = 'select_zone'.tr == 'select_zone' ? 'اختر المدينة' : 'select_zone'.tr;
+                          if (locationController.zoneList != null && locationController.zoneList!.isNotEmpty) {
+                            final currentZone = locationController.zoneList!.firstWhereOrNull((z) => z.id == locationController.zoneID);
+                            if (currentZone != null && currentZone.name != null && currentZone.name!.isNotEmpty) {
+                              currentZoneName = currentZone.name!;
+                            }
+                          }
+
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Right: Address & Location Picker (Expanded to fill available width)
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () => Get.find<LocationController>().navigateToLocationScreen('home'),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.location_on, size: 20, color: fontColor),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    (AddressHelper.getUserAddressFromSharedPref() != null && AddressHelper.getUserAddressFromSharedPref()!.addressType != null)
+                                                        ? AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr
+                                                        : 'your_location'.tr,
+                                                    style: robotoBold.copyWith(color: fontColor, fontSize: Dimensions.fontSizeDefault),
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 2),
+                                                Icon(Icons.keyboard_arrow_down, color: fontColor, size: 18),
+                                              ],
+                                            ),
+                                            Text(
+                                              AddressHelper.formatAddressWithZone(AddressHelper.getUserAddressFromSharedPref()),
+                                              style: robotoRegular.copyWith(color: fontColor?.withValues(alpha: 0.85), fontSize: Dimensions.fontSizeSmall),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                             ),
-                                          ),
-                                          Icon(Icons.expand_more,
-                                              color: fontColor, size: 20),
-                                        ]),
-                                  ]);
-                            }),
-                          ),
-                        ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 6),
+
+                              // Left: City / Zone Selector Dropdown Pill
+                              InkWell(
+                                onTap: () {
+                                  Get.bottomSheet(
+                                    const ZoneSelectionBottomSheet(),
+                                    isScrollControlled: true,
+                                  );
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.3), width: 1),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.location_city_rounded, size: 14, color: Theme.of(context).primaryColor),
+                                      const SizedBox(width: 4),
+                                      ConstrainedBox(
+                                        constraints: const BoxConstraints(maxWidth: 95),
+                                        child: Text(
+                                          currentZoneName,
+                                          style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_drop_down_rounded, color: Theme.of(context).primaryColor, size: 18),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
                       ),
                     ),
                   ),

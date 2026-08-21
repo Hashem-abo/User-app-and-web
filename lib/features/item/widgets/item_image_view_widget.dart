@@ -6,7 +6,6 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/helper/color_converter.dart';
 class ItemImageViewWidget extends StatelessWidget {
   final Item? item;
   final bool isCampaign;
@@ -24,7 +23,6 @@ class ItemImageViewWidget extends StatelessWidget {
 
       List<String?> imageList = [];
       List<String?> imageListForCampaign = [];
-      bool isVariantImage = false;
 
       if(isCampaign){
         imageListForCampaign.add(item!.imageFullUrl);
@@ -57,28 +55,10 @@ class ItemImageViewWidget extends StatelessWidget {
 
         if (selectedVariation != null && selectedVariation.imagesFullUrl != null && selectedVariation.imagesFullUrl!.isNotEmpty) {
           imageList.addAll(selectedVariation.imagesFullUrl!);
-          isVariantImage = true;
         } else {
           imageList.add(item!.imageFullUrl);
           if(item!.imagesFullUrl != null){
             imageList.addAll(item!.imagesFullUrl!);
-          }
-        }
-      }
-
-      Color? selectedColor;
-      if (item!.choiceOptions != null && itemController.variationIndex != null) {
-        for (int i = 0; i < item!.choiceOptions!.length; i++) {
-          String? title = item!.choiceOptions![i].title;
-          if (title != null && (title.toLowerCase().contains('color') || title.contains('لون'))) {
-            if (itemController.variationIndex!.length > i) {
-              int selectedIndex = itemController.variationIndex![i];
-              if (item!.choiceOptions![i].options != null && item!.choiceOptions![i].options!.length > selectedIndex) {
-                String optionName = item!.choiceOptions![i].options![selectedIndex];
-                selectedColor = ColorConverter.getColorFromOption(optionName);
-              }
-            }
-            break;
           }
         }
       }
@@ -100,26 +80,10 @@ class ItemImageViewWidget extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return ClipRRect(
                       borderRadius: BorderRadius.zero,
-                      child: (selectedColor != null && !isVariantImage) 
-                        ? ColorFiltered(
-                            colorFilter: ColorFilter.mode(selectedColor, BlendMode.overlay),
-                            child: ColorFiltered(
-                              colorFilter: const ColorFilter.matrix(<double>[
-                                0.5, 0.5, 0.5, 0, -0.4,
-                                0.5, 0.5, 0.5, 0, -0.4,
-                                0.5, 0.5, 0.5, 0, -0.4,
-                                0,   0,   0,   1, 0,
-                              ]),
-                              child: CustomImage(
-                                image: '${isCampaign ? imageListForCampaign[index] : imageList[index]}',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          )
-                        : CustomImage(
-                            image: '${isCampaign ? imageListForCampaign[index] : imageList[index]}',
-                            fit: BoxFit.cover,
-                          ),
+                      child: CustomImage(
+                        image: '${isCampaign ? imageListForCampaign[index] : imageList[index]}',
+                        fit: BoxFit.cover,
+                      ),
                     );
                   },
                   onPageChanged: (index) {

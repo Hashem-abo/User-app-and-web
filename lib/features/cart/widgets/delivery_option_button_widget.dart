@@ -1,6 +1,7 @@
 import 'package:sixam_mart/common/widgets/custom_tool_tip_widget.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
+import 'package:sixam_mart/features/checkout/widgets/animated_calculating_widget.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -88,7 +89,12 @@ class _DeliveryOptionButtonWidgetState extends State<DeliveryOptionButtonWidget>
                 Text(widget.title, style: robotoMedium.copyWith(color: select ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color)),
 
                 Row(children: [
-                  Text(widget.value == 'delivery' ? '${'charge'.tr}: +${widget.deliveryChargeForView}' : 'free'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
+                  (widget.value == 'delivery' && (widget.deliveryChargeForView == 'calculating'.tr || widget.deliveryChargeForView.contains('calculating_base'.tr) || checkoutController.distance == -1))
+                      ? Row(children: [
+                    Text('${'charge'.tr}: ', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
+                    AnimatedCalculatingWidget(textStyle: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
+                  ])
+                      : Text(widget.value == 'delivery' ? '${'charge'.tr}: +${widget.deliveryChargeForView}' : 'free'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                   widget.deliveryChargeForView != PriceConverter.convertPrice(0) && widget.value == 'delivery' && checkoutController.extraCharge != null && (widget.deliveryChargeForView != '0') && widget.extraChargeForToolTip > 0 ? CustomToolTip(

@@ -11,6 +11,7 @@ import 'package:sixam_mart/features/location/domain/models/zone_response_model.d
 import 'package:sixam_mart/features/location/widgets/dropdown_location_bottom_sheet.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -127,7 +128,27 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
   }
 
   void _applyAddressToCheckout(AddressModel address) async {
+    if (address.latitude != null && address.longitude != null) {
+      ZoneResponseModel zoneResponse = await Get.find<LocationController>().getZone(
+        address.latitude, address.longitude, false, updateInAddress: true,
+      );
+      if (zoneResponse.isSuccess && zoneResponse.zoneIds.isNotEmpty) {
+        address.zoneId = zoneResponse.zoneIds[0];
+        address.zoneIds = [];
+        address.zoneIds!.addAll(zoneResponse.zoneIds);
+        address.zoneData = [];
+        address.zoneData!.addAll(zoneResponse.zoneData);
+        address.areaIds = [];
+        address.areaIds!.addAll(zoneResponse.areaIds);
+      }
+    }
+
     await AddressHelper.saveUserAddressInSharedPref(address);
+    Get.find<LocationController>().setPlaceMark(address.address ?? '');
+    if (AuthHelper.isLoggedIn()) {
+      Get.find<AuthController>().updateZone();
+    }
+
     if (!AuthHelper.isLoggedIn()) {
       address.email = 'guest@mile.com';
       checkoutController.setGuestAddress(address);
@@ -135,10 +156,15 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
     if (AuthHelper.isLoggedIn()) {
       await Get.find<AddressController>().getAddressList();
     }
+    int currentPaymentMethod = checkoutController.paymentMethodIndex;
+    checkoutController.clearPrevData();
+    if (currentPaymentMethod != -1) {
+      checkoutController.setPaymentMethod(currentPaymentMethod, isUpdate: false);
+    } else if (!AuthHelper.isGuestLoggedIn()) {
+      checkoutController.setPaymentMethod(0, isUpdate: false);
+    }
     checkoutController.setAddressIndex(0);
-    Get.find<AddressController>().update();
-    checkoutController.update();
-    
+
     double? lat = double.tryParse(address.latitude ?? '');
     double? lng = double.tryParse(address.longitude ?? '');
     
@@ -157,6 +183,7 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
     checkoutController.floorController.text = address.floor ?? '';
     
     Get.find<AddressController>().update();
+    Get.find<LocationController>().update();
     checkoutController.update();
   }
 

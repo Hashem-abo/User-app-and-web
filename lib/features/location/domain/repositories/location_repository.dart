@@ -16,10 +16,14 @@ class LocationRepository implements LocationRepositoryInterface {
   Future<String> getAddressFromGeocode(LatLng latLng) async {
     Response response = await apiClient.getData('${AppConstants.geocodeUri}?lat=${latLng.latitude}&lng=${latLng.longitude}', handleError: false);
     String address = 'Unknown Location Found';
-    if(response.statusCode == 200 && response.body['status'] == 'OK') {
+    if(response.statusCode == 200 && response.body != null && response.body is Map && response.body['status'] == 'OK') {
       address = response.body['results'][0]['formatted_address'].toString();
     }else {
-      showCustomSnackBar(response.body['error_message'] ?? response.bodyString);
+      String? errorMessage;
+      if (response.body != null && response.body is Map && response.body['error_message'] != null) {
+        errorMessage = response.body['error_message'];
+      }
+      showCustomSnackBar(errorMessage ?? response.statusText ?? response.bodyString);
     }
     return address;
   }
@@ -27,7 +31,7 @@ class LocationRepository implements LocationRepositoryInterface {
   @override
   Future<ZoneResponseModel> getZone(String? lat, String? lng, {bool handleError = false}) async {
     Response response = await apiClient.getData('${AppConstants.zoneUri}?lat=$lat&lng=$lng', handleError: handleError);
-    if(response.statusCode == 200) {
+    if(response.statusCode == 200 && response.body != null) {
       ZoneResponseModel responseModel;
       List<int>? zoneIds = ZoneModel.fromJson(response.body).zoneIds;
       List<ZoneData>? zoneData = ZoneModel.fromJson(response.body).zoneData;

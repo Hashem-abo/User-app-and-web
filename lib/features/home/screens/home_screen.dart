@@ -608,12 +608,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                       Expanded(
                                                         child: InkWell(
                                                           onTap: () {
-                                                            String currentHint = (Get.find<SplashController>().module?.searchHints?.isNotEmpty ?? false)
-                                                                ? Get.find<SplashController>().module!.searchHints![_currentHintIndex % Get.find<SplashController>().module!.searchHints!.length]
-                                                                : (Get.find<CategoryController>().categoryList?.isNotEmpty ?? false)
-                                                                    ? Get.find<CategoryController>().categoryList![_currentHintIndex % Get.find<CategoryController>().categoryList!.length].name!
-                                                                    : '';
-                                                            Get.toNamed(RouteHelper.getSearchRoute(queryText: currentHint));
+                                                            Get.toNamed(RouteHelper.getSearchRoute(queryText: ''));
                                                           },
                                                           borderRadius:
                                                               BorderRadius
@@ -677,64 +672,51 @@ class _HomeScreenState extends State<HomeScreen>
                                                                               Theme.of(context).hintColor,
                                                                         ),
                                                                       ),
-                                                                      Expanded(
-                                                                        child:
-                                                                            AnimatedSwitcher(
-                                                                          duration:
-                                                                              const Duration(milliseconds: 500),
-                                                                          transitionBuilder:
-                                                                              (
-                                                                            Widget
-                                                                                child,
-                                                                            Animation<double>
-                                                                                animation,
-                                                                          ) {
-                                                                            final inAnimation =
-                                                                                Tween<Offset>(
-                                                                              begin: const Offset(0, 1),
-                                                                              end: Offset.zero,
-                                                                            ).animate(animation);
-
-                                                                            final outAnimation =
-                                                                                Tween<Offset>(
-                                                                              begin: const Offset(0, -1),
-                                                                              end: Offset.zero,
-                                                                            ).animate(animation);
-
-                                                                            final isCurrentHint =
-                                                                                child.key == ValueKey<int>(_currentHintIndex);
-
-                                                                            return SlideTransition(
-                                                                              position: isCurrentHint ? inAnimation : outAnimation,
-                                                                              child: FadeTransition(
-                                                                                opacity: animation,
-                                                                                child: child,
-                                                                              ),
-                                                                            );
-                                                                          },
-                                                                          child:
-                                                                              Container(
-                                                                            key:
-                                                                                ValueKey<int>(_currentHintIndex),
-                                                                            alignment:
-                                                                                AlignmentDirectional.centerStart,
-                                                                            child:
-                                                                                Text(
-                                                                              (Get.find<SplashController>().module?.searchHints?.isNotEmpty ?? false)
-                                                                                  ? Get.find<SplashController>().module!.searchHints![_currentHintIndex % Get.find<SplashController>().module!.searchHints!.length]
-                                                                                  : (Get.find<CategoryController>().categoryList?.isNotEmpty ?? false)
-                                                                                      ? Get.find<CategoryController>().categoryList![_currentHintIndex % Get.find<CategoryController>().categoryList!.length].name!
-                                                                                      : '',
-                                                                              style: robotoBold.copyWith(
-                                                                                fontSize: Dimensions.fontSizeDefault,
-                                                                                color: Theme.of(context).hintColor,
-                                                                              ),
-                                                                              maxLines: 1,
-                                                                              overflow: TextOverflow.ellipsis,
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                      ),
+                                                                      Flexible(
+                                                                         child: AnimatedSwitcher(
+                                                                           duration: const Duration(milliseconds: 500),
+                                                                           transitionBuilder: (Widget child, Animation<double> animation) {
+                                                                             final inAnimation = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(animation);
+                                                                             final outAnimation = Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero).animate(animation);
+                                                                             final isCurrentHint = child.key == ValueKey<int>(_currentHintIndex);
+                                                                             return SlideTransition(
+                                                                               position: isCurrentHint ? inAnimation : outAnimation,
+                                                                               child: FadeTransition(
+                                                                                 opacity: animation,
+                                                                                 child: child,
+                                                                               ),
+                                                                             );
+                                                                           },
+                                                                           child: Container(
+                                                                             key: ValueKey<int>(_currentHintIndex),
+                                                                             alignment: AlignmentDirectional.centerStart,
+                                                                             child: GestureDetector(
+                                                                               behavior: HitTestBehavior.deferToChild,
+                                                                               onTap: () {
+                                                                                 String currentHint = (Get.find<SplashController>().module?.searchHints?.isNotEmpty ?? false)
+                                                                                     ? Get.find<SplashController>().module!.searchHints![_currentHintIndex % Get.find<SplashController>().module!.searchHints!.length]
+                                                                                     : (Get.find<CategoryController>().categoryList?.isNotEmpty ?? false)
+                                                                                         ? Get.find<CategoryController>().categoryList![_currentHintIndex % Get.find<CategoryController>().categoryList!.length].name!
+                                                                                         : '';
+                                                                                 Get.toNamed(RouteHelper.getSearchRoute(queryText: currentHint));
+                                                                               },
+                                                                               child: Text(
+                                                                                 (Get.find<SplashController>().module?.searchHints?.isNotEmpty ?? false)
+                                                                                     ? Get.find<SplashController>().module!.searchHints![_currentHintIndex % Get.find<SplashController>().module!.searchHints!.length]
+                                                                                     : (Get.find<CategoryController>().categoryList?.isNotEmpty ?? false)
+                                                                                         ? Get.find<CategoryController>().categoryList![_currentHintIndex % Get.find<CategoryController>().categoryList!.length].name!
+                                                                                         : '',
+                                                                                 style: robotoBold.copyWith(
+                                                                                   fontSize: Dimensions.fontSizeDefault,
+                                                                                   color: Theme.of(context).hintColor,
+                                                                                 ),
+                                                                                 maxLines: 1,
+                                                                                 overflow: TextOverflow.ellipsis,
+                                                                               ),
+                                                                             ),
+                                                                           ),
+                                                                         ),
+                                                                       ),
                                                                     ],
                                                                   ),
                                                                 ),

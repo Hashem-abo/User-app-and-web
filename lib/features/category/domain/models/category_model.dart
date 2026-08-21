@@ -3,6 +3,8 @@ class CategoryModel {
   String? name;
   String? imageFullUrl;
   int? childesCount;
+  int? productsCount;
+  List<CategoryModel>? childes;
 
   List<String>? bannersFullUrl;
   int? isTitleVisible;
@@ -12,13 +14,20 @@ class CategoryModel {
   int? subCategoryWidth;
   List<CategoryBanner>? bannersDetails;
 
-  CategoryModel({this.id, this.name, this.imageFullUrl, this.childesCount, this.bannersFullUrl, this.isTitleVisible, this.bannerAdFullUrl, this.bannerAdItemId, this.subCategoryHeight, this.subCategoryWidth, this.bannersDetails});
+  CategoryModel({this.id, this.name, this.imageFullUrl, this.childesCount, this.productsCount, this.childes, this.bannersFullUrl, this.isTitleVisible, this.bannerAdFullUrl, this.bannerAdItemId, this.subCategoryHeight, this.subCategoryWidth, this.bannersDetails});
 
   CategoryModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     imageFullUrl = json['image_full_url'];
     childesCount = int.tryParse(json['childes_count'].toString());
+    productsCount = json['products_count'] != null ? int.tryParse(json['products_count'].toString()) : null;
+    if (json['childes'] != null) {
+      childes = [];
+      json['childes'].forEach((v) {
+        childes!.add(CategoryModel.fromJson(v));
+      });
+    }
     if(json['is_title_visible'] != null) {
       if(json['is_title_visible'] is bool) {
         isTitleVisible = json['is_title_visible'] ? 1 : 0;

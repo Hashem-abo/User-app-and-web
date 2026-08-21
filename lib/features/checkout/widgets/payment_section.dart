@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
+import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/string_extension.dart';
@@ -59,7 +60,7 @@ class PaymentSection extends StatelessWidget {
           boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 2))],
         ),
         padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-        child: (storeId != null && (cartList == null || cartList!.isEmpty)) ? checkoutController.paymentMethodIndex == 0 ? Row(children: [
+        child: (storeId != null && (cartList == null || cartList!.isEmpty) && !AuthHelper.isGuestLoggedIn()) ? checkoutController.paymentMethodIndex == 0 ? Row(children: [
           Image.asset(Images.cash , width: 20, height: 20,
             color: Theme.of(context).textTheme.bodyMedium!.color,
           ),
@@ -88,7 +89,7 @@ class PaymentSection extends StatelessWidget {
             }
           },
           child: Row(children: [
-            checkoutController.paymentMethodIndex != -1 ? Image.asset(
+            (checkoutController.paymentMethodIndex != -1 && !(AuthHelper.isGuestLoggedIn() && checkoutController.paymentMethodIndex == 0)) ? Image.asset(
               checkoutController.paymentMethodIndex == 0 ? Images.cash
                   : checkoutController.paymentMethodIndex == 1 ? Images.wallet
                   : checkoutController.paymentMethodIndex == 2 ? Images.digitalPayment
@@ -107,7 +108,7 @@ class PaymentSection extends StatelessWidget {
                   builder: (context) {
                     //print('=======pay: ${checkoutController.paymentMethodIndex}==== ${checkoutController.isPartialPay}');
                     return Text(
-                      checkoutController.paymentMethodIndex == 0 ? '${'cash_on_delivery'.tr} ${checkoutController.isPartialPay ? '(${'partial'.tr})' : ''}'
+                      (checkoutController.paymentMethodIndex == 0 && !AuthHelper.isGuestLoggedIn()) ? '${'cash_on_delivery'.tr} ${checkoutController.isPartialPay ? '(${'partial'.tr})' : ''}'
                           : checkoutController.paymentMethodIndex == 1 && !checkoutController.isPartialPay ? 'wallet_payment'.tr
                           : checkoutController.paymentMethodIndex == 2 ? '${'digital_payment'.tr} (${checkoutController.digitalPaymentName?.replaceAll('_', ' ').toTitleCase() ?? ''} - ${checkoutController.isPartialPay ? 'partial'.tr : ''})'
                           : (checkoutController.paymentMethodIndex == 3 && checkoutController.offlineMethodList != null && checkoutController.offlineMethodList!.isNotEmpty && checkoutController.selectedOfflineBankIndex < checkoutController.offlineMethodList!.length) ? '${'offline_payment'.tr}(${checkoutController.offlineMethodList![checkoutController.selectedOfflineBankIndex].methodName} - ${checkoutController.isPartialPay ? 'partial'.tr : ''})'

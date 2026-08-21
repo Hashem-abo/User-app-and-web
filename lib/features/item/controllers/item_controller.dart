@@ -1638,10 +1638,11 @@ class ItemController extends GetxController implements GetxService {
 
   void itemDirectlyAddToCart(Item? item, BuildContext context, {bool inStore = false, bool isCampaign = false}) {
     getItemDetails(itemId: item!.id!, item: item, isCampaign: isCampaign, fetchSimilarItems: false).then((value) {
-      bool hasRequiredFoodVariation = _item?.foodVariations != null && _item!.foodVariations!.any((v) => (v.required ?? false) || (v.min ?? 0) > 0);
-      bool canQuickAddFood = _item?.moduleType == AppConstants.food && (!hasRequiredFoodVariation);
-      
-      if (canQuickAddFood || (_item?.variations != null && _item!.variations!.isEmpty && _item?.moduleType != AppConstants.food)) {
+      bool hasVariations = (_item?.choiceOptions != null && _item!.choiceOptions!.isNotEmpty)
+          || (_item?.variations != null && _item!.variations!.isNotEmpty)
+          || (_item?.foodVariations != null && _item!.foodVariations!.isNotEmpty);
+
+      if (!hasVariations) {
         double price = _item!.price!;
         double discount = _item!.discount!;
         double discountPrice = PriceConverter.convertWithDiscount(price, discount, _item!.discountType)!;
@@ -1696,18 +1697,13 @@ class ItemController extends GetxController implements GetxService {
           Get.find<CartController>().addToCartOnline(onlineCart, cartModel);
           // showCartSnackBar();
         }
-      } else if(Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-          || _item?.moduleType == AppConstants.food
-          || _item?.moduleType == AppConstants.grocery
-          || _item?.moduleType == AppConstants.ecommerce){
+      } else {
         ResponsiveHelper.isMobile(Get.context) ? Get.bottomSheet(
           ItemBottomSheet(itemId: _item!.id!, inStorePage: inStore, isCampaign: isCampaign, item: _item),
           backgroundColor: Colors.transparent, isScrollControlled: true,
         ) : Get.dialog(
           Dialog(child: ItemBottomSheet(itemId: _item!.id!, inStorePage: inStore, isCampaign: isCampaign, item: _item)),
         );
-      } else {
-        Get.toNamed(RouteHelper.getItemDetailsRoute(_item!.id, inStore), arguments: ItemDetailsScreen(itemId: _item!.id!, inStorePage: inStore, item: _item));
       }
     });
   }

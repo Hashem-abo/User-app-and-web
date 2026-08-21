@@ -22,12 +22,14 @@ class _ZoneSelectionBottomSheetState extends State<ZoneSelectionBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(Dimensions.radiusLarge),
-          topRight: Radius.circular(Dimensions.radiusLarge),
+          topLeft: Radius.circular(Dimensions.radiusExtraLarge),
+          topRight: Radius.circular(Dimensions.radiusExtraLarge),
         ),
+        boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.1), blurRadius: 15, offset: const Offset(0, -3))],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -35,49 +37,96 @@ class _ZoneSelectionBottomSheetState extends State<ZoneSelectionBottomSheet> {
           Align(
             alignment: Alignment.center,
             child: Container(
-              height: 5, width: 50,
-              margin: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeLarge),
+              height: 5, width: 45,
+              margin: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Theme.of(context).disabledColor.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2.5),
               ),
             ),
           ),
+          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(children: [
+                Icon(Icons.location_city_rounded, color: Theme.of(context).primaryColor, size: 24),
+                const SizedBox(width: Dimensions.paddingSizeSmall),
+                Text(
+                  'select_zone'.tr == 'select_zone' ? 'اختر المدينة / المنطقة' : 'select_zone'.tr,
+                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
+                ),
+              ]),
+              IconButton(
+                icon: const Icon(Icons.close, size: 20),
+                onPressed: () => Get.back(),
+              ),
+            ],
+          ),
+          const Divider(height: Dimensions.paddingSizeSmall),
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-            child: Text(
-              'select_zone'.tr,
-              style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: Dimensions.paddingSizeDefault),
-
           GetBuilder<LocationController>(builder: (locationController) {
-            return locationController.zoneList != null ? ListView.builder(
+            return locationController.zoneList != null ? (locationController.zoneList!.isNotEmpty ? ListView.separated(
               shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
               itemCount: locationController.zoneList!.length,
+              separatorBuilder: (context, index) => const SizedBox(height: Dimensions.paddingSizeExtraSmall),
               itemBuilder: (context, index) {
                 ZoneData zone = locationController.zoneList![index];
                 bool isSelected = locationController.zoneID == zone.id;
 
-                return ListTile(
-                  title: Text(zone.name ?? 'Zone ${zone.id}', style: robotoMedium),
-                  trailing: isSelected ? Icon(Icons.check_circle, color: Theme.of(context).primaryColor) : null,
+                return InkWell(
                   onTap: () {
                     locationController.setManualZone(zone.id!);
                     Get.back();
                   },
+                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Theme.of(context).primaryColor.withValues(alpha: 0.08) : Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                      border: Border.all(
+                        color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                        width: isSelected ? 1.5 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(children: [
+                          Icon(
+                            Icons.location_on,
+                            size: 20,
+                            color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor,
+                          ),
+                          const SizedBox(width: Dimensions.paddingSizeSmall),
+                          Text(
+                            zone.name ?? 'Zone ${zone.id}',
+                            style: isSelected
+                                ? robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeDefault)
+                                : robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault),
+                          ),
+                        ]),
+                        if (isSelected)
+                          Icon(Icons.check_circle_rounded, color: Theme.of(context).primaryColor, size: 22),
+                      ],
+                    ),
+                  ),
                 );
               },
-            ) : const Center(child: Padding(
-              padding: EdgeInsets.all(Dimensions.paddingSizeDefault),
+            ) : Center(child: Padding(
+              padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+              child: Text('no_zone_found'.tr, style: robotoMedium),
+            ))) : const Center(child: Padding(
+              padding: EdgeInsets.all(Dimensions.paddingSizeExtremeLarge),
               child: CircularProgressIndicator(),
             ));
           }),
-          const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
+          const SizedBox(height: Dimensions.paddingSizeLarge),
         ],
       ),
     );

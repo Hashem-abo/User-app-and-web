@@ -481,6 +481,7 @@ class SplashController extends GetxController implements GetxService {
         if(cacheModule!.moduleType.toString() == AppConstants.globalShopping) {
           Get.find<GlobalCartController>().getCartList();
         } else {
+          Get.find<CartController>().filterCartForModuleLocal(module == null ? null : module.id);
           Get.find<CartController>().getCartDataOnline();
         }
       }

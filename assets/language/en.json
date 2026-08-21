@@ -485,7 +485,8 @@
   "join_as_a_store": "Join as a Store",
   "are_you_sure_want_to_delete_address": "Are you sure want to delete address",
   "join_us": "Join Us",
-  "calculating": "Calculating",
+  "calculating": "Calculating...",
+  "calculating_base": "Calculating",
   "delivery_fee_not_set_yet": "Delivery fee not set yet",
   "first_order": "First Order",
   "version": "Version",
@@ -2092,7 +2093,6 @@
   "parcel_requested": "Parcel Requested",
   "parcel_picked_up": "Parcel Picked Up",
   "call_delivery_man": "Call Driver",
-  "please_setup_your_delivery_address_first": "Please setup your delivery address first",
   "delivery_address_is_not_valid_for_the_selected_zone": "Delivery address is not valid for the selected zone",
   "failed_to_load_invoice": "Failed to load the invoice"
 }

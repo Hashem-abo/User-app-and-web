@@ -22,6 +22,9 @@ import 'package:sixam_mart/features/address/controllers/address_controller.dart'
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
 import 'package:sixam_mart/features/home/screens/home_screen.dart';
+import 'package:sixam_mart/features/banner/controllers/banner_controller.dart';
+import 'package:sixam_mart/features/flash_sale/controllers/flash_sale_controller.dart';
+import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
@@ -178,28 +181,68 @@ class LocationController extends GetxController implements GetxService {
 
   Future<void> getZoneList() async {
     _zoneList = await locationServiceInterface.getZoneList();
+    AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
+    if ((address == null || address.zoneId == null || address.zoneId == 0) && _zoneList != null && _zoneList!.isNotEmpty) {
+      setManualZone(_zoneList![0].id!, reload: false);
+    }
     update();
   }
 
-  Future<void> setManualZone(int zoneId) async {
+  Future<void> setManualZone(int zoneId, {bool reload = true}) async {
     _zoneID = zoneId;
     _inZone = true;
     _isManualZone = true;
     
     Get.find<SharedPreferences>().setBool('is_manual_zone', true);
     
+    String zoneName = '';
+    if (_zoneList != null && _zoneList!.isNotEmpty) {
+      for (var z in _zoneList!) {
+        if (z.id == zoneId) {
+          zoneName = z.name?.trim() ?? '';
+          break;
+        }
+      }
+    }
+
     AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
-    address ??= AddressModel(latitude: '0', longitude: '0', address: 'Manual Zone');
+    address ??= AddressModel(latitude: '0', longitude: '0', address: zoneName.isNotEmpty ? zoneName : 'Manual Zone');
     address.zoneId = zoneId;
     address.zoneIds = [zoneId];
     address.house = 'manual';
+    if (zoneName.isNotEmpty) {
+      address.address = zoneName;
+      address.zoneData = [ZoneData(id: zoneId, name: zoneName)];
+    }
     await AddressHelper.saveUserAddressInSharedPref(address);
     
     Get.find<SplashController>().setModuleList(null);
     await Get.find<SplashController>().getModules(dataSource: DataSourceEnum.client);
 
+    if (Get.isRegistered<FlashSaleController>()) {
+      Get.find<FlashSaleController>().setEmptyFlashSale(fromModule: true);
+    }
+    if (Get.isRegistered<ItemController>()) {
+      Get.find<ItemController>().clearItemLists();
+    }
+    if (Get.isRegistered<StoreController>()) {
+      Get.find<StoreController>().clearStoreLists();
+    }
+    if (Get.isRegistered<BannerController>()) {
+      Get.find<BannerController>().clearBannerData();
+    }
+    if (Get.isRegistered<CartController>()) {
+      Get.find<CartController>().calculationCart();
+      Get.find<CartController>().update();
+    }
+
+    // Force full fresh reload of all homepage sections & services for the new city
+    await HomeScreen.loadData(true, fromModule: true);
+
     update();
-    Get.offAllNamed(RouteHelper.getInitialRoute());
+    if (reload) {
+      Get.offAllNamed(RouteHelper.getInitialRoute());
+    }
   }
 
   Future<ZoneResponseModel> getZone(String? lat, String? lng, bool markerLoad, {bool updateInAddress = false, bool handleError = false}) async {
@@ -232,7 +275,7 @@ class LocationController extends GetxController implements GetxService {
     final userAddress = AddressHelper.getUserAddressFromSharedPref();
     bool isManual = Get.find<SharedPreferences>().getBool('is_manual_zone') ?? false;
     if (userAddress != null) {
-      if (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('\u200b\u200b\u200b'))) {
+      if (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('​​​​​​'))) {
         isManual = true;
       }
     }

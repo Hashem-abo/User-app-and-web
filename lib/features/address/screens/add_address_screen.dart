@@ -1,7 +1,6 @@
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/services.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
@@ -336,17 +335,27 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                         padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
                                         child: InkWell(
                                           onTap: () {
-                                            if (index == 0 && _hasHomeAddress() && widget.address == null) {
-                                              showCustomSnackBar('لديك عنوان رئيسي بالفعل، يرجى اختيار مكتب أو آخر');
-                                              return;
-                                            }
-                                            if (index == 1 && _hasOfficeAddress() && widget.address == null) {
-                                              showCustomSnackBar('لديك عنوان مكتب بالفعل، يرجى اختيار آخر وتسمية العنوان');
-                                              return;
-                                            }
-                                            _otherSelect = index == 2;
-                                            locationController.setAddressTypeIndex(index);
-                                          },
+                                             if (index == 0 && _hasHomeAddress() && widget.address == null) {
+                                               if (_hasOfficeAddress()) {
+                                                 showCustomSnackBar('لديك عنوان رئيسي ومكتب بالفعل، تم اختيار "آخرون" - يرجى كتابة مسمى العنوان');
+                                                 setState(() => _otherSelect = true);
+                                                 locationController.setAddressTypeIndex(2);
+                                               } else {
+                                                 showCustomSnackBar('لديك عنوان رئيسي بالفعل، تم اختيار "المكتب"');
+                                                 setState(() => _otherSelect = false);
+                                                 locationController.setAddressTypeIndex(1);
+                                               }
+                                               return;
+                                             }
+                                             if (index == 1 && _hasOfficeAddress() && widget.address == null) {
+                                               showCustomSnackBar('لديك عنوان مكتب بالفعل، تم اختيار "آخرون" - يرجى كتابة مسمى العنوان');
+                                               setState(() => _otherSelect = true);
+                                               locationController.setAddressTypeIndex(2);
+                                               return;
+                                             }
+                                             setState(() => _otherSelect = index == 2);
+                                             locationController.setAddressTypeIndex(index);
+                                           },
                                           child: Container(
                                             padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge, vertical: Dimensions.paddingSizeSmall),
                                             decoration: BoxDecoration(
@@ -925,12 +934,12 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         if (Get.find<AddressController>().addressList != null && Get.find<AddressController>().addressList!.isNotEmpty) {
           addedAddress = Get.find<AddressController>().addressList!.firstWhere(
             (a) => a.address == addressModel.address || (a.latitude == addressModel.latitude && a.longitude == addressModel.longitude),
-            orElse: () => Get.find<AddressController>().addressList!.last,
+            orElse: () => addressModel,
           );
-        } else {
-          addedAddress = addressModel;
         }
-        Get.back(result: addedAddress);
+        AddressModel finalAddr = addedAddress ?? addressModel;
+        AddressHelper.saveUserAddressInSharedPref(finalAddr);
+        Get.back(result: finalAddr);
         showCustomSnackBar(response.message, isError: false);
       } else if(widget.fromRide) {
         Get.back();

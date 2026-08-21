@@ -12,6 +12,7 @@ import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/auth/domain/models/social_log_in_body.dart';
 import 'package:sixam_mart/features/auth/domain/models/signup_body_model.dart';
+import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/auth/domain/services/auth_service_interface.dart';
 import 'package:sixam_mart/features/verification/screens/verification_screen.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -217,6 +218,10 @@ class AuthController extends GetxController implements GetxService {
     return authServiceInterface.getUserToken();
   }
 
+  Future<bool> saveUserToken(String token) async {
+    return await authServiceInterface.saveUserToken(token);
+  }
+
   Future<void> updateZone() async {
     await authServiceInterface.updateZone();
   }
@@ -274,10 +279,18 @@ class AuthController extends GetxController implements GetxService {
           Get.back();
         }
 
-        if(e.code == 'invalid-phone-number') {
-          showCustomSnackBar('please_submit_a_valid_phone_number'.tr);
-        }else{
-          showCustomSnackBar(e.message?.replaceAll('_', ' '));
+        if (token != null && token.isNotEmpty) {
+          saveUserToken(token);
+          Get.find<ProfileController>().getUserInfo();
+          Get.find<LocationController>().navigateToLocationScreen(fromSignUp ? RouteHelper.signUp : RouteHelper.initial);
+        } else {
+          if(e.code == 'invalid-phone-number') {
+            showCustomSnackBar('please_submit_a_valid_phone_number'.tr);
+          } else if (e.message != null && e.message!.contains('BILLING_NOT_ENABLED')) {
+            showCustomSnackBar('خدمة إرسال رسائل SMS عبر Firebase غير مفعلة (BILLING_NOT_ENABLED). يمكنك إيقاف تفعيل Firebase OTP من لوحة التحكم أو إضافة رقمك في أرقام الاختبار بـ Firebase Console.');
+          } else {
+            showCustomSnackBar(e.message?.replaceAll('_', ' '));
+          }
         }
 
       },

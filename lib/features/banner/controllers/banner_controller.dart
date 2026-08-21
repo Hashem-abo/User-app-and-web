@@ -38,6 +38,15 @@ class BannerController extends GetxController implements GetxService {
   PromotionalBanner? _promotionalBanner;
   PromotionalBanner? get promotionalBanner => _promotionalBanner;
 
+  void clearBannerData() {
+    _bannerImageList = null;
+    _featuredBannerList = null;
+    _bannerDataList = null;
+    _featuredBannerDataList = null;
+    _promotionalBanner = null;
+    update();
+  }
+
   bool _isBannerLoaded = false;
   bool _isFeaturedBannerLoaded = false;
   final Map<int, List<String?>> _moduleBannerImageList = {};

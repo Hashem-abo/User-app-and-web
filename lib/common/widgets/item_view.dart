@@ -39,6 +39,8 @@ class ItemsView extends StatefulWidget {
 class _ItemsViewState extends State<ItemsView> {
   @override
   Widget build(BuildContext context) {
+    List<Item?>? itemList = widget.items;
+
     bool isNull = true;
     int length = 0;
     if(widget.isStore) {
@@ -47,9 +49,9 @@ class _ItemsViewState extends State<ItemsView> {
         length = widget.stores!.length;
       }
     }else {
-      isNull = widget.items == null;
+      isNull = itemList == null;
       if(!isNull) {
-        length = widget.items!.length;
+        length = itemList.length;
       }
     }
     
@@ -80,17 +82,17 @@ class _ItemsViewState extends State<ItemsView> {
           )
             : !ResponsiveHelper.isDesktop(context) ? 
               (widget.mobileItemCrossAxisCount != null && widget.mobileItemCrossAxisCount! > 1) ? ItemCard(
-                item: widget.items![index],
+                item: itemList![index],
                 isFood: isFood,
                 isShop: isShop,
                 index: index,
                 isCampaign: widget.isCampaign,
               ) : ItemWidget(
-            isStore: widget.isStore, item: widget.isStore ? null : widget.items![index], isFeatured: widget.isFeatured,
+            isStore: widget.isStore, item: widget.isStore ? null : itemList![index], isFeatured: widget.isFeatured,
             store: widget.isStore ? widget.stores![index] : null, index: index, length: length, isCampaign: widget.isCampaign,
             inStore: widget.inStorePage,
           ) : WebItemWidget(
-            isStore: widget.isStore, item: widget.isStore ? null : widget.items![index], isFeatured: widget.isFeatured,
+            isStore: widget.isStore, item: widget.isStore ? null : itemList![index], isFeatured: widget.isFeatured,
             store: widget.isStore ? widget.stores![index] : null, index: index, length: length, isCampaign: widget.isCampaign,
             inStore: widget.inStorePage,
           );

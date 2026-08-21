@@ -6,6 +6,11 @@ import 'package:sixam_mart/features/flash_sale/domain/models/flash_sale_model.da
 import 'package:sixam_mart/features/flash_sale/domain/models/product_flash_sale.dart';
 import 'package:sixam_mart/features/flash_sale/domain/services/flash_sale_service_interface.dart';
 
+import 'package:sixam_mart/features/address/domain/models/address_model.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
+
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+
 class FlashSaleController extends GetxController implements GetxService {
   final FlashSaleServiceInterface flashSaleServiceInterface;
   FlashSaleController({required this.flashSaleServiceInterface});
@@ -16,13 +21,67 @@ class FlashSaleController extends GetxController implements GetxService {
   Timer? _timer;
   
   FlashSaleModel? _flashSaleModel;
-  FlashSaleModel? get flashSaleModel => _flashSaleModel;
+  FlashSaleModel? get flashSaleModel {
+    if (_flashSaleModel == null || _flashSaleModel!.activeProducts == null) return _flashSaleModel;
+    AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
+    int? activeZoneId = address?.zoneId;
+    bool moduleStock = Get.find<SplashController>().configModel?.moduleConfig?.module?.stock ?? false;
+
+    List<ActiveProducts> filteredProducts = _flashSaleModel!.activeProducts!.where((p) {
+      if (p.item == null) return true;
+      if (activeZoneId == null || activeZoneId == 0) return true;
+      int? itemZoneId = p.item!.zoneId;
+      if ((itemZoneId == null || itemZoneId == 0) && p.item!.storeDetails != null) {
+        itemZoneId = p.item!.storeDetails!['zone_id'];
+      }
+      if (itemZoneId == null || itemZoneId == 0) return true;
+      return itemZoneId == activeZoneId || (address != null && address.zoneIds != null && address.zoneIds!.contains(itemZoneId));
+    }).toList();
+
+    return FlashSaleModel(
+      id: _flashSaleModel!.id,
+      moduleId: _flashSaleModel!.moduleId,
+      title: _flashSaleModel!.title,
+      isPublish: _flashSaleModel!.isPublish,
+      adminDiscountPercentage: _flashSaleModel!.adminDiscountPercentage,
+      vendorDiscountPercentage: _flashSaleModel!.vendorDiscountPercentage,
+      startDate: _flashSaleModel!.startDate,
+      endDate: _flashSaleModel!.endDate,
+      createdAt: _flashSaleModel!.createdAt,
+      updatedAt: _flashSaleModel!.updatedAt,
+      activeProducts: filteredProducts,
+      translations: _flashSaleModel!.translations,
+    );
+  }
   
   int _pageIndex = 1;
   int get pageIndex => _pageIndex;
   
   ProductFlashSale? _productFlashSale;
-  ProductFlashSale? get productFlashSale => _productFlashSale;
+  ProductFlashSale? get productFlashSale {
+    if (_productFlashSale == null || _productFlashSale!.products == null) return _productFlashSale;
+    AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
+    int? activeZoneId = address?.zoneId;
+    if (activeZoneId == null || activeZoneId == 0) return _productFlashSale;
+
+    List<Products> filteredProducts = _productFlashSale!.products!.where((p) {
+      if (p.item == null) return true;
+      if (activeZoneId == null || activeZoneId == 0) return true;
+      int? itemZoneId = p.item!.zoneId;
+      if ((itemZoneId == null || itemZoneId == 0) && p.item!.storeDetails != null) {
+        itemZoneId = p.item!.storeDetails!['zone_id'];
+      }
+      if (itemZoneId == null || itemZoneId == 0) return true;
+      return itemZoneId == activeZoneId || (address != null && address.zoneIds != null && address.zoneIds!.contains(itemZoneId));
+    }).toList();
+
+    return ProductFlashSale(
+      flashSale: _productFlashSale!.flashSale,
+      products: filteredProducts,
+      totalSize: filteredProducts.length,
+      offset: _productFlashSale!.offset,
+    );
+  }
 
   void setPageIndex(int index) {
     _pageIndex = index;

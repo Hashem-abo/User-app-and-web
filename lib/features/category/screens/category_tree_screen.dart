@@ -216,7 +216,7 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                         color: Theme.of(context).disabledColor.withValues(alpha: 0.05),
                         border: Border(right: BorderSide(color: Theme.of(context).disabledColor.withValues(alpha: 0.1), width: 1)),
                       ),
-                      child: categoryController.subCategoryList != null ? ListView.builder(
+                      child: (categoryController.subCategoryList != null && categoryController.subCategoryList!.isNotEmpty) ? ListView.builder(
                         physics: const BouncingScrollPhysics(),
                         padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall + 80),
                         itemCount: categoryController.subCategoryList!.length,
@@ -256,7 +256,16 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                             ),
                           );
                         },
-                      ) : const Center(child: CircularProgressIndicator()),
+                      ) : categoryController.subCategoryList != null && categoryController.subCategoryList!.isEmpty
+                          ? Center(child: Padding(
+                              padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                              child: Text(
+                                'no_subcategory_found'.tr == 'no_subcategory_found' ? 'لا توجد فئات فرعية' : 'no_subcategory_found'.tr,
+                                textAlign: TextAlign.center,
+                                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
+                              ),
+                            ))
+                          : const Center(child: CircularProgressIndicator()),
                     ),
 
                     // Center: Sub-Sub Categories / Items
@@ -336,9 +345,25 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                                 );
                               },
                             )
-                          : categoryController.subSubCategoryList == null && categoryController.categoryItemList == null 
-                            ? const Center(child: CircularProgressIndicator()) // Loading state
-                            : Center(child: Text('no_data_found'.tr))
+                          : (categoryController.subCategoryList != null && categoryController.subCategoryList!.isEmpty) ||
+                            (categoryController.subSubCategoryList == null && categoryController.categoryItemList != null && categoryController.categoryItemList!.isEmpty) ||
+                            (categoryController.subSubCategoryList != null && categoryController.subSubCategoryList!.isEmpty && (categoryController.categoryItemList == null || categoryController.categoryItemList!.isEmpty))
+                              ? Center(child: Padding(
+                                  padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.category_outlined, size: 50, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
+                                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                                      Text(
+                                        'no_data_found'.tr == 'no_data_found' ? 'لا توجد بيانات متاحة في هذه الفئة' : 'no_data_found'.tr,
+                                        style: robotoMedium.copyWith(color: Theme.of(context).disabledColor),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                              : const Center(child: CircularProgressIndicator())
                     ),
                   ],
                 ),

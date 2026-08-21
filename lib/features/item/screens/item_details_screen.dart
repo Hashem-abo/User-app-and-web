@@ -606,28 +606,11 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                                 fit: BoxFit.cover,
                                                 height: 90, width: 90,
                                               )
-                                            : (color != null 
-                                                ? ColorFiltered(
-                                                    colorFilter: ColorFilter.mode(color, BlendMode.overlay),
-                                                    child: ColorFiltered(
-                                                      colorFilter: const ColorFilter.matrix(<double>[
-                                                        0.5, 0.5, 0.5, 0, -0.4,
-                                                        0.5, 0.5, 0.5, 0, -0.4,
-                                                        0.5, 0.5, 0.5, 0, -0.4,
-                                                        0,   0,   0,   1, 0,
-                                                      ]),
-                                                      child: CustomImage(
-                                                        image: item.imageFullUrl ?? '',
-                                                        fit: BoxFit.cover,
-                                                        height: 90, width: 90,
-                                                      ),
-                                                    ),
-                                                  )
-                                                : CustomImage(
-                                                    image: item.imageFullUrl ?? '',
-                                                    fit: BoxFit.cover,
-                                                    height: 90, width: 90,
-                                                  )),
+                                            : CustomImage(
+                                                image: item.imageFullUrl ?? '',
+                                                fit: BoxFit.cover,
+                                                height: 90, width: 90,
+                                              ),
                                         ),
                                       ),
                                     ),
@@ -1335,7 +1318,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                 return Container(
                   width: 1170,
                   padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                  child: _isEditing ? Container(
+                  child: (_isEditing && cartIndex != -1) ? Container(
                     height: 50,
                     padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
                     decoration: BoxDecoration(

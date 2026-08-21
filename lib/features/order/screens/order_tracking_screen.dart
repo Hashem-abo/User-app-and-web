@@ -29,6 +29,7 @@ import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
 import 'package:sixam_mart/common/widgets/menu_drawer.dart';
+import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:sixam_mart/features/order/widgets/track_details_view_widget.dart';
@@ -606,6 +607,32 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
               child: Text('contact_seller'.tr, style: robotoBold.copyWith(color: Colors.white)),
             ),
             const SizedBox(height: Dimensions.paddingSizeSmall),*/
+
+            // Show route on map button if order is in a trackable status
+            Builder(
+              builder: (context) {
+                if (track == null) return const SizedBox();
+                bool isParcel = track.orderType == 'parcel';
+                final trackableStatuses = ['pending', 'accepted', 'confirmed', 'processing', 'handover', 'picked_up'];
+                final isPendingWithoutDigitalPayment = track.orderStatus == 'pending' && track.paymentMethod != 'digital_payment';
+
+                bool showTrackDeliveryButton = isParcel
+                    ? trackableStatuses.contains(track.orderStatus)
+                    : (isPendingWithoutDigitalPayment || trackableStatuses.contains(track.orderStatus));
+
+                if (!showTrackDeliveryButton) return const SizedBox();
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                  child: CustomButton(
+                    buttonText: 'track_on_map'.tr,
+                    onPressed: () {
+                      Get.toNamed(RouteHelper.getOrderTrackingMapRoute(track!.id, widget.contactNumber));
+                    },
+                  ),
+                );
+              },
+            ),
 
             ElevatedButton(
               onPressed: () {

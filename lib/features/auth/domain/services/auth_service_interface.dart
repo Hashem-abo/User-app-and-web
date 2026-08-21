@@ -22,6 +22,7 @@ abstract class AuthServiceInterface{
   String getUserPassword();
   Future<bool> clearUserNumberAndPassword();
   String getUserToken();
+  Future<bool> saveUserToken(String token, {bool alreadyInApp = false});
   Future updateZone();
   Future<bool> saveGuestContactNumber(String number);
   String getGuestContactNumber();

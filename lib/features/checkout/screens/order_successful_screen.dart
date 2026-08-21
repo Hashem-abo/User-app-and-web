@@ -20,6 +20,8 @@ import 'package:sixam_mart/features/checkout/widgets/payment_failed_dialog.dart'
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'package:sixam_mart/helper/guest_order_helper.dart';
+
 class OrderSuccessfulScreen extends StatefulWidget {
   final String? orderID;
   final String? contactPersonNumber;
@@ -51,6 +53,13 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
 
     if(!widget.createAccount!) {
       Get.find<OrderController>().trackOrder(orderId.toString(), null, false, contactNumber: widget.contactPersonNumber);
+    }
+
+    if(AuthHelper.isGuestLoggedIn() && orderId != null) {
+      int? parsedId = int.tryParse(orderId!);
+      if(parsedId != null) {
+        GuestOrderHelper.addGuestOrder(parsedId, widget.contactPersonNumber);
+      }
     }
   }
 
@@ -190,7 +199,10 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
                     CustomButton(
                       buttonText: 'تتبع الطلب',
                       onPressed: () {
-                        Get.offNamed(RouteHelper.getOrderDetailsRoute(int.parse(orderId!)));
+                        String? phone = (widget.contactPersonNumber != null && widget.contactPersonNumber != 'null' && widget.contactPersonNumber!.isNotEmpty)
+                            ? widget.contactPersonNumber
+                            : orderController.trackModel?.deliveryAddress?.contactPersonNumber;
+                        Get.offNamed(RouteHelper.getOrderDetailsRoute(int.parse(orderId!), contactNumber: phone));
                       },
                     ),
                     const SizedBox(height: Dimensions.paddingSizeSmall),

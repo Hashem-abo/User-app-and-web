@@ -149,6 +149,11 @@ class AuthService implements AuthServiceInterface{
   }
 
   @override
+  Future<bool> saveUserToken(String token, {bool alreadyInApp = false}) async {
+    return await authRepositoryInterface.saveUserToken(token, alreadyInApp: alreadyInApp);
+  }
+
+  @override
   Future updateZone() async {
     await authRepositoryInterface.updateZone();
   }

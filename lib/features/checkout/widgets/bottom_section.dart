@@ -6,6 +6,7 @@ import 'package:sixam_mart/features/checkout/widgets/extra_discount_view_widget.
 import 'package:sixam_mart/features/checkout/widgets/prescription_image_picker_widget.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart/features/checkout/widgets/animated_calculating_widget.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/common/models/config_model.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
@@ -256,7 +257,7 @@ class BottomSection extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('order_summary'.tr == 'order_summary' ? 'ملخص الطلب' : 'order_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+          Text('order_summary'.tr == 'order_summary' ? 'ملخص الطلب' : 'order_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
           const SizedBox(height: Dimensions.paddingSizeDefault),
 
           _priceRow(
@@ -265,7 +266,7 @@ class BottomSection extends StatelessWidget {
             context: context,
           ),
 
-          if(storeId == null && discount > 0) _priceRow(
+          if(discount > 0) _priceRow(
             label: 'discount'.tr,
             value: '(-) ${PriceConverter.convertPrice(discount)}',
             context: context,
@@ -310,7 +311,10 @@ class BottomSection extends StatelessWidget {
 
           if(!(AuthHelper.isGuestLoggedIn() && checkoutController.guestAddress == null)) _priceRow(
             label: 'delivery_fee'.tr,
-            value: checkoutController.distance == -1 ? 'calculating'.tr : (deliveryCharge == 0 || (couponController.coupon != null && couponController.coupon!.couponType == 'free_delivery')) ? 'free'.tr : '(+) ${PriceConverter.convertPrice(deliveryCharge)}',
+            customValue: (checkoutController.distance == -1 || deliveryCharge == -1)
+                ? const AnimatedCalculatingWidget()
+                : null,
+            value: (deliveryCharge == 0 || (couponController.coupon != null && couponController.coupon!.couponType == 'free_delivery')) ? 'free'.tr : '(+) ${PriceConverter.convertPrice(deliveryCharge)}',
             valueColor: (deliveryCharge == 0 || (couponController.coupon != null && couponController.coupon!.couponType == 'free_delivery')) ? Theme.of(context).primaryColor : null,
             badge: checkoutController.isAiBatched ? _smartBatchBadge(context) : null,
             context: context,
@@ -359,15 +363,15 @@ class BottomSection extends StatelessWidget {
     );
   }
 
-  Widget _priceRow({required String label, required String value, Color? valueColor, Widget? badge, required BuildContext context}) {
+  Widget _priceRow({required String label, required String value, Color? valueColor, Widget? badge, Widget? customValue, required BuildContext context}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Row(children: [
-          Text(label, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault)),
+          Text(label, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
           if(badge != null) Padding(padding: const EdgeInsets.only(left: 5), child: badge),
         ]),
-        Text(value, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: valueColor), textDirection: TextDirection.rtl),
+        customValue ?? Text(value, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: valueColor), textDirection: TextDirection.rtl),
       ]),
     );
   }
