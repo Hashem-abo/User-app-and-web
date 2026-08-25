@@ -162,7 +162,10 @@ class _MyAppState extends State<MyApp> {
             defaultTransition: Transition.topLevel,
             transitionDuration: const Duration(milliseconds: 500),
             builder: (BuildContext context, widget) {
-              return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1)), child: Material(
+              double fontSizeOffset = Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSizeOffset : 0.0;
+              double fontScale = (14.0 - fontSizeOffset) / 14.0;
+              if (fontScale < 0.2) fontScale = 0.2;
+              return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(fontScale)), child: Material(
                 child: SafeArea(
                   top: false, bottom: GetPlatform.isAndroid,
                   child: Stack(children: [

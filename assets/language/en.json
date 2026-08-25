@@ -1,4 +1,5 @@
 {
+  "previous": "Previous",
   "some_items_unavailable_proceed_anyway": "Some items are out of stock. Proceed without them?",
   "select_via_dropdown": "Select via Dropdowns",
   "select_city": "Select City",

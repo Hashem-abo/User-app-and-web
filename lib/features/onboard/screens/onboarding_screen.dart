@@ -12,6 +12,7 @@ import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 
@@ -152,6 +153,62 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                                         ),
                                       );
                                     },
+                                  );
+                                },
+                              ),
+                            ),
+
+                            // زر تغيير اللغة الشفاف والأنيق
+                            PositionedDirectional(
+                              top: 10,
+                              start: 20,
+                              child: GetBuilder<LocalizationController>(
+                                builder: (localizationController) {
+                                  return Material(
+                                    color: Colors.white.withAlpha(120),
+                                    elevation: 2,
+                                    shadowColor: Colors.black.withAlpha(20),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      side: BorderSide(
+                                        color: Colors.white.withAlpha(120),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Locale newLocale = localizationController.isLtr
+                                            ? const Locale('ar', 'SA')
+                                            : const Locale('en', 'US');
+                                        localizationController.setLanguage(newLocale);
+                                        Get.find<OnBoardingController>().getOnBoardingList();
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsetsDirectional.symmetric(
+                                          horizontal: 14,
+                                          vertical: 8,
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.language,
+                                              size: 18,
+                                              color: Theme.of(context).primaryColor,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              localizationController.isLtr ? 'العربية' : 'English',
+                                              style: robotoBold.copyWith(
+                                                color: Theme.of(context).colorScheme.inverseSurface,
+                                                fontSize: Dimensions.fontSizeSmall,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   );
                                 },
                               ),

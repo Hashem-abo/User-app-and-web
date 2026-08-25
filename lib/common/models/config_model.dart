@@ -592,14 +592,18 @@ class BaseUrls {
 class OnboardingScreen {
   String? title;
   String? description;
+  String? titleEn;
+  String? descriptionEn;
   String? image;
   String? imageFullUrl;
 
-  OnboardingScreen({this.title, this.description, this.image, this.imageFullUrl});
+  OnboardingScreen({this.title, this.description, this.titleEn, this.descriptionEn, this.image, this.imageFullUrl});
 
   OnboardingScreen.fromJson(Map<String, dynamic> json) {
     title = json['title'];
     description = json['description'];
+    titleEn = json['title_en'];
+    descriptionEn = json['description_en'];
     image = json['image'];
     imageFullUrl = json['image_full_url'];
   }
@@ -608,6 +612,8 @@ class OnboardingScreen {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['title'] = title;
     data['description'] = description;
+    data['title_en'] = titleEn;
+    data['description_en'] = descriptionEn;
     data['image'] = image;
     data['image_full_url'] = imageFullUrl;
     return data;

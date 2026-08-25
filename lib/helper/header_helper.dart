@@ -19,14 +19,31 @@ class HeaderHelper {
         moduleID = ModuleModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.moduleId)!)).id;
       }catch(_) {}
     }
+    List<int>? zoneIds = addressModel?.zoneIds;
+    if ((zoneIds == null || zoneIds.isEmpty) && addressModel?.zoneId != null) {
+      zoneIds = [addressModel!.zoneId!];
+    }
+    if (zoneIds == null || zoneIds.isEmpty) {
+      zoneIds = [1];
+    }
+
+    String sanitizeCoord(String? input, String fallback) {
+      if (input == null || input.isEmpty || input == '0' || input == 'null') return fallback;
+      String clean = input.replaceAll('"', '').replaceAll("'", '').trim();
+      double? val = double.tryParse(clean);
+      return (val == null || val == 0) ? fallback : clean;
+    }
+
+    String validLat = sanitizeCoord(addressModel?.latitude, '15.369445');
+    String validLng = sanitizeCoord(addressModel?.longitude, '44.191006');
+
     return {
       'Content-Type': 'application/json; charset=UTF-8',
-      AppConstants.zoneId: addressModel?.zoneIds != null ? jsonEncode(addressModel?.zoneIds) : '',
-      moduleID != null ? AppConstants.moduleId: '$moduleID' : '',
+      AppConstants.zoneId: jsonEncode(zoneIds),
+      if (moduleID != null) AppConstants.moduleId: '$moduleID',
       AppConstants.localizationKey: sharedPreferences.getString(AppConstants.languageCode) ?? AppConstants.languages[0].languageCode!,
-      AppConstants.latitude: addressModel?.latitude != null ? jsonEncode(addressModel?.latitude) : '',
-      AppConstants.longitude: addressModel?.longitude != null ? jsonEncode(addressModel?.longitude) : '',
-      // 'Authorization': 'Bearer $token'
+      AppConstants.latitude: validLat,
+      AppConstants.longitude: validLng,
     };
   }
 }

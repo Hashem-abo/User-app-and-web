@@ -54,6 +54,16 @@ class ThemeController extends GetxController implements GetxService {
     return _fontFamily;
   }
 
+  double get fontSizeOffset {
+    if (Get.isRegistered<SplashController>()) {
+      final splashController = Get.find<SplashController>();
+      if (splashController.module != null && splashController.module!.fontSizeOffset != null) {
+        return splashController.module!.fontSizeOffset!;
+      }
+    }
+    return 0.0;
+  }
+
   String getFormattedFontFamily(String font) {
     String lower = font.trim().toLowerCase();
     if (lower == 'tajawal') return 'Tajawal';

@@ -35,8 +35,6 @@ import 'package:sixam_mart/features/home/controllers/store_corner_controller.dar
 import 'package:sixam_mart/features/home/widgets/views/store_corner_view.dart';
 import 'package:sixam_mart/features/home/widgets/views/browse_by_category_view.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/features/home/widgets/views/super_banner_view.dart';
 import 'package:sixam_mart/features/home/widgets/views/service_categories_view.dart';
 import 'package:sixam_mart/features/home/widgets/views/service_list_view.dart';
@@ -76,11 +74,11 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
             }
 
             var config = module.layoutConfig![index - 1];
-            if (config.active == false) return const SizedBox();
+            if (config.active == false) return const SizedBox.shrink();
             
             Widget widget = _buildWidget(context, config);
             if (widget is SizedBox && widget.width == null && widget.height == null && widget.child == null) {
-              return const SizedBox();
+              return const SizedBox.shrink();
             }
 
             Color? bgColor = (config.backgroundColor != null && config.backgroundColor!.startsWith('#') && config.backgroundColor!.length == 7) 
@@ -140,7 +138,7 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
         });
       case 'SuperBannerView':
         int? superBannerId = config.params?['super_banner_id'] != null ? int.tryParse(config.params!['super_banner_id'].toString()) : null;
-        return superBannerId != null ? SuperBannerView(superBannerId: superBannerId, height: height) : const SizedBox();
+        return superBannerId != null ? SuperBannerView(superBannerId: superBannerId, height: height) : const SizedBox.shrink();
       case 'CategoryView':
         return const CategoryView();
       case 'MostPopularItemView':
@@ -167,13 +165,13 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
       case 'ItemThatYouLoveView':
         return ItemThatYouLoveView(forShop: isShop, isFood: isFood, isShop: isShop, title: title, height: height);
       case 'PromoCodeBannerView':
-        return isLoggedIn ? const PromoCodeBannerView() : const SizedBox();
+        return isLoggedIn ? const PromoCodeBannerView() : const SizedBox.shrink();
       case 'NewOnMartView':
         return NewOnMartView(isPharmacy: isPharmacy, isShop: isShop);
       case 'PromotionalBannerView':
         return const PromotionalBannerView();
       case 'VisitAgainView':
-        return isLoggedIn ? const VisitAgainView() : const SizedBox();
+        return isLoggedIn ? const VisitAgainView() : const SizedBox.shrink();
       case 'BrandsViewWidget':
         return const BrandsViewWidget();
       case 'ProductWithCategoriesView':
@@ -192,40 +190,40 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
       case 'DynamicMotherShelfView':
         int? shelfId = config.params?['shelf_id'] != null ? int.tryParse(config.params!['shelf_id'].toString()) : null;
         return GetBuilder<ShelfController>(builder: (shelfController) {
-          if (shelfController.shelfList == null) return const SizedBox();
+          if (shelfController.shelfList == null) return const SizedBox.shrink();
           if (shelfId != null) {
             var shelf = shelfController.shelfList!.firstWhereOrNull((s) => s.id == shelfId);
-            return shelf != null ? DynamicMotherShelfView(shelf: shelf, isFood: isFood, isShop: isShop, height: height) : const SizedBox();
+            return shelf != null ? DynamicMotherShelfView(shelf: shelf, isFood: isFood, isShop: isShop, height: height) : const SizedBox.shrink();
           }
           return Column(children: shelfController.shelfList!.where((s) => s.children != null && s.children!.isNotEmpty).map((shelf) => DynamicMotherShelfView(shelf: shelf, isFood: isFood, isShop: isShop, height: height)).toList());
         });
       case 'DynamicShelfView':
         int? shelfId = config.params?['shelf_id'] != null ? int.tryParse(config.params!['shelf_id'].toString()) : null;
         return GetBuilder<ShelfController>(builder: (shelfController) {
-          if (shelfController.shelfList == null) return const SizedBox();
+          if (shelfController.shelfList == null) return const SizedBox.shrink();
           if (shelfId != null) {
             var shelf = shelfController.shelfList!.firstWhereOrNull((s) => s.id == shelfId);
-            return shelf != null ? DynamicShelfView(shelf: shelf, isFood: isFood, isShop: isShop, height: height) : const SizedBox();
+            return shelf != null ? DynamicShelfView(shelf: shelf, isFood: isFood, isShop: isShop, height: height) : const SizedBox.shrink();
           }
           return Column(children: shelfController.shelfList!.where((s) => s.type == 'product' || s.type == 'service' || s.type == null).map((shelf) => DynamicShelfView(shelf: shelf, isFood: isFood, isShop: isShop, height: height)).toList());
         });
       case 'DynamicCategoryShelfView':
         int? shelfId = config.params?['shelf_id'] != null ? int.tryParse(config.params!['shelf_id'].toString()) : null;
         return GetBuilder<ShelfController>(builder: (shelfController) {
-          if (shelfController.shelfList == null) return const SizedBox();
+          if (shelfController.shelfList == null) return const SizedBox.shrink();
           if (shelfId != null) {
             var shelf = shelfController.shelfList!.firstWhereOrNull((s) => s.id == shelfId);
-            return shelf != null ? DynamicCategoryShelfView(shelf: shelf, height: height) : const SizedBox();
+            return shelf != null ? DynamicCategoryShelfView(shelf: shelf, height: height) : const SizedBox.shrink();
           }
           return Column(children: shelfController.shelfList!.where((s) => s.type == 'category' || s.type == 'service_category').map((shelf) => DynamicCategoryShelfView(shelf: shelf, height: height)).toList());
         });
       case 'DynamicStoreShelfView':
         int? shelfId = config.params?['shelf_id'] != null ? int.tryParse(config.params!['shelf_id'].toString()) : null;
         return GetBuilder<ShelfController>(builder: (shelfController) {
-          if (shelfController.shelfList == null) return const SizedBox();
+          if (shelfController.shelfList == null) return const SizedBox.shrink();
           if (shelfId != null) {
             var shelf = shelfController.shelfList!.firstWhereOrNull((s) => s.id == shelfId);
-            return shelf != null ? DynamicStoreShelfView(shelf: shelf, height: height) : const SizedBox();
+            return shelf != null ? DynamicStoreShelfView(shelf: shelf, height: height) : const SizedBox.shrink();
           }
           return Column(children: shelfController.shelfList!.where((s) => s.type == 'store' || s.type == 'service_provider').map((shelf) => DynamicStoreShelfView(shelf: shelf, height: height)).toList());
         });
@@ -238,11 +236,11 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
         int? cornerId = config.params?['corner_id'] != null ? int.tryParse(config.params!['corner_id'].toString()) : null;
         return GetBuilder<StoreCornerController>(builder: (storeCornerController) {
           if (storeCornerController.storeCornerList == null) {
-              return const SizedBox();
+              return const SizedBox.shrink();
           }
           if (cornerId != null) {
             var corner = storeCornerController.storeCornerList!.firstWhereOrNull((c) => c.id == cornerId);
-            return corner != null ? StoreCornerView(storeCorner: corner, isFood: isFood, isShop: isShop, isGrocery: isGrocery) : const SizedBox();
+            return corner != null ? StoreCornerView(storeCorner: corner, isFood: isFood, isShop: isShop, isGrocery: isGrocery) : const SizedBox.shrink();
           }
           return Column(children: storeCornerController.storeCornerList!.map<Widget>((corner) => StoreCornerView(storeCorner: corner, isFood: isFood, isShop: isShop, isGrocery: isGrocery)).toList());
         });
@@ -262,7 +260,7 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
     bool isShop = module.moduleType == 'ecommerce';
     // bool isGrocery = module.moduleType == 'grocery';
     // bool isPharmacy = module.moduleType == 'pharmacy';
-    bool isFood = module.moduleType == 'food';
+    // bool isFood = module.moduleType == 'food';
 
     if (isShop) {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

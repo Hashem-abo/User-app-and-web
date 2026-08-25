@@ -63,6 +63,11 @@ class AddressHelper {
       zoneIds = [address.zoneId!];
       address.zoneIds = zoneIds;
     }
+    if (zoneIds == null || zoneIds.isEmpty) {
+      zoneIds = [1];
+      address.zoneId = 1;
+      address.zoneIds = zoneIds;
+    }
 
     if (address.address != null && address.address!.isNotEmpty) {
       address.address = formatAddressWithZone(address);
