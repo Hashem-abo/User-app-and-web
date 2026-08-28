@@ -256,17 +256,49 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
   }
 
   Widget _buildDefaultLayout(BuildContext context) {
-    // Fallback to original Grocery/Shop Layout if config is missing
     bool isShop = module.moduleType == 'ecommerce';
-    // bool isGrocery = module.moduleType == 'grocery';
-    // bool isPharmacy = module.moduleType == 'pharmacy';
-    // bool isFood = module.moduleType == 'food';
+    bool isGrocery = module.moduleType == 'grocery';
+
+    if (isGrocery) {
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          color: Theme.of(context).cardColor,
+          child: AdsBannerWidget(module: module),
+        ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: const Column(children: [BannerView(isFeatured: false), SizedBox(height: 12)]),
+        ),
+        const CategoryView(),
+        GetBuilder<ShelfController>(builder: (shelfController) {
+          return shelfController.shelfList != null
+              ? Column(children: shelfController.shelfList!.map((shelf) => DynamicShelfView(shelf: shelf, isFood: false, isShop: false)).toList())
+              : const SizedBox();
+        }),
+        const MostPopularItemView(isFood: false, isShop: false),
+        const HighlightWidget(),
+        const BrowseByCategoryView(isShop: false, isFood: false),
+        GetBuilder<StoreCornerController>(builder: (storeCornerController) {
+          return storeCornerController.storeCornerList != null
+              ? Column(children: storeCornerController.storeCornerList!.map((corner) => StoreCornerView(storeCorner: corner, isShop: false, isFood: false, isGrocery: true)).toList())
+              : const SizedBox();
+        }),
+        const FlashSaleViewWidget(),
+        const SpecialOfferView(isFood: false, isShop: false),
+        const MiddleSectionBannerView(),
+        const BestReviewItemView(),
+        const JustForYouView(),
+        const TopOffersNearMe(),
+        const ItemThatYouLoveView(forShop: false, isFood: false, isShop: false),
+        isLoggedIn ? const PromoCodeBannerView() : const SizedBox(),
+        const PromotionalBannerView(),
+      ]);
+    }
 
     if (isShop) {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         GetBuilder<SplashController>(builder: (splashController) {
-          // ... Shop Banner Logic (Keep it simpler for fallback or copy full logic if needed)
-          return const SizedBox(); // For simplicity, rely on the fact that if config is null we might want to just show nothing or assume migration is done
+          return const SizedBox();
         }),
       ]);
     }

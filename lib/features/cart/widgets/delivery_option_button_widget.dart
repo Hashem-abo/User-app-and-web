@@ -88,21 +88,24 @@ class _DeliveryOptionButtonWidgetState extends State<DeliveryOptionButtonWidget>
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(widget.title, style: robotoMedium.copyWith(color: select ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color)),
 
-                Row(children: [
-                  (widget.value == 'delivery' && (widget.deliveryChargeForView == 'calculating'.tr || widget.deliveryChargeForView.contains('calculating_base'.tr) || checkoutController.distance == -1))
-                      ? Row(children: [
-                    Text('${'charge'.tr}: ', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
-                    AnimatedCalculatingWidget(textStyle: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
-                  ])
-                      : Text(widget.value == 'delivery' ? '${'charge'.tr}: +${widget.deliveryChargeForView}' : 'free'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
-                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                if (widget.value == 'take_away')
+                  Text('free'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color))
+                else if (select)
+                  Row(children: [
+                    (widget.deliveryChargeForView == 'calculating'.tr || widget.deliveryChargeForView.contains('calculating_base'.tr) || checkoutController.distance == -1)
+                        ? Row(children: [
+                      Text('${'charge'.tr}: ', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
+                      AnimatedCalculatingWidget(textStyle: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
+                    ])
+                        : Text('${'charge'.tr}: +${widget.deliveryChargeForView}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
+                    const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                  widget.deliveryChargeForView != PriceConverter.convertPrice(0) && widget.value == 'delivery' && checkoutController.extraCharge != null && (widget.deliveryChargeForView != '0') && widget.extraChargeForToolTip > 0 ? CustomToolTip(
-                    message: '${'this_charge_include_extra_vehicle_charge'.tr} ${PriceConverter.convertPrice(widget.extraChargeForToolTip)}',
-                    preferredDirection: AxisDirection.right,
-                    child: const Icon(Icons.info, color: Colors.blue, size: 14),
-                  ) : const SizedBox(),
-                ]),
+                    widget.deliveryChargeForView != PriceConverter.convertPrice(0) && widget.value == 'delivery' && checkoutController.extraCharge != null && (widget.deliveryChargeForView != '0') && widget.extraChargeForToolTip > 0 ? CustomToolTip(
+                      message: '${'this_charge_include_extra_vehicle_charge'.tr} ${PriceConverter.convertPrice(widget.extraChargeForToolTip)}',
+                      preferredDirection: AxisDirection.right,
+                      child: const Icon(Icons.info, color: Colors.blue, size: 14),
+                    ) : const SizedBox(),
+                  ]),
 
               ]),
               const SizedBox(width: Dimensions.paddingSizeSmall),

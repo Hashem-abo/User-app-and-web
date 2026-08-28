@@ -63,6 +63,7 @@ class ConfigModel {
   String? cookiesText;
   int? homeDeliveryStatus;
   int? takeawayStatus;
+  int? pickupCenterStatus;
   bool? partialPaymentStatus;
   String? partialPaymentMethod;
   bool? additionalChargeStatus;
@@ -296,8 +297,9 @@ class ConfigModel {
     shippingPolicyStatus = json['shipping_policy'];
     prescriptionStatus = json['prescription_order_status'];
     cookiesText = json['cookies_text'];
-    homeDeliveryStatus = json['home_delivery_status'];
-    takeawayStatus = json['takeaway_status'];
+    homeDeliveryStatus = json['home_delivery_status'] != null ? int.parse(json['home_delivery_status'].toString()) : 0;
+    takeawayStatus = json['takeaway_status'] != null ? int.parse(json['takeaway_status'].toString()) : 0;
+    pickupCenterStatus = json['pickup_center_status'] != null ? int.parse(json['pickup_center_status'].toString()) : 1;
     partialPaymentStatus = json['partial_payment_status'] == 1;
     partialPaymentMethod = json['partial_payment_method'];
     additionalChargeStatus = json['additional_charge_status'] == 1;

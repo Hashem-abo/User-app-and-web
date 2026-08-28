@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sixam_mart/api/api_checker.dart';
@@ -28,6 +27,8 @@ import 'package:sixam_mart/features/checkout/widgets/order_successfull_dialog.da
 import 'package:sixam_mart/features/order/domain/services/order_service_interface.dart';
 import 'package:sixam_mart/features/checkout/widgets/partial_pay_dialog_widget.dart';
 import 'package:sixam_mart/features/home/screens/home_screen.dart';
+import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
+import 'package:sixam_mart/features/checkout/domain/models/pickup_center_model.dart';
 import 'package:sixam_mart/helper/guest_order_helper.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
@@ -36,7 +37,6 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:universal_html/html.dart' as html;
 
 class CheckoutController extends GetxController implements GetxService {
@@ -140,6 +140,45 @@ class CheckoutController extends GetxController implements GetxService {
 
   String? _orderType = 'delivery';
   String? get orderType => _orderType;
+
+  ZoneData? _selectedPickupZone;
+  ZoneData? get selectedPickupZone => _selectedPickupZone;
+
+  PickupCenterModel? _selectedPickupCenter;
+  PickupCenterModel? get selectedPickupCenter => _selectedPickupCenter;
+
+  void setPickupZone(ZoneData? zone) {
+    _selectedPickupZone = zone;
+    _selectedPickupCenter = null;
+    if (zone != null && zone.pickupCenters != null && zone.pickupCenters!.isNotEmpty) {
+      _selectedPickupCenter = zone.pickupCenters!.first;
+      recalculatePickupDistance();
+    } else {
+      _distance = -1;
+    }
+    update();
+  }
+
+  void setPickupCenter(PickupCenterModel? center) {
+    _selectedPickupCenter = center;
+    recalculatePickupDistance();
+    update();
+  }
+
+  void recalculatePickupDistance() async {
+    if (_selectedPickupCenter != null && _selectedPickupCenter!.latitude != null && _selectedPickupCenter!.longitude != null && _store != null) {
+      double? lat = double.tryParse(_selectedPickupCenter!.latitude!);
+      double? lng = double.tryParse(_selectedPickupCenter!.longitude!);
+      double? storeLat = double.tryParse(_store!.latitude ?? '');
+      double? storeLng = double.tryParse(_store!.longitude ?? '');
+      if (lat != null && lng != null && storeLat != null && storeLng != null) {
+        await getDistanceInKM(
+          LatLng(lat, lng),
+          LatLng(storeLat, storeLng),
+        );
+      }
+    }
+  }
 
   double _viewTotalPrice = 0;
   double? get viewTotalPrice => _viewTotalPrice;
@@ -396,9 +435,27 @@ class CheckoutController extends GetxController implements GetxService {
     }
   }
 
-  void setOrderType(String? type, {bool notify = true}) {
+  void setOrderType(String? type, {bool notify = true}) async {
     _orderType = type;
     _setSaverDeliveryData();
+    if (_orderType == 'pickup_center') {
+      _saverDeliveryType = 'standard';
+      recalculatePickupDistance();
+    } else if (_orderType == 'delivery' && _store != null) {
+      AddressModel? address = _guestAddress ?? AddressHelper.getUserAddressFromSharedPref();
+      if (address != null && address.latitude != null && address.longitude != null) {
+        double? lat = double.tryParse(address.latitude!);
+        double? lng = double.tryParse(address.longitude!);
+        double? storeLat = double.tryParse(_store!.latitude ?? '');
+        double? storeLng = double.tryParse(_store!.longitude ?? '');
+        if (lat != null && lng != null && storeLat != null && storeLng != null) {
+          await getDistanceInKM(
+            LatLng(lat, lng),
+            LatLng(storeLat, storeLng),
+          );
+        }
+      }
+    }
     if(notify) {
       update();
     }

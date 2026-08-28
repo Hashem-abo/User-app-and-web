@@ -150,7 +150,7 @@ class BottomSection extends StatelessWidget {
 
     final saverDeliveryOption = checkoutController.selectedSaverDeliveryOption;
     final String? saverDeliveryType = saverDeliveryOption?.deliveryType;
-    final bool showSaverDeliveryOption = !takeAway && checkoutController.orderType != 'dine_in'
+    final bool showSaverDeliveryOption = !takeAway && checkoutController.orderType != 'dine_in' && checkoutController.orderType != 'pickup_center'
         && (saverDeliveryType == 'express' || saverDeliveryType == 'slightly_delay');
     final double saverDeliveryAdjustment = checkoutController.getSaverDeliveryChargeAdjustment(deliveryOption: saverDeliveryOption).abs();
     

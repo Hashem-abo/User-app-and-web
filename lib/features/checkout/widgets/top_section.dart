@@ -217,11 +217,7 @@ class TopSection extends StatelessWidget {
               Text('delivery_type'.tr, style: robotoMedium),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
-              (storeId != null && (cartList == null || cartList!.isEmpty)) ? DeliveryOptionButtonWidget(
-                value: 'delivery', title: 'home_delivery'.tr, charge: charge,
-                isFree: checkoutController.store?.freeDelivery ?? false, fromWeb: true, total: total,
-                deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
-              ) : SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
+              SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
                 (Get.find<SplashController>().configModel?.homeDeliveryStatus == 1 && (checkoutController.store?.delivery ?? true)) ? DeliveryOptionButtonWidget(
                   value: 'delivery', title: 'home_delivery'.tr, charge: charge,
                   isFree: checkoutController.store?.freeDelivery ?? false,  fromWeb: true, total: total,
@@ -229,9 +225,18 @@ class TopSection extends StatelessWidget {
                 ) : const SizedBox(),
                 const SizedBox(width: Dimensions.paddingSizeDefault),
 
-                (Get.find<SplashController>().configModel?.takeawayStatus == 1 && (checkoutController.store?.takeAway ?? true)) ? DeliveryOptionButtonWidget(
+                (Get.find<SplashController>().configModel?.takeawayStatus == 1 && (checkoutController.store?.takeAway ?? true) && (storeId == null || (cartList != null && cartList!.isNotEmpty))) ? DeliveryOptionButtonWidget(
                   value: 'take_away', title: 'take_away'.tr, charge: deliveryCharge, isFree: true,  fromWeb: true, total: total,
                   deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
+                ) : const SizedBox(),
+
+                (Get.find<SplashController>().configModel?.pickupCenterStatus != 0) ? Container(
+                  margin: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, left: Dimensions.paddingSizeDefault),
+                  child: DeliveryOptionButtonWidget(
+                    value: 'pickup_center', title: 'delivery_to_pickup_center'.tr, charge: charge,
+                    isFree: false, fromWeb: true, total: total,
+                    deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
+                  ),
                 ) : const SizedBox(),
               ]),
               ),
@@ -242,7 +247,7 @@ class TopSection extends StatelessWidget {
 
         /// Saver Delivery Options (Standard, Express, Slightly Delay)
         GetBuilder<CheckoutController>(builder: (controller) {
-          final bool showSaver = controller.isInstantDelivery && SaverDeliveryTimeWidget.canShow(
+          final bool showSaver = controller.isInstantDelivery && controller.orderType != 'pickup_center' && SaverDeliveryTimeWidget.canShow(
             controller: controller, deliveryCharge: deliveryCharge, originalDeliveryCharge: charge, proFreeDelivery: proFreeDelivery,
           );
 

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart/common/widgets/card_design/store_card.dart';
 import 'package:sixam_mart/common/widgets/card_design/store_card_with_distance.dart';
+import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
@@ -63,202 +64,189 @@ class _BestStoreNearbyViewState extends State<BestStoreNearbyView> {
           ? storeController.featuredStoreList
           : storeController.popularStoreList;
 
-      return storeList != null
-          ? storeList.isNotEmpty
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: Dimensions.paddingSizeExtraSmall),
-                  child: Container(
-                    color: isPharmacy
-                        ? null
-                        : Theme.of(context)
-                            .disabledColor
-                            .withValues(alpha: 0.1),
-                    child: Column(children: [
-                      (isPharmacy || isFood)
-                          ? Padding(
-                              padding: const EdgeInsets.only(
-                                  top: Dimensions.paddingSizeDefault,
-                                  left: Dimensions.paddingSizeDefault,
-                                  right: Dimensions.paddingSizeDefault),
-                              child: TitleWidget(
-                                title: isPharmacy
-                                    ? 'featured_store'.tr
-                                    : (isFood
-                                        ? (Get.find<LocalizationController>()
-                                                .isLtr
-                                            ? 'Best Restaurants Nearby'
-                                            : 'أفضل المطاعم القريبة')
-                                        : 'best_store_nearby'.tr),
-                                //titleColor: titlesColor,
-                                onTap: () => Get.toNamed(
-                                    RouteHelper.getAllStoreRoute(
-                                        isPharmacy ? 'featured' : 'popular',
-                                        isNearbyStore: true)),
+      if (storeList == null) {
+        return BestStoreNearbyShimmer(isPharmacy: isPharmacy, isFood: isFood);
+      }
+      if (storeList.isEmpty) {
+        return const SizedBox();
+      }
+
+      String titleText = isPharmacy
+          ? 'featured_store'.tr
+          : (isFood
+              ? (ltr ? 'Best Restaurants Nearby' : 'أفضل المطاعم القريبة')
+              : 'best_store_nearby'.tr);
+
+      String buttonText = ltr
+          ? 'View $titleText'
+          : 'عرض $titleText';
+
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(
+          vertical: Dimensions.paddingSizeSmall,
+        ),
+        decoration: const BoxDecoration(
+          color: Color(0xFFFFC629),
+          image: DecorationImage(
+            image: AssetImage(Images.nearbyStoresFullBg),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Column(
+          children: [
+            // Top Section Header: Elegant Formal Title Text
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      titleText,
+                      style: robotoBold.copyWith(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF0A2540),
+                        letterSpacing: 0.3,
+                        shadows: [
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.65),
+                            offset: const Offset(0, 1),
+                            blurRadius: 2,
+                          ),
+                        ],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Horizontal Store List (Store Cards remain completely unmodified)
+            isPharmacy
+                ? SizedBox(
+                    height: 240,
+                    width: Get.width,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
+                      itemCount: storeList.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                            right: Dimensions.paddingSizeDefault,
+                            top: Dimensions.paddingSizeDefault,
+                            bottom: Dimensions.paddingSizeExtraSmall,
+                          ),
+                          child: StoreCardWithDistance(store: storeList[index]),
+                        );
+                      },
+                    ),
+                  )
+                : isFood
+                    ? SizedBox(
+                        height: 240,
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.only(
+                            top: Dimensions.paddingSizeDefault,
+                            bottom: Dimensions.paddingSizeDefault,
+                          ),
+                          itemCount: storeList.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: Dimensions.paddingSizeSmall,
                               ),
-                            )
-                          : Padding(
-                              padding: EdgeInsets.only(
-                                  top: Dimensions.paddingSizeDefault,
-                                  left: ltr
-                                      ? Dimensions.paddingSizeLarge
-                                      : Dimensions.paddingSizeDefault,
-                                  right: ltr
-                                      ? Dimensions.paddingSizeDefault
-                                      : Dimensions.paddingSizeLarge),
-                              child: Row(spacing: 4, children: [
-                                Text('best_store_nearby'.tr, 
-                                    style: robotoBold.copyWith(
-                                        fontSize: Dimensions.fontSizeLarge)),
-                                Expanded(
-                                  child: Container(
-                                    height: 2,
-                                    color: Theme.of(context)
-                                        .primaryColor
-                                        .withValues(alpha: 0.2),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => Get.toNamed(
-                                      RouteHelper.getAllStoreRoute('popular',
-                                          isNearbyStore: true)),
-                                  child: Padding(
-                                    padding: EdgeInsets.fromLTRB(
-                                        ltr ? 10 : 0, 5, ltr ? 0 : 10, 5),
-                                    child: Text(
-                                      'see_all'.tr,
-                                      style: robotoMedium.copyWith(
-                                          fontSize:
-                                              Dimensions.fontSizeDefault,
-                                          color:
-                                              Theme.of(context).primaryColor,
-                                          decoration:
-                                              TextDecoration.underline,
-                                          decorationColor:
-                                              Theme.of(context).primaryColor,
-                                          decorationThickness: 1.5),
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                    transform:
-                                        Matrix4.translationValues(-5, 0, 0),
-                                    child: Icon(Icons.arrow_forward,
-                                        size: 18,
-                                        color: Theme.of(context)
-                                            .primaryColor
-                                            .withValues(alpha: 0.5))),
-                              ]),
-                            ),
-                      isPharmacy
-                          ? SizedBox(
-                              height: 240,
-                              width: Get.width,
+                              child: InkWell(
+                                onTap: () {
+                                  if (Get.find<SplashController>().moduleList != null) {
+                                    for (ModuleModel module in Get.find<SplashController>().moduleList!) {
+                                      if (module.id == storeList[index].moduleId) {
+                                        Get.find<SplashController>().setModule(module);
+                                        break;
+                                      }
+                                    }
+                                  }
+                                  Get.toNamed(
+                                    RouteHelper.getStoreRoute(id: storeList[index].id, page: 'store'),
+                                    arguments: StoreScreen(store: storeList[index], fromModule: true),
+                                  );
+                                },
+                                child: StoreCardWithDistance(store: storeList[index]),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : SizedBox(
+                        height: 240,
+                        width: Get.width,
+                        child: Row(
+                          children: [
+                            Expanded(
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 physics: const BouncingScrollPhysics(),
-                                padding: const EdgeInsets.only(
-                                    left: Dimensions.paddingSizeDefault),
+                                padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
                                 itemCount: storeList.length,
                                 itemBuilder: (context, index) {
                                   return Padding(
                                     padding: const EdgeInsets.only(
-                                        right: Dimensions.paddingSizeDefault,
-                                        top: Dimensions.paddingSizeDefault,
-                                        bottom:
-                                            Dimensions.paddingSizeExtraSmall),
-                                    child: StoreCardWithDistance(
-                                        store: storeList[index]),
+                                      bottom: Dimensions.paddingSizeDefault,
+                                      right: Dimensions.paddingSizeDefault,
+                                      top: Dimensions.paddingSizeDefault,
+                                    ),
+                                    child: StoreCard(store: storeList[index]),
                                   );
                                 },
                               ),
-                            )
-                          : isFood
-                              ? SizedBox(
-                                  height: 240,
-                                  child: ListView.builder(
-                                      physics: const BouncingScrollPhysics(),
-                                      scrollDirection: Axis.horizontal,
-                                      padding: const EdgeInsets.only(
-                                          top: Dimensions.paddingSizeDefault,
-                                          bottom:
-                                              Dimensions.paddingSizeDefault),
-                                      itemCount: storeList.length,
-                                      itemBuilder: (context, index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal:
-                                                  Dimensions.paddingSizeSmall),
-                                          child: InkWell(
-                                            onTap: () {
-                                              if (Get.find<SplashController>()
-                                                      .moduleList !=
-                                                  null) {
-                                                for (ModuleModel module
-                                                    in Get.find<
-                                                            SplashController>()
-                                                        .moduleList!) {
-                                                  if (module.id ==
-                                                      storeList[index]
-                                                          .moduleId) {
-                                                    Get.find<SplashController>()
-                                                        .setModule(module);
-                                                    break;
-                                                  }
-                                                }
-                                              }
-                                              Get.toNamed(
-                                                RouteHelper.getStoreRoute(
-                                                    id: storeList[index].id,
-                                                    page: 'store'),
-                                                arguments: StoreScreen(
-                                                    store: storeList[index],
-                                                    fromModule: true),
-                                              );
-                                            },
-                                            child: StoreCardWithDistance(
-                                                store: storeList[index]),
-                                          ),
-                                        );
-                                      }),
-                                )
-                              : SizedBox(
-                                  height: 240,
-                                  width: Get.width,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: ListView.builder(
-                                          scrollDirection: Axis.horizontal,
-                                          physics:
-                                              const BouncingScrollPhysics(),
-                                          padding: const EdgeInsets.only(
-                                              left: Dimensions
-                                                  .paddingSizeDefault),
-                                          itemCount: storeList.length,
-                                          itemBuilder: (context, index) {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: Dimensions
-                                                      .paddingSizeDefault,
-                                                  right: Dimensions
-                                                      .paddingSizeDefault,
-                                                  top: Dimensions
-                                                      .paddingSizeDefault),
-                                              child: StoreCard(
-                                                  store: storeList[index]),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                    ]),
+                            ),
+                          ],
+                        ),
+                      ),
+
+            // Bottom "View All" Button (Rectangular with slight rounded corners)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: CustomInkWell(
+                onTap: () => Get.toNamed(
+                  RouteHelper.getAllStoreRoute(
+                    isPharmacy ? 'featured' : 'popular',
+                    isNearbyStore: true,
                   ),
-                )
-              : const SizedBox()
-          : BestStoreNearbyShimmer(isPharmacy: isPharmacy, isFood: isFood);
+                ),
+                radius: 18,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFD54F).withValues(alpha: 0.95),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: const Color(0xFF0D3B66),
+                      width: 2.0,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      buttonText,
+                      style: robotoBold.copyWith(
+                        fontSize: 16,
+                        color: const Color(0xFF0D3B66),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
     });
   }
 }

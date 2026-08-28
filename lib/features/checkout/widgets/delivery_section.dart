@@ -17,6 +17,8 @@ import 'package:sixam_mart/common/widgets/custom_dropdown.dart';
 import 'package:sixam_mart/features/checkout/widgets/guest_delivery_address.dart';
 import 'package:sixam_mart/features/checkout/widgets/add_address_options_bottom_sheet.dart';
 
+import 'package:sixam_mart/features/checkout/widgets/pickup_center_selection_widget.dart';
+
 class DeliverySection extends StatelessWidget {
   final CheckoutController checkoutController;
   final List<AddressModel> address;
@@ -34,9 +36,12 @@ class DeliverySection extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isGuestLoggedIn = AuthHelper.isGuestLoggedIn();
     bool takeAway = (checkoutController.orderType == 'take_away');
+    bool isPickupCenter = (checkoutController.orderType == 'pickup_center');
     bool isDesktop = ResponsiveHelper.isDesktop(context);
     return Column(children: [
-      isGuestLoggedIn ? GuestDeliveryAddress(
+      isPickupCenter
+          ? PickupCenterSelectionWidget(checkoutController: checkoutController)
+          : isGuestLoggedIn ? GuestDeliveryAddress(
         checkoutController: checkoutController, guestNumberNode: guestNumberNode,
         guestNameTextEditingController: guestNameTextEditingController, guestNumberTextEditingController: guestNumberTextEditingController,
         guestEmailController: guestEmailController, guestEmailNode: guestEmailNode,

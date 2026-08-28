@@ -53,9 +53,11 @@ class ApiClient extends GetxService {
     Map<String, String> header = {};
 
     AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
-    if (userAddress != null && (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('\u200b\u200b\u200b')))) {
-      latitude = '0';
-      longitude = '0';
+    if (latitude == null || latitude.isEmpty || latitude == '0') {
+      latitude = userAddress?.latitude;
+    }
+    if (longitude == null || longitude.isEmpty || longitude == '0') {
+      longitude = userAddress?.longitude;
     }
     if ((zoneIDs == null || zoneIDs.isEmpty) && userAddress != null) {
       if (userAddress.zoneIds != null && userAddress.zoneIds!.isNotEmpty) {
