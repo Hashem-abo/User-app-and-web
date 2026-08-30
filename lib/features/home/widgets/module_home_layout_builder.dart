@@ -91,6 +91,8 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
             );
           },
           childCount: (module.layoutConfig?.length ?? 0) + 1,
+          addAutomaticKeepAlives: true,
+          addRepaintBoundaries: true,
         ),
       );
     } else {
