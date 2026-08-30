@@ -79,12 +79,12 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.between,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Text(
                                       storeName,
-                                      style: robotoBold.copyWith(fontSize: Dimensions.fontSizeMedium),
+                                      // style: robotoBold.copyWith(fontSize: Dimensions.fontSizeMedium),
                                     ),
                                   ),
                                   Container(
@@ -117,7 +117,7 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                               ),
                               const SizedBox(height: 6),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.between,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'Used Debt: \$${used.toStringAsFixed(2)}',
