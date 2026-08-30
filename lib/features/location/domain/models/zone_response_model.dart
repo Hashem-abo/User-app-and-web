@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sixam_mart/features/checkout/domain/models/pickup_center_model.dart';
 
 class ZoneResponseModel {
   final bool _isSuccess;
@@ -27,6 +29,7 @@ class ZoneData {
   List<Modules>? modules;
   List<LatLng>? formatedCoordinates;
   List<String>? districts;
+  List<PickupCenterModel>? pickupCenters;
 
   ZoneData({
     this.id,
@@ -38,6 +41,7 @@ class ZoneData {
     this.modules,
     this.formatedCoordinates,
     this.districts,
+    this.pickupCenters,
   });
 
   ZoneData.fromJson(Map<String, dynamic> json) {
@@ -67,6 +71,22 @@ class ZoneData {
       json['districts'].forEach((v) {
         districts!.add(v.toString());
       });
+    }
+    if (json['pickup_centers'] != null) {
+      pickupCenters = <PickupCenterModel>[];
+      dynamic pcData = json['pickup_centers'];
+      if (pcData is String) {
+        try { pcData = jsonDecode(pcData); } catch (e) { pcData = []; }
+      }
+      if (pcData is List) {
+        for (var v in pcData) {
+          if (v is Map<String, dynamic>) {
+            pickupCenters!.add(PickupCenterModel.fromJson(v));
+          } else if (v is String) {
+            pickupCenters!.add(PickupCenterModel(name: v, address: v));
+          }
+        }
+      }
     }
   }
 
@@ -265,6 +285,16 @@ class Pivot {
   MinimumDeliveryTime? minimumDeliveryTime;
   double? minimumDeliveryCharge;
 
+  int? pickupCenterStatus;
+  String? pickupCenterChargeType;
+  double? pickupCenterFixedCharge;
+  double? pickupCenterPerKmCharge;
+  double? pickupCenterMinimumCharge;
+  String? pickupCenterOutsideChargeType;
+  double? pickupCenterOutsideFixedCharge;
+  double? pickupCenterOutsidePerKmCharge;
+  double? pickupCenterOutsideMinimumCharge;
+
   Pivot({
     this.zoneId,
     this.moduleId,
@@ -278,6 +308,15 @@ class Pivot {
     this.minimumShippingChargeGroup,
     this.minimumDeliveryTime,
     this.minimumDeliveryCharge,
+    this.pickupCenterStatus,
+    this.pickupCenterChargeType,
+    this.pickupCenterFixedCharge,
+    this.pickupCenterPerKmCharge,
+    this.pickupCenterMinimumCharge,
+    this.pickupCenterOutsideChargeType,
+    this.pickupCenterOutsideFixedCharge,
+    this.pickupCenterOutsidePerKmCharge,
+    this.pickupCenterOutsideMinimumCharge,
   });
 
   Pivot.fromJson(Map<String, dynamic> json) {
@@ -298,6 +337,16 @@ class Pivot {
       minimumDeliveryTime = MinimumDeliveryTime(value: rawMinDeliveryTime.toString(), unit: 'min');
     }
     minimumDeliveryCharge = json['minimum_delivery_charge']?.toDouble();
+
+    pickupCenterStatus = json['pickup_center_status'] != null ? int.tryParse(json['pickup_center_status'].toString()) : 0;
+    pickupCenterChargeType = json['pickup_center_charge_type']?.toString();
+    pickupCenterFixedCharge = double.tryParse(json['pickup_center_fixed_charge'].toString()) ?? 0.0;
+    pickupCenterPerKmCharge = double.tryParse(json['pickup_center_per_km_charge'].toString()) ?? 0.0;
+    pickupCenterMinimumCharge = double.tryParse(json['pickup_center_minimum_charge'].toString()) ?? 0.0;
+    pickupCenterOutsideChargeType = json['pickup_center_outside_charge_type']?.toString();
+    pickupCenterOutsideFixedCharge = double.tryParse(json['pickup_center_outside_fixed_charge'].toString()) ?? 0.0;
+    pickupCenterOutsidePerKmCharge = double.tryParse(json['pickup_center_outside_per_km_charge'].toString()) ?? 0.0;
+    pickupCenterOutsideMinimumCharge = double.tryParse(json['pickup_center_outside_minimum_charge'].toString()) ?? 0.0;
   }
 
   Map<String, dynamic> toJson() {

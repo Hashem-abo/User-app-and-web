@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart';
+import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart' hide Variation;
 import 'package:sixam_mart/features/cart/domain/services/cart_service_interface.dart';
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
@@ -86,44 +86,65 @@ class CartController extends GetxController implements GetxService {
     return _addingCartItemIds.contains(itemId);
   }
 
-  String _getVariationKey(CartModel cart) {
-    StringBuffer key = StringBuffer();
-    key.write('item_${cart.item?.id}_');
+  bool _isSameItemVariation(CartModel a, CartModel b) {
+    if (a.item?.id != b.item?.id) return false;
+    if (a.item?.storeId != b.item?.storeId) return false;
 
-    if (cart.variation != null && cart.variation!.isNotEmpty) {
-      for (var v in cart.variation!) {
-        key.write('v_${v.type?.replaceAll(' ', '').toLowerCase()}_');
+    // Standard variations
+    List<Variation>? varA = a.variation;
+    List<Variation>? varB = b.variation;
+    bool hasVarA = varA != null && varA.isNotEmpty;
+    bool hasVarB = varB != null && varB.isNotEmpty;
+    if (hasVarA != hasVarB) return false;
+    if (hasVarA && hasVarB) {
+      if (varA!.length != varB!.length) return false;
+      List<String> typesA = varA!.map<String>((dynamic v) => (v.type ?? '').toString().trim().toLowerCase()).toList()..sort();
+      List<String> typesB = varB!.map<String>((dynamic v) => (v.type ?? '').toString().trim().toLowerCase()).toList()..sort();
+      for (int i = 0; i < typesA.length; i++) {
+        if (typesA[i] != typesB[i]) return false;
       }
     }
 
-    if (cart.foodVariations != null && cart.foodVariations!.isNotEmpty) {
-      for (int i = 0; i < cart.foodVariations!.length; i++) {
-        key.write('fv_$i:');
-        for (int j = 0; j < cart.foodVariations![i].length; j++) {
-          if (cart.foodVariations![i][j] == true) {
-            key.write('$j,');
-          }
+    // Food variations
+    List<List<bool?>>? foodVarA = a.foodVariations;
+    List<List<bool?>>? foodVarB = b.foodVariations;
+    bool hasFoodVarA = foodVarA != null && foodVarA.isNotEmpty;
+    bool hasFoodVarB = foodVarB != null && foodVarB.isNotEmpty;
+    if (hasFoodVarA != hasFoodVarB) return false;
+    if (hasFoodVarA && hasFoodVarB) {
+      if (foodVarA!.length != foodVarB!.length) return false;
+      for (int i = 0; i < foodVarA.length; i++) {
+        List<bool?> subA = foodVarA[i];
+        List<bool?> subB = foodVarB[i];
+        if (subA.length != subB.length) return false;
+        for (int j = 0; j < subA.length; j++) {
+          if (subA[j] != subB[j]) return false;
         }
       }
     }
 
-    if (cart.addOnIds != null && cart.addOnIds!.isNotEmpty) {
-      for (var addon in cart.addOnIds!) {
-        key.write('addon_${addon.id}_q${addon.quantity}_');
+    // Addons
+    List<AddOn>? addOnA = a.addOnIds;
+    List<AddOn>? addOnB = b.addOnIds;
+    bool hasAddonA = addOnA != null && addOnA.isNotEmpty;
+    bool hasAddonB = addOnB != null && addOnB.isNotEmpty;
+    if (hasAddonA != hasAddonB) return false;
+    if (hasAddonA && hasAddonB) {
+      if (addOnA!.length != addOnB!.length) return false;
+      List<String> addonKeysA = addOnA!.map((addon) => '${addon.id}_${addon.quantity}').toList()..sort();
+      List<String> addonKeysB = addOnB!.map((addon) => '${addon.id}_${addon.quantity}').toList()..sort();
+      for (int i = 0; i < addonKeysA.length; i++) {
+        if (addonKeysA[i] != addonKeysB[i]) return false;
       }
     }
 
-    return key.toString();
+    return true;
   }
 
   List<CartModel> _deduplicateCartList(List<CartModel> list) {
     List<CartModel> result = [];
     for (var item in list) {
-      String itemKey = _getVariationKey(item);
-      int index = result.indexWhere((existing) {
-        if (existing.id != null && item.id != null && existing.id == item.id) return true;
-        return _getVariationKey(existing) == itemKey;
-      });
+      int index = result.indexWhere((existing) => _isSameItemVariation(existing, item));
 
       if (index != -1) {
         result[index].quantity = (result[index].quantity ?? 1) + (item.quantity ?? 1);
@@ -202,6 +223,7 @@ class CartController extends GetxController implements GetxService {
   }
 
   double calculationCart() {
+    _cartList = _deduplicateCartList(_cartList);
     _addOnsList = [];
     _availableList = [];
     _itemPrice = 0;
@@ -347,7 +369,12 @@ class CartController extends GetxController implements GetxService {
         _cartList.removeAt(_cartIndexToReplace!);
         _cartIndexToReplace = null;
       }
-      _cartList.add(cartModel);
+      int existingIndex = _cartList.indexWhere((existing) => _isSameItemVariation(existing, cartModel));
+      if (existingIndex != -1) {
+        _cartList[existingIndex].quantity = (_cartList[existingIndex].quantity ?? 0) + (cartModel.quantity ?? 1);
+      } else {
+        _cartList.add(cartModel);
+      }
     }
     Get.find<ItemController>().setExistInCart(cartModel.item, null, notify: true);
     await cartServiceInterface.addSharedPrefCartList(_cartList);
@@ -403,6 +430,36 @@ class CartController extends GetxController implements GetxService {
     }
   }
 
+  Future<void> clearStoreCartItems(Set<int> storeIds) async {
+    _cartDataRequestId++;
+    List<int> cartIdsToRemove = [];
+    _cartList.removeWhere((cartItem) {
+      if (cartItem.item != null) {
+        int? sId = cartItem.item!.storeId;
+        if (sId == null && cartItem.item!.storeDetails != null && cartItem.item!.storeDetails!['id'] != null) {
+          sId = int.tryParse(cartItem.item!.storeDetails!['id'].toString());
+        }
+        if (sId != null && storeIds.contains(sId)) {
+          if (cartItem.id != null) {
+            cartIdsToRemove.add(cartItem.id!);
+          }
+          return true;
+        }
+      }
+      return false;
+    });
+
+    await cartServiceInterface.addSharedPrefCartList(_cartList);
+    calculationCart();
+    update();
+
+    if (AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
+      for (int cartId in cartIdsToRemove) {
+        await cartServiceInterface.removeCartItemOnline(cartId);
+      }
+    }
+  }
+
   int isExistInCart(int? itemID, String variationType, bool isUpdate, int? cartIndex) {
     return cartServiceInterface.isExistInCart(_cartList, itemID, variationType, isUpdate, cartIndex);
   }
@@ -441,6 +498,36 @@ class CartController extends GetxController implements GetxService {
     update();
 
     try {
+      int existingIndex = _cartList.indexWhere((existing) => _isSameItemVariation(existing, cartModel));
+      if (existingIndex != -1) {
+        int oldQty = _cartList[existingIndex].quantity ?? 0;
+        int addQty = cartModel.quantity ?? 1;
+        int newQty = oldQty + addQty;
+        int? stock = cartModel.stock ?? cartModel.item?.stock;
+        int? limit = cartModel.item?.quantityLimit ?? cartModel.quantityLimit;
+        if (limit != null && newQty > limit) {
+          newQty = limit;
+        }
+        if (stock != null && newQty > stock) {
+          newQty = stock;
+        }
+        _cartList[existingIndex].quantity = newQty;
+        calculationCart();
+        update();
+
+        if (_cartList[existingIndex].id != null) {
+          double discountedPrice = await cartServiceInterface.calculateDiscountedPrice(
+            _cartList[existingIndex],
+            newQty,
+            ModuleHelper.getModuleConfig(_cartList[existingIndex].item!.moduleType).newVariation!,
+          );
+          updateCartQuantityOnline(_cartList[existingIndex].id!, discountedPrice, newQty, existingIndex, oldQty);
+        }
+        _isAddToCartLoading = false;
+        _addingCartItemIds.remove(itemId);
+        return true;
+      }
+
       if (cartModel.item != null && cartModel.item!.id != null) {
         int totalCartQty = 0;
         for (var c in _cartList) {
@@ -539,7 +626,8 @@ class CartController extends GetxController implements GetxService {
     List<OnlineCartModel>? onlineCartList = await cartServiceInterface.updateCartOnline(onlineCart);
     if(onlineCartList != null) {
       _cartList = [];
-      _cartList.addAll(cartServiceInterface.formatOnlineCartToLocalCart(onlineCartModel: onlineCartList));
+      List<CartModel> rawList = cartServiceInterface.formatOnlineCartToLocalCart(onlineCartModel: onlineCartList);
+      _cartList.addAll(_deduplicateCartList(rawList));
       cartServiceInterface.addSharedPrefCartList(_cartList);
       calculationCart();
       success = true;
@@ -558,7 +646,7 @@ class CartController extends GetxController implements GetxService {
     // No loading set here to keep UI responsive
     bool success = await cartServiceInterface.updateCartQuantityOnline(cartId, price, quantity);
     if(success) {
-      await getCartDataOnline();
+      await cartServiceInterface.addSharedPrefCartList(_cartList);
       calculationCart();
     } else {
       _cartList[cartIndex].quantity = oldQuantity;
@@ -578,7 +666,8 @@ class CartController extends GetxController implements GetxService {
       if (isPreventCartOverwritten || requestId != _cartDataRequestId) return;
       if(onlineCartList != null) {
         _cartList = [];
-        _cartList.addAll(cartServiceInterface.formatOnlineCartToLocalCart(onlineCartModel: onlineCartList));
+        List<CartModel> rawList = cartServiceInterface.formatOnlineCartToLocalCart(onlineCartModel: onlineCartList);
+        _cartList.addAll(_deduplicateCartList(rawList));
         cartServiceInterface.addSharedPrefCartList(_cartList);
         calculationCart();
       }
@@ -590,7 +679,9 @@ class CartController extends GetxController implements GetxService {
     // No loading set here
     bool success = await cartServiceInterface.removeCartItemOnline(cartId);
     if(success) {
-      await getCartDataOnline();
+      if (!isPreventCartOverwritten) {
+        await getCartDataOnline();
+      }
       if(item != null) {
         Get.find<ItemController>().setExistInCart(item, null, notify: true);
       }

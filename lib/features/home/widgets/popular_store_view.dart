@@ -31,7 +31,7 @@ class PopularStoreView extends StatelessWidget {
       List<Store>? storeList = isFeatured ? storeController.featuredStoreList : isPopular ? storeController.popularStoreList
           : storeController.latestStoreList;
 
-      return (storeList != null && storeList.isEmpty) ? const SizedBox() : Column(
+      return (storeList != null && storeList.isEmpty) ? const SizedBox.shrink() : Column(
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(10, isPopular ? 2 : 15, 10, 10),

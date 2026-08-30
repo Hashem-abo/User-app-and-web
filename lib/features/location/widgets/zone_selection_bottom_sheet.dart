@@ -68,13 +68,25 @@ class _ZoneSelectionBottomSheetState extends State<ZoneSelectionBottomSheet> {
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
           GetBuilder<LocationController>(builder: (locationController) {
-            return locationController.zoneList != null ? (locationController.zoneList!.isNotEmpty ? ListView.separated(
+            if (locationController.zoneList == null) {
+              return const Center(child: Padding(
+                padding: EdgeInsets.all(Dimensions.paddingSizeExtremeLarge),
+                child: CircularProgressIndicator(),
+              ));
+            }
+
+            final List<ZoneData> displayZones = [
+              ZoneData(id: 0, name: 'all_zone'.tr),
+              ...locationController.zoneList!,
+            ];
+
+            return ListView.separated(
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
-              itemCount: locationController.zoneList!.length,
+              itemCount: displayZones.length,
               separatorBuilder: (context, index) => const SizedBox(height: Dimensions.paddingSizeExtraSmall),
               itemBuilder: (context, index) {
-                ZoneData zone = locationController.zoneList![index];
+                ZoneData zone = displayZones[index];
                 bool isSelected = locationController.zoneID == zone.id;
 
                 return InkWell(
@@ -99,7 +111,7 @@ class _ZoneSelectionBottomSheetState extends State<ZoneSelectionBottomSheet> {
                       children: [
                         Row(children: [
                           Icon(
-                            Icons.location_on,
+                            zone.id == 0 ? Icons.public_rounded : Icons.location_on,
                             size: 20,
                             color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor,
                           ),
@@ -118,13 +130,7 @@ class _ZoneSelectionBottomSheetState extends State<ZoneSelectionBottomSheet> {
                   ),
                 );
               },
-            ) : Center(child: Padding(
-              padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-              child: Text('no_zone_found'.tr, style: robotoMedium),
-            ))) : const Center(child: Padding(
-              padding: EdgeInsets.all(Dimensions.paddingSizeExtremeLarge),
-              child: CircularProgressIndicator(),
-            ));
+            );
           }),
           const SizedBox(height: Dimensions.paddingSizeLarge),
         ],

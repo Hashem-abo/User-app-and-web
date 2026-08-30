@@ -22,6 +22,8 @@ import 'package:sixam_mart/features/checkout/widgets/payment_section.dart';
 import 'package:sixam_mart/features/checkout/widgets/time_slot_section.dart';
 import 'package:sixam_mart/features/store/widgets/camera_button_sheet_widget.dart';
 import 'package:sixam_mart/features/checkout/widgets/saver_delivery_time_widget.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
+import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'dart:io';
 
 class TopSection extends StatelessWidget {
@@ -205,44 +207,86 @@ class TopSection extends StatelessWidget {
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
         // delivery option
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.05), blurRadius: 10)],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge, vertical: Dimensions.paddingSizeSmall),
-          width: double.infinity,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('delivery_type'.tr, style: robotoMedium),
-              const SizedBox(height: Dimensions.paddingSizeSmall),
+        Builder(
+          builder: (context) {
+            AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
+            bool isOutZone = false;
+            if (checkoutController.store != null && userAddress != null) {
+              if (userAddress.zoneIds != null && userAddress.zoneIds!.isNotEmpty) {
+                isOutZone = !userAddress.zoneIds!.contains(checkoutController.store!.zoneId);
+              } else if (userAddress.zoneId != null) {
+                isOutZone = userAddress.zoneId != checkoutController.store!.zoneId;
+              }
+            }
 
-              (storeId != null && (cartList == null || cartList!.isEmpty)) ? DeliveryOptionButtonWidget(
-                value: 'delivery', title: 'home_delivery'.tr, charge: charge,
-                isFree: checkoutController.store?.freeDelivery ?? false, fromWeb: true, total: total,
-                deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
-              ) : SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
-                (Get.find<SplashController>().configModel?.homeDeliveryStatus == 1 && (checkoutController.store?.delivery ?? true)) ? DeliveryOptionButtonWidget(
-                  value: 'delivery', title: 'home_delivery'.tr, charge: charge,
-                  isFree: checkoutController.store?.freeDelivery ?? false,  fromWeb: true, total: total,
-                  deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
-                ) : const SizedBox(),
-                const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                (Get.find<SplashController>().configModel?.takeawayStatus == 1 && (checkoutController.store?.takeAway ?? true)) ? DeliveryOptionButtonWidget(
-                  value: 'take_away', title: 'take_away'.tr, charge: deliveryCharge, isFree: true,  fromWeb: true, total: total,
-                  deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
-                ) : const SizedBox(),
-              ]),
+            return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.05), blurRadius: 10)],
               ),
-            ],
-          ),
+              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge, vertical: Dimensions.paddingSizeSmall),
+              width: double.infinity,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('delivery_type'.tr, style: robotoMedium),
+                  const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                  if (isOutZone)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                        border: Border.all(color: Theme.of(context).primaryColor, width: 0.5),
+                      ),
+                      child: Row(children: [
+                        Icon(Icons.info_outline, color: Theme.of(context).primaryColor, size: 20),
+                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                        Expanded(
+                          child: Text(
+                            Get.find<LocalizationController>().isLtr
+                                ? 'This store is outside your zone. Delivery is only available via Pickup Center.'
+                                : 'هذا المتجر يقع خارج منطقتك السكنية، يتوفر التسليم عبر مركز استلام فقط.',
+                            style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
+                          ),
+                        ),
+                      ]),
+                    ),
+
+                  SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
+                    (!isOutZone && Get.find<SplashController>().configModel?.homeDeliveryStatus == 1 && (checkoutController.store?.delivery ?? true)) ? DeliveryOptionButtonWidget(
+                      value: 'delivery', title: 'home_delivery'.tr, charge: charge,
+                      isFree: checkoutController.store?.freeDelivery ?? false,  fromWeb: true, total: total,
+                      deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
+                    ) : const SizedBox(),
+                    if (!isOutZone) const SizedBox(width: Dimensions.paddingSizeDefault),
+
+                    (!isOutZone && Get.find<SplashController>().configModel?.takeawayStatus == 1 && (checkoutController.store?.takeAway ?? true) && (storeId == null || (cartList != null && cartList!.isNotEmpty))) ? DeliveryOptionButtonWidget(
+                      value: 'take_away', title: 'take_away'.tr, charge: deliveryCharge, isFree: true,  fromWeb: true, total: total,
+                      deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
+                    ) : const SizedBox(),
+
+                    (Get.find<SplashController>().configModel?.pickupCenterStatus != 0) ? Container(
+                      margin: EdgeInsets.only(right: !isOutZone ? Dimensions.paddingSizeDefault : 0, left: !isOutZone ? Dimensions.paddingSizeDefault : 0),
+                      child: DeliveryOptionButtonWidget(
+                        value: 'pickup_center', title: 'delivery_to_pickup_center'.tr, charge: charge,
+                        isFree: false, fromWeb: true, total: total,
+                        deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
+                      ),
+                    ) : const SizedBox(),
+                  ]),
+                  ),
+                ],
+              ),
+            );
+          }
         ),
         const SizedBox(height: Dimensions.paddingSizeLarge),
 
         /// Saver Delivery Options (Standard, Express, Slightly Delay)
         GetBuilder<CheckoutController>(builder: (controller) {
-          final bool showSaver = controller.isInstantDelivery && SaverDeliveryTimeWidget.canShow(
+          final bool showSaver = controller.isInstantDelivery && controller.orderType != 'pickup_center' && SaverDeliveryTimeWidget.canShow(
             controller: controller, deliveryCharge: deliveryCharge, originalDeliveryCharge: charge, proFreeDelivery: proFreeDelivery,
           );
 

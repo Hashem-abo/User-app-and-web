@@ -70,12 +70,12 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
     await Get.find<OrderController>().trackOrder(widget.orderID, null, true, contactNumber: widget.contactNumber);
     await Get.find<OrderController>().getOrderDetails(widget.orderID.toString());
 
-    /*if(Get.find<SplashController>().configModel!.websocketEnabled!) {
+    if(Get.find<SplashController>().configModel!.websocketEnabled!) {
       print('====pusher entered-------------');
       _trackWithPusher();
-    }*/
+    }
     
-    // _timerTrackOrder();
+    _timerTrackOrder();
   }
 
   void _trackWithPusher() {
@@ -95,11 +95,11 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
     }
   }
 
-  /*void _timerTrackOrder(){
+  void _timerTrackOrder(){
     if(Get.find<OrderController>().trackModel?.orderStatus != 'delivered' && Get.find<OrderController>().trackModel?.orderStatus != 'failed' && Get.find<OrderController>().trackModel?.orderStatus != 'canceled') {
       Get.find<OrderController>().timerTrackOrder(widget.orderID.toString(), contactNumber: widget.contactNumber);
       _timer?.cancel();
-      _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
         if(Get.currentRoute.contains(RouteHelper.orderDetails) || Get.currentRoute.contains(RouteHelper.orderTracking)){
           Get.find<OrderController>().timerTrackOrder(widget.orderID.toString(), contactNumber: widget.contactNumber);
 
@@ -120,7 +120,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
     }else{
       Get.find<OrderController>().timerTrackOrder(widget.orderID.toString(), contactNumber: widget.contactNumber);
     }
-  }*/
+  }
 
   @override
   void initState() {
@@ -226,7 +226,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
 
               Positioned(
                 top: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-                child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away'),
+                child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away', isPickupCenter: track.orderType == 'pickup_center'),
               ),
 
               (track.store != null && track.store!.moduleId == 1) ? const SizedBox() : Positioned(
@@ -301,7 +301,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                     child: Row(children: [
                       Icon(Icons.access_time_rounded, size: 16, color: Colors.white),
                       const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                      Text(track.orderStatus!.tr, style: robotoBold.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeSmall)),
+                      Text((track.orderType != 'pickup_center' && track.orderStatus == 'arrived_at_pickup_center' ? 'delivery_on_the_way' : track.orderStatus!).tr, style: robotoBold.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeSmall)),
                     ]),
                   ),
                   Text('ORD-${track.id}', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor)),
@@ -357,11 +357,12 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                 const SizedBox(height: Dimensions.paddingSizeDefault),
 
                 _buildTimelineStep(context, 'order_placed'.tr, track.createdAt, true),
-                _buildTimelineStep(context, 'order_confirmed'.tr, track.confirmed, track.confirmed != null),
-                _buildTimelineStep(context, 'preparing_item'.tr, track.processing, track.processing != null),
-                _buildTimelineStep(context, 'ready_for_handover'.tr, track.handover, track.handover != null),
-                _buildTimelineStep(context, 'delivery_on_the_way'.tr, track.pickedUp, track.pickedUp != null),
-                _buildTimelineStep(context, 'delivered'.tr, track.delivered, track.delivered != null, isLast: true),
+                _buildTimelineStep(context, 'order_confirmed'.tr, track.confirmed, track.confirmed != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                _buildTimelineStep(context, 'preparing_item'.tr, track.processing, track.processing != null || track.handover != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                _buildTimelineStep(context, track.orderType == 'take_away' ? 'ready_for_handover'.tr : 'delivery_on_the_way'.tr, track.orderType == 'take_away' ? (track.handover ?? track.pickedUp) : track.pickedUp, track.handover != null || track.pickedUp != null || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                if (track.orderType == 'pickup_center')
+                  _buildTimelineStep(context, 'arrived_at_pickup_center'.tr, track.orderStatus == 'arrived_at_pickup_center' ? track.updatedAt : null, track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                _buildTimelineStep(context, 'delivered'.tr, track.delivered, track.orderStatus == 'delivered', isLast: true),
 
                 const SizedBox(height: Dimensions.paddingSizeDefault),
                 if(track.deliveryMan != null && track.orderStatus != 'delivered' && track.orderStatus != 'failed' && track.orderStatus != 'canceled' && track.orderStatus != 'refunded')

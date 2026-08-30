@@ -9,7 +9,6 @@ import 'package:sixam_mart/api/api_checker.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/common/models/error_response.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
@@ -54,9 +53,11 @@ class ApiClient extends GetxService {
     Map<String, String> header = {};
 
     AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
-    if (userAddress != null && (userAddress.house == 'manual' || userAddress.latitude == '0' || (userAddress.address != null && userAddress.address!.contains('\u200b\u200b\u200b')))) {
-      latitude = '0';
-      longitude = '0';
+    if (latitude == null || latitude.isEmpty || latitude == '0') {
+      latitude = userAddress?.latitude;
+    }
+    if (longitude == null || longitude.isEmpty || longitude == '0') {
+      longitude = userAddress?.longitude;
     }
     if ((zoneIDs == null || zoneIDs.isEmpty) && userAddress != null) {
       if (userAddress.zoneIds != null && userAddress.zoneIds!.isNotEmpty) {
@@ -65,37 +66,93 @@ class ApiClient extends GetxService {
         zoneIDs = [userAddress.zoneId!];
       }
     }
+    if ((zoneIDs == null || zoneIDs.isEmpty) && userAddress?.zoneId != null) {
+      zoneIDs = [userAddress!.zoneId!];
+    }
+    if (zoneIDs == null || zoneIDs.isEmpty) {
+      zoneIDs = [1];
+    }
 
     if(moduleID != null || sharedPreferences.getString(AppConstants.cacheModuleId) != null) {
       header.addAll({AppConstants.moduleId: '${moduleID ?? ModuleModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.cacheModuleId)!)).id}'});
     }
+    String cleanCoord(String? input, String fallback) {
+      if (input == null || input.isEmpty || input == '0' || input == 'null') return fallback;
+      String clean = input.replaceAll('"', '').replaceAll("'", '').trim();
+      double? val = double.tryParse(clean);
+      return (val == null || val == 0) ? fallback : clean;
+    }
+
+    String validLat = cleanCoord(latitude, userAddress?.latitude != null ? userAddress!.latitude! : '15.369445');
+    String validLng = cleanCoord(longitude, userAddress?.longitude != null ? userAddress!.longitude! : '44.191006');
+
     header.addAll({
       'Content-Type': 'application/json; charset=UTF-8',
       'Accept': 'application/json',
-      AppConstants.zoneId: zoneIDs != null ? jsonEncode(zoneIDs) : '',
-      ///this will add in ride module
-      // AppConstants.operationAreaId: operationIds != null ? jsonEncode(operationIds) : '',
+      AppConstants.zoneId: jsonEncode(zoneIDs),
       AppConstants.localizationKey: languageCode ?? AppConstants.languages[0].languageCode!,
-      AppConstants.latitude: latitude != null ? jsonEncode(latitude) : '',
-      AppConstants.longitude: longitude != null ? jsonEncode(longitude) : '',
+      AppConstants.latitude: validLat,
+      AppConstants.longitude: validLng,
       'Authorization': 'Bearer $token'
     });
+    if (!header.containsKey(AppConstants.zoneId) || header[AppConstants.zoneId] == null || header[AppConstants.zoneId]!.isEmpty || header[AppConstants.zoneId] == '[]') {
+      header[AppConstants.zoneId] = jsonEncode([1]);
+    }
     if(setHeader) {
       _mainHeaders = header;
     }
     return header;
   }
 
-  Map<String, String> getHeader() => _mainHeaders;
+  Map<String, String> _sanitizeHeaders(Map<String, String>? inputHeaders) {
+    Map<String, String> resHeaders = Map.from(inputHeaders ?? _mainHeaders);
+
+    String? rawZone = resHeaders[AppConstants.zoneId];
+    if (rawZone == null || rawZone.isEmpty || rawZone == '[]' || rawZone == 'null') {
+      resHeaders[AppConstants.zoneId] = jsonEncode([1]);
+    } else {
+      try {
+        var decoded = jsonDecode(rawZone);
+        if (decoded is! List || decoded.isEmpty) {
+          if (decoded is int) {
+            resHeaders[AppConstants.zoneId] = jsonEncode([decoded]);
+          } else if (decoded is String) {
+            int? parsed = int.tryParse(decoded);
+            resHeaders[AppConstants.zoneId] = jsonEncode([parsed ?? 1]);
+          } else {
+            resHeaders[AppConstants.zoneId] = jsonEncode([1]);
+          }
+        }
+      } catch (_) {
+        int? parsed = int.tryParse(rawZone);
+        resHeaders[AppConstants.zoneId] = jsonEncode([parsed ?? 1]);
+      }
+    }
+
+    String cleanCoord(String? input, String fallback) {
+      if (input == null || input.isEmpty || input == '0' || input == 'null') return fallback;
+      String clean = input.replaceAll('"', '').replaceAll("'", '').trim();
+      double? val = double.tryParse(clean);
+      return (val == null || val == 0) ? fallback : clean;
+    }
+
+    resHeaders[AppConstants.latitude] = cleanCoord(resHeaders[AppConstants.latitude], '15.369445');
+    resHeaders[AppConstants.longitude] = cleanCoord(resHeaders[AppConstants.longitude], '44.191006');
+
+    return resHeaders;
+  }
+
+  Map<String, String> getHeader() => _sanitizeHeaders(_mainHeaders);
 
   Future<Response> getData(String uri, {Map<String, dynamic>? query, Map<String, String>? headers, bool handleError = true}) async {
     try {
+      Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if (kDebugMode) {
-        log('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        log('====> API Call: $uri\nHeader: $finalHeaders');
       }
       http.Response response = await http.get(
         Uri.parse(appBaseUrl+uri),
-        headers: headers ?? _mainHeaders,
+        headers: finalHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri, handleError);
     } catch (e) {
@@ -108,8 +165,9 @@ class ApiClient extends GetxService {
 
   Future<Response> postData(String uri, dynamic body, {Map<String, String>? headers, int? timeout, bool handleError = true}) async {
     try {
+      Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
-        print('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        print('====> API Call: $uri\nHeader: $finalHeaders');
         print('====> API Body: $body');
       }
 
@@ -125,7 +183,7 @@ class ApiClient extends GetxService {
       http.Response response = await http.post(
         Uri.parse(appBaseUrl+uri),
         body: jsonEncode(newBody),
-        headers: headers ?? _mainHeaders,
+        headers: finalHeaders,
       ).timeout(Duration(seconds: timeout ?? timeoutInSeconds));
       return handleResponse(response, uri, handleError);
     } catch (e) {
@@ -135,10 +193,11 @@ class ApiClient extends GetxService {
 
   Future<Response> postMultipartData(String uri, Map<String, String> body, List<MultipartBody> multipartBody, {List<MultipartDocument>? multipartDoc, Map<String, String>? headers, bool handleError = true}) async {
     try {
-      debugPrint('====> API Call: $uri\nHeader: $_mainHeaders');
+      Map<String, String> finalHeaders = _sanitizeHeaders(headers);
+      debugPrint('====> API Call: $uri\nHeader: $finalHeaders');
       debugPrint('====> API Body: $body with ${multipartBody.length} and multipart ${multipartDoc?.length}');
       http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(appBaseUrl+uri));
-      request.headers.addAll(headers ?? _mainHeaders);
+      request.headers.addAll(finalHeaders);
       for(MultipartBody multipart in multipartBody) {
         if(multipart.file != null) {
           if(kIsWeb) {
@@ -188,14 +247,25 @@ class ApiClient extends GetxService {
 
   Future<Response> putData(String uri, dynamic body, {Map<String, String>? headers, bool handleError = true}) async {
     try {
+      Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
-        print('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        print('====> API Call: $uri\nHeader: $finalHeaders');
         print('====> API Body: $body');
       }
+
+      Map<dynamic, dynamic> newBody = {};
+      if(body != null) {
+        body.forEach((key, value) {
+          if (value != null && value.toString().isNotEmpty) {
+            newBody.addAll({key: value});
+          }
+        });
+      }
+
       http.Response response = await http.put(
         Uri.parse(appBaseUrl+uri),
-        body: jsonEncode(body),
-        headers: headers ?? _mainHeaders,
+        body: jsonEncode(newBody),
+        headers: finalHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri, handleError);
     } catch (e) {
@@ -205,12 +275,13 @@ class ApiClient extends GetxService {
 
   Future<Response> deleteData(String uri, {Map<String, String>? headers, bool handleError = true}) async {
     try {
+      Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
-        print('====> API Call: $uri\nHeader: ${headers ?? _mainHeaders}');
+        print('====> API Call: $uri\nHeader: $finalHeaders');
       }
       http.Response response = await http.delete(
         Uri.parse(appBaseUrl+uri),
-        headers: headers ?? _mainHeaders,
+        headers: finalHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
       return handleResponse(response, uri, handleError);
     } catch (e) {

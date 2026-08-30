@@ -105,8 +105,10 @@ Future<void> _initDefaultAddress() async {
     AddressModel defaultAddress = AddressModel(
       latitude: '15.369445',
       longitude: '44.191006',
-      address: "Sana'a, Yemen",
+      address: "صنعاء، اليمن",
       addressType: 'others',
+      zoneId: 1,
+      zoneIds: [1],
     );
     try {
       var response = await Get.find<LocationController>().getZone(defaultAddress.latitude, defaultAddress.longitude, false);

@@ -86,7 +86,12 @@ class StoreController extends GetxController implements GetxService {
     _topOfferStoreList = null;
     _featuredStoreList = null;
     _visitAgainStoreList = null;
+    _recommendedStoreList = null;
     _storeModel = null;
+    _isPopularStoreListLoaded = false;
+    _isLatestStoreListLoaded = false;
+    _isTopOfferStoreListLoaded = false;
+    _isRecommendedStoreListLoaded = false;
     update();
   }
 
@@ -329,7 +334,7 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getPopularStoreList(bool reload, String type, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
-    if(!reload && _isPopularStoreListLoaded && _popularStoreList != null && _popularStoreList!.isNotEmpty) {
+    if(!reload && !fromRecall && _isPopularStoreListLoaded && _popularStoreList != null && _popularStoreList!.isNotEmpty) {
       if(notify) update();
       return;
     }
@@ -364,7 +369,7 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getLatestStoreList(bool reload, String type, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
-    if(!reload && _isLatestStoreListLoaded && _latestStoreList != null && _latestStoreList!.isNotEmpty) {
+    if(!reload && !fromRecall && _isLatestStoreListLoaded && _latestStoreList != null && _latestStoreList!.isNotEmpty) {
       if(notify) update();
       return;
     }
@@ -398,7 +403,7 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getTopOfferStoreList(bool reload, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
-    if(!reload && _isTopOfferStoreListLoaded && _topOfferStoreList != null && _topOfferStoreList!.isNotEmpty) {
+    if(!reload && !fromRecall && _isTopOfferStoreListLoaded && _topOfferStoreList != null && _topOfferStoreList!.isNotEmpty) {
       if(notify) update();
       return;
     }
@@ -592,7 +597,7 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getRecommendedStoreList({DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool reload = false}) async {
-    if(!reload && _isRecommendedStoreListLoaded && _recommendedStoreList != null && _recommendedStoreList!.isNotEmpty) {
+    if(!reload && !fromRecall && _isRecommendedStoreListLoaded && _recommendedStoreList != null && _recommendedStoreList!.isNotEmpty) {
       return;
     }
     if(!fromRecall) {

@@ -210,7 +210,7 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
 
               Positioned(
                 top: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-                child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away'),
+                child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away', isPickupCenter: track.orderType == 'pickup_center'),
               ),
 
               (track.store != null && track.store!.moduleId == 1) ? const SizedBox() : Positioned(

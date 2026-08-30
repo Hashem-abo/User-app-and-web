@@ -203,6 +203,21 @@ class CheckoutScreenState extends State<CheckoutScreen> {
         bool todayClosed = false;
         bool tomorrowClosed = false;
         Pivot? moduleData = _getModuleData(store: checkoutController.store);
+        AddressModel? userAddrForZone = AddressHelper.getUserAddressFromSharedPref();
+        bool isOutZoneStore = false;
+        if (checkoutController.store != null && userAddrForZone != null) {
+          if (userAddrForZone.zoneIds != null && userAddrForZone.zoneIds!.isNotEmpty) {
+            isOutZoneStore = !userAddrForZone.zoneIds!.contains(checkoutController.store!.zoneId);
+          } else if (userAddrForZone.zoneId != null) {
+            isOutZoneStore = userAddrForZone.zoneId != checkoutController.store!.zoneId;
+          }
+        }
+        if (isOutZoneStore && checkoutController.orderType != 'pickup_center') {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            checkoutController.setOrderType('pickup_center', notify: true);
+          });
+        }
+
         _isCashOnDeliveryActive = _checkCODActive(store: checkoutController.store);
         _isDigitalPaymentActive = _checkDigitalPaymentActive(store: checkoutController.store);
         _isOfflinePaymentActive = (Get.find<SplashController>().configModel?.offlinePaymentStatus ?? false) && _checkZoneOfflinePaymentOnOff(addressModel: AddressHelper.getUserAddressFromSharedPref(), checkoutController: checkoutController);
@@ -602,13 +617,13 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             }
           }
 
-          if(isGuestLogIn && checkoutController.guestAddress == null && checkoutController.orderType != 'take_away') {
+          if(isGuestLogIn && checkoutController.guestAddress == null && checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center') {
             showCustomSnackBar('please_setup_your_delivery_address_first'.tr);
           } else if(isGuestLogIn && guestContactPersonNumberController.text.trim().isEmpty) {
             showCustomSnackBar('please_enter_contact_person_number'.tr);
-          } else if(isGuestLogIn && checkoutController.orderType == 'take_away' && guestContactPersonNameController.text.isEmpty) {
+          } else if(isGuestLogIn && (checkoutController.orderType == 'take_away' || checkoutController.orderType == 'pickup_center') && guestContactPersonNameController.text.isEmpty) {
             showCustomSnackBar('please_enter_contact_person_name'.tr);
-          }else if(isGuestLogIn && checkoutController.orderType == 'take_away' && guestEmailController.text.isEmpty) {
+          }else if(isGuestLogIn && (checkoutController.orderType == 'take_away' || checkoutController.orderType == 'pickup_center') && guestEmailController.text.isEmpty) {
             showCustomSnackBar('please_enter_contact_person_email'.tr);
           }else if(isGuestLogIn && checkoutController.isCreateAccount && guestPasswordController.text.isEmpty) {
             showCustomSnackBar('enter_password'.tr);
@@ -669,13 +684,15 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             }
           }else if (!isAvailable) {
             showCustomSnackBar('one_or_more_products_are_not_available_for_this_selected_time'.tr);
-          }else if (checkoutController.orderType != 'take_away' && checkoutController.distance == -1 && deliveryCharge == -1) {
+          }else if (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter == null) {
+            showCustomSnackBar('select_center'.tr);
+          }else if (checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center' && checkoutController.distance == -1 && deliveryCharge == -1) {
             showCustomSnackBar('delivery_fee_not_set_yet'.tr);
           }else if (widget.storeId != null && (_cartList == null || _cartList!.isEmpty) && checkoutController.pickedPrescriptions.isEmpty) {
             showCustomSnackBar('please_upload_your_prescription_images'.tr);
           }else if (!checkoutController.acceptTerms) {
             showCustomSnackBar('please_accept_privacy_policy_trams_conditions_refund_policy_first'.tr);
-          }else if (checkoutController.orderType != 'take_away' && (address.isEmpty || !address[checkoutController.addressIndex!].zoneIds!.contains(checkoutController.store!.zoneId))) {
+          }else if (checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center' && (address.isEmpty || !address[checkoutController.addressIndex!].zoneIds!.contains(checkoutController.store!.zoneId))) {
             showCustomSnackBar(address.isEmpty ? 'please_setup_your_delivery_address_first'.tr : 'delivery_address_is_not_valid_for_the_selected_zone'.tr);
           }
           else {
@@ -752,8 +769,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 couponCode: (Get.find<CouponController>().discount! > 0 || (Get.find<CouponController>().coupon != null
                     && Get.find<CouponController>().freeDelivery)) ? Get.find<CouponController>().coupon!.code : null,
                 storeId: _cartList![0]!.item!.storeId,
-                address: finalAddress!.address, latitude: finalAddress.latitude, longitude: finalAddress.longitude,
-                senderZoneId: null, addressType: finalAddress.addressType,
+                address: (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? '${checkoutController.selectedPickupCenter!.name ?? ''} - ${checkoutController.selectedPickupCenter!.address ?? ''}'
+                    : finalAddress!.address,
+                latitude: (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.latitude
+                    : finalAddress!.latitude,
+                longitude: (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.longitude
+                    : finalAddress!.longitude,
+                senderZoneId: null, addressType: finalAddress!.addressType,
                 contactPersonName: finalAddress.contactPersonName ?? '${Get.find<ProfileController>().userInfoModel!.fName} '
                     '${Get.find<ProfileController>().userInfoModel!.lName}',
                 contactPersonNumber: finalAddress.contactPersonNumber ?? Get.find<ProfileController>().userInfoModel!.phone,
@@ -761,7 +786,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 house: isGuestLogIn ? finalAddress.house??'' : checkoutController.houseController.text.trim(),
                 floor: isGuestLogIn ? finalAddress.floor??'' : checkoutController.floorController.text.trim(),
                 discountAmount: discount, taxAmount: tax, receiverDetails: null, parcelCategoryId: null,
-                chargePayer: null, dmTips: (checkoutController.orderType == 'take_away' || checkoutController.tipController.text == 'not_now') ? '' : checkoutController.tipController.text.trim(),
+                chargePayer: null, dmTips: (checkoutController.orderType == 'take_away' || checkoutController.orderType == 'pickup_center' || checkoutController.tipController.text == 'not_now') ? '' : checkoutController.tipController.text.trim(),
                 cutlery: Get.find<CartController>().addCutlery ? 1 : 0,
                 unavailableItemNote: Get.find<CartController>().notAvailableIndex != -1 ? Get.find<CartController>().notAvailableList[Get.find<CartController>().notAvailableIndex] : '',
                 deliveryInstruction: checkoutController.selectedInstruction != -1 ? AppConstants.deliveryInstructionList[checkoutController.selectedInstruction] : '',
@@ -776,6 +801,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 productReferrerId: Get.find<AuthController>().getProductRefCode().isNotEmpty ? Get.find<AuthController>().getProductRefCode() : null,
                 saverDeliveryType: checkoutController.saverDeliveryType,
                 monthlySubscribe: checkoutController.monthlySubscribe,
+                pickupCenterName: checkoutController.orderType == 'pickup_center' ? checkoutController.selectedPickupCenter?.name : null,
+                phone: checkoutController.orderType == 'pickup_center' ? (checkoutController.selectedPickupCenter?.phone ?? finalAddress!.contactPersonNumber ?? Get.find<ProfileController>().userInfoModel?.phone) : finalAddress!.contactPersonNumber,
               );
 
               if(checkoutController.paymentMethodIndex == 3){
@@ -789,7 +816,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             }else{
               checkoutController.placePrescriptionOrder(
                 widget.storeId, checkoutController.store!.zoneId, checkoutController.distance,
-                finalAddress!.address!, finalAddress.longitude!, finalAddress.latitude!, checkoutController.noteController.text,
+                (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? '${checkoutController.selectedPickupCenter!.name ?? ''} - ${checkoutController.selectedPickupCenter!.address ?? ''}'
+                    : finalAddress!.address!,
+                (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.longitude!
+                    : finalAddress!.longitude!,
+                (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.latitude!
+                    : finalAddress!.latitude!,
+                checkoutController.noteController.text,
                 checkoutController.pickedPrescriptions, (checkoutController.orderType == 'take_away' || checkoutController.tipController.text == 'not_now')
                 ? '' : checkoutController.tipController.text.trim(), checkoutController.selectedInstruction != -1
                 ? AppConstants.deliveryInstructionList[checkoutController.selectedInstruction] : '', 0, 0, widget.fromCart, _isCashOnDeliveryActive!,
@@ -905,6 +941,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   bool _checkCODActive({required Store? store}) {
+    CheckoutController checkoutController = Get.find<CheckoutController>();
+    if (checkoutController.orderType == 'take_away' || checkoutController.orderType == 'pickup_center') {
+      return false;
+    }
     if (AuthHelper.isGuestLoggedIn()) {
       return false;
     }
@@ -1231,6 +1271,45 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     if (minimumCharge == 0) {
       ConfigModel? configModel = Get.find<SplashController>().configModel;
       minimumCharge = configModel?.minimumShippingCharge ?? 300;
+    }
+
+    final checkoutController = Get.find<CheckoutController>();
+    if (checkoutController.orderType == 'pickup_center') {
+      double calcDistance = 0;
+      if (checkoutController.selectedPickupCenter != null && checkoutController.selectedPickupCenter!.latitude != null) {
+        double? sLat = double.tryParse(store?.latitude ?? '');
+        double? sLng = double.tryParse(store?.longitude ?? '');
+        double? pLat = double.tryParse(checkoutController.selectedPickupCenter!.latitude!);
+        double? pLng = double.tryParse(checkoutController.selectedPickupCenter!.longitude!);
+        if (sLat != null && sLng != null && pLat != null && pLng != null && sLat != 0 && pLat != 0) {
+          calcDistance = Geolocator.distanceBetween(sLat, sLng, pLat, pLng) / 1000;
+        }
+      }
+      if (calcDistance == 0 && distance != null && distance > 0) {
+        calcDistance = distance;
+      }
+      if (calcDistance == 0) {
+        calcDistance = 2.5;
+      }
+
+      bool isSameZone = store != null && checkoutController.selectedPickupZone != null && store.zoneId == checkoutController.selectedPickupZone!.id;
+
+      String? chargeType = isSameZone ? moduleData?.pickupCenterChargeType : moduleData?.pickupCenterOutsideChargeType;
+      double fixedCharge = isSameZone ? (moduleData?.pickupCenterFixedCharge ?? 0) : (moduleData?.pickupCenterOutsideFixedCharge ?? 0);
+      double pkCharge = isSameZone ? (moduleData?.pickupCenterPerKmCharge ?? 0) : (moduleData?.pickupCenterOutsidePerKmCharge ?? 0);
+      double minCharge = isSameZone ? (moduleData?.pickupCenterMinimumCharge ?? 0) : (moduleData?.pickupCenterOutsideMinimumCharge ?? 0);
+
+      if (chargeType == 'fixed') {
+        deliveryCharge = fixedCharge;
+      } else {
+        if (pkCharge <= 0) pkCharge = perKmCharge;
+        if (minCharge <= 0) minCharge = minimumCharge;
+        deliveryCharge = calcDistance * pkCharge;
+        if (deliveryCharge < minCharge) {
+          deliveryCharge = minCharge;
+        }
+      }
+      return deliveryCharge;
     }
 
     double calcDistance = 0;

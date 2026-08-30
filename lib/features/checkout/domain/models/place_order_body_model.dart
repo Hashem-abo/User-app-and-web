@@ -47,6 +47,8 @@ class PlaceOrderBodyModel {
   String? _productReferrerId;
   String? _saverDeliveryType;
   bool? _monthlySubscribe;
+  String? _pickupCenterName;
+  String? _phone;
 
   PlaceOrderBodyModel({
     required List<OnlineCart> cart,
@@ -93,6 +95,8 @@ class PlaceOrderBodyModel {
     String? productReferrerId,
     String? saverDeliveryType,
     bool? monthlySubscribe,
+    String? pickupCenterName,
+    String? phone,
   }) {
     _cart = cart;
     _couponDiscountAmount = couponDiscountAmount;
@@ -138,6 +142,8 @@ class PlaceOrderBodyModel {
     _productReferrerId = productReferrerId;
     _saverDeliveryType = saverDeliveryType;
     _monthlySubscribe = monthlySubscribe;
+    _pickupCenterName = pickupCenterName;
+    _phone = phone;
   }
 
   List<OnlineCart>? get cart => _cart;
@@ -182,6 +188,8 @@ class PlaceOrderBodyModel {
   String? get purchaseCode => _purchaseCode;
   String? get productReferrerId => _productReferrerId;
   String? get saverDeliveryType => _saverDeliveryType;
+  String? get pickupCenterName => _pickupCenterName;
+  String? get phone => _phone;
 
   PlaceOrderBodyModel.fromJson(Map<String, dynamic> json) {
     if (json['cart'] != null) {
@@ -321,6 +329,13 @@ class PlaceOrderBodyModel {
     }
     if (_monthlySubscribe != null) {
       data['monthly_subscribe'] = _monthlySubscribe! ? 'true' : 'false';
+    }
+    if (_pickupCenterName != null) {
+      data['pickup_center_name'] = _pickupCenterName!;
+    }
+    if (_phone != null) {
+      data['phone'] = _phone!;
+      data['pickup_center_phone'] = _phone!;
     }
     return data;
   }

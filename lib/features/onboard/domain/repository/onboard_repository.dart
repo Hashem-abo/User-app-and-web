@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/features/onboard/domain/repository/onboard_repository_interface.dart';
 import 'package:sixam_mart/features/onboard/domain/models/onboarding_model.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/common/models/config_model.dart';
 
 class OnboardRepository implements OnboardRepositoryInterface {
@@ -11,10 +12,13 @@ class OnboardRepository implements OnboardRepositoryInterface {
     try {
       List<OnBoardingModel> onBoardingList = [];
       List<OnboardingScreen>? screens = Get.find<SplashController>().configModel!.onboardingScreens;
+      bool isLtr = Get.isRegistered<LocalizationController>() ? Get.find<LocalizationController>().isLtr : false;
 
       if(screens != null && screens.isNotEmpty) {
         for (var screen in screens) {
-          onBoardingList.add(OnBoardingModel(screen.imageFullUrl!, screen.title!, screen.description!));
+          String title = (isLtr && screen.titleEn != null && screen.titleEn!.isNotEmpty) ? screen.titleEn! : (screen.title ?? '');
+          String description = (isLtr && screen.descriptionEn != null && screen.descriptionEn!.isNotEmpty) ? screen.descriptionEn! : (screen.description ?? '');
+          onBoardingList.add(OnBoardingModel(screen.imageFullUrl ?? '', title, description));
         }
       } else {
         // Fallback or empty list

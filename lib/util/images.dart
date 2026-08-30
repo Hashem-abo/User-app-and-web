@@ -3,6 +3,9 @@ class Images {
   static const String placeholder = 'assets/image/placeholder.jpg';
 
   static const String notificationPlaceholder = 'assets/image/notification_placeholder.jpg';
+  static const String nearbyStoresHeaderGraphic = 'assets/image/nearby_stores_header_graphic.png';
+  static const String nearbyStoresFullBg = 'assets/image/nearby_stores_full_bg.png';
+  static const String nearbyStoresFullBgWithText = 'assets/image/nearby_stores_full_bg_with_text.png';
   static const String arabic = 'assets/image/arabic.png';
   static const String bengali = 'assets/image/bangla.png';
   static const String call = 'assets/image/call.png';

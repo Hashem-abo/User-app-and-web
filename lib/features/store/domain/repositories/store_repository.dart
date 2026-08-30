@@ -77,7 +77,7 @@ class StoreRepository implements StoreRepositoryInterface {
 
     switch(source) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData('${AppConstants.popularStoreUri}?type=$type');
+        Response response = await apiClient.getData('${AppConstants.popularStoreUri}?type=$type&limit=50&offset=1');
         if (response.statusCode == 200) {
           popularStoreList = [];
           response.body['stores'].forEach((store) => popularStoreList!.add(Store.fromJson(store)));
@@ -101,7 +101,7 @@ class StoreRepository implements StoreRepositoryInterface {
 
     switch(source) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData('${AppConstants.latestStoreUri}?type=$type');
+        Response response = await apiClient.getData('${AppConstants.latestStoreUri}?type=$type&limit=50&offset=1');
         if (response.statusCode == 200) {
           latestStoreList = [];
           response.body['stores'].forEach((store) => latestStoreList!.add(Store.fromJson(store)));
@@ -125,7 +125,7 @@ class StoreRepository implements StoreRepositoryInterface {
 
     switch(source) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData('${AppConstants.topOfferStoreUri}?sort_by=$sortBy&${filterBy == '1' ? 'halal=1' : filterBy == 'veg' ? 'type=veg' : filterBy == 'non_veg' ? 'type=non_veg' : 'type='}');
+        Response response = await apiClient.getData('${AppConstants.topOfferStoreUri}?sort_by=$sortBy&limit=50&offset=1&${filterBy == '1' ? 'halal=1' : filterBy == 'veg' ? 'type=veg' : filterBy == 'non_veg' ? 'type=non_veg' : 'type='}');
         if (response.statusCode == 200) {
           topOfferStoreList = [];
           response.body['stores'].forEach((store) => topOfferStoreList!.add(Store.fromJson(store)));

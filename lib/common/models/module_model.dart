@@ -33,6 +33,7 @@ class ModuleModel {
   int? categoryRows;
   String? categoryViewBgColor;
   String? fontFamily;
+  double? fontSizeOffset;
   String? iconAddToCart;
   String? iconRating;
   String? iconStore;
@@ -82,6 +83,7 @@ class ModuleModel {
     this.categoryRows,
     this.categoryViewBgColor,
     this.fontFamily,
+    this.fontSizeOffset,
     this.iconAddToCart,
     this.iconRating,
     this.iconStore,
@@ -133,6 +135,7 @@ class ModuleModel {
     categoryRows = json['category_rows'];
     categoryViewBgColor = json['category_view_bg_color'];
     fontFamily = json['font_family'];
+    fontSizeOffset = json['font_size_offset'] != null ? double.parse(json['font_size_offset'].toString()) : 0.0;
     iconAddToCart = json['icon_add_to_cart'];
     iconRating = json['icon_rating'];
     iconStore = json['icon_store'];
@@ -195,6 +198,7 @@ class ModuleModel {
     data['category_rows'] = categoryRows;
     data['category_view_bg_color'] = categoryViewBgColor;
     data['font_family'] = fontFamily;
+    data['font_size_offset'] = fontSizeOffset;
     data['icon_add_to_cart'] = iconAddToCart;
     data['icon_rating'] = iconRating;
     data['icon_store'] = iconStore;

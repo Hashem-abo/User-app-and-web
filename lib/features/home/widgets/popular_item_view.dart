@@ -20,7 +20,7 @@ class PopularItemView extends StatelessWidget {
     return GetBuilder<ItemController>(builder: (itemController) {
       List<Item>? itemList = isPopular ? itemController.popularItemList : itemController.reviewedItemList;
 
-      return (itemList != null && itemList.isEmpty) ? const SizedBox() : Column(
+      return (itemList != null && itemList.isEmpty) ? const SizedBox.shrink() : Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 15, 10, 10),

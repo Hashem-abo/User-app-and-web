@@ -115,9 +115,13 @@ class OrderViewWidget extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
                                     ),
                                     child: Row(children: [
-                                      Icon(Icons.access_time_rounded, size: 15, color: (order.orderStatus == 'delivered' || order.orderStatus == 'picked_up') ? Colors.green : Theme.of(context).primaryColor),
+                                      Icon(Icons.access_time_rounded, size: 15, color: (order.orderStatus == 'delivered' || order.orderStatus == 'picked_up' || order.orderStatus == 'arrived_at_pickup_center') ? Colors.green : Theme.of(context).primaryColor),
                                       const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                      Text(order.orderStatus!.tr, style: robotoBold.copyWith(color: (order.orderStatus == 'delivered' || order.orderStatus == 'picked_up') ? Colors.green : Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall)),
+                                      Text(
+                                        (order.orderType == 'take_away' && (order.orderStatus == 'handover' || order.orderStatus == 'picked_up') ? 'ready_for_handover'
+                                        : (order.orderType != 'pickup_center' && order.orderStatus == 'arrived_at_pickup_center' ? 'delivery_on_the_way' : order.orderStatus!)).tr,
+                                        style: robotoBold.copyWith(color: (order.orderStatus == 'delivered' || order.orderStatus == 'picked_up' || order.orderStatus == 'arrived_at_pickup_center') ? Colors.green : Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
+                                      ),
                                     ]),
                                   ),
 

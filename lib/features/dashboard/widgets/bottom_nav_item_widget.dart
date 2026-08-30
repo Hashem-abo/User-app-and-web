@@ -129,7 +129,7 @@ class BottomNavItemWidget extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: robotoRegular.copyWith(
                       color: isSelected ? selectedColor : unselectedColor,
-                      fontSize: 12,
+                      fontSize: Dimensions.fontSizeExtraSmall,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

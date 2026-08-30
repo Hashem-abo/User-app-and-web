@@ -49,6 +49,9 @@ class OrderController extends GetxController implements GetxService {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _isReordering = false;
+  bool get isReordering => _isReordering;
+
   bool _showCancelled = false;
   bool get showCancelled => _showCancelled;
 
@@ -323,126 +326,138 @@ class OrderController extends GetxController implements GetxService {
   }
 
   void reorder(int orderId, {OrderModel? order}) async {
-    OrderModel? orderModel = order;
-    if (orderModel == null) {
-      orderModel = orderServiceInterface.prepareOrderModel(_runningOrderModel, orderId);
-      orderModel ??= orderServiceInterface.prepareOrderModel(_historyOrderModel, orderId);
-    }
-
-    if (orderModel != null && orderModel.orderType == 'parcel') {
-      if (orderModel.parcelCategory != null) {
-        _isLoading = true;
-        update();
-        SplashController splashController = Get.find<SplashController>();
-        int index = splashController.moduleList?.indexWhere((m) => m.moduleType == 'parcel') ?? -1;
-        if (index != -1) {
-          await splashController.switchModule(index, true);
-        }
-        _isLoading = false;
-        update();
-        Get.toNamed(RouteHelper.getParcelLocationRoute(
-          orderModel.parcelCategory!,
-          pickupAddress: orderModel.deliveryAddress,
-          destinationAddress: orderModel.receiverDetails,
-        ));
-      }
-      return;
-    }
-
+    if (_isReordering) return;
+    _isReordering = true;
     _isLoading = true;
     update();
-    List<OrderDetailsModel>? details = await orderServiceInterface.getOrderDetails(orderId.toString(), AuthHelper.isLoggedIn() ? null : AuthHelper.getGuestId());
-    _isLoading = false;
-    update();
 
-    if (details != null && details.isNotEmpty) {
-      CartController cartController = Get.find<CartController>();
-      if (details[0].itemDetails!.moduleId != null) {
-        int currentModuleId = Get.find<SplashController>().module?.id ?? ModuleHelper.getCacheModule()?.id ?? 0;
-        if (currentModuleId != details[0].itemDetails!.moduleId) {
-          await cartController.forcefullySetModule(details[0].itemDetails!.moduleId!);
-          await cartController.getCartDataOnline();
+    try {
+      OrderModel? orderModel = order;
+      if (orderModel == null) {
+        orderModel = orderServiceInterface.prepareOrderModel(_runningOrderModel, orderId);
+        orderModel ??= orderServiceInterface.prepareOrderModel(_historyOrderModel, orderId);
+      }
+
+      if (orderModel != null && orderModel.orderType == 'parcel') {
+        if (orderModel.parcelCategory != null) {
+          SplashController splashController = Get.find<SplashController>();
+          int index = splashController.moduleList?.indexWhere((m) => m.moduleType == 'parcel') ?? -1;
+          if (index != -1) {
+            await splashController.switchModule(index, true);
+          }
+          Get.toNamed(RouteHelper.getParcelLocationRoute(
+            orderModel.parcelCategory!,
+            pickupAddress: orderModel.deliveryAddress,
+            destinationAddress: orderModel.receiverDetails,
+          ));
         }
-      }
-      cartController.isPreventCartOverwritten = true;
-
-      if (cartController.cartList.isNotEmpty) {
-         bool hasAnotherStore = cartController.existAnotherStoreItem(details[0].itemDetails!.storeId, details[0].itemDetails!.moduleId);
-         if(hasAnotherStore) {
-           await cartController.clearCartList();
-         }
+        return;
       }
 
-      for (var detail in details) {
-         if(detail.itemDetails != null) {
-            List<List<bool?>> selectedFoodVariations = [];
-            if (detail.itemDetails!.foodVariations != null && detail.itemDetails!.foodVariations!.isNotEmpty) {
-              for (int i = 0; i < detail.itemDetails!.foodVariations!.length; i++) {
-                selectedFoodVariations.add([]);
-                for (int j = 0; j < detail.itemDetails!.foodVariations![i].variationValues!.length; j++) {
-                  bool isSelected = false;
-                  if (detail.foodVariation != null) {
-                     var group = detail.foodVariation!.firstWhereOrNull((element) => element.name == detail.itemDetails!.foodVariations![i].name);
-                     if (group != null && group.variationValues != null) {
-                        var val = group.variationValues!.firstWhereOrNull((v) => v.level == detail.itemDetails!.foodVariations![i].variationValues![j].level);
-                        if (val != null) isSelected = true;
-                     }
+      List<OrderDetailsModel>? details = await orderServiceInterface.getOrderDetails(orderId.toString(), AuthHelper.isLoggedIn() ? null : AuthHelper.getGuestId());
+
+      if (details != null && details.isNotEmpty) {
+        CartController cartController = Get.find<CartController>();
+        if (details[0].itemDetails!.moduleId != null) {
+          int currentModuleId = Get.find<SplashController>().module?.id ?? ModuleHelper.getCacheModule()?.id ?? 0;
+          if (currentModuleId != details[0].itemDetails!.moduleId) {
+            await cartController.forcefullySetModule(details[0].itemDetails!.moduleId!);
+            await cartController.getCartDataOnline();
+          }
+        }
+        Set<int> reorderStoreIds = {};
+        if (orderModel?.store != null && orderModel!.store!.id != null) {
+          reorderStoreIds.add(orderModel.store!.id!);
+        }
+        for (var d in details) {
+          if (d.itemDetails != null) {
+            if (d.itemDetails!.storeId != null) {
+              reorderStoreIds.add(d.itemDetails!.storeId!);
+            }
+            if (d.itemDetails!.storeDetails != null && d.itemDetails!.storeDetails!['id'] != null) {
+              int? id = int.tryParse(d.itemDetails!.storeDetails!['id'].toString());
+              if (id != null) reorderStoreIds.add(id);
+            }
+          }
+        }
+
+        if (reorderStoreIds.isNotEmpty) {
+          await cartController.clearStoreCartItems(reorderStoreIds);
+        }
+
+        for (var detail in details) {
+           if(detail.itemDetails != null) {
+              List<List<bool?>> selectedFoodVariations = [];
+              if (detail.itemDetails!.foodVariations != null && detail.itemDetails!.foodVariations!.isNotEmpty) {
+                for (int i = 0; i < detail.itemDetails!.foodVariations!.length; i++) {
+                  selectedFoodVariations.add([]);
+                  for (int j = 0; j < detail.itemDetails!.foodVariations![i].variationValues!.length; j++) {
+                    bool isSelected = false;
+                    if (detail.foodVariation != null) {
+                       var group = detail.foodVariation!.firstWhereOrNull((element) => element.name == detail.itemDetails!.foodVariations![i].name);
+                       if (group != null && group.variationValues != null) {
+                          var val = group.variationValues!.firstWhereOrNull((v) => v.level == detail.itemDetails!.foodVariations![i].variationValues![j].level);
+                          if (val != null) isSelected = true;
+                       }
+                    }
+                    selectedFoodVariations[i].add(isSelected);
                   }
-                  selectedFoodVariations[i].add(isSelected);
                 }
               }
-            }
 
-            CartModel cartModel = CartModel(
-                id: null,
-                price: detail.price,
-                discountedPrice: detail.price ?? 0,
-                variation: detail.variation ?? [],
-                foodVariations: selectedFoodVariations,
-                discountAmount: 0,
-                quantity: detail.quantity,
-                addOnIds: [], 
-                addOns: [], 
-                isCampaign: false,
-                stock: detail.itemDetails!.stock,
-                item: detail.itemDetails,
-                quantityLimit: detail.itemDetails!.quantityLimit,
-                note: detail.note,
-            );
-            cartController.addToCart(cartModel, null);
-            if(AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
-              List<OrderVariation> variations = [];
-              if(Get.find<SplashController>().getModuleConfig(detail.itemDetails!.moduleType).newVariation!) {
-                for(int i=0; i<detail.itemDetails!.foodVariations!.length; i++) {
-                  if(selectedFoodVariations[i].contains(true)) {
-                    variations.add(OrderVariation(name: detail.itemDetails!.foodVariations![i].name, values: OrderVariationValue(label: [])));
-                    for(int j=0; j<detail.itemDetails!.foodVariations![i].variationValues!.length; j++) {
-                      if(selectedFoodVariations[i][j]!) {
-                        variations[variations.length-1].values!.label!.add(detail.itemDetails!.foodVariations![i].variationValues![j].level);
+              CartModel cartModel = CartModel(
+                  id: null,
+                  price: detail.price,
+                  discountedPrice: detail.price ?? 0,
+                  variation: detail.variation ?? [],
+                  foodVariations: selectedFoodVariations,
+                  discountAmount: 0,
+                  quantity: detail.quantity,
+                  addOnIds: [], 
+                  addOns: [], 
+                  isCampaign: false,
+                  stock: detail.itemDetails!.stock,
+                  item: detail.itemDetails,
+                  quantityLimit: detail.itemDetails!.quantityLimit,
+                  note: detail.note,
+              );
+              cartController.addToCart(cartModel, null);
+              if(AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
+                List<OrderVariation> variations = [];
+                if(Get.find<SplashController>().getModuleConfig(detail.itemDetails!.moduleType).newVariation!) {
+                  for(int i=0; i<detail.itemDetails!.foodVariations!.length; i++) {
+                    if(selectedFoodVariations[i].contains(true)) {
+                      variations.add(OrderVariation(name: detail.itemDetails!.foodVariations![i].name, values: OrderVariationValue(label: [])));
+                      for(int j=0; j<detail.itemDetails!.foodVariations![i].variationValues!.length; j++) {
+                        if(selectedFoodVariations[i][j]!) {
+                          variations[variations.length-1].values!.label!.add(detail.itemDetails!.foodVariations![i].variationValues![j].level);
+                        }
                       }
                     }
                   }
                 }
+                OnlineCart onlineCart = OnlineCart(
+                    cartId: null, itemId: detail.itemDetails!.id, itemCampaignId: null,
+                    price: detail.price.toString(), variant: '', variation: detail.variation ?? [],
+                    variations: Get.find<SplashController>().getModuleConfig(detail.itemDetails!.moduleType).newVariation! ? variations : null,
+                    quantity: detail.quantity, addOnIds: [], addOns: [], addOnQtys: [], model: 'Item',
+                    note: detail.note,
+                );
+                await cartController.cartServiceInterface.addToCartOnline(onlineCart);
               }
-              OnlineCart onlineCart = OnlineCart(
-                  cartId: null, itemId: detail.itemDetails!.id, itemCampaignId: null,
-                  price: detail.price.toString(), variant: '', variation: detail.variation ?? [],
-                  variations: Get.find<SplashController>().getModuleConfig(detail.itemDetails!.moduleType).newVariation! ? variations : null,
-                  quantity: detail.quantity, addOnIds: [], addOns: [], addOnQtys: [], model: 'Item',
-                  note: detail.note,
-              );
-              await cartController.cartServiceInterface.addToCartOnline(onlineCart);
-            }
-         }
-      }
-      
-      if(AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
-         await cartController.getCartDataOnline();
-      }
-      Get.toNamed(RouteHelper.getCartRoute());
-      Future.delayed(const Duration(seconds: 2), () {
+           }
+        }
+        
         cartController.isPreventCartOverwritten = false;
-      });
+        if(AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
+           await cartController.getCartDataOnline();
+        }
+        Get.toNamed(RouteHelper.getCartRoute());
+      }
+    } finally {
+      _isReordering = false;
+      _isLoading = false;
+      update();
     }
   }
 

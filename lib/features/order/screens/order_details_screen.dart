@@ -63,6 +63,15 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
     });
     Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: contact);
     Get.find<OrderController>().getOrderDetails(widget.orderId.toString());
+
+    _timer?.cancel();
+    if (Get.find<OrderController>().trackModel?.orderStatus != 'delivered' &&
+        Get.find<OrderController>().trackModel?.orderStatus != 'failed' &&
+        Get.find<OrderController>().trackModel?.orderStatus != 'canceled') {
+      _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+        Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: contact);
+      });
+    }
   }
 
   void _startApiCall(){
