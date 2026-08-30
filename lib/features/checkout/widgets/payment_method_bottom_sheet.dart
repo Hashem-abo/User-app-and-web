@@ -132,7 +132,7 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
 
                     walletView(checkoutController),
 
-                    widget.isCashOnDeliveryActive && notHideCod && !AuthHelper.isGuestLoggedIn() ? paymentButtonView(
+                    (widget.isCashOnDeliveryActive && notHideCod && !AuthHelper.isGuestLoggedIn() && checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center') ? paymentButtonView(
                       padding: EdgeInsets.only(bottom: Dimensions.paddingSizeDefault),
                       title: 'cash_on_delivery'.tr,
                       isSelected: checkoutController.paymentMethodIndex == 0,
@@ -147,7 +147,7 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                       },
                     ) : const SizedBox(),
 
-                    widget.isCashOnDeliveryActive && notHideCod && !AuthHelper.isGuestLoggedIn() ? changeAmountView(checkoutController) : const SizedBox(),
+                    (widget.isCashOnDeliveryActive && notHideCod && !AuthHelper.isGuestLoggedIn() && checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center') ? changeAmountView(checkoutController) : const SizedBox(),
 
                     widget.isDigitalPaymentActive && notHideDigital ? Container(
                       decoration: BoxDecoration(

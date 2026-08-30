@@ -182,8 +182,10 @@ class LocationController extends GetxController implements GetxService {
   Future<void> getZoneList() async {
     _zoneList = await locationServiceInterface.getZoneList();
     AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
-    if ((address == null || address.zoneId == null || address.zoneId == 0) && _zoneList != null && _zoneList!.isNotEmpty) {
-      setManualZone(_zoneList![0].id!, reload: false);
+    bool isManualZone = Get.find<SharedPreferences>().getBool('is_manual_zone') ?? false;
+    
+    if (!isManualZone || address == null || address.zoneId == null || address.zoneId == 0) {
+      setManualZone(0, reload: false);
     }
     update();
   }
@@ -195,8 +197,8 @@ class LocationController extends GetxController implements GetxService {
     
     Get.find<SharedPreferences>().setBool('is_manual_zone', true);
     
-    String zoneName = '';
-    if (_zoneList != null && _zoneList!.isNotEmpty) {
+    String zoneName = zoneId == 0 ? 'all_zone'.tr : '';
+    if (zoneId != 0 && _zoneList != null && _zoneList!.isNotEmpty) {
       for (var z in _zoneList!) {
         if (z.id == zoneId) {
           zoneName = z.name?.trim() ?? '';
@@ -205,14 +207,18 @@ class LocationController extends GetxController implements GetxService {
       }
     }
 
+    List<int> allZoneIds = (_zoneList != null && _zoneList!.isNotEmpty)
+        ? _zoneList!.map((z) => z.id!).whereType<int>().toList()
+        : [1];
+
     AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
-    address ??= AddressModel(latitude: '0', longitude: '0', address: zoneName.isNotEmpty ? zoneName : 'Manual Zone');
+    address ??= AddressModel(latitude: '15.369445', longitude: '44.191006', address: zoneName.isNotEmpty ? zoneName : 'all_zone'.tr);
     address.zoneId = zoneId;
-    address.zoneIds = [zoneId];
+    address.zoneIds = zoneId == 0 ? allZoneIds : [zoneId];
     address.house = 'manual';
     if (zoneName.isNotEmpty) {
       address.address = zoneName;
-      address.zoneData = [ZoneData(id: zoneId, name: zoneName)];
+      address.zoneData = zoneId == 0 ? _zoneList : [ZoneData(id: zoneId, name: zoneName)];
     }
     await AddressHelper.saveUserAddressInSharedPref(address);
     

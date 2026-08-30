@@ -437,6 +437,11 @@ class CheckoutController extends GetxController implements GetxService {
 
   void setOrderType(String? type, {bool notify = true}) async {
     _orderType = type;
+    if (_orderType == 'take_away' || _orderType == 'pickup_center') {
+      if (_paymentMethodIndex == 0) {
+        _paymentMethodIndex = -1;
+      }
+    }
     _setSaverDeliveryData();
     if (_orderType == 'pickup_center') {
       _saverDeliveryType = 'standard';

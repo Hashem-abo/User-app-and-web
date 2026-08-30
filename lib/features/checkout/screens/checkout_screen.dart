@@ -203,6 +203,21 @@ class CheckoutScreenState extends State<CheckoutScreen> {
         bool todayClosed = false;
         bool tomorrowClosed = false;
         Pivot? moduleData = _getModuleData(store: checkoutController.store);
+        AddressModel? userAddrForZone = AddressHelper.getUserAddressFromSharedPref();
+        bool isOutZoneStore = false;
+        if (checkoutController.store != null && userAddrForZone != null) {
+          if (userAddrForZone.zoneIds != null && userAddrForZone.zoneIds!.isNotEmpty) {
+            isOutZoneStore = !userAddrForZone.zoneIds!.contains(checkoutController.store!.zoneId);
+          } else if (userAddrForZone.zoneId != null) {
+            isOutZoneStore = userAddrForZone.zoneId != checkoutController.store!.zoneId;
+          }
+        }
+        if (isOutZoneStore && checkoutController.orderType != 'pickup_center') {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            checkoutController.setOrderType('pickup_center', notify: true);
+          });
+        }
+
         _isCashOnDeliveryActive = _checkCODActive(store: checkoutController.store);
         _isDigitalPaymentActive = _checkDigitalPaymentActive(store: checkoutController.store);
         _isOfflinePaymentActive = (Get.find<SplashController>().configModel?.offlinePaymentStatus ?? false) && _checkZoneOfflinePaymentOnOff(addressModel: AddressHelper.getUserAddressFromSharedPref(), checkoutController: checkoutController);
@@ -754,8 +769,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 couponCode: (Get.find<CouponController>().discount! > 0 || (Get.find<CouponController>().coupon != null
                     && Get.find<CouponController>().freeDelivery)) ? Get.find<CouponController>().coupon!.code : null,
                 storeId: _cartList![0]!.item!.storeId,
-                address: finalAddress!.address, latitude: finalAddress.latitude, longitude: finalAddress.longitude,
-                senderZoneId: null, addressType: finalAddress.addressType,
+                address: (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? '${checkoutController.selectedPickupCenter!.name ?? ''} - ${checkoutController.selectedPickupCenter!.address ?? ''}'
+                    : finalAddress!.address,
+                latitude: (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.latitude
+                    : finalAddress!.latitude,
+                longitude: (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.longitude
+                    : finalAddress!.longitude,
+                senderZoneId: null, addressType: finalAddress!.addressType,
                 contactPersonName: finalAddress.contactPersonName ?? '${Get.find<ProfileController>().userInfoModel!.fName} '
                     '${Get.find<ProfileController>().userInfoModel!.lName}',
                 contactPersonNumber: finalAddress.contactPersonNumber ?? Get.find<ProfileController>().userInfoModel!.phone,
@@ -763,7 +786,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 house: isGuestLogIn ? finalAddress.house??'' : checkoutController.houseController.text.trim(),
                 floor: isGuestLogIn ? finalAddress.floor??'' : checkoutController.floorController.text.trim(),
                 discountAmount: discount, taxAmount: tax, receiverDetails: null, parcelCategoryId: null,
-                chargePayer: null, dmTips: (checkoutController.orderType == 'take_away' || checkoutController.tipController.text == 'not_now') ? '' : checkoutController.tipController.text.trim(),
+                chargePayer: null, dmTips: (checkoutController.orderType == 'take_away' || checkoutController.orderType == 'pickup_center' || checkoutController.tipController.text == 'not_now') ? '' : checkoutController.tipController.text.trim(),
                 cutlery: Get.find<CartController>().addCutlery ? 1 : 0,
                 unavailableItemNote: Get.find<CartController>().notAvailableIndex != -1 ? Get.find<CartController>().notAvailableList[Get.find<CartController>().notAvailableIndex] : '',
                 deliveryInstruction: checkoutController.selectedInstruction != -1 ? AppConstants.deliveryInstructionList[checkoutController.selectedInstruction] : '',
@@ -778,6 +801,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 productReferrerId: Get.find<AuthController>().getProductRefCode().isNotEmpty ? Get.find<AuthController>().getProductRefCode() : null,
                 saverDeliveryType: checkoutController.saverDeliveryType,
                 monthlySubscribe: checkoutController.monthlySubscribe,
+                pickupCenterName: checkoutController.orderType == 'pickup_center' ? checkoutController.selectedPickupCenter?.name : null,
+                phone: checkoutController.orderType == 'pickup_center' ? (checkoutController.selectedPickupCenter?.phone ?? finalAddress!.contactPersonNumber ?? Get.find<ProfileController>().userInfoModel?.phone) : finalAddress!.contactPersonNumber,
               );
 
               if(checkoutController.paymentMethodIndex == 3){
@@ -791,7 +816,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             }else{
               checkoutController.placePrescriptionOrder(
                 widget.storeId, checkoutController.store!.zoneId, checkoutController.distance,
-                finalAddress!.address!, finalAddress.longitude!, finalAddress.latitude!, checkoutController.noteController.text,
+                (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? '${checkoutController.selectedPickupCenter!.name ?? ''} - ${checkoutController.selectedPickupCenter!.address ?? ''}'
+                    : finalAddress!.address!,
+                (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.longitude!
+                    : finalAddress!.longitude!,
+                (checkoutController.orderType == 'pickup_center' && checkoutController.selectedPickupCenter != null)
+                    ? checkoutController.selectedPickupCenter!.latitude!
+                    : finalAddress!.latitude!,
+                checkoutController.noteController.text,
                 checkoutController.pickedPrescriptions, (checkoutController.orderType == 'take_away' || checkoutController.tipController.text == 'not_now')
                 ? '' : checkoutController.tipController.text.trim(), checkoutController.selectedInstruction != -1
                 ? AppConstants.deliveryInstructionList[checkoutController.selectedInstruction] : '', 0, 0, widget.fromCart, _isCashOnDeliveryActive!,
@@ -907,6 +941,10 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   bool _checkCODActive({required Store? store}) {
+    CheckoutController checkoutController = Get.find<CheckoutController>();
+    if (checkoutController.orderType == 'take_away' || checkoutController.orderType == 'pickup_center') {
+      return false;
+    }
     if (AuthHelper.isGuestLoggedIn()) {
       return false;
     }

@@ -180,7 +180,8 @@ class OrderInfoWidget extends StatelessWidget {
                   border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
                 ),
                 child: Text(
-                  order.orderStatus!.tr,
+                  (order.orderType == 'take_away' && (order.orderStatus == 'handover' || order.orderStatus == 'picked_up') ? 'ready_for_handover'
+                  : (order.orderType != 'pickup_center' && order.orderStatus == 'arrived_at_pickup_center' ? 'delivery_on_the_way' : order.orderStatus!)).tr,
                   style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
                 ),
               ),
