@@ -477,7 +477,7 @@ class _PickMapScreenState extends State<PickMapScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      tooltip: 'Change Map View',
+                      tooltip: 'change_map_view'.tr,
                       icon: Icon(_getMapTypeIcon(), size: 22, color: Theme.of(context).primaryColor),
                       onPressed: _toggleMapType,
                     ),

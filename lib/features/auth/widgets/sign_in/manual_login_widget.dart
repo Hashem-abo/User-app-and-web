@@ -134,7 +134,7 @@ class ManualLoginWidget extends StatelessWidget {
                 Get.toNamed(RouteHelper.getForgotPassRoute());
               },
               child: Text(
-                '${'forgot_password'.tr}؟',
+                'forgot_password_question'.tr,
                 style: robotoRegular.copyWith(
                   color: Theme.of(context).secondaryHeaderColor,
                   fontSize: Dimensions.fontSizeSmall,
@@ -295,7 +295,7 @@ class ManualLoginWidget extends StatelessWidget {
                   }
                 },
                 child: Text(
-                  '${'forgot_password'.tr}?',
+                  'forgot_password_question'.tr,
                   style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
                 ),
               ),

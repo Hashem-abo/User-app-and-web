@@ -594,11 +594,11 @@ class _DropdownLocationBottomSheetState extends State<DropdownLocationBottomShee
                         child: InkWell(
                           onTap: () {
                             if (index == 0 && _hasHomeAddress()) {
-                              showCustomSnackBar('لديك عنوان رئيسي بالفعل، يرجى اختيار مكتب أو آخر');
+                              showCustomSnackBar('home_address_already_added_choose_another'.tr);
                               return;
                             }
                             if (index == 1 && _hasOfficeAddress()) {
-                              showCustomSnackBar('لديك عنوان مكتب بالفعل، يرجى اختيار آخر وتسمية العنوان');
+                              showCustomSnackBar('work_address_already_added_choose_another'.tr);
                               return;
                             }
                             setState(() {
@@ -639,7 +639,7 @@ class _DropdownLocationBottomSheetState extends State<DropdownLocationBottomShee
 
                 // Custom Address Type TextField (if Others is selected)
                 if (_selectedAddressTypeIndex == 2) ...[
-                  Text('${'level_name'.tr} (إجباري)', style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
+                  Text('address_label_required'.tr, style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
                   const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                   TextField(
                     controller: _customAddressTypeController,
@@ -686,7 +686,7 @@ class _DropdownLocationBottomSheetState extends State<DropdownLocationBottomShee
                       return;
                     }
                     if (_selectedAddressTypeIndex == 2 && _customAddressTypeController.text.trim().isEmpty) {
-                      showCustomSnackBar('يرجى إدخال اسم العنوان في مربع النص');
+                      showCustomSnackBar('please_enter_address_label'.tr);
                       return;
                     }
                     

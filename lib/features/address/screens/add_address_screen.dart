@@ -337,18 +337,18 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                           onTap: () {
                                              if (index == 0 && _hasHomeAddress() && widget.address == null) {
                                                if (_hasOfficeAddress()) {
-                                                 showCustomSnackBar('لديك عنوان رئيسي ومكتب بالفعل، تم اختيار "آخرون" - يرجى كتابة مسمى العنوان');
+                                                 showCustomSnackBar('home_and_work_addresses_exist_other_selected'.tr);
                                                  setState(() => _otherSelect = true);
                                                  locationController.setAddressTypeIndex(2);
                                                } else {
-                                                 showCustomSnackBar('لديك عنوان رئيسي بالفعل، تم اختيار "المكتب"');
+                                                 showCustomSnackBar('home_address_exists_work_selected'.tr);
                                                  setState(() => _otherSelect = false);
                                                  locationController.setAddressTypeIndex(1);
                                                }
                                                return;
                                              }
                                              if (index == 1 && _hasOfficeAddress() && widget.address == null) {
-                                               showCustomSnackBar('لديك عنوان مكتب بالفعل، تم اختيار "آخرون" - يرجى كتابة مسمى العنوان');
+                                               showCustomSnackBar('work_address_exists_other_selected'.tr);
                                                setState(() => _otherSelect = true);
                                                locationController.setAddressTypeIndex(2);
                                                return;
@@ -682,11 +682,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       child: InkWell(
                         onTap: () {
                           if (index == 0 && _hasHomeAddress() && widget.address == null) {
-                            showCustomSnackBar('لديك عنوان رئيسي بالفعل، يرجى اختيار مكتب أو آخر');
+                            showCustomSnackBar('home_address_already_added_choose_another'.tr);
                             return;
                           }
                           if (index == 1 && _hasOfficeAddress() && widget.address == null) {
-                            showCustomSnackBar('لديك عنوان مكتب بالفعل، يرجى اختيار آخر وتسمية العنوان');
+                            showCustomSnackBar('work_address_already_added_choose_another'.tr);
                             return;
                           }
                           _otherSelect = index == 2;
@@ -714,7 +714,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                   SizedBox(height: _otherSelect ? Dimensions.paddingSizeLarge : 0),
 
                   _otherSelect ? CustomTextField(
-                    labelText: '${'level_name'.tr} (إجباري)',
+                    labelText: 'address_label_required'.tr,
                     titleText: 'write_level_name'.tr,
                     inputType: TextInputType.text,
                     controller: _levelController,
@@ -890,7 +890,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     String? addressType = locationController.addressTypeList[locationController.addressTypeIndex];
     if(locationController.addressTypeIndex == 2){
       if (_levelController.text.trim().isEmpty) {
-        showCustomSnackBar('يرجى إدخال اسم العنوان في مربع النص');
+        showCustomSnackBar('please_enter_address_label'.tr);
         return null;
       }
       addressType = _levelController.text.trim();

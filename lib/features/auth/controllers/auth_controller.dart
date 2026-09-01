@@ -284,12 +284,13 @@ class AuthController extends GetxController implements GetxService {
           Get.find<ProfileController>().getUserInfo();
           Get.find<LocationController>().navigateToLocationScreen(fromSignUp ? RouteHelper.signUp : RouteHelper.initial);
         } else {
+          Get.log('Firebase phone verification failed (${e.code}): ${e.message}');
           if(e.code == 'invalid-phone-number') {
-            showCustomSnackBar('please_submit_a_valid_phone_number'.tr);
-          } else if (e.message != null && e.message!.contains('BILLING_NOT_ENABLED')) {
-            showCustomSnackBar('خدمة إرسال رسائل SMS عبر Firebase غير مفعلة (BILLING_NOT_ENABLED). يمكنك إيقاف تفعيل Firebase OTP من لوحة التحكم أو إضافة رقمك في أرقام الاختبار بـ Firebase Console.');
+            showCustomSnackBar('enter_a_valid_phone_number'.tr);
+          } else if (e.code == 'billing-not-enabled') {
+            showCustomSnackBar('firebase_verification_unavailable'.tr);
           } else {
-            showCustomSnackBar(e.message?.replaceAll('_', ' '));
+            showCustomSnackBar('firebase_verification_failed'.tr);
           }
         }
 

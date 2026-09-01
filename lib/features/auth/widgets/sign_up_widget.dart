@@ -104,7 +104,7 @@ class SignUpWidgetState extends State<SignUpWidget> {
                 Directionality(
                   textDirection: TextDirection.ltr,
                   child: CustomTextField(
-                    hintText: 'xxx-xxx-xxxxx'.tr,
+                    hintText: 'xxx-xxx-xxxxx',
                     controller: _phoneController,
                     focusNode: _phoneFocus,
                     nextFocus: _emailFocus,
