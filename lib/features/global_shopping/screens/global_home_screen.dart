@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
@@ -20,6 +21,15 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final splashController = Get.find<SplashController>();
+      if (splashController.moduleList != null) {
+        for (var m in splashController.moduleList!) {
+          if (m.moduleType == 'global_shopping') {
+            splashController.setModule(m);
+            break;
+          }
+        }
+      }
       Get.find<GlobalBrowseController>().getGlobalStores();
     });
   }
@@ -38,70 +48,40 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
         final stores = browseController.globalStores ?? [];
 
         return Padding(
-          padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Banner Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor,
-                      Theme.of(context).primaryColor.withValues(alpha: 0.85),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
+              if (stores.isNotEmpty) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.public_rounded, size: 48, color: Colors.white),
-                    const SizedBox(width: Dimensions.paddingSizeDefault),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'المتاجر العالمية (Global Stores)',
-                            style: robotoBold.copyWith(
-                              fontSize: Dimensions.fontSizeLarge,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                          Text(
-                            'اختر المتجر العالمي، انسخ رابط السلة، وسنقوم بشرائه وتوصيله إليك!',
-                            style: robotoRegular.copyWith(
-                              fontSize: Dimensions.fontSizeSmall,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                          ),
-                        ],
+                    Text(
+                      'المتاجر العالمية المتاحة للطلب:',
+                      style: robotoBold.copyWith(
+                        fontSize: Dimensions.fontSizeLarge,
+                        color: Theme.of(context).textTheme.bodyLarge!.color,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+                      ),
+                      child: Text(
+                        '${stores.length} متجر',
+                        style: robotoBold.copyWith(
+                          fontSize: Dimensions.fontSizeExtraSmall,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
 
-              const SizedBox(height: Dimensions.paddingSizeLarge),
+                const SizedBox(height: Dimensions.paddingSizeDefault),
 
-              if (stores.isNotEmpty) ...[
-                Text(
-                  'المتاجر المتاحة للطلب:',
-                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
-                ),
-                const SizedBox(height: Dimensions.paddingSizeSmall),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -109,86 +89,158 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 0.95,
-                    crossAxisSpacing: Dimensions.paddingSizeSmall,
-                    mainAxisSpacing: Dimensions.paddingSizeSmall,
+                    crossAxisSpacing: Dimensions.paddingSizeDefault,
+                    mainAxisSpacing: Dimensions.paddingSizeDefault,
                   ),
                   itemBuilder: (context, index) {
                     final store = stores[index];
-                    return InkWell(
-                      onTap: () {
-                        Get.to(() => GlobalOrderFormScreen(
-                              storeName: store.name ?? 'متجر عالمي',
-                              storeLogo: store.logoFullUrl,
-                              urlPlaceholder: store.urlPlaceholder,
-                            ));
-                      },
-                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                      child: Container(
-                        padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor,
-                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                          border: Border.all(
-                            color: Theme.of(context).primaryColor.withValues(alpha: 0.15),
-                            width: 1,
+                    return Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
+                            blurRadius: 14,
+                            offset: const Offset(0, 5),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 65,
-                              height: 65,
-                              padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
-                                shape: BoxShape.circle,
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(35),
-                                child: (store.logoFullUrl != null && store.logoFullUrl!.isNotEmpty)
-                                    ? CustomImage(image: store.logoFullUrl!, fit: BoxFit.contain)
-                                    : Icon(Icons.storefront_rounded, size: 35, color: Theme.of(context).primaryColor),
-                              ),
-                            ),
-                            const SizedBox(height: Dimensions.paddingSizeSmall),
-                            Text(
-                              store.name ?? '',
-                              textAlign: TextAlign.center,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault),
-                            ),
-                            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'انقر للطلب',
-                                    style: robotoMedium.copyWith(
-                                      fontSize: Dimensions.fontSizeExtraSmall,
-                                      color: Theme.of(context).primaryColor,
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => GlobalOrderFormScreen(
+                                    storeName: store.name ?? 'متجر عالمي',
+                                    storeLogo: store.logoFullUrl,
+                                    urlPlaceholder: store.urlPlaceholder,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Stack(
+                              children: [
+                                // Layer 1: Logo / Image as Background
+                                Positioned.fill(
+                                  child: (store.logoFullUrl != null && store.logoFullUrl!.isNotEmpty)
+                                      ? CustomImage(
+                                          image: store.logoFullUrl!,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        )
+                                      : Container(
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Theme.of(context).primaryColor,
+                                                Theme.of(context).primaryColor.withValues(alpha: 0.7),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                          ),
+                                          child: const Icon(Icons.storefront_rounded, size: 60, color: Colors.white),
+                                        ),
+                                ),
+
+                                // Layer 2: Gradient Dark Overlay for Legibility
+                                Positioned.fill(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withValues(alpha: 0.2),
+                                          Colors.black.withValues(alpha: 0.8),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        stops: const [0.0, 0.45, 1.0],
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(width: 4),
-                                  Icon(Icons.arrow_forward_ios_rounded, size: 10, color: Theme.of(context).primaryColor),
-                                ],
-                              ),
+                                ),
+
+                                // Layer 3: Store Title & Modern Action Button at Bottom
+                                Positioned(
+                                  left: Dimensions.paddingSizeSmall,
+                                  right: Dimensions.paddingSizeSmall,
+                                  bottom: Dimensions.paddingSizeSmall + 2,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        store.name ?? '',
+                                        textAlign: TextAlign.center,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: robotoBold.copyWith(
+                                          fontSize: Dimensions.fontSizeLarge,
+                                          color: Colors.white,
+                                          shadows: const [
+                                            Shadow(
+                                              blurRadius: 6,
+                                              color: Colors.black54,
+                                              offset: Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Theme.of(context).primaryColor,
+                                              Theme.of(context).primaryColor.withValues(alpha: 0.85),
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Theme.of(context).primaryColor.withValues(alpha: 0.4),
+                                              blurRadius: 8,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'اطلب الآن',
+                                              style: robotoBold.copyWith(
+                                                fontSize: Dimensions.fontSizeExtraSmall + 1,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            const Icon(
+                                              Icons.arrow_forward_rounded,
+                                              size: 13,
+                                              color: Colors.white,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     );

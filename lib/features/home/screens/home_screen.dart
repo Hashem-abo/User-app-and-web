@@ -610,7 +610,62 @@ class _HomeScreenState extends State<HomeScreen>
                                                   child: Row(
                                                     children: [
                                                       Expanded(
-                                                        child: InkWell(
+                                                        child: isGlobal
+                                                            ? Container(
+                                                                height: 48,
+                                                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: 4),
+                                                                decoration: BoxDecoration(
+                                                                  gradient: LinearGradient(
+                                                                    colors: [
+                                                                      Theme.of(context).primaryColor,
+                                                                      Theme.of(context).primaryColor.withValues(alpha: 0.85),
+                                                                    ],
+                                                                    begin: Alignment.topLeft,
+                                                                    end: Alignment.bottomRight,
+                                                                  ),
+                                                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                                                                      blurRadius: 6,
+                                                                      offset: const Offset(0, 2),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                child: Row(
+                                                                  children: [
+                                                                    const Icon(Icons.public_rounded, size: 24, color: Colors.white),
+                                                                    const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                                                    Expanded(
+                                                                      child: Column(
+                                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                                        children: [
+                                                                          Text(
+                                                                            'المتاجر العالمية (Global Stores)',
+                                                                            style: robotoBold.copyWith(
+                                                                              fontSize: Dimensions.fontSizeSmall,
+                                                                              color: Colors.white,
+                                                                            ),
+                                                                            maxLines: 1,
+                                                                            overflow: TextOverflow.ellipsis,
+                                                                          ),
+                                                                          Text(
+                                                                            'اختر المتجر، انسخ رابط السلة وسنقوم بشرائه وتوصيله إليك!',
+                                                                            style: robotoRegular.copyWith(
+                                                                              fontSize: 10,
+                                                                              color: Colors.white.withValues(alpha: 0.9),
+                                                                            ),
+                                                                            maxLines: 1,
+                                                                            overflow: TextOverflow.ellipsis,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              )
+                                                            : InkWell(
                                                           onTap: () {
                                                             Get.toNamed(RouteHelper.getSearchRoute(queryText: ''));
                                                           },
@@ -875,6 +930,7 @@ class _HomeScreenState extends State<HomeScreen>
                             !showMobileModule &&
                                     !isTaxi &&
                                     !isServices &&
+                                    !isGlobal &&
                                     showStoreList
                                 ?
                                 // Hide if Aggregated Module // + ahmed
@@ -897,6 +953,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 child: !showMobileModule &&
                                         !isTaxi &&
                                         !isServices &&
+                                        !isGlobal &&
                                         showStoreList
                                     ? Center(
                                         key: ValueKey(
