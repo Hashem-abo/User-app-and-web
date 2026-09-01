@@ -107,7 +107,7 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
                 const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
                 _isSocial ? CustomTextField(
-                  titleText: 'xxx-xxx-xxxxx'.tr,
+                  titleText: 'xxx-xxx-xxxxx',
                   labelText: 'phone'.tr,
                   showLabelText: true,
                   required: true,

@@ -56,7 +56,7 @@ class PaymentCompleteDialog extends StatelessWidget {
 
             GetBuilder<OrderController>(builder: (orderController) {
               return !orderController.isLoading ? CustomButton(
-                buttonText: isLogOut ? 'no'.tr : 'ok'.tr,
+                buttonText: isLogOut ? 'no'.tr : 'okay'.tr,
                 onPressed: () => isLogOut ? Get.back() : onYesPressed(),
                 radius: Dimensions.radiusSmall, height: 50,
                 width: 90,

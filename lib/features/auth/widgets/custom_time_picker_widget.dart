@@ -105,7 +105,7 @@ class CustomTimePickerWidget extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeLarge),
                   child: Text(
-                    '${storeRegController.storeMinTime} - ${storeRegController.storeMaxTime} ${storeRegController.storeTimeUnit}',
+                    'processing_time_range'.trParams({'min': storeRegController.storeMinTime, 'max': storeRegController.storeMaxTime, 'unit': (storeRegController.storeTimeUnit == 'minute' ? 'minutes' : storeRegController.storeTimeUnit).tr}),
                     style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge),
                   ),
                 ),
@@ -124,15 +124,15 @@ class CustomTimePickerWidget extends StatelessWidget {
                     }
 
                     if(min == null){
-                      showCustomSnackBar(isRental ? 'minimum_pickup_time_can_not_be_empty' : 'minimum_delivery_time_can_not_be_empty'.tr);
+                      showCustomSnackBar((isRental ? 'minimum_pickup_time_can_not_be_empty' : 'minimum_delivery_time_can_not_be_empty').tr);
                     }else if(max == null){
-                      showCustomSnackBar(isRental ? 'maximum_pickup_time_can_not_be_empty' : 'maximum_delivery_time_can_not_be_empty'.tr);
+                      showCustomSnackBar((isRental ? 'maximum_pickup_time_can_not_be_empty' : 'maximum_delivery_time_can_not_be_empty').tr);
                     }else if(storeRegController.storeTimeUnit.isEmpty){
                       showCustomSnackBar('time_unit_can_not_be_empty'.tr);
                     }else if(min < max){
                       Get.back();
                     }else{
-                      showCustomSnackBar(isRental ? 'maximum_pickup_time_can_not_be_smaller_then_minimum_pickup_time' : 'maximum_delivery_time_can_not_be_smaller_then_minimum_delivery_time'.tr);
+                      showCustomSnackBar((isRental ? 'maximum_pickup_time_can_not_be_smaller_then_minimum_pickup_time' : 'maximum_delivery_time_can_not_be_smaller_then_minimum_delivery_time').tr);
                     }
                   },
                 ),

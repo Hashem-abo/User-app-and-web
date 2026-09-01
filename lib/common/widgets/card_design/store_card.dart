@@ -143,7 +143,7 @@ class StoreCard extends StatelessWidget {
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  '${store.itemCount ?? 0}+ ' 'منتج'.tr,
+                                  '${store.itemCount ?? 0}+ ${((store.itemCount ?? 0) == 1 ? 'item' : 'items').tr}',
                                   style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
                                   textAlign: TextAlign.center,
                                   maxLines: 1, overflow: TextOverflow.ellipsis,

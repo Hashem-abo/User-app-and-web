@@ -60,7 +60,7 @@ class ExistingUserBottomSheet extends StatelessWidget {
         )),
         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-        Text(userModel.name ?? 'Jhon Doe', style: robotoMedium, textAlign: TextAlign.center),
+        Text(userModel.name?.trim().isNotEmpty == true ? userModel.name! : 'unknown_user'.tr, style: robotoMedium, textAlign: TextAlign.center),
         const SizedBox(height: Dimensions.paddingSizeLarge),
 
         Text('is_it_you'.tr, style: robotoBold, textAlign: TextAlign.center),

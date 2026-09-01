@@ -83,7 +83,7 @@ class _NewPassScreenState extends State<NewPassScreen> {
                       isPassword: true,
                       divider: false,
                       labelText: 'new_password'.tr,
-                      validator: (value) => ValidateCheck.validateEmptyText(value, 'please_enter_new_password'.tr),
+                      validator: (value) => ValidateCheck.validateEmptyText(value, 'password_field_is_required'.tr),
                     ),
                     const SizedBox(height: Dimensions.paddingSizeLarge),
 
@@ -97,7 +97,7 @@ class _NewPassScreenState extends State<NewPassScreen> {
                       isPassword: true,
                       onSubmit: (text) => GetPlatform.isWeb ? _onPressedPasswordChange() : null,
                       labelText: 'confirm_password'.tr,
-                      validator: (value) => ValidateCheck.validateEmptyText(value, 'please_enter_confirm_password'.tr),
+                      validator: (value) => ValidateCheck.validateEmptyText(value, 'confirm_password_field_is_required'.tr),
                     ),
 
                   ]),

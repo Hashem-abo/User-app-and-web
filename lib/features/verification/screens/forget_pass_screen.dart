@@ -115,7 +115,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
                     Form(
                       key: _formKeyLogin,
                       child: isPhone ? CustomTextField(
-                        titleText: 'xxx-xxx-xxxxx'.tr,
+                        titleText: 'xxx-xxx-xxxxx',
                         controller: _numberController,
                         focusNode: _numberFocusNode,
                         inputType: TextInputType.phone,

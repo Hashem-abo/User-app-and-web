@@ -94,7 +94,7 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen> {
                       Get.offNamed(RouteHelper.getOnBoardingRoute());
                     }
                   }else {
-                    showCustomSnackBar('select_a_language'.tr);
+                    showCustomSnackBar('select_language'.tr);
                   }
                 },
               ),

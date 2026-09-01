@@ -329,9 +329,11 @@ class AppConstants {
 
 
   ///Refer & Earn work flow list..
-  static final dataList = [
+  static List<String> get dataList => [
     'invite_your_friends_and_business'.tr,
-    '${'they_register'.tr} ${AppConstants.appName} ${'with_special_offer'.tr}',
+    'refer_register_with_special_offer'.trParams({
+      'app_name': AppConstants.appName,
+    }),
     'you_made_your_earning'.tr,
   ];
 
@@ -385,7 +387,7 @@ class AppConstants {
 
 
   static List<LanguageModel> languages = [
-    LanguageModel(imageUrl: Images.arabic, languageName: 'عربى', countryCode: 'SA', languageCode: 'ar'),
+    LanguageModel(imageUrl: Images.arabic, languageName: 'العربية', countryCode: 'YE', languageCode: 'ar'),
     LanguageModel(imageUrl: Images.english, languageName: 'English', countryCode: 'US', languageCode: 'en'),
     // LanguageModel(imageUrl: Images.spanish, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
     // LanguageModel(imageUrl: Images.bengali, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),

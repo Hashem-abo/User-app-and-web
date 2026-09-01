@@ -664,9 +664,10 @@ class _ItemCardState extends State<ItemCard> {
 
                                     // View Count
                                     if(widget.item != null && widget.item!.itemViewCount != null && widget.item!.itemViewCount! > 0) {
+                                      final int viewCount = widget.item!.itemViewCount!;
                                       statusList.add({
-                                        'text': '${widget.item!.itemViewCount} ${'views'.tr}', 
-                                        'icon': Icons.visibility_outlined, 
+                                        'text':'$viewCount ${(viewCount == 1 ? 'view_count_singular' : 'views').tr}',
+                                        'icon': Icons.visibility_outlined,
                                         'color': Colors.teal, // Modern Teal
                                       });
                                     }

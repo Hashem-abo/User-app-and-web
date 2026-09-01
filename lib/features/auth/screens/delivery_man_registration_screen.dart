@@ -590,7 +590,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                               key: _formKeyStep2,
                               child: CustomTextField(
                                 labelText: 'identity_number'.tr,
-                                titleText: deliverymanRegistrationController.identityTypeIndex == 0 ? 'Ex: XXXXX-XXXXXXX-X'
+                                titleText: deliverymanRegistrationController.identityTypeIndex == 0 ? 'identity_number_example'.tr
                                     : deliverymanRegistrationController.identityTypeIndex == 1 ? 'L-XXX-XXX-XXX-XXX.' : 'XXX-XXXXX',
                                 controller: _identityNumberController,
                                 focusNode: _identityNumberNode,

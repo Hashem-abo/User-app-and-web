@@ -73,14 +73,14 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
           DropdownMenuItem<String>(
             value: null,
             child: Text(
-              'no_data_available'.tr,
+              'no_data_found'.tr,
               style: robotoRegular.copyWith(color: Colors.grey),
             ),
           )
         ],
         validator: widget.validator ?? (value) {
           if (value == null) {
-            return 'please_select_an_option'.tr;
+            return 'select_an_option'.tr;
           }
           return null;
         },

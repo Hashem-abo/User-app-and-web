@@ -54,7 +54,7 @@ class _ZoneSelectionBottomSheetState extends State<ZoneSelectionBottomSheet> {
                 Icon(Icons.location_city_rounded, color: Theme.of(context).primaryColor, size: 24),
                 const SizedBox(width: Dimensions.paddingSizeSmall),
                 Text(
-                  'select_zone'.tr == 'select_zone' ? 'اختر المدينة / المنطقة' : 'select_zone'.tr,
+                  'select_zone'.tr,
                   style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
                 ),
               ]),
@@ -117,7 +117,7 @@ class _ZoneSelectionBottomSheetState extends State<ZoneSelectionBottomSheet> {
                           ),
                           const SizedBox(width: Dimensions.paddingSizeSmall),
                           Text(
-                            zone.name ?? 'Zone ${zone.id}',
+                            zone.name ?? 'zone_number'.trParams({'id': '${zone.id}'}),
                             style: isSelected
                                 ? robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeDefault)
                                 : robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault),

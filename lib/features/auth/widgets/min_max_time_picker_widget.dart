@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 
@@ -47,7 +48,7 @@ class _MinMaxTimePickerWidgetState extends State<MinMaxTimePickerWidget> {
               color: selectedIndex == index ? Theme.of(context).primaryColor.withValues(alpha: 0.1) : Colors.transparent,
             ),
             child: Center(child: Text(
-              widget.times[index].toString(),
+              (widget.times[index] == 'minute' ? 'minutes' : widget.times[index]).tr,
               style: selectedIndex == index ? robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge) : robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
             )),
           );

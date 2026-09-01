@@ -33,7 +33,7 @@ class OtpLoginWidget extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeExtraOverLarge),
 
           CustomTextField(
-            titleText: 'xxx-xxx-xxxxx'.tr,
+            titleText: 'xxx-xxx-xxxxx',
             controller: phoneController,
             focusNode: phoneFocus,
             inputAction: TextInputAction.done,

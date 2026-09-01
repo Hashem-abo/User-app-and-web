@@ -426,7 +426,7 @@ class StoreRegistrationController extends GetxController implements GetxService 
     if (result != null && result.files.isNotEmpty) {
       for (var file in result.files) {
         if (file.size > 2000000) {
-          showCustomSnackBar('please_upload_lower_size_file'.tr);
+          showCustomSnackBar('file_size_too_large'.tr);
         } else {
           _tinFiles.add(result);
         }

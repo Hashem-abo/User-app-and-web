@@ -278,7 +278,8 @@ class LoginSuggestionBottomSheet extends StatelessWidget {
       });
 
     } catch (e) {
-      showCustomSnackBar(e.toString());
+      debugPrint('Error in Google web sign in: $e');
+      showCustomSnackBar('sorry_something_went_wrong'.tr);
     }
   }
 

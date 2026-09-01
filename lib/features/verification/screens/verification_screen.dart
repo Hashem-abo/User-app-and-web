@@ -263,7 +263,7 @@ class VerificationScreenState extends State<VerificationScreen> {
                         _resendOtp();
                       }
                     } : null,
-                    child: Text('${'resent_it'.tr}${_seconds > 0 ? ' (${_seconds}s)' : ''}', style: TextStyle(color: Theme.of(context).primaryColor),),
+                    child: Text(_seconds > 0 ? 'resend_in_seconds'.trParams({'seconds': _seconds.toString()}) : 'resend'.tr, style: TextStyle(color: Theme.of(context).primaryColor),),
                   ),
                 ]),
               ),
