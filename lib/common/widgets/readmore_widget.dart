@@ -2,6 +2,7 @@ import 'dart:ui' as ui show TextHeightBehavior;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 enum TrimMode {
   // ignore: constant_identifier_names
@@ -27,8 +28,8 @@ class ReadMoreText extends StatefulWidget {
     this.postDataText,
     this.preDataTextStyle,
     this.postDataTextStyle,
-    this.trimExpandedText = 'show less',
-    this.trimCollapsedText = 'read more',
+    this.trimExpandedText = 'show_less',
+    this.trimCollapsedText = 'read_more',
     this.colorClickableText,
     this.trimLength = 240,
     this.trimLines = 2,
@@ -59,8 +60,8 @@ class ReadMoreText extends StatefulWidget {
     this.richPreData,
     this.richPostData,
     this.isCollapsed,
-    this.trimExpandedText = 'show less',
-    this.trimCollapsedText = 'read more',
+    this.trimExpandedText = 'show_less',
+    this.trimCollapsedText = 'read_more',
     this.colorClickableText,
     this.trimLength = 240,
     this.trimLines = 2,
@@ -173,6 +174,13 @@ class ReadMoreTextState extends State<ReadMoreText> {
     }
   }
 
+  String _localizedTrimText(String value) {
+    if (value == 'read_more' || value == 'show_less') {
+      return value.tr;
+    }
+    return value;
+  }
+
   RegExp? _mergeRegexPatterns(List<Annotation>? annotations) {
     if (annotations == null || annotations.isEmpty) {
       return null;
@@ -248,7 +256,9 @@ class ReadMoreTextState extends State<ReadMoreText> {
     final defaultDelimiterStyle = widget.delimiterStyle ?? effectiveTextStyle;
 
     final link = TextSpan(
-      text: isCollapsed ? widget.trimCollapsedText : widget.trimExpandedText,
+      text: isCollapsed
+          ? _localizedTrimText(widget.trimCollapsedText)
+          : _localizedTrimText(widget.trimExpandedText),
       style: isCollapsed ? defaultMoreStyle : defaultLessStyle,
       recognizer: _recognizer,
     );

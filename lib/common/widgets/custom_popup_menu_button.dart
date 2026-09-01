@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
 class CustomPopupMenuButton extends StatelessWidget {
   final Widget child;
   final List<MenuItem> items;
@@ -48,7 +50,7 @@ class CustomPopupMenuButton extends StatelessWidget {
       offset: const Offset(0, 48), // Moves the menu down so it starts below the button
 
       // Tooltip is optional but good practice
-      tooltip: 'Show actions menu',
+      tooltip: 'show_actions_menu'.tr,
       // 1. Anchor the menu to the custom button widget
       child: child,
     );

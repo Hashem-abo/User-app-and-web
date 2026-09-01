@@ -162,8 +162,8 @@ class StoreCardWithDistance extends StatelessWidget {
                                 flex: 3,
                                 child: Text(
                                   (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food')
-                                      ? '${store.distance != null ? (store.distance! > 100 ? store.distance! / 1000 : store.distance!).toStringAsFixed(1) : '0.0'} ' 'كم'.tr
-                                      : '${store.itemCount}+ ' 'منتج'.tr,
+                                      ? '${store.distance != null ? (store.distance! > 100 ? store.distance! / 1000 : store.distance!).toStringAsFixed(1) : '0.0'} ' 'km'.tr
+                                      : '${store.itemCount ?? 0}+ ${((store.itemCount ?? 0) == 1 ? 'item' : 'items').tr}',
                                   style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
                                   textAlign: TextAlign.center,
                                   maxLines: 1, overflow: TextOverflow.ellipsis,
