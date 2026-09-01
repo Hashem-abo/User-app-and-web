@@ -44,12 +44,12 @@ class PaymentScreenState extends State<PaymentScreen> {
   void initState() {
     super.initState();
 
-    if(widget.addFundUrl == '' && widget.addFundUrl!.isEmpty && widget.subscriptionUrl == '' && widget.subscriptionUrl!.isEmpty){
+    if ((widget.addFundUrl == null || widget.addFundUrl!.isEmpty) && (widget.subscriptionUrl == null || widget.subscriptionUrl!.isEmpty)) {
       selectedUrl = '${AppConstants.baseUrl}/payment-mobile?customer_id=${widget.createAccount ? widget.createUserId : widget.orderModel.userId == 0 ? widget.guestId : widget.orderModel.userId}&order_id=${widget.orderModel.id}&payment_method=${widget.paymentMethod}';
-    } else if(widget.subscriptionUrl != '' && widget.subscriptionUrl!.isNotEmpty){
+    } else if (widget.subscriptionUrl != null && widget.subscriptionUrl!.isNotEmpty) {
       selectedUrl = widget.subscriptionUrl!;
-    } else{
-      selectedUrl = widget.addFundUrl!;
+    } else {
+      selectedUrl = widget.addFundUrl ?? '';
     }
 
     if (kDebugMode) {
@@ -61,12 +61,16 @@ class PaymentScreenState extends State<PaymentScreen> {
 
   void _initData() async {
 
-    if(widget.addFundUrl == '' && widget.addFundUrl!.isEmpty && widget.subscriptionUrl == '' && widget.subscriptionUrl!.isEmpty){
-      for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
-        for(Modules m in zData.modules!) {
-          if(m.id == Get.find<SplashController>().module!.id) {
-            _maximumCodOrderAmount = m.pivot!.maximumCodOrderAmount;
-            break;
+    if ((widget.addFundUrl == null || widget.addFundUrl!.isEmpty) && (widget.subscriptionUrl == null || widget.subscriptionUrl!.isEmpty)) {
+      if (AddressHelper.getUserAddressFromSharedPref()?.zoneData != null) {
+        for(ZoneData zData in AddressHelper.getUserAddressFromSharedPref()!.zoneData!) {
+          if (zData.modules != null) {
+            for(Modules m in zData.modules!) {
+              if(m.id == Get.find<SplashController>().module?.id) {
+                _maximumCodOrderAmount = m.pivot?.maximumCodOrderAmount;
+                break;
+              }
+            }
           }
         }
       }
@@ -137,7 +141,7 @@ class PaymentScreenState extends State<PaymentScreen> {
   }
 
   Future<bool?> _exitApp() async {
-    if((widget.addFundUrl == null || widget.addFundUrl!.isEmpty) && (widget.subscriptionUrl == '' && widget.subscriptionUrl!.isEmpty)){
+    if ((widget.addFundUrl == null || widget.addFundUrl!.isEmpty) && (widget.subscriptionUrl == null || widget.subscriptionUrl!.isEmpty)) {
       return Get.dialog(PaymentFailedDialog(
         orderID: widget.orderModel.id.toString(), orderAmount: widget.orderModel.orderAmount,
         maxCodOrderAmount: _maximumCodOrderAmount, orderType: widget.orderModel.orderType,

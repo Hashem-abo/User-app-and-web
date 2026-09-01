@@ -14,6 +14,7 @@ import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/payment/widgets/offline_payment_button.dart';
+import 'package:sixam_mart/common/widgets/custom_text_field.dart';
 
 class ParcelPaymentMethodBottomSheet extends StatefulWidget {
   final bool isCashOnDeliveryActive;
@@ -115,16 +116,32 @@ class _ParcelPaymentMethodBottomSheetState extends State<ParcelPaymentMethodBott
                             itemBuilder: (context, index){
                               bool isSelected = parcelController.paymentIndex == 2 && Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay! == parcelController.digitalPaymentName;
 
-                              return paymentButtonView(
-                                padding: EdgeInsets.only(bottom: index == Get.find<SplashController>().configModel!.activePaymentMethodList!.length - 1 ? 0 : Dimensions.paddingSizeSmall),
-                                disablePayments: false,
-                                onTap: () {
-                                  parcelController.setPaymentIndex(2, true);
-                                  parcelController.changeDigitalPaymentName(Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay!);
-                                },
-                                title: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayTitle!,
-                                isSelected: isSelected,
-                                image: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayImageFullUrl,
+                              return Column(
+                                children: [
+                                  paymentButtonView(
+                                    padding: EdgeInsets.only(bottom: index == Get.find<SplashController>().configModel!.activePaymentMethodList!.length - 1 ? 0 : Dimensions.paddingSizeSmall),
+                                    disablePayments: false,
+                                    onTap: () {
+                                      parcelController.setPaymentIndex(2, true);
+                                      parcelController.changeDigitalPaymentName(Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay!);
+                                    },
+                                    title: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayTitle!,
+                                    isSelected: isSelected,
+                                    image: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayImageFullUrl,
+                                  ),
+                                  if (isSelected && (parcelController.digitalPaymentName == 'easy_wallet' || parcelController.digitalPaymentName == 'floosak'))
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeLarge, right: Dimensions.paddingSizeLarge),
+                                      child: CustomTextField(
+                                        titleText: 'Purchase Code (كود الشراء)',
+                                        controller: Get.find<CheckoutController>().purchaseCodeController,
+                                        inputType: TextInputType.number,
+                                        isNumber: true,
+                                        maxLength: 8,
+                                        showTitle: true,
+                                      ),
+                                    ),
+                                ],
                               );
                             },
                           ),

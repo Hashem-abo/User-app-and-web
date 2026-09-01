@@ -19,7 +19,6 @@ import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
 import 'package:sixam_mart/features/checkout/widgets/tips_widget.dart';
 import 'package:sixam_mart/features/dashboard/widgets/parcel_bottom_sheet_widget.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
 import 'package:sixam_mart/features/parcel/domain/models/parcel_category_model.dart';
 import 'package:sixam_mart/features/pro/widgets/pro_cart_banner_widget.dart';
@@ -154,19 +153,8 @@ class _ParcelLocationScreenState extends State<ParcelLocationScreen> {
   }
 
   void _resolvePaymentFlags() {
-    final pickup = Get.find<ParcelController>().pickupAddress;
-    final savedAddress = AddressHelper.getUserAddressFromSharedPref();
-    final config = Get.find<SplashController>().configModel!;
-    _isCashOnDeliveryActive = false;
-    _isDigitalPaymentActive = false;
-    if (pickup?.zoneData == null || savedAddress == null) return;
-    for (ZoneData zData in pickup!.zoneData!) {
-      if (zData.id == savedAddress.zoneId) {
-        _isCashOnDeliveryActive = (zData.cashOnDelivery ?? false) && (config.cashOnDelivery ?? false);
-        _isDigitalPaymentActive = (zData.digitalPayment ?? false) && (config.digitalPayment ?? false);
-        break;
-      }
-    }
+    _isCashOnDeliveryActive = true;
+    _isDigitalPaymentActive = true;
   }
 
   void _ensureDistance() {

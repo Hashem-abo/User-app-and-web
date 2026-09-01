@@ -63,6 +63,7 @@ import 'package:sixam_mart/features/home/widgets/views/national_products_filter_
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
 import 'package:sixam_mart/features/store/widgets/prescription_store_bottom_sheet_widget.dart';
 import 'package:sixam_mart/common/widgets/custom_bottom_sheet_widget.dart';
+import 'package:sixam_mart/features/global_shopping/screens/global_home_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -493,6 +494,9 @@ class _HomeScreenState extends State<HomeScreen>
       bool isServices = splashController.module != null &&
           splashController.module!.moduleType.toString().trim().toLowerCase() ==
               AppConstants.services;
+      bool isGlobal = splashController.module != null &&
+          splashController.module!.moduleType.toString().trim().toLowerCase() ==
+              AppConstants.globalShopping;
 
       // + ahmed
       bool isAggregatedModule =
@@ -862,7 +866,10 @@ class _HomeScreenState extends State<HomeScreen>
                                                                     _headerKey,
                                                                 exploreRestaurantKey:
                                                                     _headerKey)
-                                                            : const SliverToBoxAdapter(),
+                                                             : isGlobal
+                                                                 ? const SliverToBoxAdapter(
+                                                                     child: GlobalHomeScreen())
+                                                                 : const SliverToBoxAdapter(),
                               ),
 
                             !showMobileModule &&

@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
+import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/features/global_shopping/domain/models/global_product_model.dart';
+import 'package:sixam_mart/features/global_shopping/domain/models/global_store_model.dart';
 import 'package:sixam_mart/features/global_shopping/domain/services/global_shopping_service_interface.dart';
 
 class GlobalBrowseController extends GetxController implements GetxService {
@@ -13,11 +15,14 @@ class GlobalBrowseController extends GetxController implements GetxService {
   bool _isImageSearching = false;
   bool get isImageSearching => _isImageSearching;
 
-  String _selectedSource = 'shein'; // shein, aliexpress, cj
+  String _selectedSource = 'shein';
   String get selectedSource => _selectedSource;
 
   List<GlobalProductModel>? _products;
   List<GlobalProductModel>? get products => _products;
+
+  List<GlobalStoreModel>? _globalStores;
+  List<GlobalStoreModel>? get globalStores => _globalStores;
 
   GlobalProductModel? _productDetails;
   GlobalProductModel? get productDetails => _productDetails;
@@ -30,6 +35,30 @@ class GlobalBrowseController extends GetxController implements GetxService {
 
   bool _offsetError = false;
   bool get offsetError => _offsetError;
+
+  Future<void> getGlobalStores({bool reload = false}) async {
+    if (_globalStores != null && !reload) {
+      return;
+    }
+
+    _isLoading = true;
+    update();
+
+    try {
+      final Response response = await Get.find<ApiClient>().getData('/api/v1/global-shopping/stores');
+      _globalStores = [];
+      if (response.statusCode == 200 && response.body != null && response.body is List) {
+        for (var v in response.body) {
+          _globalStores!.add(GlobalStoreModel.fromJson(v));
+        }
+      }
+    } catch (e) {
+      _globalStores = [];
+    } finally {
+      _isLoading = false;
+      update();
+    }
+  }
 
   void setSource(String source) {
     _selectedSource = source;
@@ -95,7 +124,6 @@ class GlobalBrowseController extends GetxController implements GetxService {
     update();
   }
 
-  /// Called by the UI when it directly processes the multipart upload response.
   void setImageSearching(bool value) {
     _isImageSearching = value;
     _isLoading = value;
@@ -103,7 +131,6 @@ class GlobalBrowseController extends GetxController implements GetxService {
     update();
   }
 
-  /// Called by the UI to directly set products from a parsed JSON response.
   void setImageSearchResults(List<dynamic> rawList) {
     try {
       _products = rawList.map((p) => GlobalProductModel.fromJson(p as Map<String, dynamic>)).toList();

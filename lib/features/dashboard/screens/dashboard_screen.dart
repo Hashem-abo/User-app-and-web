@@ -123,7 +123,7 @@ class DashboardScreenState extends State<DashboardScreen> {
         Get.find<SplashController>().module?.moduleType.toString();
     bool isGlobal = modType == AppConstants.globalShopping;
     _screens = [
-      isGlobal ? const GlobalHomeScreen() : const HomeScreen(),
+      const HomeScreen(),
       isGlobal ? const GlobalHomeScreen() : const CategoryTreeScreen(),
       isGlobal ? const GlobalOrderListScreen() : const OrderScreen(),
       isGlobal ? const GlobalCartScreen() : const CartScreen(fromNav: true),
@@ -220,7 +220,7 @@ class DashboardScreenState extends State<DashboardScreen> {
       isParcel = isParcel && !isTaxiWithCache;
 
       _screens = [
-        isGlobal ? const GlobalHomeScreen() : const HomeScreen(),
+        const HomeScreen(),
         isParcel
             ? const AddressScreen(fromDashboard: true)
             : isTaxi
