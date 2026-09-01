@@ -17,7 +17,6 @@ import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dar
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
 import 'package:sixam_mart/features/checkout/widgets/condition_check_box.dart';
 import 'package:sixam_mart/features/checkout/widgets/guest_create_account.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
 import 'package:sixam_mart/features/parcel/domain/models/parcel_category_model.dart';
 import 'package:sixam_mart/features/parcel/widgets/parcel_info_bottom_sheet.dart';
@@ -26,7 +25,6 @@ import 'package:sixam_mart/features/pro/controllers/pro_controller.dart';
 import 'package:sixam_mart/features/pro/domain/models/pro_active_offer_model.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/custom_validator.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
@@ -134,13 +132,8 @@ class _ParcelRequestScreenState extends State<ParcelRequestScreen> {
       dateTime: DateConverter.dateToDateTime(DateTime.now()), guestId: AuthHelper.getGuestId(),
     );
     Get.find<ParcelController>().startLoader(false, canUpdate: false);
-      for(ZoneData zData in widget.pickedUpAddress.zoneData!){
-        if(zData.id == AddressHelper.getUserAddressFromSharedPref()!.zoneId){
-          _isCashOnDeliveryActive = zData.cashOnDelivery! && Get.find<SplashController>().configModel!.cashOnDelivery!;
-          _isDigitalPaymentActive = zData.digitalPayment! && Get.find<SplashController>().configModel!.digitalPayment!;
-          break;
-        }
-      }
+      _isCashOnDeliveryActive = true;
+      _isDigitalPaymentActive = true;
       if (Get.find<ProfileController>().userInfoModel == null && _isLoggedIn) {
         Get.find<ProfileController>().getUserInfo();
       }
@@ -487,6 +480,8 @@ class _ParcelRequestScreenState extends State<ParcelRequestScreen> {
       showCustomSnackBar('tips_can_not_be_negative'.tr);
     }else if(parcelController.paymentIndex == -1) {
       showCustomSnackBar('please_select_payment_method_first'.tr);
+    }else if(parcelController.paymentIndex == 2 && (parcelController.digitalPaymentName == 'easy_wallet' || parcelController.digitalPaymentName == 'floosak') && Get.find<CheckoutController>().purchaseCodeController.text.trim().isEmpty) {
+      showCustomSnackBar('Please enter your Purchase Code'.tr);
     }else if(isGuestLoggedIn && Get.find<CheckoutController>().isCreateAccount && _guestPasswordController.text.isEmpty) {
       showCustomSnackBar('enter_password'.tr);
     }else if(isGuestLoggedIn && Get.find<CheckoutController>().isCreateAccount && _guestConfirmPasswordController.text.isEmpty) {
