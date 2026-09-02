@@ -45,7 +45,7 @@ class GlobalBrowseController extends GetxController implements GetxService {
     update();
 
     try {
-      final Response response = await Get.find<ApiClient>().getData('/api/v1/global-shopping/stores');
+      final Response response = await Get.find<ApiClient>().getData('/api/v1/global-shopping/stores', handleError: false);
       _globalStores = [];
       if (response.statusCode == 200 && response.body != null && response.body is List) {
         for (var v in response.body) {

@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
@@ -35,17 +39,22 @@ class GlobalOrderFormScreen extends StatefulWidget {
 class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
   final TextEditingController _cartLinkController = TextEditingController();
   AddressModel? _selectedAddress;
+  XFile? _rawScreenshot;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Get.find<AddressController>().addressList == null) {
-        Get.find<AddressController>().getAddressList();
+      if (AuthHelper.isLoggedIn()) {
+        if (Get.find<AddressController>().addressList == null) {
+          Get.find<AddressController>().getAddressList();
+        }
       }
       _selectedAddress = AddressHelper.getUserAddressFromSharedPref();
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -53,6 +62,16 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
   void dispose() {
     _cartLinkController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    if (image != null) {
+      setState(() {
+        _rawScreenshot = image;
+      });
+    }
   }
 
   Future<void> _submitOrder() async {
@@ -71,6 +90,16 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
     });
 
     try {
+      final splashController = Get.find<SplashController>();
+      if (splashController.moduleList != null) {
+        for (var m in splashController.moduleList!) {
+          if (m.moduleType == 'global_shopping') {
+            splashController.setModule(m);
+            break;
+          }
+        }
+      }
+
       final bool isLoggedIn = AuthHelper.isLoggedIn();
       final String guestId = AuthHelper.getGuestId();
       final profile = Get.find<ProfileController>().userInfoModel;
@@ -80,7 +109,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
         couponDiscountAmount: 0.0,
         couponCode: '',
         orderAmount: 0.0,
-        orderType: 'parcel',
+        orderType: 'delivery',
         paymentMethod: 'cash_on_delivery',
         storeId: null,
         distance: 1.0,
@@ -94,8 +123,8 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
         contactPersonName: _selectedAddress!.contactPersonName ?? (profile != null ? '${profile.fName} ${profile.lName}' : 'Customer'),
         contactPersonNumber: _selectedAddress!.contactPersonNumber ?? (profile?.phone ?? ''),
         addressType: _selectedAddress!.addressType ?? 'home',
-        parcelCategoryId: '1',
-        chargePayer: 'sender',
+        parcelCategoryId: null,
+        chargePayer: null,
         dmTips: '0',
         unavailableItemNote: '',
         cutlery: 0,
@@ -109,7 +138,14 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
       );
 
       final parcelController = Get.find<ParcelController>();
-      await parcelController.placeOrder(
+      
+      // If optional screenshot is picked, create MultipartBody
+      List<MultipartBody> attachments = [];
+      if (_rawScreenshot != null) {
+        attachments.add(MultipartBody('order_attachment', _rawScreenshot));
+      }
+
+      String orderId = await parcelController.placeOrder(
         placeOrderBody,
         _selectedAddress!.zoneId,
         0.0,
@@ -119,7 +155,11 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
       );
 
       showCustomSnackBar('تم إرسال طلب التسوق بنجاح، بانتظار إرسال عرض السعر'.tr, isError: false);
-      Get.offAllNamed(RouteHelper.getInitialRoute());
+      if (orderId.isNotEmpty && orderId != '-1') {
+        Get.offNamed(RouteHelper.getOrderDetailsRoute(int.tryParse(orderId)));
+      } else if (mounted) {
+        Navigator.of(context).pop();
+      }
     } catch (e) {
       showCustomSnackBar('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً'.tr);
     } finally {
@@ -199,7 +239,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
               const SizedBox(height: Dimensions.paddingSizeLarge),
 
               // Cart Link Input Section
-              Text('رابط السلة (Cart Link)', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+              Text('رابط السلة (Cart Link) *', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
               const SizedBox(height: Dimensions.paddingSizeSmall),
               CustomTextField(
                 hintText: widget.urlPlaceholder ?? 'الصق رابط السلة هنا (e.g. https://shein.com/cart)',
@@ -211,8 +251,90 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
 
               const SizedBox(height: Dimensions.paddingSizeLarge),
 
+              // Optional Cart Screenshot Section
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('صورة السلة / لقطة الشاشة', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).disabledColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                    ),
+                    child: Text('اختياري', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Dimensions.paddingSizeSmall),
+              InkWell(
+                onTap: _pickImage,
+                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                child: Container(
+                  width: double.infinity,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    border: Border.all(
+                      color: Theme.of(context).primaryColor.withValues(alpha: 0.25),
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  child: _rawScreenshot != null
+                      ? Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                              child: Image.file(
+                                File(_rawScreenshot!.path),
+                                width: double.infinity,
+                                height: 120,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _rawScreenshot = null;
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.black54,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_a_photo_outlined, size: 36, color: Theme.of(context).primaryColor),
+                            const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                            Text(
+                              'انقر لرفع صورة السلة (اختياري)',
+                              style: robotoMedium.copyWith(
+                                fontSize: Dimensions.fontSizeSmall,
+                                color: Theme.of(context).disabledColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+
+              const SizedBox(height: Dimensions.paddingSizeLarge),
+
               // Delivery Address Section
-              Text('عنوان التوصيل (Delivery Address)', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+              Text('عنوان التوصيل (Delivery Address) *', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               GetBuilder<AddressController>(builder: (addressController) {
@@ -251,7 +373,13 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
                               _selectedAddress = result;
                             });
                           } else {
-                            Get.find<AddressController>().getAddressList();
+                            if (AuthHelper.isLoggedIn()) {
+                              Get.find<AddressController>().getAddressList();
+                            }
+                            _selectedAddress = AddressHelper.getUserAddressFromSharedPref();
+                            if (mounted) {
+                              setState(() {});
+                            }
                           }
                         },
                         child: Row(
