@@ -128,9 +128,12 @@ class CustomTextFieldState extends State<CustomTextField> {
             focusNode: widget.focusNode,
             textAlign: widget.textAlign,
             validator: widget.validator,
-            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge),
+            style: (widget.isPassword && _obscureText)
+                ? robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge, fontFamily: null)
+                : robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge),
             textInputAction: widget.inputAction,
-            keyboardType: widget.isAmount ? TextInputType.number : widget.inputType,
+            keyboardType: widget.isAmount ? TextInputType.number : (widget.isPassword ? TextInputType.text : widget.inputType),
+            obscuringCharacter: '.',
             cursorColor: Theme.of(context).primaryColor,
             textCapitalization: widget.capitalization,
             enabled: widget.isEnabled,
@@ -142,27 +145,27 @@ class CustomTextFieldState extends State<CustomTextField> {
             decoration: InputDecoration(
               counterText: '',
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusDefault),
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusMedium),
                 borderSide: BorderSide(style: widget.showBorder ? BorderStyle.solid : BorderStyle.none, width: ResponsiveHelper.isDesktop(context) ? 0.7 : 0.3, color: Theme.of(context).disabledColor),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusDefault),
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusMedium),
                 borderSide: BorderSide(style: widget.showBorder ? BorderStyle.solid : BorderStyle.none, width: 1, color: Theme.of(context).primaryColor),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusDefault),
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusMedium),
                 borderSide: BorderSide(style: widget.showBorder ? BorderStyle.solid : BorderStyle.none, width: 0.3, color: Theme.of(context).primaryColor),
               ),
               errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusDefault),
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusMedium),
                 borderSide: BorderSide(style: widget.showBorder ? BorderStyle.solid : BorderStyle.none, color: Theme.of(context).colorScheme.error),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusDefault),
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusMedium),
                 borderSide: BorderSide(style: widget.showBorder ? BorderStyle.solid : BorderStyle.none, color: Theme.of(context).colorScheme.error),
               ),
               disabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusDefault),
+                borderRadius: BorderRadius.circular(widget.borderRadius ?? Dimensions.radiusMedium),
                 borderSide: BorderSide(style: widget.showBorder ? BorderStyle.solid : BorderStyle.none, color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
               ),
               isDense: true,

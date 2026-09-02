@@ -33,8 +33,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ar', null);
   await initializeDateFormatting('en', null);
-  await initializeDateFormatting('es', null);
-  await initializeDateFormatting('bn', null);
+  // await initializeDateFormatting('es', null);
+  // await initializeDateFormatting('bn', null);
 
   /*///Pass all uncaught "fatal" errors from the framework to Crashlytics
   FlutterError.onError = (errorDetails) {

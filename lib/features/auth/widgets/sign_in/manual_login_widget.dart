@@ -99,7 +99,6 @@ class ManualLoginWidget extends StatelessWidget {
                     ? null
                     : 'enter_email_address_or_phone_number'.tr;
               },
-              borderRadius: 15,
             ),
           ),
 
@@ -117,13 +116,12 @@ class ManualLoginWidget extends StatelessWidget {
             controller: passwordController,
             focusNode: passwordFocus,
             inputAction: TextInputAction.done,
-            inputType: TextInputType.visiblePassword,
+            inputType: TextInputType.text,
             prefixIcon: Icons.lock_outline,
             isPassword: true,
             onSubmit: (text) => (GetPlatform.isWeb) ? onWebSubmit : null,
             required: true,
             validator: (value) => ValidateCheck.validateEmptyText(value, "please_enter_password".tr),
-            borderRadius: 15,
           ),
 
           Align(
@@ -145,7 +143,6 @@ class ManualLoginWidget extends StatelessWidget {
 
           CustomButton(
             buttonText: 'continue'.tr,
-            radius: 15,
             isBold: true,
             isLoading: authController.isLoading,
             onPressed: onClickLoginButton,
@@ -161,7 +158,7 @@ class ManualLoginWidget extends StatelessWidget {
               Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-                child: Text('do_not_have_account'.tr, style: robotoMedium.copyWith(color: Theme.of(context).disabledColor)),
+                child: Text('do_not_have_account'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
               ),
               Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
             ]),
@@ -308,7 +305,7 @@ class ManualLoginWidget extends StatelessWidget {
 
             CustomButton(
               buttonText: 'login'.tr,
-              radius: Dimensions.radiusDefault,
+              radius: Dimensions.radiusMedium,
               isBold: isDesktop ? false : true,
               isLoading: authController.isLoading,
               onPressed: onClickLoginButton,
@@ -401,7 +398,7 @@ class ManualLoginWidget extends StatelessWidget {
                             padding: const EdgeInsets.all(1),
                             decoration: BoxDecoration(
                               color: Theme.of(context).cardColor,
-                              borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
+                              borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusMedium)),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.grey[Get.isDarkMode ? 700 : 300]!,
@@ -413,7 +410,7 @@ class ManualLoginWidget extends StatelessWidget {
                             ),
                             child: CustomInkWell(
                               onTap: onOtpViewClick!,
-                              radius: Dimensions.radiusDefault,
+                              radius: Dimensions.radiusMedium,
                               child: Padding(
                                 padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [

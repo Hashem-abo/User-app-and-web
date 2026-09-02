@@ -65,12 +65,12 @@ class SocialLoginWidget extends StatelessWidget {
               padding: const EdgeInsets.all(1),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
+                borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusMedium)),
                 boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 700 : 300]!, spreadRadius: 1, blurRadius: 5, offset: const Offset(2, 2))],
               ),
               child: CustomInkWell(
                 onTap: ()=> _googleLogin(googleSignIn),
-                radius: Dimensions.radiusDefault,
+                radius: Dimensions.radiusMedium,
                 child: Padding(
                   padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -89,12 +89,12 @@ class SocialLoginWidget extends StatelessWidget {
               padding: const EdgeInsets.all(1),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
+                borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusMedium)),
                 boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 700 : 300]!, spreadRadius: 1, blurRadius: 5, offset: const Offset(2, 2))],
               ),
               child: CustomInkWell(
                 onTap: ()=> _facebookLogin(),
-                radius: Dimensions.radiusDefault,
+                radius: Dimensions.radiusMedium,
                 child: Padding(
                   padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -113,12 +113,12 @@ class SocialLoginWidget extends StatelessWidget {
               padding: const EdgeInsets.all(1),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
+                borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusMedium)),
                 boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 700 : 300]!, spreadRadius: 1, blurRadius: 5, offset: const Offset(2, 2))],
               ),
               child: CustomInkWell(
                 onTap: ()=> _appleLogin(),
-                radius: Dimensions.radiusDefault,
+                radius: Dimensions.radiusMedium,
                 child: Padding(
                   padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -139,13 +139,13 @@ class SocialLoginWidget extends StatelessWidget {
             padding: const EdgeInsets.all(1),
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
-              borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusDefault)),
+              borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusMedium)),
               boxShadow: [BoxShadow(color: Colors.grey[Get.isDarkMode ? 700 : 300]!, spreadRadius: 1, blurRadius: 5, offset: const Offset(2, 2))],
             ),
             margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeExtremeLarge),
             child: CustomInkWell(
               onTap: onOtpViewClick!,
-              radius: Dimensions.radiusDefault,
+              radius: Dimensions.radiusMedium,
               child: Padding(
                 padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                 child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -169,7 +169,7 @@ class SocialLoginWidget extends StatelessWidget {
         Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-          child: Text('or_continue_with'.tr, style: robotoMedium.copyWith(color: Theme.of(context).disabledColor)),
+          child: Text('or_continue_with'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
         ),
         Expanded(child: Container(height: 1, color: Theme.of(context).disabledColor)),
       ]),

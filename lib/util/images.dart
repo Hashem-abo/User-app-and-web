@@ -15,6 +15,7 @@ class Images {
   static const String locationMarker = 'assets/image/location_marker.png';
   static const String mail = 'assets/image/mail.png';
   static const String map = 'assets/image/map.png';
+  static const String authBackground = 'assets/image/background_layer.png';
   static const String onboard_1 = 'assets/image/onboard_1.png';
   static const String onboard_2 = 'assets/image/onboard_2.png';
   static const String onboard_3 = 'assets/image/onboard_3.png';

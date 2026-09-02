@@ -78,20 +78,20 @@ class SignInScreenState extends State<SignInScreen> {
             // Background Image
             Positioned.fill(
               child: Image.asset(
-                Images.onboard_1, 
+                Images.authBackground, 
                 fit: BoxFit.fill,
               ),
             ),
 
             // Blur Effect
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(
-                  color: Colors.black.withAlpha(50), 
-                ),
-              ),
-            ),
+            // Positioned.fill(
+            //   child: BackdropFilter(
+            //     filter: ui.ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+            //     child: Container(
+            //       color: Colors.white.withAlpha(50), 
+            //     ),
+            //   ),
+            // ),
 
             // Main Content
             SafeArea(
@@ -100,22 +100,22 @@ class SignInScreenState extends State<SignInScreen> {
                   physics: const BouncingScrollPhysics(),
                   padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
                   child: Center(
-                    child: Container(
+                    child: SizedBox(
                       width: context.width > 700 ? 500 : context.width,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: Dimensions.paddingSizeExtraLarge,
-                          vertical: Dimensions.paddingSizeLarge),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(220), 
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(25),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          )
-                        ],
-                      ),
+                      // padding: const EdgeInsets.symmetric(
+                      //     horizontal: Dimensions.paddingSizeExtraLarge,
+                      //     vertical: Dimensions.paddingSizeLarge),
+                      // decoration: BoxDecoration(
+                      //   color: Colors.white.withAlpha(220), 
+                      //   borderRadius: BorderRadius.circular(30),
+                      //   boxShadow: [
+                      //     BoxShadow(
+                      //       color: Colors.black.withAlpha(25),
+                      //       blurRadius: 20,
+                      //       offset: const Offset(0, 10),
+                      //     )
+                      //   ],
+                      // ),
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -163,9 +163,11 @@ class SignInScreenState extends State<SignInScreen> {
                   }
                 },
                 child: Container(
+                  width: 48,
+                  height: 48,
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                    color: Colors.white,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5)],

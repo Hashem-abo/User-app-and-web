@@ -392,7 +392,7 @@ class SocialLoginButton extends StatelessWidget {
       child: Container(
         height: 50,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusMedium)),
           border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.8), width: 1.2),
           color: Theme.of(context).cardColor,
         ),
