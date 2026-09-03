@@ -148,6 +148,9 @@ class VerificationScreenState extends State<VerificationScreen> {
                     appContext: context,
                     keyboardType: TextInputType.number,
                     animationType: AnimationType.slide,
+                    textStyle: robotoBold.copyWith(
+                      color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
+                    ),
                     pinTheme: PinTheme(
                       shape: PinCodeFieldShape.box,
                       fieldHeight: 60,

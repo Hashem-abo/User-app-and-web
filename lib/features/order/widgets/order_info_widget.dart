@@ -795,15 +795,8 @@ class OrderInfoWidget extends StatelessWidget {
 
               ) : const SizedBox(),
 
-              (showChatPermission && AuthHelper.isLoggedIn() && !parcel && order.orderStatus != 'delivered' && order.orderStatus != 'failed' && order.orderStatus != 'canceled' && order.orderStatus != 'refunded') ? InkWell(
-                onTap: () async {
-                  await Get.toNamed(RouteHelper.getChatRoute(
-                    notificationBody: NotificationBodyModel(orderId: order.id, restaurantId: order.store!.vendorId),
-                    user: User(id: order.store!.vendorId, fName: order.store!.name, lName: '', imageFullUrl: order.store!.logoFullUrl),
-                  ));
-                },
-                child: Image.asset(Images.chatOrderDetails, height: 30, width: 30),
-              ) : const SizedBox(),
+              // Vendor contact button hidden per user request
+              const SizedBox(),
 
               !isGuestLoggedIn && (Get.find<SplashController>().configModel!.refundActiveStatus! && order.orderStatus == 'delivered' && !parcel
               && (parcel || (orderController.orderDetails!.isNotEmpty && orderController.orderDetails![0].itemCampaignId == null))) ? InkWell(

@@ -54,7 +54,9 @@ class MyTextFieldState extends State<MyTextField> {
       maxLines: widget.maxLines,
       controller: widget.controller,
       focusNode: widget.focusNode,
-      style: robotoRegular,
+      style: robotoRegular.copyWith(
+        color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2E2E2E)),
+      ),
       textInputAction: widget.inputAction,
       keyboardType: widget.inputType,
       cursorColor: Theme.of(context).primaryColor,
@@ -62,6 +64,7 @@ class MyTextFieldState extends State<MyTextField> {
       enabled: widget.isEnabled,
       autofocus: widget.autoFocus,
       obscureText: widget.isPassword ? _obscureText : false,
+      obscuringCharacter: '•',
       inputFormatters: widget.inputType == TextInputType.phone ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9+]'))] : null,
       decoration: InputDecoration(
         hintText: widget.hintText,
