@@ -219,8 +219,12 @@ class OrderModel {
     moduleType = json['module_type'];
     deliveryMan = json['delivery_man'] != null ? DeliveryMan.fromJson(json['delivery_man']) : null;
     store = json['store'] != null ? Store.fromJson(json['store']) : null;
-    deliveryAddress = json['delivery_address'] != null ? AddressModel.fromJson(json['delivery_address']) : null;
-    receiverDetails = json['receiver_details'] != null ? AddressModel.fromJson(json['receiver_details']) : null;
+    deliveryAddress = (json['delivery_address'] != null && json['delivery_address'] is Map)
+        ? AddressModel.fromJson(Map<String, dynamic>.from(json['delivery_address']))
+        : (json['delivery_address'] is String ? AddressModel(address: json['delivery_address']) : null);
+    receiverDetails = (json['receiver_details'] != null && json['receiver_details'] is Map)
+        ? AddressModel.fromJson(Map<String, dynamic>.from(json['receiver_details']))
+        : (json['receiver_details'] is String ? AddressModel(address: json['receiver_details']) : null);
     parcelCategory = json['parcel_category'] != null ? ParcelCategoryModel.fromJson(json['parcel_category']) : null;
     dmTips = (json['dm_tips'] as num?)?.toDouble() ?? 0;
     refundCancellationNote = json['refund_cancellation_note'];
