@@ -172,7 +172,13 @@ class GuestDeliveryAddress extends StatelessWidget {
       padding: const EdgeInsets.all(5.0),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Text('$key: ', style: robotoRegular),
-        Flexible(child: Text(value, style: robotoRegular, maxLines: 1, overflow: TextOverflow.ellipsis)),
+        Flexible(child: Text(
+          value,
+          style: robotoRegular,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textDirection: (key.toLowerCase().contains('phone') || value.startsWith('+')) ? TextDirection.ltr : null,
+        )),
       ]),
     );
   }

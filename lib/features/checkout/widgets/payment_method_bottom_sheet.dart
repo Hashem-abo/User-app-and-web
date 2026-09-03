@@ -14,6 +14,7 @@ import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/payment/widgets/offline_payment_button.dart';
+import 'package:sixam_mart/features/checkout/widgets/payment_onboarding_dialog.dart';
 
 class PaymentMethodBottomSheet extends StatefulWidget {
   final bool isCashOnDeliveryActive;
@@ -233,8 +234,27 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeLarge),
                 child: CustomButton(
-                  buttonText: 'select'.tr,
-                  onPressed: () => Get.back(),
+                  buttonText: 'continue'.tr,
+                  onPressed: () {
+                    final bool isWalletGateway = checkoutController.paymentMethodIndex == 2 &&
+                        (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak');
+                    if (isWalletGateway) {
+                      final digitalGateways = Get.find<SplashController>().configModel?.activePaymentMethodList;
+                      final selectedGateway = digitalGateways?.firstWhereOrNull((g) => g.getWay == checkoutController.digitalPaymentName);
+
+                      Get.back();
+                      Get.dialog(
+                        PaymentOnboardingDialog(
+                          paymentMethodName: checkoutController.digitalPaymentName ?? '',
+                          paymentTitle: selectedGateway?.getWayTitle ?? (checkoutController.digitalPaymentName == 'easy_wallet' ? 'Easy Wallet' : 'Floosak'),
+                          paymentImage: selectedGateway?.getWayImageFullUrl,
+                          totalPrice: widget.totalPrice,
+                        ),
+                      );
+                    } else {
+                      Get.back();
+                    }
+                  },
                 ),
               ),
             ),

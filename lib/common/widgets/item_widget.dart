@@ -25,6 +25,7 @@ import 'package:sixam_mart/common/widgets/not_available_widget.dart';
 import 'package:sixam_mart/common/widgets/organic_tag.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:sixam_mart/common/widgets/store_verified_avatar.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 import 'package:sixam_mart/helper/item_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -191,6 +192,10 @@ class ItemWidget extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                            if (isStore && store != null && store!.vendorType.isNotEmpty) ...[
+                              VendorTypeBadgeWidget(store: store),
+                              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                            ],
 
                             (!isStore && Get.find<SplashController>().configModel!.moduleConfig!.module!.vegNonVeg! && Get.find<SplashController>().configModel!.toggleVegNonVeg!)
                                 ? Image.asset(item != null && item!.veg == 0 ? Images.nonVegImage : Images.vegImage,

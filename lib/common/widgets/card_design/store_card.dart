@@ -13,6 +13,7 @@ import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 
 class StoreCard extends StatelessWidget {
   final Store store;
@@ -118,6 +119,10 @@ class StoreCard extends StatelessWidget {
                               ),
                               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                               store.verifiedSeller == 1 ? Image.asset(Images.verifiedBadge2, width: 16, height: 16) : const SizedBox.shrink(),
+                              if (store.vendorType.isNotEmpty) ...[
+                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                VendorTypeBadgeWidget(store: store),
+                              ],
                             ],
                           ),
                           const SizedBox(height: Dimensions.paddingSizeExtraSmall),

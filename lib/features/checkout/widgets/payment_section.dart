@@ -77,15 +77,35 @@ class PaymentSection extends StatelessWidget {
 
         ]) : const SizedBox() : InkWell(
           onTap: () {
-            if(ResponsiveHelper.isDesktop(context) && checkoutController.paymentMethodIndex == -1){
-              if(isCashOnDeliveryActive || isDigitalPaymentActive || isWalletActive || isOfflinePaymentActive){
-                Get.dialog(Dialog(backgroundColor: Colors.transparent, child: PaymentMethodBottomSheet(
-                  isCashOnDeliveryActive: isCashOnDeliveryActive, isDigitalPaymentActive: isDigitalPaymentActive,
-                  isWalletActive: isWalletActive, storeId: storeId, totalPrice: total, isOfflinePaymentActive: isOfflinePaymentActive,
-                )));
-              }else{
-                showCustomSnackBar('no_payment_method_found'.tr);
+            if (isCashOnDeliveryActive || isDigitalPaymentActive || isWalletActive || isOfflinePaymentActive) {
+              if (ResponsiveHelper.isDesktop(context)) {
+                Get.dialog(Dialog(
+                  backgroundColor: Colors.transparent,
+                  child: PaymentMethodBottomSheet(
+                    isCashOnDeliveryActive: isCashOnDeliveryActive,
+                    isDigitalPaymentActive: isDigitalPaymentActive,
+                    isWalletActive: isWalletActive,
+                    storeId: storeId,
+                    totalPrice: total,
+                    isOfflinePaymentActive: isOfflinePaymentActive,
+                  ),
+                ));
+              } else {
+                Get.bottomSheet(
+                  PaymentMethodBottomSheet(
+                    isCashOnDeliveryActive: isCashOnDeliveryActive,
+                    isDigitalPaymentActive: isDigitalPaymentActive,
+                    isWalletActive: isWalletActive,
+                    storeId: storeId,
+                    totalPrice: total,
+                    isOfflinePaymentActive: isOfflinePaymentActive,
+                  ),
+                  backgroundColor: Colors.transparent,
+                  isScrollControlled: true,
+                );
               }
+            } else {
+              showCustomSnackBar('no_payment_method_found'.tr);
             }
           },
           child: Row(children: [

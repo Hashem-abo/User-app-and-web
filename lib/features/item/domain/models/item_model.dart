@@ -262,9 +262,9 @@ class Item {
         }
       }
     }
-    price = (json['price'] as num?)?.toDouble() ?? 0;
-    tax = json['tax']?.toDouble();
-    discount = (json['discount'] as num?)?.toDouble() ?? 0;
+    price = json['price'] != null ? (double.tryParse(json['price'].toString()) ?? 0.0) : 0.0;
+    tax = json['tax'] != null ? double.tryParse(json['tax'].toString()) : null;
+    discount = json['discount'] != null ? (double.tryParse(json['discount'].toString()) ?? 0.0) : 0.0;
     discountType = json['discount_type'];
     availableTimeStarts = json['available_time_starts'];
     availableTimeEnds = json['available_time_ends'];
@@ -273,11 +273,11 @@ class Item {
     deliveryTime = json['delivery_time'];
     zoneId = json['zone_id'];
     scheduleOrder = json['schedule_order'];
-    avgRating = json['avg_rating']?.toDouble();
+    avgRating = json['avg_rating'] != null ? double.tryParse(json['avg_rating'].toString()) : null;
     ratingCount = json['rating_count'];
     moduleId = json['module_id'];
     moduleType = json['module_type'];
-    veg = json['veg'] != null ? int.parse(json['veg'].toString()) : 0;
+    veg = json['veg'] != null ? (int.tryParse(json['veg'].toString()) ?? 0) : 0;
     stock = json['stock'];
     unitType = json['unit_type'];
     availableDateStarts = json['available_date_starts'];
@@ -287,9 +287,9 @@ class Item {
     isStoreHalalActive = json['halal_tag_status'] == 1;
     isHalalItem = json['is_halal'] == 1;
     isPrescriptionRequired = json['is_prescription_required'] == 1;
-    nutritionsName = json['nutritions_name']?.cast<String>();
-    allergiesName = json['allergies_name']?.cast<String>();
-    genericName = json['generic_name']?.cast<String>();
+    nutritionsName = json['nutritions_name'] is List ? List<String>.from(json['nutritions_name'].map((e) => e.toString())) : (json['nutritions_name'] is String && json['nutritions_name'].toString().trim().isNotEmpty ? [json['nutritions_name'].toString()] : null);
+    allergiesName = json['allergies_name'] is List ? List<String>.from(json['allergies_name'].map((e) => e.toString())) : (json['allergies_name'] is String && json['allergies_name'].toString().trim().isNotEmpty ? [json['allergies_name'].toString()] : null);
+    genericName = json['generic_name'] is List ? List<String>.from(json['generic_name'].map((e) => e.toString())) : (json['generic_name'] is String && json['generic_name'].toString().trim().isNotEmpty ? [json['generic_name'].toString()] : null);
     if (json['reviews'] != null) {
       reviews = <ReviewModel>[];
       json['reviews'].forEach((v) {

@@ -42,11 +42,11 @@ class OnlineCartModel {
     moduleId = json['module_id'];
     itemId = json['item_id'];
     isGuest = json['is_guest'];
-    addOnIds = json['add_on_ids'].cast<int>();
-    addOnQtys = json['add_on_qtys'].cast<int>();
+    addOnIds = json['add_on_ids'] != null ? List<int>.from(json['add_on_ids'].map((x) => int.tryParse(x.toString()) ?? 0)) : null;
+    addOnQtys = json['add_on_qtys'] != null ? List<int>.from(json['add_on_qtys'].map((x) => int.tryParse(x.toString()) ?? 0)) : null;
     itemType = json['item_type'];
-    price = json['price']?.toDouble();
-    quantity = json['quantity'];
+    price = json['price'] != null ? double.tryParse(json['price'].toString()) : null;
+    quantity = json['quantity'] != null ? int.tryParse(json['quantity'].toString()) : null;
     if (json['variation'] != null) {
       foodVariation = [];
       productVariation = [];

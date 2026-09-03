@@ -16,6 +16,7 @@ import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 
 
 class StoreCardWithDistance extends StatelessWidget {
@@ -137,6 +138,10 @@ class StoreCardWithDistance extends StatelessWidget {
                               ),
                               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                               store.verifiedSeller == 1 ? Icon(Icons.check_circle, size: 16, color: Colors.blue) : const SizedBox.shrink(),
+                              if (store.vendorType.isNotEmpty) ...[
+                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                VendorTypeBadgeWidget(store: store),
+                              ],
                             ],
                           ), 
                           const SizedBox(height: Dimensions.paddingSizeExtraSmall),

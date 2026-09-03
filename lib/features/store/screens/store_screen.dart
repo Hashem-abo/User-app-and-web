@@ -24,6 +24,7 @@ import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
 import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
@@ -344,6 +345,10 @@ class _StoreScreenState extends State<StoreScreen> {
                                               if (store.verifiedSeller == 1) ...[
                                                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                                 Icon(Icons.verified, color: Theme.of(context).primaryColor, size: 16),
+                                              ],
+                                              if (store.vendorType.isNotEmpty) ...[
+                                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                                VendorTypeBadgeWidget(store: store),
                                               ],
                                             ]),
                                             const SizedBox(height: Dimensions.paddingSizeExtraSmall),

@@ -13,6 +13,7 @@ import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -69,6 +70,10 @@ class StoreDescriptionViewWidget extends StatelessWidget {
             if (store?.verifiedSeller == 1) ...[
               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
               Icon(Icons.verified, color: Theme.of(context).primaryColor, size: 16),
+            ],
+            if (store != null && store!.vendorType.isNotEmpty) ...[
+              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+              VendorTypeBadgeWidget(store: store),
             ],
             const SizedBox(width: Dimensions.paddingSizeSmall),
 

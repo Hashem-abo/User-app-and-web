@@ -11,6 +11,7 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 
 class VisitAgainCard extends StatelessWidget {
   final Store store;
@@ -65,7 +66,15 @@ class VisitAgainCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(store.name ?? '', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge), maxLines: 1, overflow: TextOverflow.ellipsis),
+                              Row(
+                                children: [
+                                  Flexible(child: Text(store.name ?? '', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                  if (store.vendorType.isNotEmpty) ...[
+                                    const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                    VendorTypeBadgeWidget(store: store),
+                                  ],
+                                ],
+                              ),
                               const SizedBox(height: 4),
                               
                               if(store.ratingCount! > 0)

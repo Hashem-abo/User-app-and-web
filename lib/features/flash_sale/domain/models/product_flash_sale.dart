@@ -11,9 +11,9 @@ class ProductFlashSale {
   ProductFlashSale({this.totalSize, this.limit, this.offset, this.flashSale, this.products});
 
   ProductFlashSale.fromJson(Map<String, dynamic> json) {
-    totalSize = json['total_size'];
-    limit = int.parse(json['limit'].toString());
-    offset = int.parse(json['offset'].toString());
+    totalSize = json['total_size'] != null ? int.tryParse(json['total_size'].toString()) : null;
+    limit = json['limit'] != null ? int.tryParse(json['limit'].toString()) : null;
+    offset = json['offset'] != null ? int.tryParse(json['offset'].toString()) : null;
     flashSale = json['flash_sale'] != null ? FlashSaleModel.fromJson(json['flash_sale']) : null;
     if (json['products'] != null) {
       products = <Products>[];

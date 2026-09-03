@@ -18,6 +18,7 @@ import 'package:sixam_mart/common/widgets/discount_tag.dart';
 import 'package:sixam_mart/common/widgets/hover/on_hover.dart';
 import 'package:sixam_mart/common/widgets/not_available_widget.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 
 class StoreCardWidget extends StatelessWidget {
   final Store? store;
@@ -127,6 +128,10 @@ class StoreCardWidget extends StatelessWidget {
                               ),
                               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                               store!.verifiedSeller == 1 ? Image.asset(Images.verifiedBadge2, width: 16, height: 16) : const SizedBox.shrink(),
+                              if (store!.vendorType.isNotEmpty) ...[
+                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                VendorTypeBadgeWidget(store: store),
+                              ],
                             ],
                           ),
                           const SizedBox(height: Dimensions.paddingSizeExtraSmall),

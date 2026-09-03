@@ -58,16 +58,16 @@ class Transaction {
   Transaction.fromJson(Map<String, dynamic> json) {
     userId = json["user_id"];
     transactionId = json["transaction_id"];
-    credit = json["credit"].toDouble();
-    debit = json["debit"].toDouble();
+    credit = json["credit"] != null ? double.tryParse(json["credit"].toString()) : 0.0;
+    debit = json["debit"] != null ? double.tryParse(json["debit"].toString()) : 0.0;
     if (json["admin_bonus"] != null) {
-      adminBonus = json["admin_bonus"].toDouble();
+      adminBonus = double.tryParse(json["admin_bonus"].toString());
     }
-    balance = json["balance"].toDouble();
+    balance = json["balance"] != null ? double.tryParse(json["balance"].toString()) : 0.0;
     transactionType = json["transaction_type"];
     reference = json["reference"];
-    createdAt = DateTime.parse(json["created_at"]);
-    updatedAt = DateTime.parse(json["updated_at"]);
+    createdAt = json["created_at"] != null ? DateTime.tryParse(json["created_at"].toString()) : null;
+    updatedAt = json["updated_at"] != null ? DateTime.tryParse(json["updated_at"].toString()) : null;
   }
 
   Map<String, dynamic> toJson() {

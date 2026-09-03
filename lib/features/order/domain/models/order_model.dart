@@ -257,12 +257,12 @@ class OrderModel {
       });
     }
     offlinePayment = json['offline_payment'] != null ? OfflinePayment.fromJson(json['offline_payment']) : null;
-    flashAdminDiscountAmount = json['flash_admin_discount_amount']?.toDouble();
-    flashStoreDiscountAmount = json['flash_store_discount_amount']?.toDouble();
-    extraPackagingAmount = json['extra_packaging_amount']?.toDouble();
-    referrerBonusAmount = json['ref_bonus_amount']?.toDouble();
+    flashAdminDiscountAmount = json['flash_admin_discount_amount'] != null ? double.tryParse(json['flash_admin_discount_amount'].toString()) : null;
+    flashStoreDiscountAmount = json['flash_store_discount_amount'] != null ? double.tryParse(json['flash_store_discount_amount'].toString()) : null;
+    extraPackagingAmount = json['extra_packaging_amount'] != null ? double.tryParse(json['extra_packaging_amount'].toString()) : null;
+    referrerBonusAmount = json['ref_bonus_amount'] != null ? double.tryParse(json['ref_bonus_amount'].toString()) : null;
     parcelCancellation = json['parcel_cancellation'] != null ? ParcelCancellation.fromJson(json['parcel_cancellation']) : null;
-    bringChangeAmount = json['bring_change_amount']?.toDouble();
+    bringChangeAmount = json['bring_change_amount'] != null ? double.tryParse(json['bring_change_amount'].toString()) : null;
     cancellationNote = json['cancellation_note'];
     proDiscount = _asDouble(json['pro_discount'] ?? json['pro_customer_discount']);
     proDeliveryDiscount = _asDouble(json['pro_delivery_discount'] ?? json['delivery_fee_discount_pro'] ?? json['delivery_fee_discount']);

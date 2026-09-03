@@ -1,3 +1,7 @@
+import 'package:get/get.dart';
+import 'package:sixam_mart/common/models/module_model.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+
 class StoreModel {
   int? totalSize;
   String? limit;
@@ -88,6 +92,8 @@ class Store {
   String? metaDescription;
   String? metaImage;
   int? verifiedSeller;
+  String? moduleType;
+  ModuleModel? module;
 
   Store({
     this.id,
@@ -147,6 +153,8 @@ class Store {
     this.metaTitle,
     this.metaDescription,
     this.metaImage,
+    this.moduleType,
+    this.module,
   });
 
   Store.fromJson(Map<String, dynamic> json) {
@@ -178,12 +186,16 @@ class Store {
     minimumShippingChargeGroup = json['minimum_shipping_charge_group'] != null ? json['minimum_shipping_charge_group'].toDouble() : 0;
     open = json['open'];
     active = json['active'];
-    featured = int.parse(json['featured'].toString());
+    featured = json['featured'] != null ? int.tryParse(json['featured'].toString()) : 0;
     zoneId = json['zone_id'];
     deliveryTime = json['delivery_time'];
     veg = json['veg'];
     nonVeg = json['non_veg'];
     moduleId = json['module_id'];
+    moduleType = json['module_type']?.toString();
+    if (json['module'] != null && json['module'] is Map<String, dynamic>) {
+      module = ModuleModel.fromJson(json['module']);
+    }
     orderPlaceToScheduleInterval = json['order_place_to_schedule_interval'];
     categoryIds = json['category_ids'] != null ? json['category_ids'].cast<int>() : [];
     discount = json['discount'] != null ? Discount.fromJson(json['discount']) : null;
@@ -292,7 +304,41 @@ class Store {
     data['meta_description'] = metaDescription;
     data['meta_image'] = metaImage;
     data['verified_seller'] = verifiedSeller;
+    data['module_type'] = moduleType;
+    if (module != null) {
+      data['module'] = module!.toJson();
+    }
     return data;
+  }
+
+  String get vendorType {
+    if (module?.moduleName != null && module!.moduleName!.trim().isNotEmpty) {
+      return module!.moduleName!;
+    }
+    if (moduleType != null && moduleType!.trim().isNotEmpty) {
+      return moduleType!.tr;
+    }
+    if (moduleId != null && Get.isRegistered<SplashController>()) {
+      final splash = Get.find<SplashController>();
+      if (splash.moduleList != null) {
+        for (final m in splash.moduleList!) {
+          if (m.id == moduleId) {
+            return m.moduleName ?? (m.moduleType != null ? m.moduleType!.tr : '');
+          }
+        }
+      }
+      if (splash.module != null && splash.module!.id == moduleId) {
+        return splash.module!.moduleName ?? (splash.module!.moduleType != null ? splash.module!.moduleType!.tr : '');
+      }
+    }
+    if (storeBusinessModel != null && storeBusinessModel!.trim().isNotEmpty) {
+      return storeBusinessModel!.tr;
+    }
+    if (Get.isRegistered<SplashController>() && Get.find<SplashController>().module != null) {
+      final m = Get.find<SplashController>().module!;
+      return m.moduleName ?? (m.moduleType != null ? m.moduleType!.tr : '');
+    }
+    return '';
   }
 }
 
@@ -329,11 +375,17 @@ class Discount {
     id = json['id'];
     startDate = json['start_date'];
     endDate = json['end_date'];
-    startTime = json['start_time']?.substring(0, 5);
-    endTime = json['end_time']?.substring(0, 5);
-    minPurchase = json['min_purchase']?.toDouble();
-    maxDiscount = json['max_discount']?.toDouble();
-    discount = json['discount']?.toDouble();
+    if (json['start_time'] != null) {
+      final s = json['start_time'].toString();
+      startTime = s.length > 5 ? s.substring(0, 5) : s;
+    }
+    if (json['end_time'] != null) {
+      final s = json['end_time'].toString();
+      endTime = s.length > 5 ? s.substring(0, 5) : s;
+    }
+    minPurchase = json['min_purchase'] != null ? double.tryParse(json['min_purchase'].toString()) : null;
+    maxDiscount = json['max_discount'] != null ? double.tryParse(json['max_discount'].toString()) : null;
+    discount = json['discount'] != null ? double.tryParse(json['discount'].toString()) : null;
     discountType = json['discount_type'];
     storeId = json['store_id'];
     createdAt = json['created_at'];
@@ -377,8 +429,14 @@ class Schedules {
     id = json['id'];
     storeId = json['store_id'];
     day = json['day'];
-    openingTime = json['opening_time'].substring(0, 5);
-    closingTime = json['closing_time'].substring(0, 5);
+    if (json['opening_time'] != null) {
+      final s = json['opening_time'].toString();
+      openingTime = s.length > 5 ? s.substring(0, 5) : s;
+    }
+    if (json['closing_time'] != null) {
+      final s = json['closing_time'].toString();
+      closingTime = s.length > 5 ? s.substring(0, 5) : s;
+    }
   }
 
   Map<String, dynamic> toJson() {
