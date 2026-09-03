@@ -60,12 +60,12 @@ class TrackDetailsViewWidget extends StatelessWidget {
               ratingCount: takeAway ? track.store != null ? track.store!.ratingCount : '' as int? : track.deliveryMan!.ratingCount,
             ),
           ])),
-          InkWell(
+          !takeAway ? InkWell(
             onTap: () async {
-              if(await canLaunchUrlString('tel:${takeAway ? track.store != null ? track.store!.phone : '' : track.deliveryMan!.phone}')) {
-                launchUrlString('tel:${takeAway ? track.store != null ? track.store!.phone : '' : track.deliveryMan!.phone}', mode: LaunchMode.externalApplication);
+              if(await canLaunchUrlString('tel:${track.deliveryMan?.phone ?? ''}')) {
+                launchUrlString('tel:${track.deliveryMan?.phone ?? ''}', mode: LaunchMode.externalApplication);
               }else {
-                showCustomSnackBar('${'can_not_launch'.tr} ${takeAway ? track.store != null ? track.store!.phone : '' : track.deliveryMan!.phone}');
+                showCustomSnackBar('${'can_not_launch'.tr} ${track.deliveryMan?.phone ?? ''}');
               }
             },
             child: Container(
@@ -79,10 +79,10 @@ class TrackDetailsViewWidget extends StatelessWidget {
                 style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).cardColor),
               ),
             ),
-          ),
-          const SizedBox(width: Dimensions.paddingSizeSmall),
+          ) : const SizedBox(),
+          SizedBox(width: !takeAway ? Dimensions.paddingSizeSmall : 0),
 
-          showChatPermission ? InkWell(
+          (showChatPermission && !takeAway) ? InkWell(
             onTap: callback as void Function()?,
             child: Container(
               padding: EdgeInsets.symmetric(vertical: Get.context!.width >= 1300 ? 7 : Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeSmall),

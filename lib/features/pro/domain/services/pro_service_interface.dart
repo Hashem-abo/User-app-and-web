@@ -7,7 +7,7 @@ abstract class ProServiceInterface {
   Future<ProPlanModel?> getProPlans();
   Future<List<ProFaqModel>?> getProFaqs();
   Future<ProActiveOfferModel?> getProActiveOffer({required String? moduleType});
-  Future<Response> subscribePlan({required int planId, required String paymentType, required String paymentMethod, String? callback, required String paymentPlatform});
+  Future<Response> subscribePlan({required int planId, required String paymentType, required String paymentMethod, String? callback, required String paymentPlatform, String? purchaseCode});
   Future<Response> cancelSubscription();
   Future<bool> saveCurrentPath(String route);
   String? getSavedRoute();

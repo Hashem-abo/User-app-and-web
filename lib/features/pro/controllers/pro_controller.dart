@@ -91,10 +91,10 @@ class ProController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> subscribePlan(PlanItem plan, String paymentType, String paymentMethod, bool isRenew) async {
+  Future<Response> subscribePlan(PlanItem plan, String paymentType, String paymentMethod, bool isRenew, {String? purchaseCode}) async {
     if(plan.id == null) {
       showCustomSnackBar('no_data_found'.tr);
-      return;
+      return const Response(statusCode: 400, statusText: 'no_data_found');
     }
 
     _isSubscribeLoading = true;
@@ -103,7 +103,14 @@ class ProController extends GetxController implements GetxService {
     String protocol = html.window.location.protocol;
     String paymentPlatform = GetPlatform.isWeb ? 'web' : 'app';
     String? callback = kIsWeb ? '$protocol//$hostname${RouteHelper.subscriptionPlan}${isRenew ? '/renew' : ''}' : null;
-    Response response = await proServiceInterface.subscribePlan(planId: plan.id!, paymentType: paymentType, paymentMethod: paymentMethod, callback: callback, paymentPlatform: paymentPlatform);
+    Response response = await proServiceInterface.subscribePlan(
+      planId: plan.id!,
+      paymentType: paymentType,
+      paymentMethod: paymentMethod,
+      callback: callback,
+      paymentPlatform: paymentPlatform,
+      purchaseCode: purchaseCode,
+    );
     _isSubscribeLoading = false;
     update();
 
@@ -119,6 +126,7 @@ class ProController extends GetxController implements GetxService {
     } else {
       showCustomSnackBar(response.statusText);
     }
+    return response;
   }
 
   void saveCurrentPath({String? route}) {

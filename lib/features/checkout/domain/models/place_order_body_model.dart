@@ -198,17 +198,17 @@ class PlaceOrderBodyModel {
         _cart!.add(OnlineCart.fromJson(v));
       });
     }
-    _couponDiscountAmount = double.parse(json['coupon_discount_amount'] ?? 0.toString());
-    _orderAmount = double.parse(json['order_amount'].toString());
+    _couponDiscountAmount = json['coupon_discount_amount'] != null ? double.tryParse(json['coupon_discount_amount'].toString()) : null;
+    _orderAmount = json['order_amount'] != null ? double.tryParse(json['order_amount'].toString()) : null;
     _orderType = json['order_type'];
     _paymentMethod = json['payment_method'];
     _orderNote = json['order_note'];
     _couponCode = json['coupon_code'];
-    _storeId = json['store_id'] != null ? int.parse(json['store_id'].toString()) : null;
-    _distance = double.parse(json['distance'].toString());
+    _storeId = json['store_id'] != null ? int.tryParse(json['store_id'].toString()) : null;
+    _distance = json['distance'] != null ? double.tryParse(json['distance'].toString()) : null;
     _scheduleAt = json['schedule_at'];
-    _discountAmount = double.parse(json['discount_amount'].toString());
-    _taxAmount = double.parse(json['tax_amount'].toString());
+    _discountAmount = json['discount_amount'] != null ? double.tryParse(json['discount_amount'].toString()) : null;
+    _taxAmount = json['tax_amount'] != null ? double.tryParse(json['tax_amount'].toString()) : null;
     _address = json['address'];
     _receiverDetails = json['receiver_details'] != null ? AddressModel.fromJson(json['receiver_details'] is String ? jsonDecode(json['receiver_details'])
         : json['receiver_details']) : null;
@@ -228,8 +228,8 @@ class PlaceOrderBodyModel {
     _deliveryInstruction = json['delivery_instruction'];
     _cutlery = json['cutlery'] != null ? int.parse(json['cutlery'].toString()) : null;
     _partialPayment = json['partial_payment'] != null ? int.parse(json['partial_payment'].toString()) : null;
-    _guestId = json['guest_id'] != null ? int.parse(json['guest_id'].toString()) : null;
-    _isBuyNow = int.parse(json['is_buy_now'].toString());
+    _guestId = json['guest_id'] != null ? int.tryParse(json['guest_id'].toString()) : null;
+    _isBuyNow = json['is_buy_now'] != null ? (int.tryParse(json['is_buy_now'].toString()) ?? 0) : 0;
     _guestEmail = json['contact_person_email'];
     _extraPackagingAmount = json['extra_packaging_amount'] != null && json['extra_packaging_amount'] != 'null' ? double.parse(json['extra_packaging_amount'].toString()) : null;
     _createNewUser = json['create_new_user'] != null ? int.parse(json['create_new_user'].toString()) : null;
@@ -328,7 +328,8 @@ class PlaceOrderBodyModel {
       data['delivery_type'] = _saverDeliveryType!;
     }
     if (_monthlySubscribe != null) {
-      data['monthly_subscribe'] = _monthlySubscribe! ? 'true' : 'false';
+      data['monthly_subscribe'] = _monthlySubscribe! ? '1' : '0';
+      data['is_monthly_subscribe'] = _monthlySubscribe! ? '1' : '0';
     }
     if (_pickupCenterName != null) {
       data['pickup_center_name'] = _pickupCenterName!;

@@ -50,14 +50,18 @@ class ProRepository implements ProRepositoryInterface {
   }
 
   @override
-  Future<Response> subscribePlan({required int planId, required String paymentType, required String paymentMethod, String? callback, required String paymentPlatform}) async {
-    return await apiClient.postData(AppConstants.proCustomerSubscribeUri, {
+  Future<Response> subscribePlan({required int planId, required String paymentType, required String paymentMethod, String? callback, required String paymentPlatform, String? purchaseCode}) async {
+    final Map<String, dynamic> data = {
       'plan_id': planId,
       'payment_type': paymentType,
       'payment_method': paymentMethod,
       'callback': callback,
       'payment_platform': paymentPlatform,
-    });
+    };
+    if (purchaseCode != null && purchaseCode.isNotEmpty) {
+      data['purchase_code'] = purchaseCode;
+    }
+    return await apiClient.postData(AppConstants.proCustomerSubscribeUri, data);
   }
 
   @override

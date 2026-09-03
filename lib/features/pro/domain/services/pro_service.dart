@@ -25,8 +25,8 @@ class ProService implements ProServiceInterface {
   }
 
   @override
-  Future<Response> subscribePlan({required int planId, required String paymentType, required String paymentMethod, String? callback, required String paymentPlatform}) async {
-    return await proRepositoryInterface.subscribePlan(planId: planId, paymentType: paymentType, paymentMethod: paymentMethod, callback: callback, paymentPlatform: paymentPlatform);
+  Future<Response> subscribePlan({required int planId, required String paymentType, required String paymentMethod, String? callback, required String paymentPlatform, String? purchaseCode}) async {
+    return await proRepositoryInterface.subscribePlan(planId: planId, paymentType: paymentType, paymentMethod: paymentMethod, callback: callback, paymentPlatform: paymentPlatform, purchaseCode: purchaseCode);
   }
 
   @override

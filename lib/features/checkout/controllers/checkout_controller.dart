@@ -531,7 +531,7 @@ class CheckoutController extends GetxController implements GetxService {
     _viewTotalPrice = amount;
   }
 
-  void clearPrevData() {
+  void clearPrevData({bool resetMonthly = false}) {
     _distance = null;
     _estimatedDuration = null;
     _addressIndex = 0;
@@ -541,7 +541,9 @@ class CheckoutController extends GetxController implements GetxService {
     _selectedTimeSlot = 0;
     _orderAttachment = null;
     _rawAttachment = null;
-    _monthlySubscribe = false;
+    if (resetMonthly) {
+      _monthlySubscribe = false;
+    }
   }
 
   Future<void> initializeTimeSlot(Store store) async {
@@ -830,8 +832,11 @@ class CheckoutController extends GetxController implements GetxService {
           Get.offNamed(RouteHelper.getOrderSuccessRoute(orderID, contactNumber, createAccount: _isCreateAccount));
         }
       }
+      if (_monthlySubscribe) {
+        Get.find<OrderController>().getMonthlyOrderList();
+      }
       Future.microtask(() => HomeScreen.loadData(true));
-      clearPrevData();
+      clearPrevData(resetMonthly: true);
       Get.find<CouponController>().removeCouponData(false);
       updateTips(
         getSharedPrefDmTipIndex().isNotEmpty ? int.parse(getSharedPrefDmTipIndex()) : 0,

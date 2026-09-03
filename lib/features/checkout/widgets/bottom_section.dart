@@ -20,6 +20,8 @@ import 'package:sixam_mart/features/checkout/widgets/coupon_section.dart';
 import 'package:sixam_mart/features/checkout/widgets/note_prescription_section.dart';
 import 'package:sixam_mart/features/checkout/widgets/partial_pay_view.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
+import 'package:sixam_mart/features/cart/widgets/add_to_monthly_widget.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 
 class BottomSection extends StatelessWidget {
   final CheckoutController checkoutController;
@@ -249,6 +251,11 @@ class BottomSection extends StatelessWidget {
       ),
       if(cartList != null && cartList!.isNotEmpty) const SizedBox(height: Dimensions.paddingSizeDefault),
 
+      if (_isGroceryOrPharmacy(cartList) && !_hasCampaignOrFlashSaleItem(cartList) && (AuthHelper.isLoggedIn() && Get.find<SplashController>().configModel?.monthlyOrderRemainder == 1)) ...[
+        const MonthlyReorderSection(),
+        const SizedBox(height: Dimensions.paddingSizeDefault),
+      ],
+
       Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -393,5 +400,14 @@ class BottomSection extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  bool _isGroceryOrPharmacy(List<CartModel?>? cartList) {
+    final String? moduleType = (cartList != null && cartList.isNotEmpty) ? cartList[0]?.item?.moduleType : null;
+    return moduleType == AppConstants.grocery || moduleType == AppConstants.pharmacy;
+  }
+
+  bool _hasCampaignOrFlashSaleItem(List<CartModel?>? cartList) {
+    return cartList != null && cartList.any((cart) => (cart?.isCampaign ?? false) || (cart?.item?.flashSale ?? 0) > 0);
   }
 }

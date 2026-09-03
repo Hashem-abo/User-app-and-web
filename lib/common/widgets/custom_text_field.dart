@@ -122,20 +122,26 @@ class CustomTextFieldState extends State<CustomTextField> {
           onTap: () {
             FocusScope.of(context).requestFocus(widget.focusNode);
           },
-          child: TextFormField(
-            maxLines: widget.maxLines,
-            controller: widget.controller,
-            focusNode: widget.focusNode,
-            textAlign: widget.textAlign,
-            validator: widget.validator,
-            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge),
-            textInputAction: widget.inputAction,
-            keyboardType: widget.isAmount ? TextInputType.number : widget.inputType,
+          child: Directionality(
+            textDirection: (widget.isPhone || widget.countryDialCode != null) ? TextDirection.ltr : Directionality.of(context),
+            child: TextFormField(
+              maxLines: widget.maxLines,
+              controller: widget.controller,
+              focusNode: widget.focusNode,
+              textAlign: (widget.isPhone || widget.countryDialCode != null) ? TextAlign.left : widget.textAlign,
+              validator: widget.validator,
+              style: robotoRegular.copyWith(
+                fontSize: Dimensions.fontSizeLarge,
+                color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2E2E2E)),
+              ),
+              textInputAction: widget.inputAction,
+              keyboardType: widget.isAmount ? TextInputType.number : widget.inputType,
             cursorColor: Theme.of(context).primaryColor,
             textCapitalization: widget.capitalization,
             enabled: widget.isEnabled,
             autofocus: false,
             obscureText: widget.isPassword ? _obscureText : false,
+            obscuringCharacter: '•',
             maxLength: widget.maxLength,
             inputFormatters: widget.inputType == TextInputType.phone ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9]'))]
                 : widget.isAmount ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))] : widget.isNumber ? [FilteringTextInputFormatter.allow(RegExp(r'\d'))] : null,
@@ -210,7 +216,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                       onChanged: widget.onCountryChanged,
                       initialSelection: widget.countryDialCode,
                       favorite: [widget.countryDialCode ?? ''],
-                      enabled: Get.find<SplashController>().configModel?.countryPickerStatus,
+                      enabled: Get.isRegistered<SplashController>() ? (Get.find<SplashController>().configModel?.countryPickerStatus ?? false) : false,
                       dialogBackgroundColor: Theme.of(context).cardColor,
                       textStyle: robotoRegular.copyWith(
                         fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyMedium!.color,
@@ -243,7 +249,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                 : widget.onSubmit != null ? widget.onSubmit!(text) : null,
             onChanged: widget.onChanged as void Function(String)?,
           ),
-        ),
+        )),
 
         widget.divider ? const Padding(padding: EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge), child: Divider()) : const SizedBox(),
 
