@@ -60,10 +60,10 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
                   child: Column(children: [
-                    Text('تحديد موعد الطلب', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                    Text('select_order_time_slot'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                     const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                     Text(
-                      'اختر الوقت المناسب لتنفيذ طلبك حسب أوقات عمل المتجر',
+                      'choose_time_according_to_store'.tr,
                       style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
                       textAlign: TextAlign.center,
                     ),
@@ -71,11 +71,11 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
 
                     // Stepper
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      _stepItem(step: 1, title: 'اختيار اليوم', isActive: _step >= 1, isCompleted: _step > 1),
+                      _stepItem(step: 1, title: 'select_day'.tr, isActive: _step >= 1, isCompleted: _step > 1),
                       _stepDivider(isCompleted: _step > 1),
-                      _stepItem(step: 2, title: 'اختيار الوقت', isActive: _step >= 2, isCompleted: _step > 2),
+                      _stepItem(step: 2, title: 'select_time'.tr, isActive: _step >= 2, isCompleted: _step > 2),
                       _stepDivider(isCompleted: _step > 2),
-                      _stepItem(step: 3, title: 'التأكيد', isActive: _step >= 3, isCompleted: _step > 3),
+                      _stepItem(step: 3, title: 'confirmation'.tr, isActive: _step >= 3, isCompleted: _step > 3),
                     ]),
                     const SizedBox(height: Dimensions.paddingSizeLarge),
 
@@ -87,7 +87,7 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
 
                     Row(children: [
                       if (_step > 1) Expanded(child: CustomButton(
-                        buttonText: 'السابق',
+                        buttonText: 'previous'.tr,
                         transparent: true,
                         isBorder: true,
                         radius: Dimensions.radiusDefault,
@@ -95,7 +95,7 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
                       )),
                       if (_step > 1) const SizedBox(width: Dimensions.paddingSizeSmall),
                       Expanded(child: CustomButton(
-                        buttonText: _step == 3 ? 'اعتماد الموعد' : 'التالي',
+                        buttonText: _step == 3 ? 'confirm_schedule'.tr : 'next'.tr,
                         radius: Dimensions.radiusDefault,
                         onPressed: () {
                           if (_step < 3) {
@@ -170,21 +170,21 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
 
   Widget _daySelection(CheckoutController checkoutController) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('اختر يوم التنفيذ', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+      Text('choose_execution_day'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
       const SizedBox(height: Dimensions.paddingSizeSmall),
-      Text('يمكنك اختيار اليوم الحالي أو خلال الثلاثة الأيام القادمة', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
+      Text('choose_day_description'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
       const SizedBox(height: Dimensions.paddingSizeLarge),
 
       Row(children: [
-        _dayItem(title: 'اليوم', date: DateTime.now(), isSelected: checkoutController.selectedDateSlot == 0, onTap: () {
+        _dayItem(title: 'today'.tr, date: DateTime.now(), isSelected: checkoutController.selectedDateSlot == 0, onTap: () {
           checkoutController.updateDateSlot(0, Get.find<StoreController>().store!.orderPlaceToScheduleInterval);
         }),
         const SizedBox(width: Dimensions.paddingSizeSmall),
-        _dayItem(title: 'غداً', date: DateTime.now().add(const Duration(days: 1)), isSelected: checkoutController.selectedDateSlot == 1, onTap: () {
+        _dayItem(title: 'tomorrow'.tr, date: DateTime.now().add(const Duration(days: 1)), isSelected: checkoutController.selectedDateSlot == 1, onTap: () {
           checkoutController.updateDateSlot(1, Get.find<StoreController>().store!.orderPlaceToScheduleInterval);
         }),
         const SizedBox(width: Dimensions.paddingSizeSmall),
-        _dayItem(title: 'بعد غد', date: DateTime.now().add(const Duration(days: 2)), isSelected: checkoutController.selectedDateSlot == 2, onTap: () {
+        _dayItem(title: 'day_after_tomorrow'.tr, date: DateTime.now().add(const Duration(days: 2)), isSelected: checkoutController.selectedDateSlot == 2, onTap: () {
           checkoutController.updateDateSlot(2, Get.find<StoreController>().store!.orderPlaceToScheduleInterval);
         }),
       ]),
@@ -214,9 +214,9 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
     bool isClosed = (checkoutController.selectedDateSlot == 0 && widget.todayClosed) || (checkoutController.selectedDateSlot == 1 && widget.tomorrowClosed);
     
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('اختر وقت التنفيذ', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+      Text('choose_execution_time'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
       const SizedBox(height: Dimensions.paddingSizeSmall),
-      Text('المواعيد المتاحة حسب ساعات عمل المتجر وسعة التوصيل', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
+      Text('available_times_description'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
       const SizedBox(height: Dimensions.paddingSizeLarge),
 
       if (isClosed) Center(child: Text(widget.module!.showRestaurantText! ? 'restaurant_is_closed'.tr : 'store_is_closed'.tr))
@@ -275,24 +275,24 @@ class _TimeSlotBottomSheetState extends State<TimeSlotBottomSheet> {
   }
 
   Widget _reviewSection(CheckoutController checkoutController) {
-    String day = 'اليوم';
-    if (checkoutController.selectedDateSlot == 1) day = 'غداً';
-    if (checkoutController.selectedDateSlot == 2) day = 'بعد غد';
+    String day = 'today'.tr;
+    if (checkoutController.selectedDateSlot == 1) day = 'tomorrow'.tr;
+    if (checkoutController.selectedDateSlot == 2) day = 'day_after_tomorrow'.tr;
     
     DateTime date = DateTime.now().add(Duration(days: checkoutController.selectedDateSlot));
     String dateStr = '$day - ${date.day} ${DateFormat('MMMM', Get.locale?.languageCode).format(date)}';
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('مراجعة الموعد', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+      Text('schedule_review'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
       const SizedBox(height: Dimensions.paddingSizeLarge),
       
-      _reviewItem(label: 'اليوم المختار', value: dateStr),
+      _reviewItem(label: 'selected_day'.tr, value: dateStr),
       const Divider(),
-      _reviewItem(label: 'الوقت المختار', value: selectedTimeSlot),
+      _reviewItem(label: 'selected_time'.tr, value: selectedTimeSlot),
       
       const SizedBox(height: Dimensions.paddingSizeLarge),
       Text(
-        'الموعد تقريبي وقد يتأثر بالازدحام أو ضغط الطلبات.',
+        'approximate_time_notice'.tr,
         style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor),
         textAlign: TextAlign.center,
       ),

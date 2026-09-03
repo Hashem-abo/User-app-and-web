@@ -23,6 +23,7 @@ import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
+import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -169,7 +170,7 @@ class _CartScreenState extends State<CartScreen> {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           Text(
-            'each_department_has_its_own_cart'.tr == 'each_department_has_its_own_cart' ? 'لكل قسم سلة خاصة به' : 'each_department_has_its_own_cart'.tr,
+            'each_module_has_own_cart'.tr,
             style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
           ),
           const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -202,11 +203,11 @@ class _CartScreenState extends State<CartScreen> {
                   ),
                   child: Row(children: [
                     Expanded(child: Text(
-                      '${'cart'.tr == 'cart' ? 'سلة' : 'cart'.tr} ${module.moduleName!}',
+                      '${'cart'.tr} ${module.moduleName!}',
                       style: robotoMedium.copyWith(color: isActive ? Theme.of(context).primaryColor : null),
                     )),
                     Text(
-                      count > 0 ? '$count' : ('empty'.tr == 'empty' ? 'فارغة' : 'empty'.tr),
+                      count > 0 ? '$count' : 'cart_is_empty'.tr,
                       style: robotoRegular.copyWith(color: count > 0 ? null : Theme.of(context).disabledColor),
                     ),
                   ]),
@@ -257,18 +258,18 @@ class _CartScreenState extends State<CartScreen> {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           Text(
-            'share_cart'.tr == 'share_cart' ? 'مشاركة السلة' : 'share_cart'.tr,
+            'share_cart'.tr,
             style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
           ),
           Text(
-            'share_this_cart_with_others'.tr == 'share_this_cart_with_others' ? 'شارك هذه السلة مع الآخرين' : 'share_this_cart_with_others'.tr,
+            'share_this_cart_with_others'.tr,
             style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
           ),
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           _buildShareOption(
             context,
-            'copy_current_cart_link'.tr == 'copy_current_cart_link' ? 'نسخ رابط السلة الحالية' : 'copy_current_cart_link'.tr,
+            'copy_current_cart_link'.tr,
             Icons.copy,
             () {
               Clipboard.setData(ClipboardData(text: link));
@@ -280,11 +281,21 @@ class _CartScreenState extends State<CartScreen> {
 
           _buildShareOption(
             context,
-            'share_via_apps'.tr == 'share_via_apps' ? 'مشاركة عبر التطبيقات' : 'share_via_apps'.tr,
+            'share_via_apps'.tr,
             Icons.send,
             () {
-              Share.share(link);
               Navigator.pop(context);
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (con) => ContactShareSheet(
+                  shareableType: 'cart',
+                  shareableId: 0,
+                  shareableName: 'cart'.tr,
+                  shareUrl: link,
+                ),
+              );
             },
           ),
           const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -293,7 +304,7 @@ class _CartScreenState extends State<CartScreen> {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           Text(
-            'open_cart_from_link'.tr == 'open_cart_from_link' ? 'قم بفتح سلة من رابط' : 'open_cart_from_link'.tr,
+            'open_cart_from_link'.tr,
             style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault),
           ),
           const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -310,7 +321,7 @@ class _CartScreenState extends State<CartScreen> {
               Expanded(child: TextField(
                 controller: _shareLinkController,
                 decoration: InputDecoration(
-                  hintText: 'paste_cart_link_here'.tr == 'paste_cart_link_here' ? 'ألصق رابط سلة هنا' : 'paste_cart_link_here'.tr,
+                  hintText: 'paste_cart_link_here'.tr,
                   hintStyle: robotoRegular.copyWith(color: Theme.of(context).disabledColor),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
@@ -330,7 +341,7 @@ class _CartScreenState extends State<CartScreen> {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           CustomButton(
-            buttonText: 'open_cart'.tr == 'open_cart' ? 'فتح السلة' : 'open_cart'.tr,
+            buttonText: 'open_cart'.tr,
             onPressed: () => _openSharedCart(_shareLinkController.text),
           ),
           const SizedBox(height: Dimensions.paddingSizeDefault),
@@ -340,7 +351,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   void _showWishListBottomSheet(BuildContext context) {
-    TextEditingController groupNameController = TextEditingController(text: 'home_purchases'.tr == 'home_purchases' ? 'مشتريات البيت' : 'home_purchases'.tr);
+    TextEditingController groupNameController = TextEditingController(text: 'home_purchases'.tr);
     DateTime? selectedDate = DateTime.now().add(const Duration(days: 7));
     
     showModalBottomSheet(
@@ -362,10 +373,10 @@ class _CartScreenState extends State<CartScreen> {
               Container(height: 4, width: 40, decoration: BoxDecoration(color: Theme.of(context).disabledColor.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10))),
               const SizedBox(height: Dimensions.paddingSizeLarge),
 
-              Text('save_as_wish_list'.tr == 'save_as_wish_list' ? 'حفظ كقائمة الامنيات' : 'save_as_wish_list'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+              Text('save_as_wishlist'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
               const SizedBox(height: Dimensions.paddingSizeDefault),
 
-              Align(alignment: Alignment.centerRight, child: Text('group_name'.tr == 'group_name' ? 'اسم المجموعة' : 'group_name'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor))),
+              Align(alignment: Alignment.centerRight, child: Text('group_name'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor))),
               const SizedBox(height: Dimensions.paddingSizeExtraSmall),
               TextField(
                 controller: groupNameController,
@@ -376,7 +387,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
               const SizedBox(height: Dimensions.paddingSizeDefault),
 
-              Align(alignment: Alignment.centerRight, child: Text('set_reminder_date'.tr == 'set_reminder_date' ? 'تحديد موعد تذكير' : 'set_reminder_date'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor))),
+              Align(alignment: Alignment.centerRight, child: Text('set_reminder_date'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor))),
               const SizedBox(height: Dimensions.paddingSizeExtraSmall),
               InkWell(
                 onTap: () async {
@@ -406,7 +417,7 @@ class _CartScreenState extends State<CartScreen> {
               const SizedBox(height: Dimensions.paddingSizeLarge),
 
               CustomButton(
-                buttonText: 'save'.tr == 'save' ? 'حفظ' : 'save'.tr,
+                buttonText: 'save'.tr,
                 onPressed: () {
                   if (groupNameController.text.isEmpty) {
                     showCustomSnackBar('please_enter_group_name'.tr);
@@ -418,7 +429,7 @@ class _CartScreenState extends State<CartScreen> {
                       reminderDate: selectedDate,
                     ));
                     Navigator.pop(context);
-                    showCustomSnackBar('wish_list_saved_successfully'.tr == 'wish_list_saved_successfully' ? 'تم حفظ قائمة الامنيات بنجاح' : 'wish_list_saved_successfully'.tr, isError: false);
+                    showCustomSnackBar('wishlist_saved_successfully'.tr, isError: false);
                   }
                 },
               ),
@@ -740,7 +751,7 @@ class _CartScreenState extends State<CartScreen> {
                                                         Icon(Icons.add_circle_outline_sharp, color: Theme.of(context).primaryColor, size: 20),
                                                         const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                                         Text(
-                                                          'add_more_from_this_store'.tr == 'add_more_from_this_store' ? 'أضف المزيد من منتجات هذا المتجر' : 'add_more_from_this_store'.tr,
+                                                          'add_more_from_this_store'.tr,
                                                           style: robotoMedium.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeDefault),
                                                         ),
                                                       ]),
@@ -835,7 +846,7 @@ class _CartScreenState extends State<CartScreen> {
                                                             Icon(Icons.add_circle_outline_sharp, color: Theme.of(context).primaryColor, size: 20),
                                                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                                             Text(
-                                                              'add_more_from_this_store'.tr == 'add_more_from_this_store' ? 'أضف المزيد من منتجات هذا المتجر' : 'add_more_from_this_store'.tr,
+                                                              'add_more_from_this_store'.tr,
                                                               style: robotoMedium.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeDefault),
                                                             ),
                                                           ]),
@@ -1300,9 +1311,7 @@ class CheckoutButton extends StatelessWidget {
                           builder: (BuildContext context) {
                             return ConfirmationDialog(
                               icon: Images.warning,
-                              description: 'some_items_unavailable_proceed_anyway'.tr == 'some_items_unavailable_proceed_anyway' 
-                                  ? 'بعض العناصر غير متوفرة في المخزون. هل تريد المتابعة بدونها؟' 
-                                  : 'some_items_unavailable_proceed_anyway'.tr,
+                              description: 'some_items_unavailable_proceed_anyway'.tr,
                               onYesPressed: () {
                                 Get.back();
                                 List<int> toRemove = [];

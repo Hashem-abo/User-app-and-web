@@ -59,7 +59,7 @@ class _AllStoreScreenState extends State<AllStoreScreen> {
           backButton: widget.backButton,
           title: widget.isFeatured ? 'featured_stores'.tr :  widget.isPopular
             ? Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-            ? widget.isNearbyStore ? (isFood ? (Get.find<LocalizationController>().isLtr ? 'Best Restaurants Nearby' : 'أفضل المطاعم القريبة') : 'best_store_nearby'.tr) : 'popular_restaurants'.tr : widget.isNearbyStore ? 'best_store_nearby'.tr : 'popular_stores'.tr
+            ? widget.isNearbyStore ? (isFood ? 'best_restaurants_nearby'.tr : 'best_store_nearby'.tr) : 'popular_restaurants'.tr : widget.isNearbyStore ? 'best_store_nearby'.tr : 'popular_stores'.tr
               : widget.isTopOfferStore ? 'top_offers_near_me'.tr : widget.isRecommendedStore ? 'recommended_store'.tr : '${'new_on'.tr} ${AppConstants.appName}',
           type: widget.isFeatured ? null : storeController.type,
           onVegFilterTap: widget.isRecommendedStore ? null : (String type) {

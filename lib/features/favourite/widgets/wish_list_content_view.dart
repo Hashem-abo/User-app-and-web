@@ -98,14 +98,14 @@ class _WishListContentViewState extends State<WishListContentView> {
                       onPressed: () => wishListController.deleteWishList(index),
                     ),
                   ]),
-                  Text('${wishList.items?.length ?? 0} ${'items'.tr == 'items' ? 'منتجات' : 'items'.tr}', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+                  Text('${wishList.items?.length ?? 0} ${'items'.tr}', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
                   if(wishList.reminderDate != null)
-                    Text('${'reminder'.tr == 'reminder' ? 'تذكير' : 'reminder'.tr}: ${DateFormat('dd/MM/yyyy').format(wishList.reminderDate!)}', style: robotoRegular.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall)),
+                    Text('${'reminder'.tr}: ${DateFormat('dd/MM/yyyy').format(wishList.reminderDate!)}', style: robotoRegular.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall)),
                   const SizedBox(height: Dimensions.paddingSizeSmall),
                   
                   Row(children: [
                     Expanded(child: CustomButton(
-                      buttonText: 'view_items'.tr == 'view_items' ? 'عرض المنتجات' : 'view_items'.tr,
+                      buttonText: 'view_items'.tr,
                       onPressed: () {
                         _showItemsDialog(context, wishList);
                       },
@@ -117,7 +117,7 @@ class _WishListContentViewState extends State<WishListContentView> {
                     )),
                     const SizedBox(width: Dimensions.paddingSizeSmall),
                     Expanded(child: CustomButton(
-                      buttonText: 'add_to_cart'.tr == 'add_to_cart' ? 'إضافة إلى السلة' : 'add_to_cart'.tr,
+                      buttonText: 'add_to_cart'.tr,
                       onPressed: () async {
                         CartController cartController = Get.find<CartController>();
                         for (var cartModel in wishList.items!) {
@@ -134,7 +134,7 @@ class _WishListContentViewState extends State<WishListContentView> {
                             await cartController.addToCart(cartModel, null);
                           }
                         }
-                        showCustomSnackBar('added_to_cart_successfully'.tr == 'added_to_cart_successfully' ? 'تمت الإضافة إلى السلة بنجاح' : 'added_to_cart_successfully'.tr, isError: false);
+                        showCustomSnackBar('added_to_cart_successfully'.tr, isError: false);
                       },
                       height: 35,
                       radius: Dimensions.radiusSmall,
@@ -146,7 +146,7 @@ class _WishListContentViewState extends State<WishListContentView> {
                 ]),
               );
             },
-          ) : NoDataScreen(text: 'no_wish_list_found'.tr == 'no_wish_list_found' ? 'لم يتم العثور على قائمة امنيات' : 'no_wish_list_found'.tr, showFooter: false),
+          ) : NoDataScreen(text: 'no_wishlist_found'.tr, showFooter: false),
         ),
       ]);
     });
@@ -180,7 +180,7 @@ class _WishListContentViewState extends State<WishListContentView> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text('close'.tr == 'close' ? 'إغلاق' : 'close'.tr)),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('close'.tr)),
         ],
       ),
     );

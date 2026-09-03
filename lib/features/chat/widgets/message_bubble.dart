@@ -78,7 +78,7 @@ class MessageBubble extends StatelessWidget {
             if (!isUser)
                Padding(
                  padding: const EdgeInsets.only(bottom: 4.0),
-                 child: Text("الهدهد", style: robotoBold.copyWith(fontSize: 10, color: Theme.of(context).primaryColor)),
+                 child: Text("hoopoe_name".tr, style: robotoBold.copyWith(fontSize: 10, color: Theme.of(context).primaryColor)),
                ),
 
             if (message.image != null)
@@ -235,7 +235,7 @@ class MessageBubble extends StatelessWidget {
                                  ),
                                ),
                                Text(
-                                 coupon.discountType == 'percent' ? "${coupon.discount}% خصم" : "${PriceConverter.convertPrice(coupon.discount)} خصم",
+                                 coupon.discountType == 'percent' ? "${coupon.discount}% ${'off_discount'.tr}" : "${PriceConverter.convertPrice(coupon.discount)} ${'off_discount'.tr}",
                                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.green),
                                ),
                              ],
@@ -250,13 +250,13 @@ class MessageBubble extends StatelessWidget {
                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                              children: [
                                Text(
-                                 "الحد الأدنى: ${PriceConverter.convertPrice(coupon.minPurchase)}",
+                                 "${'min_purchase'.tr}: ${PriceConverter.convertPrice(coupon.minPurchase)}",
                                  style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor),
                                ),
                                ElevatedButton(
                                  onPressed: () {
                                    Get.find<CouponController>().applyCoupon(coupon.code!, 100.0, 10.0, null);
-                                   showCustomSnackBar("تم نسخ وتطبيق الكود ${coupon.code}! 🎟️", isError: false);
+                                   showCustomSnackBar("${'coupon_applied_success'.tr} ${coupon.code}! 🎟️", isError: false);
                                  },
                                  style: ElevatedButton.styleFrom(
                                    backgroundColor: Theme.of(context).primaryColor,
@@ -264,7 +264,7 @@ class MessageBubble extends StatelessWidget {
                                    minimumSize: Size.zero,
                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                  ),
-                                 child: const Text("تطبيق 🎟️", style: TextStyle(fontSize: 10, color: Colors.white)),
+                                 child: Text("apply".tr, style: const TextStyle(fontSize: 10, color: Colors.white)),
                                ),
                              ],
                            ),
@@ -298,21 +298,21 @@ class MessageBubble extends StatelessWidget {
                      child: Column(
                        crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
-                         Text("حالة الطلب رقم #${order.id}", style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                         Text("${'order_status'.tr} #${order.id}", style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall)),
                          const SizedBox(height: 15),
                          
                          Row(
                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                            children: [
-                             _buildStep(context, "معلق", step >= 0),
+                             _buildStep(context, "step_pending".tr, step >= 0),
                              _buildStepLine(step >= 1),
-                             _buildStep(context, "مقبول", step >= 1),
+                             _buildStep(context, "step_accepted".tr, step >= 1),
                              _buildStepLine(step >= 2),
-                             _buildStep(context, "تجهيز", step >= 2),
+                             _buildStep(context, "step_processing".tr, step >= 2),
                              _buildStepLine(step >= 3),
-                             _buildStep(context, "توصيل", step >= 3),
+                             _buildStep(context, "step_delivering".tr, step >= 3),
                              _buildStepLine(step >= 4),
-                             _buildStep(context, "مستلم", step >= 4),
+                             _buildStep(context, "step_delivered".tr, step >= 4),
                            ],
                          ),
                          
@@ -341,7 +341,7 @@ class MessageBubble extends StatelessWidget {
                                    crossAxisAlignment: CrossAxisAlignment.start,
                                    children: [
                                      Text("${order.deliveryMan!.fName} ${order.deliveryMan!.lName}", style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                                     Text("مندوب التوصيل 🛵", style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor)),
+                                     Text("delivery_man_label".tr, style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor)),
                                    ],
                                  ),
                                ),
@@ -422,7 +422,7 @@ class MessageBubble extends StatelessWidget {
                                child: ElevatedButton(
                                  onPressed: () {
                                    Get.find<OrderController>().reorder(itemOrder.id!, order: itemOrder);
-                                   showCustomSnackBar("جاري إعادة إضافة محتويات الطلب #${itemOrder.id} للسلة! 🛒", isError: false);
+                                   showCustomSnackBar("${'readding_order_items_to_cart'.tr} #${itemOrder.id}! 🛒", isError: false);
                                  },
                                  style: ElevatedButton.styleFrom(
                                    backgroundColor: Colors.green,
@@ -430,7 +430,7 @@ class MessageBubble extends StatelessWidget {
                                    minimumSize: Size.zero,
                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                  ),
-                                 child: const Text("إعادة طلب 🔄", style: TextStyle(fontSize: 10, color: Colors.white)),
+                                 child: Text("reorder_btn".tr, style: const TextStyle(fontSize: 10, color: Colors.white)),
                                ),
                              ),
                            ],
@@ -450,7 +450,7 @@ class MessageBubble extends StatelessWidget {
                    child: ElevatedButton.icon(
                      onPressed: () => Get.toNamed(RouteHelper.getCartRoute()),
                      icon: const Icon(Icons.shopping_cart, size: 14, color: Colors.white),
-                     label: const Text("عرض السلة 🛒", style: TextStyle(fontSize: 12, color: Colors.white)),
+                     label: Text("view_cart_btn".tr, style: const TextStyle(fontSize: 12, color: Colors.white)),
                      style: ElevatedButton.styleFrom(
                        backgroundColor: Colors.green,
                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

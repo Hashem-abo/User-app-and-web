@@ -178,7 +178,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   List<Widget> _itemDetails(List<OrderDetailsModel> details) => [
-     Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? ('meals_summary'.tr == 'meals_summary' ? 'ملخص الوجبات' : 'meals_summary'.tr) : ('products_summary'.tr == 'products_summary' ? 'ملخص المنتجات' : 'products_summary'.tr), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+     Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meals_summary'.tr : 'products_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
     const SizedBox(height: Dimensions.paddingSizeSmall),
     ...details.map((detail) => _row(
       '${detail.quantity ?? 0} x ${detail.itemDetails?.name ?? 'item'.tr}',

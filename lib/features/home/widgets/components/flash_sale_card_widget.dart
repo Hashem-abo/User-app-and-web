@@ -17,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
 
 class FlashSaleCard extends StatefulWidget {
   final List<ActiveProducts> activeProducts;
@@ -176,7 +177,17 @@ class _FlashSaleCardState extends State<FlashSaleCard> {
                         shareUrl = shareUrl.contains('?') ? '$shareUrl&ref=$refCode' : '$shareUrl?ref=$refCode';
                       }
                     }
-                    Share.share('${activeProduct.item!.name} \n$shareUrl', subject: activeProduct.item!.name ?? '');
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (con) => ContactShareSheet(
+                        shareableType: 'item',
+                        shareableId: activeProduct.item!.id!,
+                        shareableName: activeProduct.item!.name ?? '',
+                        shareUrl: shareUrl,
+                      ),
+                    );
                   }, 
                   child: Container(
                     padding: const EdgeInsets.all(6),

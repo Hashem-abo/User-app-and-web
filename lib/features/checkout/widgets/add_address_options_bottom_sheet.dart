@@ -48,7 +48,7 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           Text(
-            'add_new_address'.tr == 'add_new_address' ? 'إضافة عنوان جديد' : 'add_new_address'.tr,
+            'add_new_address'.tr,
             style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
             textAlign: TextAlign.center,
           ),
@@ -59,7 +59,7 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
             context: context,
             icon: Icons.my_location,
             title: 'user_current_location'.tr,
-            subtitle: 'استخدام موقع الجهاز الفعلي الحالي',
+            subtitle: 'current_location_description'.tr,
             onTap: () async {
               Get.back();
               Get.find<LocationController>().checkPermission(() async {
@@ -93,7 +93,7 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
             context: context,
             icon: Icons.map,
             title: 'set_from_map'.tr,
-            subtitle: 'تحديد موقع العنوان بدقة على الخريطة',
+            subtitle: 'map_location_description'.tr,
             onTap: () async {
               Get.back();
               var address = await Get.toNamed(RouteHelper.getAddAddressRoute(true, false, checkoutController.store?.zoneId));
@@ -109,7 +109,7 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
             context: context,
             icon: Icons.list_alt,
             title: 'select_via_dropdown'.tr,
-            subtitle: 'اختيار المدينة والمديرية من القوائم',
+            subtitle: 'dropdown_location_description'.tr,
             onTap: () async {
               Get.back();
               var address = await Get.bottomSheet(

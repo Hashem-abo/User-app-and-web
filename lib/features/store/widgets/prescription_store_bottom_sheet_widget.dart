@@ -23,12 +23,7 @@ class _PrescriptionStoreBottomSheetWidgetState extends State<PrescriptionStoreBo
   String _searchQuery = '';
 
   String _getVal(String key, String enVal, String arVal) {
-    String trVal = key.tr;
-    if (trVal == key) {
-      bool isArabic = Get.locale?.languageCode == 'ar';
-      return isArabic ? arVal : enVal;
-    }
-    return trVal;
+    return key.tr;
   }
 
   @override

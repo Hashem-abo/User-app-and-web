@@ -311,7 +311,7 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                                     child: Text(
-                                      actionText ?? (isLtr ? 'view_all'.tr : 'عرض المزيد'),
+                                      actionText ?? 'view_all'.tr,
                                       style: robotoMedium.copyWith(
                                         fontSize: Dimensions.fontSizeDefault,
                                         color: Theme.of(context).primaryColor,
@@ -327,9 +327,9 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // SECTION 1: Suggestions (إقتراحات)
+                          // SECTION 1: Suggestions
                           if (_isLoggedIn && searchController.suggestedItemList != null && searchController.suggestedItemList!.isNotEmpty) ...[
-                            buildSectionHeader(isLtr ? 'suggestions'.tr : 'إقتراحات', () {
+                            buildSectionHeader('suggestions'.tr, () {
                               Get.toNamed(RouteHelper.getItemViewAllScreen(true, false));
                             }),
                              SizedBox(
@@ -358,14 +358,14 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                             ),
                           ],
 
-                          // SECTION 2: Recent Searches (آخر عمليات البحث)
+                          // SECTION 2: Recent Searches
                           if (searchController.historyList.isNotEmpty) ...[
                             buildSectionHeader(
-                              isLtr ? 'recent_searches'.tr : 'آخر عمليات البحث',
+                              'recent_searches'.tr,
                               () {
                                 searchController.clearSearchHistory();
                               },
-                              actionText: isLtr ? 'clear_all'.tr : 'مسح الكل',
+                              actionText: 'clear_all'.tr,
                             ),
                             Container(
                               decoration: BoxDecoration(
@@ -430,9 +430,9 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                             ),
                           ],
 
-                          // SECTION 3: Most Searched (الأكثر بحثاً)
+                          // SECTION 3: Most Searched
                           if (searchController.popularCategoryList != null && searchController.popularCategoryList!.isNotEmpty) ...[
-                            buildSectionHeader(isLtr ? 'most_searched'.tr : 'الأكثر بحثاً', null),
+                            buildSectionHeader('most_searched'.tr, null),
                             Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context).cardColor,
@@ -512,7 +512,7 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                buildSectionHeader(isLtr ? 'recently_viewed'.tr : 'آخر ما تم مشاهدته', () {
+                                buildSectionHeader('recently_viewed'.tr, () {
                                   Get.offAllNamed('${RouteHelper.getMainRoute('favourite')}&tab=history');
                                 }),
                                 SizedBox(

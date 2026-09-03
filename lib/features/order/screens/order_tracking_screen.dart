@@ -518,7 +518,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                         children: [
                           TableRow(children: [
                             _buildTableHeader(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meal'.tr : 'product'.tr),
-                            if (hasUnit) _buildTableHeader('unit'.tr == 'unit' ? 'الوحدة' : 'unit'.tr),
+                            if (hasUnit) _buildTableHeader('unit'.tr),
                             _buildTableHeader('price'.tr),
                             _buildTableHeader('quantity'.tr),
                             _buildTableHeader('total'.tr),

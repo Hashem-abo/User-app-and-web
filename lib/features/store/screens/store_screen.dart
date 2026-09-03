@@ -1540,8 +1540,8 @@ class _StoreScreenState extends State<StoreScreen> {
                                 children: [
                                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                                     Expanded(child: Text('day'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
-                                    Expanded(child: Text('slot_1'.tr == 'slot_1' ? 'الفترة الصباحية' : 'slot_1'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), textAlign: TextAlign.center)),
-                                    Expanded(child: Text('slot_2'.tr == 'slot_2' ? 'الفترة المسائية' : 'slot_2'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), textAlign: TextAlign.right)),
+                                    Expanded(child: Text('slot_1'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), textAlign: TextAlign.center)),
+                                    Expanded(child: Text('slot_2'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), textAlign: TextAlign.right)),
                                   ]),
                                   const Divider(),
                                   ...sortedDays.map((day) {

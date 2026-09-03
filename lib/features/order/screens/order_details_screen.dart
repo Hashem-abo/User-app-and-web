@@ -422,7 +422,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   Widget _buildInvoiceButton(String orderId) {
     return CustomButton(
-      buttonText: 'طباعة فاتورة',
+      buttonText: 'print_invoice'.tr,
       transparent: true,
       color: Theme.of(context).disabledColor.withOpacity(0.1),
       textColor: Theme.of(context).disabledColor,

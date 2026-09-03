@@ -342,7 +342,7 @@ class AIChatController extends GetxController implements GetxService {
         localeId: "ar_SA",
       );
     } else {
-      _messages.add(ChatMessage(text: "عذراً، خدمة الصوت غير متوفرة في جهازك حالياً. 🐦", role: ChatRole.ai, isError: true));
+      _messages.add(ChatMessage(text: "hoopoe_voice_unavailable".tr, role: ChatRole.ai, isError: true));
     }
   }
 
@@ -528,11 +528,11 @@ class AIChatController extends GetxController implements GetxService {
           _saveChatHistory();
         }
       } else {
-         _messages.add(ChatMessage(text: "عذراً، لم تصلني الرسالة بشكل واضح. هل يمكنك التكرار؟ 🐦", role: ChatRole.ai, isError: true));
+         _messages.add(ChatMessage(text: "hoopoe_did_not_understand".tr, role: ChatRole.ai, isError: true));
          _saveChatHistory();
       }
     } catch (e) {
-      _messages.add(ChatMessage(text: "عذراً، حديث خطأ في الاتصال: $e", role: ChatRole.ai, isError: true));
+      _messages.add(ChatMessage(text: "${'hoopoe_connection_error'.tr} $e", role: ChatRole.ai, isError: true));
       _saveChatHistory();
     } finally {
       _isLoading.value = false;
@@ -542,7 +542,7 @@ class AIChatController extends GetxController implements GetxService {
 
   void _performClearCart() {
     Get.find<CartController>().clearCartList();
-    _messages.add(ChatMessage(text: "أفرغت السلة كما طلبت! 🗑️", role: ChatRole.ai));
+    _messages.add(ChatMessage(text: "hoopoe_cart_cleared".tr, role: ChatRole.ai));
     _saveChatHistory();
   }
 
@@ -575,90 +575,81 @@ class AIChatController extends GetxController implements GetxService {
     if (items != null && items.isNotEmpty) {
       final item = items.first; // Pick the best match
       
-      // Check for variations (simple check based on ItemModel properties)
-      // Assuming 'variations' is a list property or similar. 
-      // If we simply check variations isEmpty, or foodVariations for food module.
-      
       bool hasVariations = (item.variations != null && item.variations!.isNotEmpty) || 
                            (item.foodVariations != null && item.foodVariations!.isNotEmpty);
 
       if (hasVariations) {
         // Must navigate to details
-        _messages.add(ChatMessage(text: "هذا المنتج يتطلب تحديد خيارات. سأفتح لك التفاصيل! 🐦", role: ChatRole.ai));
+        _messages.add(ChatMessage(text: "hoopoe_requires_options".tr, role: ChatRole.ai));
         _saveChatHistory();
         await Future.delayed(const Duration(seconds: 1));
         Get.toNamed(RouteHelper.getItemDetailsRoute(item.id, true));
       } else {
-        // Direct add to cart
-        // Construct CartModel. This requires mapping ItemModel to CartModel.
-        // We'll use default values for simple items.
-        
         double price = item.price!;
-        double discount = item.discount!; // assuming item.discount is double, checking model might be needed but assuming yes
+        double discount = item.discount!;
         double discountPrice = PriceConverter.convertWithDiscount(price, discount, item.discountType)!;
         
         CartModel cartModel = CartModel(
           id: null, price: price, discountedPrice: discountPrice, variation: [], foodVariations: [], discountAmount: (price - discountPrice), quantity: 1, addOnIds: [], addOns: [], isCampaign: false, stock: item.stock, item: item, quantityLimit: item.quantityLimit
         );
         
-        // Add to cart controller
         Get.find<CartController>().addToCart(cartModel, null);
         
         _messages.add(ChatMessage(text: "تمت إضافة ${item.name} إلى السلة! ✅", role: ChatRole.ai, showCartButton: true));
         _saveChatHistory();
       }
     } else {
-      _messages.add(ChatMessage(text: "لم أعثر على منتج بهذا الاسم. هل تريد البحث عنه؟ 🐦", role: ChatRole.ai));
+      _messages.add(ChatMessage(text: "hoopoe_item_not_found".tr, role: ChatRole.ai));
       _saveChatHistory();
     }
   }
 
   Future<void> _performNavigationAndReply(String screenCode) async {
-    String replyMessage = "بسعادة! سأطير بك إلى هناك! 🐦";
+    String replyMessage = "hoopoe_nav_flying".tr;
     String route = "";
 
     switch (screenCode.toUpperCase()) {
       case 'CART':
         route = RouteHelper.getCartRoute();
-        replyMessage = "إلى السلة! 🛒";
+        replyMessage = "hoopoe_nav_cart".tr;
         break;
       case 'PROFILE':
         route = RouteHelper.getProfileRoute();
-        replyMessage = "ملفك الشخصي. 👤";
+        replyMessage = "hoopoe_nav_profile".tr;
         break;
       case 'FAVORITE':
         route = RouteHelper.getFavouriteScreen();
-        replyMessage = "المفضلات لديك. ⭐";
+        replyMessage = "hoopoe_nav_favorites".tr;
         break;
       case 'ORDERS':
         route = RouteHelper.getOrderRoute();
-        replyMessage = "طلباتك السابقة. 📦";
+        replyMessage = "hoopoe_nav_orders".tr;
         break;
       case 'CATEGORIES':
         route = RouteHelper.getCategoryRoute();
-        replyMessage = "تصفح الأقسام. 📂";
+        replyMessage = "hoopoe_nav_categories".tr;
         break;
       case 'WALLET':
         route = RouteHelper.getWalletRoute();
-        replyMessage = "المحفظة. 💰";
+        replyMessage = "hoopoe_nav_wallet".tr;
         break;
       case 'OFFERS':
         route = RouteHelper.getPopularItemRoute(false, true);
-        replyMessage = "أفضل العروض! 🔥";
+        replyMessage = "hoopoe_nav_offers".tr;
         break;
       case 'SERVICES':
       case 'SERVICE_CATEGORIES':
         route = RouteHelper.getServicesRoute();
-        replyMessage = "إليك قائمة الخدمات المتوفرة. 🛠️";
+        replyMessage = "hoopoe_nav_services".tr;
         break;
       case 'SERVICE_BOOKINGS':
         route = RouteHelper.getServiceBookingListRoute();
-        replyMessage = "طلبات الخدمات وحجوزاتك. 📅";
+        replyMessage = "hoopoe_nav_bookings".tr;
         break;
       case 'HOME':
       default:
         route = RouteHelper.initial;
-        replyMessage = "إلى الرئيسية. 🏠";
+        replyMessage = "hoopoe_nav_home".tr;
         break;
     }
 

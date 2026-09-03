@@ -167,7 +167,7 @@ class BottomSection extends StatelessWidget {
             border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.1)),
           ),
           child: ExpansionTile(
-            title: Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? ('meals_summary'.tr == 'meals_summary' ? 'ملخص الوجبات' : 'meals_summary'.tr) : ('products_summary'.tr == 'products_summary' ? 'ملخص المنتجات' : 'products_summary'.tr), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+            title: Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meals_summary'.tr : 'products_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(Dimensions.radiusDefault))),
             collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(Dimensions.radiusDefault))),
             iconColor: Theme.of(context).primaryColor,
@@ -189,11 +189,11 @@ class BottomSection extends StatelessWidget {
                   TableRow(
                     decoration: BoxDecoration(color: Theme.of(context).disabledColor.withOpacity(0.05)),
                     children: [
-                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? ('meal'.tr == 'meal' ? 'الوجبة' : 'meal'.tr) : ('product'.tr == 'product' ? 'المنتج' : 'product'.tr), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
-                      if (hasUnit) Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('unit'.tr == 'unit' ? 'الوحدة' : 'unit'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
-                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('price'.tr == 'price' ? 'السعر' : 'price'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
-                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('quantity'.tr == 'quantity' ? 'الكمية' : 'quantity'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
-                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('total'.tr == 'total' ? 'الإجمالي' : 'total'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
+                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meal'.tr : 'product'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
+                      if (hasUnit) Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('unit'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
+                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('price'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
+                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('quantity'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
+                      Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text('total'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall))),
                     ],
                   ),
                   ...cartList!.map((cart) {
@@ -257,7 +257,7 @@ class BottomSection extends StatelessWidget {
         ),
         padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('order_summary'.tr == 'order_summary' ? 'ملخص الطلب' : 'order_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+          Text('order_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
           const SizedBox(height: Dimensions.paddingSizeDefault),
 
           _priceRow(

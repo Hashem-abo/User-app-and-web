@@ -155,9 +155,7 @@ class _SimilarItemsScreenState extends State<SimilarItemsScreen> {
                   if (itemController.similarProductList!.isEmpty) {
                     return Center(
                       child: Text(
-                        'no_similar_products_found'.tr == 'no_similar_products_found'
-                            ? 'لا توجد منتجات مشابهة'
-                            : 'no_similar_products_found'.tr,
+                        'no_similar_products_found'.tr,
                         style: robotoMedium.copyWith(color: Theme.of(context).disabledColor),
                       ),
                     );

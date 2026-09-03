@@ -197,7 +197,7 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
                   child: Column(children: [
                     CustomButton(
-                      buttonText: 'تتبع الطلب',
+                      buttonText: 'track_order'.tr,
                       onPressed: () {
                         String? phone = (widget.contactPersonNumber != null && widget.contactPersonNumber != 'null' && widget.contactPersonNumber!.isNotEmpty)
                             ? widget.contactPersonNumber
@@ -208,7 +208,7 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
                     const SizedBox(height: Dimensions.paddingSizeSmall),
 
                     CustomButton(
-                      buttonText: 'متابعة التسوق',
+                      buttonText: 'continue_shopping'.tr,
                       transparent: true,
                       isBorder: true,
                       onPressed: () {
@@ -218,7 +218,7 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
                     const SizedBox(height: Dimensions.paddingSizeSmall),
 
                     CustomButton(
-                      buttonText: 'طباعة فاتورة',
+                      buttonText: 'print_invoice'.tr,
                       transparent: true,
                       color: Theme.of(context).disabledColor.withOpacity(0.1),
                       textColor: Theme.of(context).disabledColor,
@@ -232,13 +232,13 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
 
                 const SizedBox(height: 40),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Text('تحتاج مساعدة؟', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+                  Text('need_help'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
                   const SizedBox(width: 5),
                   InkWell(
                     onTap: () {
                       Get.toNamed(RouteHelper.getChatRoute(notificationBody: NotificationBodyModel(adminId: 0)));
                     },
-                    child: Text('تواصل معنا', style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
+                    child: Text('contact_us'.tr, style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
                   ),
                 ]),
                 const SizedBox(height: 50),

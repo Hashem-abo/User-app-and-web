@@ -77,7 +77,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
   Future<void> _submitOrder() async {
     final String cartLink = _cartLinkController.text.trim();
     if (cartLink.isEmpty) {
-      showCustomSnackBar('يرجى لصق رابط السلة أولاً'.tr);
+      showCustomSnackBar('please_paste_cart_link_first'.tr);
       return;
     }
     if (_selectedAddress == null) {
@@ -154,14 +154,14 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
         true,
       );
 
-      showCustomSnackBar('تم إرسال طلب التسوق بنجاح، بانتظار إرسال عرض السعر'.tr, isError: false);
+      showCustomSnackBar('global_order_submitted_success'.tr, isError: false);
       if (orderId.isNotEmpty && orderId != '-1') {
         Get.offNamed(RouteHelper.getOrderDetailsRoute(int.tryParse(orderId)));
       } else if (mounted) {
         Navigator.of(context).pop();
       }
     } catch (e) {
-      showCustomSnackBar('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً'.tr);
+      showCustomSnackBar('error_sending_order_try_later'.tr);
     } finally {
       if (mounted) {
         setState(() {
@@ -174,7 +174,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'طلب تسوق - ${widget.storeName}'),
+      appBar: CustomAppBar(title: '${'shopping_order'.tr} - ${widget.storeName}'),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
@@ -223,7 +223,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
                           ),
                           const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                           Text(
-                            'قم بفتح المتجر، انسخ رابط السلة، وألصقه هنا مباشرة'.tr,
+                            'open_store_copy_cart_link_paste_here'.tr,
                             style: robotoRegular.copyWith(
                               fontSize: Dimensions.fontSizeSmall,
                               color: Theme.of(context).disabledColor,
@@ -239,10 +239,10 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
               const SizedBox(height: Dimensions.paddingSizeLarge),
 
               // Cart Link Input Section
-              Text('رابط السلة (Cart Link) *', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+              Text('${'cart_link'.tr} *', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
               const SizedBox(height: Dimensions.paddingSizeSmall),
               CustomTextField(
-                hintText: widget.urlPlaceholder ?? 'الصق رابط السلة هنا (e.g. https://shein.com/cart)',
+                hintText: widget.urlPlaceholder ?? 'paste_cart_link_example'.tr,
                 controller: _cartLinkController,
                 inputType: TextInputType.url,
                 maxLines: 2,
@@ -255,14 +255,14 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('صورة السلة / لقطة الشاشة', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                  Text('cart_screenshot'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: Theme.of(context).disabledColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                     ),
-                    child: Text('اختياري', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
+                    child: Text('optional'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
                   ),
                 ],
               ),
@@ -320,7 +320,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
                             Icon(Icons.add_a_photo_outlined, size: 36, color: Theme.of(context).primaryColor),
                             const SizedBox(height: Dimensions.paddingSizeExtraSmall),
                             Text(
-                              'انقر لرفع صورة السلة (اختياري)',
+                              'click_to_upload_cart_screenshot'.tr,
                               style: robotoMedium.copyWith(
                                 fontSize: Dimensions.fontSizeSmall,
                                 color: Theme.of(context).disabledColor,
@@ -334,7 +334,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
               const SizedBox(height: Dimensions.paddingSizeLarge),
 
               // Delivery Address Section
-              Text('عنوان التوصيل (Delivery Address) *', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+              Text('${'delivery_address'.tr} *', style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
               const SizedBox(height: Dimensions.paddingSizeSmall),
 
               GetBuilder<AddressController>(builder: (addressController) {
@@ -362,7 +362,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
                       else
                         Padding(
                           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                          child: Text('لم يتم اختيار عنوان توصيل بعد'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
+                          child: Text('no_delivery_address_selected'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
                         ),
                       const Divider(),
                       InkWell(

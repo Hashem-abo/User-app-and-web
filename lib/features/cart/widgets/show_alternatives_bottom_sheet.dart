@@ -56,12 +56,12 @@ class _ShowAlternativesBottomSheetState extends State<ShowAlternativesBottomShee
             padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
             child: Column(children: [
               Text(
-                'suggested_alternatives'.tr == 'suggested_alternatives' ? 'بدائل مقترحة' : 'suggested_alternatives'.tr,
+                'suggested_alternatives'.tr,
                 style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
               ),
               const SizedBox(height: Dimensions.paddingSizeExtraSmall),
               Text(
-                'find_something_similar'.tr == 'find_something_similar' ? 'ابحث عن شيء مشابه لما كنت تريده' : 'find_something_similar'.tr,
+                'find_something_similar'.tr,
                 style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
               ),
             ]),
@@ -113,7 +113,7 @@ class _ShowAlternativesBottomSheetState extends State<ShowAlternativesBottomShee
               Icon(Icons.search_off, size: 50, color: Theme.of(context).disabledColor),
               const SizedBox(height: Dimensions.paddingSizeSmall),
               Text(
-                'no_alternatives_found'.tr == 'no_alternatives_found' ? 'لم يتم العلم العثور على بدائل حالياً' : 'no_alternatives_found'.tr,
+                'no_alternatives_found'.tr,
                 style: robotoMedium.copyWith(color: Theme.of(context).disabledColor),
               ),
             ]),

@@ -431,7 +431,7 @@ Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     children: [
                       MenuButton(icon: 'assets/svg/icons/linear/24-support.svg', title: 'help_and_support'.tr, route: RouteHelper.getSupportRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
-                      MenuButton(icon: 'assets/svg/icons/linear/info.svg', title: 'عن التطبيق'.tr, route: RouteHelper.getHtmlRoute('about-us')),
+                      MenuButton(icon: 'assets/svg/icons/linear/info.svg', title: 'about_us'.tr, route: RouteHelper.getHtmlRoute('about-us')),
                     ],
                   ),
                 )

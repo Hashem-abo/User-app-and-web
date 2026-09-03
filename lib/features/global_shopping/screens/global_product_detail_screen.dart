@@ -112,11 +112,11 @@ class _GlobalProductDetailScreenState extends State<GlobalProductDetailScreen> {
             const SizedBox(height: Dimensions.paddingSizeLarge),
 
             Text(
-              'share_product'.tr == 'share_product' ? 'مشاركة المنتج' : 'share_product'.tr,
+              'share_product'.tr,
               style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
             ),
             Text(
-              'share_this_product_with_others'.tr == 'share_this_product_with_others' ? 'شارك هذا المنتج مع الآخرين' : 'share_this_product_with_others'.tr,
+              'share_this_product_with_others'.tr,
               style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
             ),
             const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -124,7 +124,7 @@ class _GlobalProductDetailScreenState extends State<GlobalProductDetailScreen> {
             InkWell(
               onTap: () {
                 Clipboard.setData(ClipboardData(text: shareUrl));
-                showCustomSnackBar('link_copied'.tr == 'link_copied' ? 'تم نسخ الرابط' : 'link_copied'.tr, isError: false);
+                showCustomSnackBar('link_copied'.tr, isError: false);
                 Navigator.pop(context);
               },
               child: Container(
@@ -135,7 +135,7 @@ class _GlobalProductDetailScreenState extends State<GlobalProductDetailScreen> {
                   border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
                 ),
                 child: Row(children: [
-                  Expanded(child: Text('copy_product_link'.tr == 'copy_product_link' ? 'نسخ رابط المنتج' : 'copy_product_link'.tr, style: robotoMedium)),
+                  Expanded(child: Text('copy_product_link'.tr, style: robotoMedium)),
                   const Icon(Icons.copy, size: 20),
                 ]),
               ),
@@ -144,8 +144,18 @@ class _GlobalProductDetailScreenState extends State<GlobalProductDetailScreen> {
 
             InkWell(
               onTap: () {
-                Share.share(shareText);
                 Navigator.pop(context);
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (con) => ContactShareSheet(
+                    shareableType: 'global_product',
+                    shareableId: int.tryParse('${widget.product.id}') ?? 0,
+                    shareableName: widget.product.title ?? '',
+                    shareUrl: shareUrl,
+                  ),
+                );
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
@@ -155,7 +165,7 @@ class _GlobalProductDetailScreenState extends State<GlobalProductDetailScreen> {
                   border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
                 ),
                 child: Row(children: [
-                  Expanded(child: Text('share_via_apps'.tr == 'share_via_apps' ? 'مشاركة عبر التطبيقات' : 'share_via_apps'.tr, style: robotoMedium)),
+                  Expanded(child: Text('share_via_apps'.tr, style: robotoMedium)),
                   const Icon(Icons.send, size: 20),
                 ]),
               ),
@@ -210,8 +220,17 @@ class _GlobalProductDetailScreenState extends State<GlobalProductDetailScreen> {
                       shareUrl = shareUrl.contains('?') ? '$shareUrl&ref=$refCode' : '$shareUrl?ref=$refCode';
                     }
                   }
-                  String shareText = '${product.title ?? 'Product'} \n$shareUrl';
-                  _showShareBottomSheet(context, shareUrl, shareText);
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (con) => ContactShareSheet(
+                      shareableType: 'global_product',
+                      shareableId: int.tryParse('${product.id}') ?? 0,
+                      shareableName: product.title ?? '',
+                      shareUrl: shareUrl,
+                    ),
+                  );
                 },
                 child: Icon(Icons.send_outlined, size: 20, color: Theme.of(context).textTheme.bodyLarge!.color),
               ),

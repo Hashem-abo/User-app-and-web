@@ -23,6 +23,7 @@ import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/features/review/widgets/review_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/util/app_constants.dart';
+import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
 
 class ItemTitleViewWidget extends StatefulWidget {
   final Item? item;
@@ -193,10 +194,20 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
               borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
             ),
             child: InkWell(
-              onTap: () => Share.share(
-                '${widget.item?.name ?? ''} \n${AppConstants.webHostedUrl}${RouteHelper.getItemDetailsRoute(widget.item?.id ?? 0, widget.inStorePage)}',
-                subject: widget.item?.name ?? '',
-              ),
+              onTap: () {
+                String shareUrl = '${AppConstants.webHostedUrl}${RouteHelper.getItemDetailsRoute(widget.item?.id ?? 0, widget.inStorePage)}';
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (con) => ContactShareSheet(
+                    shareableType: 'item',
+                    shareableId: widget.item?.id ?? 0,
+                    shareableName: widget.item?.name ?? '',
+                    shareUrl: shareUrl,
+                  ),
+                );
+              },
               child: Icon(Icons.share, size: 25, color: Theme.of(context).primaryColor),
             ),
           ),

@@ -466,7 +466,7 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                   .bodyLarge!
                                   .color;
 
-                          String currentZoneName = locationController.zoneID == 0 ? 'all_zone'.tr : ('select_zone'.tr == 'select_zone' ? 'اختر المدينة' : 'select_zone'.tr);
+                          String currentZoneName = locationController.zoneID == 0 ? 'all_zone'.tr : 'select_zone'.tr;
                           if (locationController.zoneID != 0 && locationController.zoneList != null && locationController.zoneList!.isNotEmpty) {
                             final currentZone = locationController.zoneList!.firstWhereOrNull((z) => z.id == locationController.zoneID);
                             if (currentZone != null && currentZone.name != null && currentZone.name!.isNotEmpty) {

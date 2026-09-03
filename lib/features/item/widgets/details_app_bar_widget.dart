@@ -84,22 +84,22 @@ class DetailsAppBarWidgetState extends State<DetailsAppBarWidget> with SingleTic
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           Text(
-            'share_product'.tr == 'share_product' ? 'مشاركة المنتج' : 'share_product'.tr,
+            'share_product'.tr,
             style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
           ),
           Text(
-            'share_this_product_with_others'.tr == 'share_this_product_with_others' ? 'شارك هذا المنتج مع الآخرين' : 'share_this_product_with_others'.tr,
+            'share_this_product_with_others'.tr,
             style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
           ),
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           _buildShareOption(
             context,
-            'copy_product_link'.tr == 'copy_product_link' ? 'نسخ رابط المنتج' : 'copy_product_link'.tr,
+            'copy_product_link'.tr,
             Icons.copy,
             () {
               Clipboard.setData(ClipboardData(text: rawLink));
-              showCustomSnackBar('link_copied'.tr == 'link_copied' ? 'تم نسخ الرابط' : 'link_copied'.tr, isError: false);
+              showCustomSnackBar('link_copied'.tr, isError: false);
               Navigator.pop(context);
             },
           ),
@@ -107,11 +107,21 @@ class DetailsAppBarWidgetState extends State<DetailsAppBarWidget> with SingleTic
 
           _buildShareOption(
             context,
-            'share_via_apps'.tr == 'share_via_apps' ? 'مشاركة عبر التطبيقات' : 'share_via_apps'.tr,
+            'share_via_apps'.tr,
             Icons.send,
             () {
-              Share.share(shareText);
               Navigator.pop(context);
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (con) => ContactShareSheet(
+                  shareableType: 'item',
+                  shareableId: widget.item?.id ?? 0,
+                  shareableName: widget.item?.name ?? '',
+                  shareUrl: shareText,
+                ),
+              );
             },
           ),
           const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -177,20 +187,18 @@ class DetailsAppBarWidgetState extends State<DetailsAppBarWidget> with SingleTic
                 if (refCode.isNotEmpty) {
                   rawLink = rawLink.contains('?') ? '$rawLink&ref=$refCode' : '$rawLink?ref=$refCode';
                 }
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (con) => ContactShareSheet(
-                    shareableType: 'item',
-                    shareableId: widget.item!.id!,
-                    shareableName: widget.item!.name!,
-                    shareUrl: rawLink,
-                  ),
-                );
-              } else {
-                Share.share('${widget.item!.name} \n$rawLink');
               }
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (con) => ContactShareSheet(
+                  shareableType: 'item',
+                  shareableId: widget.item!.id!,
+                  shareableName: widget.item!.name!,
+                  shareUrl: rawLink,
+                ),
+              );
             },
             child: Icon(Icons.send_outlined, size: 24, color: Theme.of(context).textTheme.bodyLarge!.color),
           ),

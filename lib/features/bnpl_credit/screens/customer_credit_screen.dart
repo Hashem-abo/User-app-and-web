@@ -23,7 +23,7 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'My Store Credit Lines'),
+      appBar: CustomAppBar(title: 'my_store_credit_lines'.tr),
       body: GetBuilder<CustomerCreditController>(builder: (creditController) {
         if (creditController.isLoading && creditController.creditList == null) {
           return const Center(child: CircularProgressIndicator());
@@ -42,7 +42,7 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Store Credit Accounts (${credits.length})',
+                  '${'store_credit_accounts'.tr} (${credits.length})',
                   style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
                 ),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -53,7 +53,7 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                     padding: const EdgeInsets.all(Dimensions.paddingSizeExtraLarge),
                     alignment: Alignment.center,
                     child: Text(
-                      'You do not have any active credit accounts with stores.',
+                      'no_active_credit_accounts'.tr,
                       style: robotoRegular.copyWith(color: Theme.of(context).disabledColor),
                     ),
                   )
@@ -94,7 +94,7 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      isFrozen ? 'FROZEN' : 'ACTIVE',
+                                      isFrozen ? 'frozen_status'.tr : 'active_status'.tr,
                                       style: robotoBold.copyWith(
                                         color: isFrozen ? Colors.red.shade900 : Colors.green.shade900,
                                         fontSize: 11,
@@ -108,9 +108,9 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text('Credit Limit: \$${limit.toStringAsFixed(2)}', style: robotoRegular),
+                                  Text('${'credit_limit'.tr}: \$${limit.toStringAsFixed(2)}', style: robotoRegular),
                                   Text(
-                                    'Available: \$${available.toStringAsFixed(2)}',
+                                    '${'available_credit'.tr}: \$${available.toStringAsFixed(2)}',
                                     style: robotoBold.copyWith(color: Colors.green.shade700),
                                   ),
                                 ],
@@ -120,10 +120,10 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Used Debt: \$${used.toStringAsFixed(2)}',
+                                    '${'used_debt'.tr}: \$${used.toStringAsFixed(2)}',
                                     style: robotoMedium.copyWith(color: used > 0 ? Colors.red : Colors.grey),
                                   ),
-                                  Text('${credit.paymentTermsDays} Days Term', style: robotoRegular.copyWith(fontSize: 12)),
+                                  Text('${credit.paymentTermsDays} ${'days_term'.tr}', style: robotoRegular.copyWith(fontSize: 12)),
                                 ],
                               ),
                               const SizedBox(height: 6),
@@ -136,7 +136,7 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                               if (used > 0) ...[
                                 const SizedBox(height: Dimensions.paddingSizeDefault),
                                 CustomButton(
-                                  buttonText: 'Repay Debt Online',
+                                  buttonText: 'repay_debt_online'.tr,
                                   onPressed: () {
                                     _showRepayDialog(context, creditController, credit.id!, used);
                                   },
@@ -161,26 +161,26 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Repay Credit Debt'),
+        title: Text('repay_credit_debt'.tr),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Repayment Amount (\$)'),
+              decoration: InputDecoration(labelText: 'repayment_amount'.tr),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'ⓘ Payment will automatically clear your oldest due open invoices first (FIFO Order).',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            Text(
+              'repayment_fifo_note'.tr,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -190,7 +190,7 @@ class _CustomerCreditScreenState extends State<CustomerCreditScreen> {
                 await controller.repayCreditAccount(creditId, double.parse(amountStr), 'online_wallet', null);
               }
             },
-            child: const Text('Confirm Repayment'),
+            child: Text('confirm_repayment'.tr),
           ),
         ],
       ),

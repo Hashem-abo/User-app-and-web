@@ -74,12 +74,10 @@ class _BestStoreNearbyViewState extends State<BestStoreNearbyView> {
       String titleText = isPharmacy
           ? 'featured_store'.tr
           : (isFood
-              ? (ltr ? 'Best Restaurants Nearby' : 'أفضل المطاعم القريبة')
+              ? 'best_restaurants_nearby'.tr
               : 'best_store_nearby'.tr);
 
-      String buttonText = ltr
-          ? 'View $titleText'
-          : 'عرض $titleText';
+      String buttonText = '${'view_all'.tr} $titleText';
 
       return Container(
         width: double.infinity,

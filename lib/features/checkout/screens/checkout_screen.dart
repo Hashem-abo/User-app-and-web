@@ -592,7 +592,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             //   ),
             CustomButton(
               isLoading: checkoutController.isLoading,
-              buttonText: '${'confirm_order'.tr == 'confirm_order' ? 'تأكيد الطلب' : 'confirm_order'.tr} - ${PriceConverter.convertPrice(total)}',
+              buttonText: '${'confirm_order'.tr} - ${PriceConverter.convertPrice(total)}',
               onPressed: checkoutController.acceptTerms ? () {
           bool isAvailable = true;
           DateTime scheduleStartDate = DateTime.now();
@@ -666,9 +666,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
               }
             }
           } else if(AuthHelper.isGuestLoggedIn() && checkoutController.paymentMethodIndex == 0) {
-            showCustomSnackBar('cash_on_delivery_is_not_available_for_guest_user'.tr == 'cash_on_delivery_is_not_available_for_guest_user'
-                ? 'الدفع عند الاستلام غير متاح للزوار، يرجى تسجيل الدخول أو اختيار طريقة دفع أخرى'
-                : 'cash_on_delivery_is_not_available_for_guest_user'.tr);
+            showCustomSnackBar('cash_on_delivery_is_not_available_for_guest_user'.tr);
           } else if(orderAmount < checkoutController.store!.minimumOrder! && widget.storeId == null) {
             showCustomSnackBar('${'minimum_order_amount_is'.tr} ${checkoutController.store!.minimumOrder}');
           }else if(checkoutController.tipController.text.isNotEmpty && checkoutController.tipController.text != 'not_now' && double.parse(checkoutController.tipController.text.trim()) < 0) {

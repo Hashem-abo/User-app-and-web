@@ -15,6 +15,7 @@ import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/reels/controllers/reels_controller.dart';
 import 'package:sixam_mart/features/reels/domain/models/reel_model.dart';
 import 'package:sixam_mart/features/reels/widgets/reel_transient_toast_widget.dart';
+import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
 
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
@@ -1009,8 +1010,17 @@ class _ReelLikeViewStats extends StatelessWidget {
                 String videoLink = reel.resolvedVideoUrl.isNotEmpty
                     ? reel.resolvedVideoUrl
                     : '${AppConstants.webHostedUrl}/reels?id=${reel.reelId}';
-                String shareText = '${reel.resolvedTitle}\n${reel.resolvedSubtitle}\n\n🎬 شاهد الفيديو عبر الرابط:\n$videoLink';
-                Share.share(shareText);
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (con) => ContactShareSheet(
+                    shareableType: 'reel',
+                    shareableId: reel.reelId ?? 0,
+                    shareableName: reel.resolvedTitle.isNotEmpty ? reel.resolvedTitle : 'Reel',
+                    shareUrl: videoLink,
+                  ),
+                );
               },
               customBorder: const CircleBorder(),
               child: Padding(

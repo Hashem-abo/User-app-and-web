@@ -73,7 +73,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('الهدهد', style: robotoBold),
+        title: Text('hoopoe_name'.tr, style: robotoBold),
         centerTitle: true,
         backgroundColor: Theme.of(context).cardColor,
         elevation: 0,
@@ -421,7 +421,7 @@ class _AIChatScreenState extends State<AIChatScreen> {
                                 maxLines: 5,
                                 keyboardType: TextInputType.multiline,
                                 decoration: InputDecoration(
-                                  hintText: "اكتب سؤالاً..",
+                                  hintText: "ai_chat_input_hint".tr,
                                   hintStyle: robotoRegular.copyWith(color: Theme.of(context).disabledColor),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),

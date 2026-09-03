@@ -23,6 +23,7 @@ import 'package:sixam_mart/features/favourite/controllers/favourite_controller.d
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/cart/screens/similar_items_screen.dart';
 import 'package:sixam_mart/util/app_constants.dart';
+import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -125,7 +126,17 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                         shareUrl = shareUrl.contains('?') ? '$shareUrl&ref=$refCode' : '$shareUrl?ref=$refCode';
                       }
                     }
-                    Share.share('${widget.cart.item!.name!}\n$shareUrl');
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (con) => ContactShareSheet(
+                        shareableType: 'item',
+                        shareableId: widget.cart.item!.id!,
+                        shareableName: widget.cart.item!.name ?? '',
+                        shareUrl: shareUrl,
+                      ),
+                    );
                   },
                   backgroundColor: const Color(0xFFFF5722),
                   foregroundColor: Colors.white,
@@ -198,7 +209,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                       if(!widget.isAvailable)
                         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                           Text(
-                            'not_available_now'.tr == 'not_available_now' ? 'غير متوفر الآن' : 'not_available_now'.tr,
+                            'not_available_now'.tr,
                             style: robotoRegular.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeOverSmall),
                           ),
                           InkWell(
@@ -420,7 +431,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                                 ),
                                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                                   Text(
-                                    'show_alternatives'.tr == 'show_alternatives' ? 'عرض البدائل' : 'show_alternatives'.tr,
+                                    'show_alternatives'.tr,
                                     style: robotoMedium.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeExtraSmall),
                                   ),
                                   const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -490,7 +501,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                             controller: _noteController,
                             style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
                             decoration: InputDecoration(
-                              hintText: 'add_note_for_this_product'.tr == 'add_note_for_this_product' ? 'أضف ملاحظة لهذا المنتج' : 'add_note_for_this_product'.tr,
+                              hintText: 'add_note_for_product'.tr,
                               hintStyle: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
                               border: InputBorder.none,
                               isDense: true,

@@ -197,13 +197,13 @@ class FavouriteScreenState extends State<FavouriteScreen> with SingleTickerProvi
         _tabItem(context, 0, 'notification'.tr, Icons.notifications_active),
         _tabItem(context, 1, 'view_log'.tr, Icons.watch_later),
         _tabItem(context, 2, 'buy_again'.tr, Icons.shopping_cart),
-        _tabItem(context, 3, 'wish_list'.tr == 'wish_list' ? 'قائمة الامنيات' : 'wish_list'.tr, Icons.playlist_add),
+        _tabItem(context, 3, 'wish_list'.tr, Icons.playlist_add),
         _tabItem(context, 4, 'favourite'.tr, Icons.favorite),
       ];
     } else {
       return [
         _tabItem(context, 0, 'favourite'.tr, Icons.favorite),
-        _tabItem(context, 1, 'wish_list'.tr == 'wish_list' ? 'قائمة الامنيات' : 'wish_list'.tr, Icons.playlist_add),
+        _tabItem(context, 1, 'wish_list'.tr, Icons.playlist_add),
         _tabItem(context, 2, 'buy_again'.tr, Icons.shopping_cart),
         _tabItem(context, 3, 'view_log'.tr, Icons.watch_later),
         _tabItem(context, 4, 'notification'.tr, Icons.notifications_active),

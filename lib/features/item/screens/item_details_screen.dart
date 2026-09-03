@@ -1057,15 +1057,15 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                   Row(mainAxisSize: MainAxisSize.min, children: [
                                     Text(double.tryParse(item.avgRating.toString())?.toStringAsFixed(1) ?? '0', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
                                     const SizedBox(width: 2),
-                                    Icon(Icons.star, size: 12, color: Colors.amber),
+                                    const Icon(Icons.star, size: 12, color: Colors.amber),
                                     const SizedBox(width: 2),
                                     Text('(${item.ratingCount ?? 0})', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
                                   ]),
                                   Text('|', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
-                                  Text('${item.storeDetails != null ? item.storeDetails!['total_items'] ?? 0 : 0} منتج', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
+                                  Text('${item.storeDetails != null ? item.storeDetails!['total_items'] ?? 0 : 0} ${'items'.tr}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
                                   if ((item.orderCount ?? 0) > 0) ...[
                                     Text('|', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
-                                    Text('تم بيع ${item.orderCount} ${item.unitType ?? 'قطعة'}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
+                                    Text('${'sold'.tr} ${item.orderCount} ${item.unitType ?? 'piece'.tr}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
                                   ],
                                 ]),
                               ]),

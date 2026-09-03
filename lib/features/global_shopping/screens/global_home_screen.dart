@@ -57,7 +57,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'المتاجر العالمية المتاحة للطلب:',
+                      'stores_available_for_order'.tr,
                       style: robotoBold.copyWith(
                         fontSize: Dimensions.fontSizeLarge,
                         color: Theme.of(context).textTheme.bodyLarge!.color,
@@ -70,7 +70,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
                         borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
                       ),
                       child: Text(
-                        '${stores.length} متجر',
+                        '${stores.length} ${'store'.tr}',
                         style: robotoBold.copyWith(
                           fontSize: Dimensions.fontSizeExtraSmall,
                           color: Theme.of(context).primaryColor,
@@ -119,7 +119,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
                                   builder: (context) => GlobalOrderFormScreen(
-                                    storeName: store.name ?? 'متجر عالمي',
+                                    storeName: store.name ?? 'global_store'.tr,
                                     storeLogo: store.logoFullUrl,
                                     urlPlaceholder: store.urlPlaceholder,
                                   ),
@@ -220,7 +220,7 @@ class _GlobalHomeScreenState extends State<GlobalHomeScreen> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
-                                              'اطلب الآن',
+                                              'order_now'.tr,
                                               style: robotoBold.copyWith(
                                                 fontSize: Dimensions.fontSizeExtraSmall + 1,
                                                 color: Colors.white,
