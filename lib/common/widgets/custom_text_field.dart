@@ -123,26 +123,35 @@ class CustomTextFieldState extends State<CustomTextField> {
             FocusScope.of(context).requestFocus(widget.focusNode);
           },
           child: Directionality(
-            textDirection: (widget.isPhone || widget.countryDialCode != null) ? TextDirection.ltr : Directionality.of(context),
+            textDirection: (widget.isPhone || widget.isPassword || widget.countryDialCode != null) ? TextDirection.ltr : Directionality.of(context),
             child: TextFormField(
               maxLines: widget.maxLines,
               controller: widget.controller,
               focusNode: widget.focusNode,
-              textAlign: (widget.isPhone || widget.countryDialCode != null) ? TextAlign.left : widget.textAlign,
+              textAlign: (widget.isPhone || widget.isPassword || widget.countryDialCode != null) ? TextAlign.left : widget.textAlign,
               validator: widget.validator,
               style: robotoRegular.copyWith(
                 fontSize: Dimensions.fontSizeLarge,
-                color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2E2E2E)),
+                fontFamily: widget.isPassword ? 'Roboto' : null,
+                fontFamilyFallback: const ['Roboto', 'sans-serif'],
+                letterSpacing: widget.isPassword && _obscureText ? 3.0 : null,
+                color: (Theme.of(context).cardColor.computeLuminance() > 0.5)
+                    ? const Color(0xFF2E2E2E)
+                    : Colors.white,
               ),
               textInputAction: widget.inputAction,
-              keyboardType: widget.isAmount ? TextInputType.number : widget.inputType,
-            cursorColor: Theme.of(context).primaryColor,
-            textCapitalization: widget.capitalization,
-            enabled: widget.isEnabled,
-            autofocus: false,
-            obscureText: widget.isPassword ? _obscureText : false,
-            obscuringCharacter: '•',
-            maxLength: widget.maxLength,
+              keyboardType: widget.isAmount
+                  ? TextInputType.number
+                  : (widget.isPassword
+                      ? (_obscureText ? TextInputType.text : TextInputType.visiblePassword)
+                      : widget.inputType),
+              cursorColor: Theme.of(context).primaryColor,
+              textCapitalization: widget.capitalization,
+              enabled: widget.isEnabled,
+              autofocus: false,
+              obscureText: widget.isPassword ? _obscureText : false,
+              obscuringCharacter: '•',
+              maxLength: widget.maxLength,
             inputFormatters: widget.inputType == TextInputType.phone ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9]'))]
                 : widget.isAmount ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))] : widget.isNumber ? [FilteringTextInputFormatter.allow(RegExp(r'\d'))] : null,
             decoration: InputDecoration(

@@ -49,39 +49,51 @@ class MyTextFieldState extends State<MyTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      key: widget.key,
-      maxLines: widget.maxLines,
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-      style: robotoRegular.copyWith(
-        color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2E2E2E)),
+    final Color effectiveFillColor = widget.fillColor ?? Theme.of(context).cardColor;
+    final bool isCardLight = effectiveFillColor.computeLuminance() > 0.5;
+
+    return Directionality(
+      textDirection: (widget.inputType == TextInputType.phone || widget.isPassword) ? TextDirection.ltr : Directionality.of(context),
+      child: TextField(
+        key: widget.key,
+        maxLines: widget.maxLines,
+        controller: widget.controller,
+        focusNode: widget.focusNode,
+        textAlign: (widget.inputType == TextInputType.phone || widget.isPassword) ? TextAlign.left : TextAlign.start,
+        style: robotoRegular.copyWith(
+          fontFamily: widget.isPassword ? 'Roboto' : null,
+          fontFamilyFallback: const ['Roboto', 'sans-serif'],
+          letterSpacing: widget.isPassword && _obscureText ? 3.0 : null,
+          color: isCardLight ? const Color(0xFF2E2E2E) : Colors.white,
+        ),
+        textInputAction: widget.inputAction,
+        keyboardType: widget.isPassword
+            ? (_obscureText ? TextInputType.text : TextInputType.visiblePassword)
+            : widget.inputType,
+        cursorColor: Theme.of(context).primaryColor,
+        textCapitalization: widget.capitalization,
+        enabled: widget.isEnabled,
+        autofocus: widget.autoFocus,
+        obscureText: widget.isPassword ? _obscureText : false,
+        obscuringCharacter: '•',
+        inputFormatters: widget.inputType == TextInputType.phone ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9+]'))] : null,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          isDense: true,
+          filled: true,
+          fillColor: effectiveFillColor,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(widget.borderRadius), borderSide: BorderSide.none),
+          hintStyle: robotoRegular.copyWith(color: Theme.of(context).hintColor),
+          suffixIcon: widget.isPassword ? IconButton(
+            icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).hintColor.withValues(alpha: 0.3)),
+            onPressed: _toggle,
+          ) : null,
+        ),
+        onTap: widget.onTap as void Function()?,
+        onSubmitted: (text) => widget.nextFocus != null ? FocusScope.of(context).requestFocus(widget.nextFocus)
+            : widget.onSubmit != null ? widget.onSubmit!(text) : null,
+        onChanged: widget.onChanged as void Function(String)?,
       ),
-      textInputAction: widget.inputAction,
-      keyboardType: widget.inputType,
-      cursorColor: Theme.of(context).primaryColor,
-      textCapitalization: widget.capitalization,
-      enabled: widget.isEnabled,
-      autofocus: widget.autoFocus,
-      obscureText: widget.isPassword ? _obscureText : false,
-      obscuringCharacter: '•',
-      inputFormatters: widget.inputType == TextInputType.phone ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9+]'))] : null,
-      decoration: InputDecoration(
-        hintText: widget.hintText,
-        isDense: true,
-        filled: true,
-        fillColor: widget.fillColor ?? Theme.of(context).cardColor,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(widget.borderRadius), borderSide: BorderSide.none),
-        hintStyle: robotoRegular.copyWith(color: Theme.of(context).hintColor),
-        suffixIcon: widget.isPassword ? IconButton(
-          icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).hintColor.withValues(alpha: 0.3)),
-          onPressed: _toggle,
-        ) : null,
-      ),
-      onTap: widget.onTap as void Function()?,
-      onSubmitted: (text) => widget.nextFocus != null ? FocusScope.of(context).requestFocus(widget.nextFocus)
-          : widget.onSubmit != null ? widget.onSubmit!(text) : null,
-      onChanged: widget.onChanged as void Function(String)?,
     );
   }
 

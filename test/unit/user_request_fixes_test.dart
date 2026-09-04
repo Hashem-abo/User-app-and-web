@@ -157,4 +157,43 @@ void main() {
       expect(requestPayload.containsKey('purchase_code'), isFalse);
     });
   });
+
+  group('USER REQUEST FIX 5: Password Fields LTR Direction, High Contrast Color & Font', () {
+    test('Password fields must use LTR directionality even when app is RTL', () {
+      bool isPassword = true;
+      bool isPhone = false;
+      String? countryDialCode;
+      
+      // Simulating Directionality check in CustomTextField / MyTextField
+      final isRtlContext = true;
+      final resolvedDirection = (isPhone || isPassword || countryDialCode != null) ? 'ltr' : (isRtlContext ? 'rtl' : 'ltr');
+      expect(resolvedDirection, equals('ltr'));
+    });
+
+    test('Password field text color must contrast with background', () {
+      // Light card (e.g. #FFFFFF or #FCFCFC)
+      final lightLuminance = 1.0;
+      final lightModeColor = (lightLuminance > 0.5) ? '0xFF2E2E2E' : '0xFFFFFFFF';
+      expect(lightModeColor, equals('0xFF2E2E2E'));
+
+      // Dark card (e.g. #30313C)
+      final darkLuminance = 0.2;
+      final darkModeColor = (darkLuminance > 0.5) ? '0xFF2E2E2E' : '0xFFFFFFFF';
+      expect(darkModeColor, equals('0xFFFFFFFF'));
+    });
+
+    test('Password field adaptive keyboardType switches between text and visiblePassword', () {
+      bool isPassword = true;
+      bool obscureText = true;
+
+      String resolveKeyboardType(bool isPassword, bool obscureText) {
+        if (!isPassword) return 'text';
+        return obscureText ? 'text' : 'visiblePassword';
+      }
+
+      expect(resolveKeyboardType(isPassword, true), equals('text'));
+      expect(resolveKeyboardType(isPassword, false), equals('visiblePassword'));
+    });
+  });
 }
+

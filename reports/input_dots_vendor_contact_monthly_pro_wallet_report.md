@@ -21,24 +21,37 @@ This report provides a complete, verified, production-ready audit and resolution
 
 ## 2. Issue-by-Issue Technical Analysis & Implementation
 
-### 2.1 Issue 1: Password & Obscured Input Dots Contrast Fix
+### 2.1 Issue 1: Password & Obscured Input Dots Contrast & Alignment Fix
 
-#### Root Cause:
-* In `CustomTextField` (`lib/common/widgets/custom_text_field.dart`) and `MyTextField` (`lib/common/widgets/my_text_field.dart`), `style` was instantiated with `robotoRegular.copyWith(...)` without an explicit `color`.
-* In `PinCodeTextField` (`lib/features/verification/screens/verification_screen.dart`), `textStyle` was omitted.
-* When running in web browsers or devices with OS Dark Mode enabled, `<input type="password">` user-agent styles applied `-webkit-text-security: disc` with white/canvas foreground color (`#FFFFFF`). When the input background was white or card-colored, the obscured dots became completely invisible. Clicking the eye icon toggled `obscureText: false`, which reverted the element to standard text or canvas painting, making plain letters visible.
+#### Root Cause Deep Dive:
+1. **Font Glyph Bounding Box (Tajawal vs. Roboto):**
+   * The app's global font is configured to `Tajawal` (Arabic font).
+   * Binary inspection of `Tajawal-Regular.ttf` revealed that the bullet glyph `•` (Unicode `0x2022`) has a bounding box of `(70, 150)` to `(217, 300)` with advance width 287 out of an em-square of 1000. This places the bullet dot at the very bottom baseline (15% line height).
+   * Inside single-line, vertically centered input fields with `isDense: true` and content padding, this low-baseline dot gets clipped or rendered completely out of the visible viewport.
+   * In contrast, `Roboto-Regular.ttf` defines the bullet glyph with bounding box `(138, 535)` to `(546, 971)` and advance width 690 out of 2048, placing the dots right at the vertical center (x-height) where password dots belong.
+2. **Bidirectional (RTL) Layout Conflict on Obscured Text:**
+   * In Arabic locales, `Directionality.of(context)` resolves to `TextDirection.rtl`.
+   * While phone fields were guarded with `(widget.isPhone || widget.countryDialCode != null) ? TextDirection.ltr : Directionality.of(context)`, password fields were not guarded.
+   * Under the Unicode Bidirectional Algorithm (BiDi), bullet `•` (`\u2022`) is classified as **ON** (Other Neutral). In an RTL context, neutral character sequences are treated as RTL, causing the dots to be pushed against the right margin, under prefix icons, or outside the visible clipping box.
+   * When the user toggles the visibility eye icon to "show" (`_obscureText = false`), the plain text consists of Latin characters/digits which have strong LTR directionality, causing Flutter's layout engine to render them left-to-right correctly.
+3. **Android IME / Samsung Keyboard Conflict with `TextInputType.visiblePassword`:**
+   * Passing `inputType: TextInputType.visiblePassword` to an obscured `TextFormField` sends `InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD` to Android's IME. On Samsung One UI keyboards, this conflicts with Flutter's `RenderEditable` obscuring pipeline, causing visual suppression of the masked dots.
+4. **Theme Contrast Resolution:**
+   * Relying on `Theme.of(context).textTheme.bodyLarge?.color` returned `null` at runtime in default theme configurations, falling back to brightness checks that could mismatch hardcoded white card containers (e.g. `SignInScreen`'s container `Colors.white.withAlpha(220)`).
 
 #### Code Modifications:
 1. **`lib/common/widgets/custom_text_field.dart`:**
-   - Explicitly assigned `color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2E2E2E))` in the text style.
-   - Added explicit `obscuringCharacter: '•'`.
+   * **Directionality & Alignment:** Enforced `(widget.isPhone || widget.isPassword || widget.countryDialCode != null) ? TextDirection.ltr : Directionality.of(context)` and `textAlign: (widget.isPhone || widget.isPassword || widget.countryDialCode != null) ? TextAlign.left : widget.textAlign`.
+   * **Font & Spacing:** Specified `fontFamily: widget.isPassword ? 'Roboto' : null`, `fontFamilyFallback: const ['Roboto', 'sans-serif']`, and `letterSpacing: widget.isPassword && _obscureText ? 3.0 : null`.
+   * **Adaptive Luminance Contrast:** Set text color using `(Theme.of(context).cardColor.computeLuminance() > 0.5) ? const Color(0xFF2E2E2E) : Colors.white` to guarantee high contrast regardless of container theme.
+   * **Adaptive Keyboard Type:** Configured `keyboardType` to automatically switch between `TextInputType.text` when obscured and `TextInputType.visiblePassword` when shown.
 2. **`lib/common/widgets/my_text_field.dart`:**
-   - Explicitly added `color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF2E2E2E))` in `style`.
-   - Added explicit `obscuringCharacter: '•'`.
-3. **`lib/features/verification/screens/verification_screen.dart`:**
-   - Added `textStyle: robotoBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color ?? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black))` to `PinCodeTextField`.
+   * Wrapped in `Directionality(textDirection: (widget.inputType == TextInputType.phone || widget.isPassword) ? TextDirection.ltr : Directionality.of(context))`.
+   * Added `Roboto` font, `letterSpacing: 3.0`, and luminance-based color contrast.
+3. **`lib/features/auth/widgets/sign_in/manual_login_widget.dart`:**
+   * Changed `inputType` from `TextInputType.visiblePassword` to `TextInputType.text` across both mobile and desktop login views.
 4. **`web/style.css`:**
-   - Added explicit CSS rules for light and dark themes targeting `input[type="password"]`, `input[type="text"]`, `input[type="tel"]`, `input[type="number"]`, `input[type="email"]`, and `textarea` to guarantee proper color contrast in all web rendering modes.
+   * Retained explicit CSS rules for web inputs to ensure contrast across light and dark theme classes.
 
 ---
 
