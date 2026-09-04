@@ -10,6 +10,7 @@ import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/features/splash/domain/repositories/splash_repository_interface.dart';
 
 class SplashRepository implements SplashRepositoryInterface {
@@ -130,12 +131,7 @@ class SplashRepository implements SplashRepositoryInterface {
 
   @override
   Future<void> setStoreCategory(int storeCategoryID) async {
-    AddressModel? addressModel;
-    try {
-      addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
-    }catch(e) {
-      debugPrint('Did not get shared Preferences address . Note: $e');
-    }
+    AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
     apiClient.updateHeader(
       sharedPreferences.getString(AppConstants.token), addressModel?.zoneIds,
       addressModel?.areaIds, sharedPreferences.getString(AppConstants.languageCode),
@@ -184,12 +180,7 @@ class SplashRepository implements SplashRepositoryInterface {
 
   @override
   Future<void> setModule(ModuleModel? module) async {
-    AddressModel? addressModel;
-    try {
-      addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
-    }catch(e) {
-      debugPrint('Did not get shared Preferences address . Note: $e');
-    }
+    AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
     apiClient.updateHeader(
       sharedPreferences.getString(AppConstants.token), addressModel?.zoneIds, addressModel?.areaIds,
       sharedPreferences.getString(AppConstants.languageCode), module?.id,

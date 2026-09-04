@@ -81,7 +81,7 @@ class ItemWidget extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
             color: Theme.of(context).cardColor,
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+            boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withValues(alpha: 0.06), blurRadius: 6, spreadRadius: 0, offset: const Offset(0, 2))],
           ),
           child: CustomInkWell(
             onTap: isEntirelyOutOfStock ? null : () {
@@ -168,15 +168,22 @@ class ItemWidget extends StatelessWidget {
 
                         Positioned(
                           top: 5, left: 5,
-                          child: GetBuilder<FavouriteController>(builder: (favouriteController) {
-                            bool isWished = isStore ? favouriteController.wishStoreIdList.contains(store!.id) : favouriteController.wishItemIdList.contains(item!.id);
-                            return CustomFavouriteWidget(
-                              isWished: isWished,
-                              isStore: isStore,
-                              store: store,
-                              item: item,
-                            );
-                          }),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                            ),
+                            padding: const EdgeInsets.all(2),
+                            child: GetBuilder<FavouriteController>(builder: (favouriteController) {
+                              bool isWished = isStore ? favouriteController.wishStoreIdList.contains(store!.id) : favouriteController.wishItemIdList.contains(item!.id);
+                              return CustomFavouriteWidget(
+                                isWished: isWished,
+                                isStore: isStore,
+                                store: store,
+                                item: item,
+                              );
+                            }),
+                          ),
                         ),
                       ]),
                       const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -254,7 +261,7 @@ class ItemWidget extends StatelessWidget {
                           ) : const SizedBox(),
                           SizedBox(height: ((desktop || isStore) && (isStore ? store!.address != null : item!.storeName != null)) ? 3 : 3),
 
-                          !isStore && (item!.ratingCount! > 0) ? Wrap(children: [
+                          !isStore && (item!.ratingCount! > 0) ? Row(children: [
 
                             Icon(Icons.star, size: 16, color: Theme.of(context).primaryColor),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),

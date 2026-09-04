@@ -441,17 +441,32 @@ class RouteHelper {
   }
 
   static List<GetPage> routes = [
-    GetPage(name: initial, page: () => getRoute(DashboardScreen(pageIndex: 0, fromSplash: Get.parameters['from-splash'] == 'true'))),
-    GetPage(name: splash, page: () {
-      NotificationBodyModel? data;
-      if(Get.parameters['data'] != 'null') {
-        List<int> decode = base64Decode(Get.parameters['data']!.replaceAll(' ', '+'));
-        data = NotificationBodyModel.fromJson(jsonDecode(utf8.decode(decode)));
-      }
-      return SplashScreen(body: data);
-    }),
+    GetPage(
+      name: initial,
+      page: () => getRoute(DashboardScreen(pageIndex: 0, fromSplash: Get.parameters['from-splash'] == 'true')),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 380),
+    ),
+    GetPage(
+      name: splash,
+      page: () {
+        NotificationBodyModel? data;
+        if(Get.parameters['data'] != 'null') {
+          List<int> decode = base64Decode(Get.parameters['data']!.replaceAll(' ', '+'));
+          data = NotificationBodyModel.fromJson(jsonDecode(utf8.decode(decode)));
+        }
+        return SplashScreen(body: data);
+      },
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 380),
+    ),
     GetPage(name: language, page: () => ChooseLanguageScreen(fromMenu: Get.parameters['page'] == 'menu')),
-    GetPage(name: onBoarding, page: () => const OnBoardingScreen()),
+    GetPage(
+      name: onBoarding,
+      page: () => const OnBoardingScreen(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 380),
+    ),
     GetPage(name: signIn, page: () => SignInScreen(
       exitFromApp: Get.parameters['page'] == signUp || Get.parameters['page'] == splash || Get.parameters['page'] == onBoarding,
       backFromThis: Get.parameters['page'] != splash && Get.parameters['page'] != onBoarding,

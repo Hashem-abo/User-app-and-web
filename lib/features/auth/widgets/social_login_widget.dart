@@ -34,22 +34,23 @@ class SocialLoginWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final GoogleSignIn googleSignIn = GoogleSignIn.instance;
 
-    bool canAppleLogin = Get.find<SplashController>().configModel!.appleLogin!.isNotEmpty && Get.find<SplashController>().configModel!.appleLogin![0].status!
+    final splash = Get.find<SplashController>();
+
+    bool canAppleLogin = (splash.configModel?.appleLogin?.isNotEmpty ?? false) && (splash.configModel!.appleLogin![0].status ?? false)
     && !GetPlatform.isAndroid;
 
-    bool googleLoginActive = true;
+    bool googleLoginActive = (splash.configModel?.socialLogin?.isNotEmpty ?? false)
+        && (splash.configModel!.socialLogin![0].status ?? true);
 
-    bool canGoogleAndFacebookLogin = Get.find<SplashController>().configModel!.socialLogin!.isNotEmpty && (googleLoginActive
-        || Get.find<SplashController>().configModel!.socialLogin![1].status!);
+    bool facebookLoginActive = (splash.configModel?.socialLogin != null && splash.configModel!.socialLogin!.length > 1)
+        && (splash.configModel!.socialLogin![1].status ?? false)
+        && (splash.configModel?.centralizeLoginSetup?.socialLoginStatus ?? false)
+        && (splash.configModel?.centralizeLoginSetup?.facebookLoginStatus ?? false);
 
-    // bool googleLoginActive = Get.find<SplashController>().configModel!.socialLogin![0].status! && Get.find<SplashController>().configModel!.centralizeLoginSetup!.socialLoginStatus!
-    // && Get.find<SplashController>().configModel!.centralizeLoginSetup!.googleLoginStatus!;
+    bool canGoogleAndFacebookLogin = (splash.configModel?.socialLogin?.isNotEmpty ?? false) && (googleLoginActive || facebookLoginActive);
 
-    bool facebookLoginActive = Get.find<SplashController>().configModel!.socialLogin![1].status! && Get.find<SplashController>().configModel!.centralizeLoginSetup!.socialLoginStatus!
-    && Get.find<SplashController>().configModel!.centralizeLoginSetup!.facebookLoginStatus!;
-
-    bool appleLoginActive = canAppleLogin && Get.find<SplashController>().configModel!.centralizeLoginSetup!.socialLoginStatus!
-    && Get.find<SplashController>().configModel!.centralizeLoginSetup!.appleLoginStatus!;
+    bool appleLoginActive = canAppleLogin && (splash.configModel?.centralizeLoginSetup?.socialLoginStatus ?? false)
+    && (splash.configModel?.centralizeLoginSetup?.appleLoginStatus ?? false);
 
     if(onlySocialLogin) {
       return Column(
@@ -409,7 +410,7 @@ class SocialLoginWidget extends StatelessWidget {
           socialLogInBodyModel: googleBodyModel ?? appleBodyModel ?? facebookBodyModel, email: email, backFromThis: backFromThis,
         ));
       }
-    } else if(response.isSuccess && response.authResponseModel != null && !response.authResponseModel!.isPersonalInfo!) {
+    } else if(response.isSuccess && response.authResponseModel != null && response.authResponseModel!.isPersonalInfo == false) {
 
       String? displayName = googleBodyModel != null ? googleBodyModel.email?.split('@')[0] : appleBodyModel != null ? appleBodyModel.email?.split('@')[0] : facebookBodyModel?.email?.split('@')[0];
 

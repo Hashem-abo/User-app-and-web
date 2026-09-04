@@ -55,18 +55,23 @@ class _CategoryViewState extends State<CategoryView> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: Dimensions.paddingSizeExtraSmall), // Added horizontal spacing
                           child: InkWell(
+                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                             onTap: () => Get.toNamed(RouteHelper.getCategoryItemRoute(
                               categoryController.categoryList![index].id, categoryController.categoryList![index].name!,
                             )),
                             child: Container(
-                              width: 90, // Wider for text
+                              width: 94, // Wider for text
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                color: Theme.of(context).primaryColor.withValues(alpha: 0.05), // Light gray/primary tint background
+                                color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+                                border: Border.all(
+                                  color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+                                  width: 0.8,
+                                ),
                               ),
                               child: Column(children: [
                                 Padding(
-                                  padding: const EdgeInsets.fromLTRB(5, 10, 5, 5),
+                                  padding: const EdgeInsets.fromLTRB(5, 8, 5, 4),
                                   child: Text(
                                     categoryController.categoryList![index].name!,
                                     style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color),
@@ -146,7 +151,7 @@ class PharmacyCategoryView extends StatelessWidget {
                 onTap: () => Get.toNamed(RouteHelper.getCategoryItemRoute(
                   categoryController.categoryList![index].id, categoryController.categoryList![index].name!,
                 )),
-                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                 child: Container(
                   width: 70,
                   decoration: BoxDecoration(
@@ -221,7 +226,7 @@ class _FoodCategoryViewState extends State<FoodCategoryView> {
                   onTap: () => Get.toNamed(RouteHelper.getCategoryItemRoute(
                     widget.categoryController.categoryList![index].id, widget.categoryController.categoryList![index].name!,
                   )),
-                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                   child: SizedBox(
                     width: 60,
                     child: Column(children: [

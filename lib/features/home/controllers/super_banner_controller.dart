@@ -36,4 +36,18 @@ class SuperBannerController extends GetxController implements GetxService {
       update();
     }
   }
+
+  /// Batch preload multiple SuperBanners with a single update notification.
+  void preloadSuperBanners(List<SuperBanner> banners) {
+    bool hasAdded = false;
+    for (final banner in banners) {
+      if (banner.id != null) {
+        _superBanners[banner.id!] = banner;
+        hasAdded = true;
+      }
+    }
+    if (hasAdded) {
+      update();
+    }
+  }
 }

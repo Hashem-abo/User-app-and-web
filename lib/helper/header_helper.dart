@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/util/app_constants.dart';
@@ -9,10 +10,7 @@ import 'package:sixam_mart/util/app_constants.dart';
 class HeaderHelper {
   static Map<String, String> featuredHeader() {
     SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
-    AddressModel? addressModel;
-    try {
-      addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
-    }catch(_) {}
+    AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
     int? moduleID;
     if(GetPlatform.isWeb && sharedPreferences.containsKey(AppConstants.moduleId)) {
       try {

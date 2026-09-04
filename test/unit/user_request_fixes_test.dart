@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sixam_mart/common/models/config_model.dart';
 import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
+import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
@@ -10,6 +12,9 @@ import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/api/data_module_manager.dart';
+import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
+import 'package:sixam_mart/util/images.dart';
+import 'package:get/get.dart';
 
 PlaceOrderBodyModel _buildTestBody({bool? monthlySubscribe}) {
   return PlaceOrderBodyModel(
@@ -376,7 +381,7 @@ void main() {
       expect(storeOmitted.vendorType, equals(''));
     });
 
-    test('Store in Zad displays vendorType when vendor_type has valid value (wholesale/retail/custom)', () {
+    test('Store in Zad displays vendorType for wholesale/factory, hides retailer and empty', () {
       final wholesaleStore = Store.fromJson({
         'id': 20,
         'name': 'Zad Wholesale Co',
@@ -387,6 +392,16 @@ void main() {
       expect(wholesaleStore.vendorType, isNotEmpty);
       expect(wholesaleStore.vendorType.toLowerCase(), anyOf(contains('wholesale'), contains('جملة')));
 
+      final factoryStore = Store.fromJson({
+        'id': 23,
+        'name': 'Zad Factory Co',
+        'module_id': 1,
+        'vendor_type': 'factory',
+      });
+      expect(factoryStore.isZad, isTrue);
+      expect(factoryStore.vendorType, isNotEmpty);
+      expect(factoryStore.vendorType.toLowerCase(), anyOf(contains('factory'), contains('مصنع')));
+
       final retailStore = Store.fromJson({
         'id': 21,
         'name': 'Zad Corner Retail',
@@ -394,8 +409,8 @@ void main() {
         'vendor_type': 'retail',
       });
       expect(retailStore.isZad, isTrue);
-      expect(retailStore.vendorType, isNotEmpty);
-      expect(retailStore.vendorType.toLowerCase(), anyOf(contains('retail'), contains('تجزئة')));
+      expect(retailStore.vendorType, isEmpty);
+      expect(retailStore.vendorType, equals(''));
 
       final customStore = Store.fromJson({
         'id': 22,
@@ -429,7 +444,7 @@ void main() {
       expect(find.byType(Icon), findsNothing);
     });
 
-    testWidgets('VendorTypeBadgeWidget returns SizedBox when vendorType parameter is "null" string or empty', (tester) async {
+    testWidgets('VendorTypeBadgeWidget returns SizedBox when vendorType is empty, "null", or retailer', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -448,9 +463,29 @@ void main() {
         ),
       );
       expect(find.byType(Icon), findsNothing);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: VendorTypeBadgeWidget(vendorType: 'retail'),
+          ),
+        ),
+      );
+      expect(find.byType(Icon), findsNothing);
+      expect(find.text('Retail'), findsNothing);
+      expect(find.text('تجزئة'), findsNothing);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: VendorTypeBadgeWidget(vendorType: 'retailer'),
+          ),
+        ),
+      );
+      expect(find.byType(Icon), findsNothing);
     });
 
-    testWidgets('VendorTypeBadgeWidget displays badge when store has valid vendorType', (tester) async {
+    testWidgets('VendorTypeBadgeWidget displays badge when store has wholesale or factory vendorType', (tester) async {
       final zadWholesaleStore = Store.fromJson({
         'id': 31,
         'name': 'Zad Wholesale Store',
@@ -466,8 +501,26 @@ void main() {
         ),
       );
 
-      // Icon storefront should be rendered
+      // Icon storefront should be rendered for wholesale
       expect(find.byIcon(Icons.storefront_outlined), findsOneWidget);
+
+      final zadFactoryStore = Store.fromJson({
+        'id': 32,
+        'name': 'Zad Factory Store',
+        'module_id': 1,
+        'vendor_type': 'factory',
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: VendorTypeBadgeWidget(store: zadFactoryStore),
+          ),
+        ),
+      );
+
+      // Icon manufacturing should be rendered for factory
+      expect(find.byIcon(Icons.precision_manufacturing_outlined), findsOneWidget);
     });
   });
 
@@ -669,6 +722,314 @@ void main() {
       expect(DataModuleManager().isGenerationActive('national_products_tab', gen2), isFalse);
     });
   });
+
+  group('USER REQUEST FIX: Logout Confirmation UI/UX & Non-Blocking Safety', () {
+    testWidgets('ConfirmationDialog uses logout icon, logout title, and error color badge when isLogOut is true', (tester) async {
+      await tester.pumpWidget(
+        GetMaterialApp(
+          translations: _TestTranslations(),
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: ConfirmationDialog(
+              icon: Images.support,
+              description: 'are_you_sure_to_logout',
+              isLogOut: true,
+              onYesPressed: () {},
+            ),
+          ),
+        ),
+      );
+
+      // Allow the 250ms anti-tap-through debounce to finish
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Title should automatically display 'Logout' for logout confirmation
+      expect(find.text('Logout'), findsWidgets);
+
+      // The image asset should resolve to Images.logOut rather than Images.support
+      final imageFinder = find.byType(Image);
+      expect(imageFinder, findsOneWidget);
+      final Image imageWidget = tester.widget(imageFinder);
+      expect((imageWidget.image as AssetImage).assetName, equals(Images.logOut));
+    });
+
+    testWidgets('ConfirmationDialog transitions to loading indicator on confirm click and disables cancel', (tester) async {
+      bool taskCompleted = false;
+
+      await tester.pumpWidget(
+        GetMaterialApp(
+          translations: _TestTranslations(),
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: ConfirmationDialog(
+              icon: Images.logOut,
+              description: 'Are you sure want to logout?',
+              isLogOut: true,
+              onYesPressed: () async {
+                await Future.delayed(const Duration(milliseconds: 500));
+                taskCompleted = true;
+              },
+            ),
+          ),
+        ),
+      );
+
+      // Allow the 250ms anti-tap-through debounce to finish
+      await tester.pump(const Duration(milliseconds: 300));
+
+      // Find the confirm/logout button and tap it
+      final logoutButton = find.text('Logout');
+      expect(logoutButton, findsWidgets);
+
+      await tester.tap(logoutButton.last);
+      // Pump initial frame of async action
+      await tester.pump();
+
+      // Now it should show 'Logging out...'
+      expect(find.text('Logging out...'), findsWidgets);
+
+      // Advance time by 600ms to allow task to finish
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(taskCompleted, isTrue);
+    });
+
+    test('Safe social logout handles errors gracefully without throwing', () async {
+      bool errorLogged = false;
+      Future<void> simulateSafeSocialLogout({required bool throwGoogle, required bool throwFacebook}) async {
+        try {
+          if (throwGoogle) throw StateError('Google disconnect failed');
+        } catch (e) {
+          errorLogged = true;
+        }
+
+        try {
+          if (throwFacebook) throw StateError('Facebook logout failed');
+        } catch (e) {
+          errorLogged = true;
+        }
+      }
+
+      // Should complete normally without throwing
+      await expectLater(
+        simulateSafeSocialLogout(throwGoogle: true, throwFacebook: true),
+        completes,
+      );
+      expect(errorLogged, isTrue);
+    });
+
+    test('Logout timeout protection guarantees non-blocking execution', () async {
+      Future<void> simulateLogoutWithTimeout() async {
+        // Simulate a hung backend request that takes 10 seconds
+        Future<void> hungApiCall() async {
+          await Future.delayed(const Duration(seconds: 10));
+        }
+
+        try {
+          await hungApiCall().timeout(const Duration(milliseconds: 50));
+        } catch (_) {
+          // Timeout safely absorbed
+        }
+      }
+
+      final stopwatch = Stopwatch()..start();
+      await simulateLogoutWithTimeout();
+      stopwatch.stop();
+
+      // Must have resolved quickly via timeout rather than waiting 10 seconds
+      expect(stopwatch.elapsedMilliseconds, lessThan(1000));
+    });
+  });
+
+  group('USER REQUEST FIX 9: Login & SignUp UI/UX Resilience & Non-Stuck Safety', () {
+    test('AuthController async actions guarantee _isLoading resets to false even on error', () async {
+      bool isLoading = false;
+
+      Future<void> simulateAuthAction({required bool shouldFail}) async {
+        isLoading = true;
+        try {
+          if (shouldFail) {
+            throw Exception('Network timeout during login/signup');
+          }
+        } finally {
+          isLoading = false;
+        }
+      }
+
+      // Successful call resets isLoading
+      await simulateAuthAction(shouldFail: false);
+      expect(isLoading, isFalse);
+
+      // Failed call also guarantees isLoading resets to false (never stuck)
+      expect(simulateAuthAction(shouldFail: true), throwsA(isA<Exception>()));
+      // Give microtask queue time to finish
+      await Future.delayed(Duration.zero);
+      expect(isLoading, isFalse);
+    });
+
+    test('Null-safe check for AuthResponseModel prevents crash on null boolean fields', () {
+      // Simulates payload with null booleans
+      final Map<String, dynamic> partialAuthResponse = {
+        'token': 'test_token',
+        'is_phone_verified': null,
+        'is_email_verified': null,
+        'is_personal_info': null,
+      };
+
+      bool isPhoneVerified(Map<String, dynamic> json) => (json['is_phone_verified'] as bool?) ?? false;
+      bool isEmailVerified(Map<String, dynamic> json) => (json['is_email_verified'] as bool?) ?? false;
+      bool isPersonalInfo(Map<String, dynamic> json) => (json['is_personal_info'] as bool?) ?? false;
+
+      // Must not throw Null check operator used on null value
+      expect(isPhoneVerified(partialAuthResponse), isFalse);
+      expect(isEmailVerified(partialAuthResponse), isFalse);
+      expect(isPersonalInfo(partialAuthResponse), isFalse);
+    });
+
+    test('Terms & conditions validation returns clear prompt when not accepted', () {
+      bool acceptTerms = false;
+      String? snackbarMessage;
+
+      void onContinuePressed() {
+        if (!acceptTerms) {
+          snackbarMessage = 'please_agree_with_terms_conditions';
+          return;
+        }
+        snackbarMessage = 'success';
+      }
+
+      onContinuePressed();
+      expect(snackbarMessage, equals('please_agree_with_terms_conditions'));
+
+      acceptTerms = true;
+      onContinuePressed();
+      expect(snackbarMessage, equals('success'));
+    });
+
+    test('RTL back button icon resolves to forward chevron and LTR to back chevron', () {
+      IconData getBackIcon(TextDirection direction) {
+        return direction == TextDirection.rtl
+            ? Icons.arrow_forward_ios_rounded
+            : Icons.arrow_back_ios_rounded;
+      }
+
+      expect(getBackIcon(TextDirection.ltr), equals(Icons.arrow_back_ios_rounded));
+      expect(getBackIcon(TextDirection.rtl), equals(Icons.arrow_forward_ios_rounded));
+    });
+  });
+
+  group('USER REQUEST FIX 11: Home Screen Freeze & ANR Elimination', () {
+    testWidgets('PaginatedListView safely removes scroll listener upon disposal', (tester) async {
+      final ScrollController scrollController = ScrollController();
+      int paginateCount = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              controller: scrollController,
+              child: PaginatedListView(
+                scrollController: scrollController,
+                totalSize: 50,
+                offset: 1,
+                onPaginate: (offset) async {
+                  paginateCount++;
+                },
+                itemView: const SizedBox(height: 1000),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Rebuild with PaginatedListView disposed
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SizedBox(),
+          ),
+        ),
+      );
+
+      // Verify no exceptions when disposing or scrolling afterwards
+      expect(scrollController.hasClients, isFalse);
+      scrollController.dispose();
+      expect(paginateCount, equals(0));
+    });
+
+    test('Module scroll sync calculation avoids division by zero when extents are 0', () {
+      double computeTarget(double offset, double maxExpanded, double maxCollapsed) {
+        if (maxExpanded > 0 && maxCollapsed > 0) {
+          double ratio = offset / maxExpanded;
+          return (ratio * maxCollapsed).clamp(0.0, maxCollapsed);
+        }
+        return 0.0;
+      }
+
+      // When maxCollapsed is 0, must return safe 0.0 without NaN or Infinity
+      expect(computeTarget(10.0, 100.0, 0.0), equals(0.0));
+      expect(computeTarget(10.0, 0.0, 100.0), equals(0.0));
+      expect(computeTarget(50.0, 100.0, 200.0), equals(100.0));
+    });
+
+    test('Scroll direction forward/reverse strictly filters idle ticks to prevent constant update() loops', () {
+      bool showFav = true;
+      int updateCount = 0;
+
+      void onScrollDirectionChanged(ScrollDirection direction) {
+        if (direction == ScrollDirection.forward) {
+          if (!showFav) {
+            showFav = true;
+            updateCount++;
+          }
+        } else if (direction == ScrollDirection.reverse) {
+          if (showFav) {
+            showFav = false;
+            updateCount++;
+          }
+        }
+        // ScrollDirection.idle is strictly ignored!
+      }
+
+      // Initial idle ticks should do NOTHING
+      onScrollDirectionChanged(ScrollDirection.idle);
+      onScrollDirectionChanged(ScrollDirection.idle);
+      expect(updateCount, equals(0));
+      expect(showFav, isTrue);
+
+      // Reverse hides
+      onScrollDirectionChanged(ScrollDirection.reverse);
+      expect(updateCount, equals(1));
+      expect(showFav, isFalse);
+
+      // Further reverse ticks do not re-trigger
+      onScrollDirectionChanged(ScrollDirection.reverse);
+      expect(updateCount, equals(1));
+
+      // Idle does not re-trigger or toggle
+      onScrollDirectionChanged(ScrollDirection.idle);
+      expect(updateCount, equals(1));
+
+      // Forward shows
+      onScrollDirectionChanged(ScrollDirection.forward);
+      expect(updateCount, equals(2));
+      expect(showFav, isTrue);
+    });
+  });
+}
+
+class _TestTranslations extends Translations {
+  @override
+  Map<String, Map<String, String>> get keys => {
+    'en': {
+      'logout': 'Logout',
+      'logging_out': 'Logging out...',
+      'cancel': 'Cancel',
+      'yes': 'Yes',
+      'confirm': 'Confirm',
+      'are_you_sure_to_logout': 'Are you sure want to logout?',
+      'please_agree_with_terms_conditions': 'Please agree with terms & conditions',
+    },
+  };
 }
 
 

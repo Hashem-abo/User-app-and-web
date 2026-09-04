@@ -10,7 +10,9 @@ ThemeData dark({Color color = const Color(0xFF54b46b), Color disabledColor = con
   brightness: Brightness.dark,
   hintColor: hintColor,
   cardColor: cardColor,
+  splashFactory: InkSparkle.splashFactory,
   shadowColor: Colors.white.withValues(alpha: 0.03),
+  cardTheme: CardThemeData(elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
   textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white70)),
   textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: color)),
   colorScheme: ColorScheme.dark(primary: color, secondary: color).copyWith(surface: const Color(0xFF191A26)).copyWith(error: const Color(0xFFdd3135)),
@@ -18,7 +20,7 @@ ThemeData dark({Color color = const Color(0xFF54b46b), Color disabledColor = con
   dialogTheme: const DialogThemeData(surfaceTintColor: Colors.white10),
   floatingActionButtonTheme: FloatingActionButtonThemeData(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(500))),
   bottomAppBarTheme: const BottomAppBarThemeData(
-    surfaceTintColor: Colors.black, height: 60,
+    surfaceTintColor: Colors.black, height: 65,
     padding: EdgeInsets.symmetric(vertical: 5),
   ),
   dividerTheme: const DividerThemeData(thickness: 0.5, color: Color(0xFFA0A4A8)),

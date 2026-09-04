@@ -50,42 +50,50 @@ class StoreCornerController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getStoreCornerList(bool reload) async {
+  Future<void> getStoreCornerList(bool reload, {bool isPagination = false}) async {
     int? currentModuleId = Get.find<SplashController>().module?.id;
     if (reload) {
       _offset = 1;
       _storeCornerList = null;
       update();
-    } else if (currentModuleId != null && _moduleStoreCornerList.containsKey(currentModuleId)) {
-      _storeCornerList = _moduleStoreCornerList[currentModuleId];
-      _pageSize = _modulePageSize[currentModuleId];
-      _offset = _moduleOffset[currentModuleId] ?? 1;
-      update();
+    } else if (!isPagination && currentModuleId != null && _moduleStoreCornerList.containsKey(currentModuleId)) {
+      if (_storeCornerList != _moduleStoreCornerList[currentModuleId]) {
+        _storeCornerList = _moduleStoreCornerList[currentModuleId];
+        _pageSize = _modulePageSize[currentModuleId];
+        _offset = _moduleOffset[currentModuleId] ?? 1;
+        update();
+      }
       return;
-    } else {
+    } else if (!isPagination) {
       _storeCornerList = null;
       _offset = 1;
       _pageSize = null;
     }
+
+    if (_isLoading) return;
+
     if (_storeCornerList == null || (_pageSize != null && _storeCornerList!.length < _pageSize!)) {
       _isLoading = true;
       update();
-      StoreCornerDataModel? storeCornerData = await storeCornerRepositoryInterface.getStoreCorners(offset: _offset);
-      if (storeCornerData != null && storeCornerData.storeCorners != null) {
-        if (_offset == 1) {
-          _storeCornerList = [];
+      try {
+        StoreCornerDataModel? storeCornerData = await storeCornerRepositoryInterface.getStoreCorners(offset: _offset);
+        if (storeCornerData != null && storeCornerData.storeCorners != null && storeCornerData.storeCorners!.isNotEmpty) {
+          if (_offset == 1) {
+            _storeCornerList = [];
+          }
+          _storeCornerList!.addAll(storeCornerData.storeCorners!);
+          _pageSize = storeCornerData.totalSize;
+          _offset = _offset + 1;
+          if (currentModuleId != null) {
+            _moduleStoreCornerList[currentModuleId] = _storeCornerList!;
+            _modulePageSize[currentModuleId] = _pageSize!;
+            _moduleOffset[currentModuleId] = _offset;
+          }
         }
-        _storeCornerList!.addAll(storeCornerData.storeCorners!);
-        _pageSize = storeCornerData.totalSize;
-        _offset = _offset + 1;
-        if (currentModuleId != null) {
-          _moduleStoreCornerList[currentModuleId] = _storeCornerList!;
-          _modulePageSize[currentModuleId] = _pageSize!;
-          _moduleOffset[currentModuleId] = _offset;
-        }
+      } finally {
+        _isLoading = false;
+        update();
       }
-      _isLoading = false;
-      update();
     }
   }
 

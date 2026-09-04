@@ -11,13 +11,32 @@ class DataModuleManager {
   /// In-flight request map for coalescing simultaneous identical calls (thundering herd protection)
   final Map<String, Future<dynamic>> _inFlightRequests = {};
 
-  /// Bounded LRU response cache (capped at 20 entries with 60s TTL by default)
-  final LruMemoryCache<dynamic> _lruCache = LruMemoryCache<dynamic>(maxEntries: 20, defaultTtl: const Duration(seconds: 60));
+  /// Bounded LRU response cache (capped at 100 entries with 120s TTL by default)
+  final LruMemoryCache<dynamic> _lruCache = LruMemoryCache<dynamic>(
+    maxEntries: 100,
+    defaultTtl: const Duration(seconds: 120),
+    defaultStaleGracePeriod: const Duration(seconds: 180),
+  );
 
   /// Generation tracking map keyed by context (e.g., 'national_products_tab', 'category_items', 'home_module')
   final Map<String, int> _contextGenerations = {};
 
   LruMemoryCache<dynamic> get cache => _lruCache;
+
+  /// Invalidates cached entries by URI prefix
+  void invalidatePrefix(String prefix) {
+    _lruCache.removePrefix(prefix);
+  }
+
+  /// Invalidates cached entries whose keys match any of the given patterns
+  void invalidatePatterns(List<String> patterns) {
+    _lruCache.removeMatching((key) {
+      for (final p in patterns) {
+        if (key.contains(p)) return true;
+      }
+      return false;
+    });
+  }
 
   /// Coalesces concurrent identical asynchronous operations into a single Future.
   /// If a request with [key] is currently executing, subsequent callers await the same Future.

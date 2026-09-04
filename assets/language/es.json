@@ -123,6 +123,7 @@
   "help_support": "Ayuda y soporte",
   "logout": "Cerrar sesión",
   "logging_out": "Cerrando sesión...",
+  "please_agree_with_terms_conditions": "Por favor acepte los términos y condiciones",
   "type_here": "Escribe aquí.....",
   "available": "Disponible",
   "used": "Usado",
@@ -1661,5 +1662,10 @@
   "call_via_internet": "Llamar por internet",
   "cellular_call": "Llamada celular",
   "call_via_sim_card": "Llamar por tarjeta SIM",
-  "delivery_man_offline_message": "El repartidor no está disponible en línea en este momento. Intente llamarlo por red celular."
+  "delivery_man_offline_message": "El repartidor no está disponible en línea en este momento. Intente llamarlo por red celular.",
+  "wholesale": "Mayorista",
+  "wholesaler": "Mayorista",
+  "retail": "Minorista",
+  "retailer": "Minorista",
+  "factory": "Fábrica"
 }

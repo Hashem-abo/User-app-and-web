@@ -335,6 +335,7 @@
   "help_support": "Help & Support",
   "logout": "Logout",
   "logging_out": "Logging out...",
+  "please_agree_with_terms_conditions": "Please agree with terms & conditions",
   "type_here": "Type here.....",
   "available": "Available",
   "used": "Used",
@@ -2285,5 +2286,8 @@
   "paste": "Paste",
   "scan_qr_to_pay": "Scan QR Code to Pay",
   "wholesale": "Wholesale",
-  "retail": "Retail"
+  "wholesaler": "Wholesale",
+  "retail": "Retail",
+  "retailer": "Retailer",
+  "factory": "Factory"
 }

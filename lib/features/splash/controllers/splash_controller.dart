@@ -38,6 +38,7 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/home/screens/home_screen.dart';
 import 'package:sixam_mart/features/splash/domain/services/splash_service_interface.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:app_links/app_links.dart';
@@ -104,8 +105,45 @@ class SplashController extends GetxController implements GetxService {
   bool _videoFinished = false;
   bool get videoFinished => _videoFinished;
 
+  bool _isExiting = false;
+  bool get isExiting => _isExiting;
+
+  DateTime? _splashStartTime;
+  bool _isRoutingStarted = false;
+  Completer<void>? _videoCompleter;
+
+  void initSplashSession() {
+    _splashStartTime = DateTime.now();
+    _isExiting = false;
+    _isRoutingStarted = false;
+    _videoFinished = false;
+    _videoCompleter = null;
+  }
+
+  void markSplashStarted() {
+    _splashStartTime = DateTime.now();
+  }
+
+  void resetSplashExitState() {
+    _isExiting = false;
+    _isRoutingStarted = false;
+  }
+
+  Future<void> _performSmoothExit(FutureOr<void> Function() navigate) async {
+    if (_isExiting) {
+      await navigate();
+      return;
+    }
+    _isExiting = true;
+    update();
+    await navigate();
+  }
+
   void setVideoFinished() {
     _videoFinished = true;
+    if (_videoCompleter != null && !_videoCompleter!.isCompleted) {
+      _videoCompleter!.complete();
+    }
     update(); // This triggers the UI to refresh
   }
 
@@ -210,7 +248,9 @@ class SplashController extends GetxController implements GetxService {
       if(fromMainFunction) {
         _mainConfigRouting();
       } else if (fromDemoReset) {
-        Get.offAllNamed(RouteHelper.getInitialRoute(fromSplash: true));
+        await _performSmoothExit(() {
+          Get.offAllNamed(RouteHelper.getInitialRoute(fromSplash: true));
+        });
       } else {
         route(body: notificationBody);
       }
@@ -233,29 +273,46 @@ class SplashController extends GetxController implements GetxService {
   }
 
   Future<void> route({NotificationBodyModel? body}) async {
-    int duration = 1;
-    if(_cacheModule?.splashScreenImageFullUrl != null || _module?.splashScreenImageFullUrl != null) {
-      duration = 4;
-    }
-    Timer(Duration(seconds: duration), () async {
-      double? minimumVersion = _getMinimumVersion();
-      double? latestVersion = _getLatestVersion();
-      bool isMaintenanceMode = _configModel!.maintenanceMode!;
-      bool needsUpdate = AppConstants.appVersion < minimumVersion!;
-      bool canUpdate = AppConstants.appVersion < latestVersion!;
+    if (_isRoutingStarted) return;
+    _isRoutingStarted = true;
+    markSplashStarted();
 
-      if(needsUpdate || isMaintenanceMode) {
-        Get.offNamed(RouteHelper.getUpdateRoute(needsUpdate));
-      } else if (canUpdate) {
-        Get.offNamed(RouteHelper.getUpdateRoute(true, isOptional: true));
-      } else {
-        if(body != null) {
-          _forNotificationRouteProcess(body);
-        }else {
-          _handleUserRouting();
-        }
+    String? splashImage = _cacheModule?.splashScreenImageFullUrl ?? _module?.splashScreenImageFullUrl;
+    bool isVideo = splashImage != null && splashImage.toLowerCase().contains('.mp4');
+
+    if (isVideo && !_videoFinished) {
+      _videoCompleter = Completer<void>();
+      await Future.any([
+        _videoCompleter!.future,
+        Future.delayed(const Duration(seconds: 6)),
+      ]);
+    } else {
+      final bool hasCustomSplash = splashImage != null && splashImage.trim().isNotEmpty && splashImage.trim() != 'null';
+      final int minMs = hasCustomSplash ? 2500 : 2200;
+      final int elapsed = DateTime.now().difference(_splashStartTime!).inMilliseconds;
+      final int remainingMs = minMs - elapsed;
+      if (remainingMs > 0) {
+        await Future.delayed(Duration(milliseconds: remainingMs));
       }
-    });
+    }
+
+    double? minimumVersion = _getMinimumVersion();
+    double? latestVersion = _getLatestVersion();
+    bool isMaintenanceMode = _configModel?.maintenanceMode ?? false;
+    bool needsUpdate = AppConstants.appVersion < (minimumVersion ?? 0);
+    bool canUpdate = AppConstants.appVersion < (latestVersion ?? 0);
+
+    if(needsUpdate || isMaintenanceMode) {
+      await _performSmoothExit(() => Get.offNamed(RouteHelper.getUpdateRoute(needsUpdate)));
+    } else if (canUpdate) {
+      await _performSmoothExit(() => Get.offNamed(RouteHelper.getUpdateRoute(true, isOptional: true)));
+    } else {
+      if(body != null) {
+        await _performSmoothExit(() => _forNotificationRouteProcess(body));
+      } else {
+        await _handleUserRouting();
+      }
+    }
   }
 
   double? _getMinimumVersion() {
@@ -347,50 +404,67 @@ class SplashController extends GetxController implements GetxService {
       await _forLoggedInUserRouteProcess();
     } else if (showIntro() == true) {
       if (_configModel != null && _configModel!.onboardingScreens != null && _configModel!.onboardingScreens!.isNotEmpty) {
-        _newlyRegisteredRouteProcess();
+        await _newlyRegisteredRouteProcess();
       } else {
         disableIntro();
-        _forGuestUserRouteProcess();
+        await _forGuestUserRouteProcess();
       }
     } else if (AuthHelper.isGuestLoggedIn()) {
-      _forGuestUserRouteProcess();
+      await _forGuestUserRouteProcess();
     } else {
       // Already logged in as guest at the top
-      _forGuestUserRouteProcess();
+      await _forGuestUserRouteProcess();
     }
   }
 
   Future<void> _forLoggedInUserRouteProcess() async {
     Get.find<AuthController>().updateToken();
+    if (AddressHelper.getUserAddressFromSharedPref() == null) {
+      await _initDefaultAddress();
+    }
     if (AddressHelper.getUserAddressFromSharedPref() != null) {
-      if(Get.find<SplashController>().module != null) {
-       // await Get.find<FavouriteController>().getFavouriteList();
-      }
       if(_deepLinkUri != null) {
-        Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
-        _navigateDeepLink(_deepLinkUri!);
+        await _performSmoothExit(() {
+          Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+          _navigateDeepLink(_deepLinkUri!);
+        });
       } else {
-        Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+        await _performSmoothExit(() {
+          Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+        });
       }
     } else {
-      Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
+      await _performSmoothExit(() {
+        Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
+      });
     }
   }
 
-  void _newlyRegisteredRouteProcess() {
-    Get.offNamed(RouteHelper.getOnBoardingRoute());
+  Future<void> _newlyRegisteredRouteProcess() async {
+    await _performSmoothExit(() {
+      Get.offNamed(RouteHelper.getOnBoardingRoute());
+    });
   }
 
-  void _forGuestUserRouteProcess() {
+  Future<void> _forGuestUserRouteProcess() async {
+    if (AddressHelper.getUserAddressFromSharedPref() == null) {
+      await _initDefaultAddress();
+    }
     if (AddressHelper.getUserAddressFromSharedPref() != null) {
       if(_deepLinkUri != null) {
-        Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
-        _navigateDeepLink(_deepLinkUri!);
+        await _performSmoothExit(() {
+          Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+          _navigateDeepLink(_deepLinkUri!);
+        });
       } else {
-        Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+        await _performSmoothExit(() {
+          Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+        });
       }
     } else {
-      Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
+      await _performSmoothExit(() {
+        Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
+      });
     }
   }
 
@@ -579,11 +653,11 @@ class SplashController extends GetxController implements GetxService {
       // }
       if (_moduleList!.isNotEmpty) {
         if (_module == null) {
-           setModule(_moduleList![0]);
+          setModule(_moduleList![0]);
         } else {
           int index = _moduleList!.indexWhere((module) => module.id == _module!.id);
           if (index != -1) {
-            setModule(_moduleList![index]);
+            _module = _moduleList![index];
             if(_configModel != null && _configModel!.module != null && _configModel!.module!.id == _moduleList![index].id) {
                _configModel!.module = _moduleList![index];
             }
@@ -739,13 +813,22 @@ class SplashController extends GetxController implements GetxService {
         longitude: '44.191006',
         address: "Sana'a, Yemen",
         addressType: 'others',
+        zoneId: 1,
+        zoneIds: [1],
       );
       try {
         var response = await Get.find<LocationController>().getZone(defaultAddress.latitude, defaultAddress.longitude, false);
         if(response.isSuccess) {
-          defaultAddress.zoneId = response.zoneIds[0];
-          defaultAddress.zoneIds = response.zoneIds;
-          defaultAddress.zoneData = response.zoneData;
+          defaultAddress.zoneId = response.zoneIds.isNotEmpty ? response.zoneIds[0] : 1;
+          defaultAddress.zoneIds = response.zoneIds.isNotEmpty ? response.zoneIds : [1];
+          defaultAddress.zoneData = response.zoneData.map<ZoneData>((z) => ZoneData(
+            id: z.id,
+            name: z.name,
+            status: z.status,
+            cashOnDelivery: z.cashOnDelivery,
+            digitalPayment: z.digitalPayment,
+            offlinePayment: z.offlinePayment,
+          )).toList();
           defaultAddress.areaIds = response.areaIds;
         }
       } catch(e) {

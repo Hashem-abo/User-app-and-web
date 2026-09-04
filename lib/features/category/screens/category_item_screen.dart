@@ -20,6 +20,7 @@ import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/helper/sliver_delegate.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
+import 'package:flutter/services.dart';
 
 class CategoryItemScreen extends StatefulWidget {
   final String? categoryID;
@@ -42,6 +43,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
     _tabController = TabController(length: 2, initialIndex: 0, vsync: this);
     _tabController!.addListener(() {
       if (!_tabController!.indexIsChanging) {
+        HapticFeedback.selectionClick();
         if (_tabController!.index == 1 && Get.find<CategoryController>().categoryStoreList == null) {
           Get.find<CategoryController>().getCategoryStoreList(
             widget.categoryID, 1, Get.find<CategoryController>().type, true,
@@ -62,6 +64,10 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
 
       // Initial tab is items (0); fetch items lazily
       Get.find<CategoryController>().getCategoryItemList(
+        widget.categoryID, 1, Get.find<CategoryController>().type, false,
+      );
+      // Smart prefetch: also prefetch stores in background so tab switching is 0ms instant
+      Get.find<CategoryController>().getCategoryStoreList(
         widget.categoryID, 1, Get.find<CategoryController>().type, false,
       );
     });
@@ -291,6 +297,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                 padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
                                 child: InkWell(
                                   onTap: () {
+                                    HapticFeedback.selectionClick();
                                     Get.toNamed(RouteHelper.getCategoryItemRoute(
                                       catController.subCategoryList![index].id,
                                       catController.subCategoryList![index].name!,
@@ -314,7 +321,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).colorScheme.surface,
                                       borderRadius: BorderRadius.circular(50),
-                                      border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.3)),
+                                      border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.3)),
                                     ),
                                     alignment: Alignment.center,
                                     child: Row(
@@ -325,7 +332,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             color: Theme.of(context).cardColor,
-                                            boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.15), blurRadius: 3, spreadRadius: 1)],
+                                            boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.15), blurRadius: 3, spreadRadius: 1)],
                                           ),
                                           alignment: Alignment.center,
                                           child: Padding(
@@ -340,7 +347,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                                 decoration: BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   boxShadow: [
-                                                    BoxShadow(color: Colors.black.withOpacity(0.35), blurRadius: 12, offset: const Offset(4, 6)),
+                                                    BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 12, offset: const Offset(4, 6)),
                                                   ],
                                                 ),
                                                 child: ClipOval(
@@ -565,6 +572,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                     padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall),
                                     child: InkWell(
                                       onTap: () {
+                                        HapticFeedback.selectionClick();
                                         Get.toNamed(RouteHelper.getCategoryItemRoute(
                                           catController.subCategoryList![index].id,
                                           catController.subCategoryList![index].name!,
@@ -588,7 +596,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                         decoration: BoxDecoration(
                                           color: Theme.of(context).colorScheme.surface,
                                           borderRadius: BorderRadius.circular(50),
-                                          border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.3)),
+                                          border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.3)),
                                         ),
                                         alignment: Alignment.center,
                                         child: Row(
@@ -599,7 +607,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                               decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
                                                 color: Theme.of(context).cardColor,
-                                                boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.15), blurRadius: 3, spreadRadius: 1)],
+                                                boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.15), blurRadius: 3, spreadRadius: 1)],
                                               ),
                                               alignment: Alignment.center,
                                               child: Padding(
@@ -614,7 +622,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                                                     decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
                                                       boxShadow: [
-                                                        BoxShadow(color: Colors.black.withOpacity(0.35), blurRadius: 12, offset: const Offset(4, 6)),
+                                                        BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 12, offset: const Offset(4, 6)),
                                                       ],
                                                     ),
                                                     child: ClipOval(

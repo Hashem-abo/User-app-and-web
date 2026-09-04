@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/service/widgets/service_provider_widget.dart';
 import 'package:sixam_mart/features/service/controllers/service_controller.dart';
 import 'dart:async'; // + ahmed
 import 'package:flutter/rendering.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/banner/controllers/banner_controller.dart';
 import 'package:sixam_mart/features/brands/controllers/brands_controller.dart';
 import 'package:sixam_mart/features/home/controllers/advertisement_controller.dart';
@@ -16,11 +14,9 @@ import 'package:sixam_mart/features/home/widgets/all_store_filter_widget.dart';
 import 'package:sixam_mart/features/home/widgets/cashback_logo_widget.dart';
 import 'package:sixam_mart/features/home/widgets/cashback_dialog_widget.dart';
 import 'package:sixam_mart/features/home/widgets/refer_bottom_sheet_widget.dart';
-import 'package:sixam_mart/features/item/controllers/campaign_controller.dart';
 import 'package:sixam_mart/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
 import 'package:sixam_mart/features/flash_sale/controllers/flash_sale_controller.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
@@ -38,7 +34,6 @@ import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
 import 'package:sixam_mart/features/rental_module/home/controllers/taxi_home_controller.dart';
 import 'package:sixam_mart/features/rental_module/home/screens/taxi_home_screen.dart';
 import 'package:sixam_mart/features/rental_module/rental_cart_screen/controllers/taxi_cart_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -53,10 +48,7 @@ import 'package:sixam_mart/common/widgets/web_menu_bar.dart';
 import 'package:sixam_mart/features/home/screens/web_new_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/home/widgets/module_view.dart';
-import 'package:sixam_mart/features/parcel/screens/parcel_category_screen.dart';
 import 'package:sixam_mart/features/redesign_feature/parcel/screens/parcel_module_screen.dart';
-import 'package:sixam_mart/features/home/widgets/horizontal_module_view.dart'; // + ahmed
 import 'package:sixam_mart/features/home/widgets/module_sticky_delegate.dart'; // + ahmed
 import 'package:sixam_mart/features/home/widgets/views/national_products_view.dart'; // + ahmed
 import 'package:sixam_mart/features/home/widgets/views/national_products_filter_widget.dart'; // + ahmed
@@ -69,18 +61,19 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   static Future<void> loadData(bool reload, {bool fromModule = false}) async {
-    // Phase 1: Critical Core Data — fire zone sync & user info in parallel
     Get.find<FlashSaleController>().setEmptyFlashSale(fromModule: fromModule);
-    await Future.wait([
-      Get.find<LocationController>().syncZoneData(),
-      if (AuthHelper.isLoggedIn()) Get.find<ProfileController>().getUserInfo(),
-    ]);
 
-    // Query the aggregated homepage endpoint to prefetch modules, banners, categories, shelves, corners, campaigns in one call
+    // Run zone sync & user profile in background without blocking homepage load
+    Get.find<LocationController>().syncZoneData();
+    if (AuthHelper.isLoggedIn()) {
+      Get.find<ProfileController>().getUserInfo();
+    }
+
+    // Query the aggregated homepage endpoint immediately to prefetch modules, banners, categories, shelves, corners, campaigns in one call
     await Get.find<HomeController>().getHomepageData();
 
-    if (Get.find<SplashController>().module == null &&
-        Get.find<SplashController>().configModel!.module == null) {
+    final splashCtrl = Get.find<SplashController>();
+    if (splashCtrl.module == null && splashCtrl.configModel?.module == null) {
       Get.find<BannerController>().getFeaturedBanner();
       Get.find<StoreController>().getFeaturedStoreList();
       if (AuthHelper.isLoggedIn()) {
@@ -88,17 +81,12 @@ class HomeScreen extends StatefulWidget {
       }
     }
 
-    if (Get.find<SplashController>().module != null &&
-        !Get.find<SplashController>()
-            .configModel!
-            .moduleConfig!
-            .module!
-            .isParcel! &&
-        !Get.find<SplashController>()
-            .configModel!
-            .moduleConfig!
-            .module!
-            .isTaxi!) {
+    bool isParcel = splashCtrl.module?.moduleType.toString().trim().toLowerCase() == AppConstants.parcel ||
+        (splashCtrl.configModel?.moduleConfig?.module?.isParcel ?? false);
+    bool isTaxi = splashCtrl.module?.moduleType.toString().trim().toLowerCase() == AppConstants.taxi ||
+        (splashCtrl.configModel?.moduleConfig?.module?.isTaxi ?? false);
+
+    if (splashCtrl.module != null && !isParcel && !isTaxi) {
       // Banners, categories, shelves, store corners, campaigns are already loaded and populated into their controllers via getHomepageData()!
 
       // Phase 3a: Below-the-fold data that isn't aggregated (ads, stores list)
@@ -232,7 +220,6 @@ class _HomeScreenState extends State<HomeScreen>
   final GlobalKey _headerKey = GlobalKey();
   Timer? _timer;
   int _currentHintIndex = 0;
-  final bool _firstTimeSubModuleLoaded = true;
   int? _currentModuleId;
   final GlobalKey _exploreFilterKey = GlobalKey();
   double _appBarRatio = 1.0;
@@ -253,9 +240,12 @@ class _HomeScreenState extends State<HomeScreen>
       if (_collapsedModuleController.hasClients && _expandedModuleController.hasClients) {
         double maxExpanded = _expandedModuleController.position.maxScrollExtent;
         double maxCollapsed = _collapsedModuleController.position.maxScrollExtent;
-        if (maxExpanded > 0) {
+        if (maxExpanded > 0 && maxCollapsed > 0) {
           double ratio = _expandedModuleController.offset / maxExpanded;
-          _collapsedModuleController.jumpTo((ratio * maxCollapsed).clamp(0.0, maxCollapsed));
+          double target = (ratio * maxCollapsed).clamp(0.0, maxCollapsed);
+          if ((_collapsedModuleController.offset - target).abs() > 1.0) {
+            _collapsedModuleController.jumpTo(target);
+          }
         }
       }
       _isSyncing = false;
@@ -267,9 +257,12 @@ class _HomeScreenState extends State<HomeScreen>
       if (_expandedModuleController.hasClients && _collapsedModuleController.hasClients) {
         double maxExpanded = _expandedModuleController.position.maxScrollExtent;
         double maxCollapsed = _collapsedModuleController.position.maxScrollExtent;
-        if (maxCollapsed > 0) {
+        if (maxExpanded > 0 && maxCollapsed > 0) {
           double ratio = _collapsedModuleController.offset / maxCollapsed;
-          _expandedModuleController.jumpTo((ratio * maxExpanded).clamp(0.0, maxExpanded));
+          double target = (ratio * maxExpanded).clamp(0.0, maxExpanded);
+          if ((_expandedModuleController.offset - target).abs() > 1.0) {
+            _expandedModuleController.jumpTo(target);
+          }
         }
       }
       _isSyncing = false;
@@ -295,6 +288,8 @@ class _HomeScreenState extends State<HomeScreen>
     });
 
     _scrollController.addListener(() {
+      if (!_scrollController.hasClients) return;
+
       if (_scrollController.offset > 1000) {
         if (!_showBackToTop) {
           setState(() => _showBackToTop = true);
@@ -342,21 +337,23 @@ class _HomeScreenState extends State<HomeScreen>
             .saveScrollOffset(currentModuleId, _scrollController.offset);
       }
 
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 100) {
-        if (Get.find<ShelfController>().shelfList != null &&
-            !Get.find<ShelfController>().isLoading &&
-            (Get.find<ShelfController>().pageSize == null ||
-                Get.find<ShelfController>().shelfList!.length <
-                    Get.find<ShelfController>().pageSize!)) {
-          Get.find<ShelfController>().getShelfList(false);
+      if (_scrollController.hasClients &&
+          _scrollController.position.maxScrollExtent > 200 &&
+          _scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 100) {
+        final shelfCtrl = Get.find<ShelfController>();
+        if (shelfCtrl.shelfList != null &&
+            !shelfCtrl.isLoading &&
+            shelfCtrl.pageSize != null &&
+            shelfCtrl.shelfList!.length < shelfCtrl.pageSize!) {
+          shelfCtrl.getShelfList(false, isPagination: true);
         }
-        if (Get.find<StoreCornerController>().storeCornerList != null &&
-            !Get.find<StoreCornerController>().isLoading &&
-            (Get.find<StoreCornerController>().pageSize == null ||
-                Get.find<StoreCornerController>().storeCornerList!.length <
-                    Get.find<StoreCornerController>().pageSize!)) {
-          Get.find<StoreCornerController>().getStoreCornerList(false);
+        final storeCornerCtrl = Get.find<StoreCornerController>();
+        if (storeCornerCtrl.storeCornerList != null &&
+            !storeCornerCtrl.isLoading &&
+            storeCornerCtrl.pageSize != null &&
+            storeCornerCtrl.storeCornerList!.length < storeCornerCtrl.pageSize!) {
+          storeCornerCtrl.getStoreCornerList(false, isPagination: true);
         }
       }
 
@@ -365,11 +362,10 @@ class _HomeScreenState extends State<HomeScreen>
         if (!Get.find<HomeController>().showFavButton) {
           Get.find<HomeController>().changeFavVisibility();
         }
-      } else {
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
         if (Get.find<HomeController>().showFavButton) {
           Get.find<HomeController>().changeFavVisibility();
-          Future.delayed(const Duration(milliseconds: 800),
-              () => Get.find<HomeController>().changeFavVisibility());
         }
       }
     });
@@ -456,6 +452,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return GetBuilder<SplashController>(builder: (splashController) {
       int? newModuleId = splashController.module?.id;
       if (newModuleId != _currentModuleId) {
@@ -475,7 +472,7 @@ class _HomeScreenState extends State<HomeScreen>
 
       bool showMobileModule = !ResponsiveHelper.isDesktop(context) &&
           splashController.module == null &&
-          splashController.configModel!.module == null;
+          splashController.configModel?.module == null;
       bool isParcel = splashController.module != null &&
           splashController.module!.moduleType.toString().trim().toLowerCase() ==
               AppConstants.parcel;
@@ -507,35 +504,30 @@ class _HomeScreenState extends State<HomeScreen>
       bool showStoreList = splashController.module?.showStoreList ?? true;
       // + ahmed
 
-      return GetBuilder<HomeController>(builder: (homeController) {
-        // if(splashController.module != null && !_firstTimeSubModuleLoaded) {
-        //   _firstTimeSubModuleLoaded = true;
-        //   print("AHMED_DEBUG: Lazy triggering loadData(true)");
-        //   HomeScreen.loadData(true, fromModule: true);
-        // }
-        return Scaffold(
-          appBar:
-              ResponsiveHelper.isDesktop(context) ? const WebMenuBar() : null,
-          endDrawer: const MenuDrawer(),
-          endDrawerEnableOpenDragGesture: false,
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          body: Stack(
-            children: [
-              // Positioned Sky Background removed as it's now integrated into sticky headers
-              ResponsiveHelper.isDesktop(context)
-                  ? RefreshIndicator(
-                      onRefresh: () async {
-                        await HomeScreen.refreshAllData();
-                      },
-                      child: WebNewHomeScreen(
-                        scrollController: _scrollController,
-                      ),
-                    )
-                  : GestureDetector(
-                      onHorizontalDragEnd: (details) {
-                        if (details.primaryVelocity == null) return;
-                        if (details.primaryVelocity!.abs() < 300)
-                          return; // Ignore slow swipes
+      return Scaffold(
+        appBar:
+            ResponsiveHelper.isDesktop(context) ? const WebMenuBar() : null,
+        endDrawer: const MenuDrawer(),
+        endDrawerEnableOpenDragGesture: false,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Stack(
+          children: [
+            // Positioned Sky Background removed as it's now integrated into sticky headers
+            ResponsiveHelper.isDesktop(context)
+                ? RefreshIndicator(
+                    onRefresh: () async {
+                      await HomeScreen.refreshAllData();
+                    },
+                    child: WebNewHomeScreen(
+                      scrollController: _scrollController,
+                    ),
+                  )
+                : GestureDetector(
+                    onHorizontalDragEnd: (details) {
+                      if (details.primaryVelocity == null) return;
+                      if (details.primaryVelocity!.abs() < 300) {
+                        return; // Ignore slow swipes
+                      }
 
                         if (isAggregatedModule) {
                           final ItemController itemController =
@@ -1106,92 +1098,93 @@ class _HomeScreenState extends State<HomeScreen>
           floatingActionButton: Padding(
             padding: EdgeInsets.only(
                 bottom: ResponsiveHelper.isDesktop(context) ? 0 : 70),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (isPharmacy &&
-                    Get.find<SplashController>().configModel!.moduleConfig!.module!.orderAttachment! &&
-                    Get.find<SplashController>().configModel!.prescriptionStatus! &&
-                    AuthHelper.isLoggedIn() &&
-                    homeController.showFavButton) ...[
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
-                          blurRadius: 10,
-                          offset: const Offset(2, 2),
-                        )
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: ResponsiveHelper.isDesktop(context) ? 180 : 150,
-                          height: 30,
-                          child: Center(
-                            child: Text(
-                              'prescription_order'.tr,
-                              textAlign: TextAlign.center,
-                              style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+            child: GetBuilder<HomeController>(builder: (homeController) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (isPharmacy &&
+                      (splashController.configModel?.moduleConfig?.module?.orderAttachment ?? false) &&
+                      (splashController.configModel?.prescriptionStatus ?? false) &&
+                      AuthHelper.isLoggedIn() &&
+                      homeController.showFavButton) ...[
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                            blurRadius: 10,
+                            offset: const Offset(2, 2),
+                          )
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: ResponsiveHelper.isDesktop(context) ? 180 : 150,
+                            height: 30,
+                            child: Center(
+                              child: Text(
+                                'prescription_order'.tr,
+                                textAlign: TextAlign.center,
+                                style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            showCustomBottomSheet(
-                              child: const PrescriptionStoreBottomSheetWidget(),
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).primaryColor,
-                              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                          InkWell(
+                            onTap: () {
+                              showCustomBottomSheet(
+                                child: const PrescriptionStoreBottomSheetWidget(),
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                              ),
+                              padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                              child: Image.asset(Images.prescriptionIcon, height: 25, width: 25),
                             ),
-                            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                            child: Image.asset(Images.prescriptionIcon, height: 25, width: 25),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: Dimensions.paddingSizeSmall),
-                ],
-                if (_showBackToTop) ...[
-                  FloatingActionButton(
-                    mini: true,
-                    onPressed: () => _scrollController.animateTo(0,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeInOut),
-                    backgroundColor: Colors.grey.withValues(alpha: 0.5),
-                    child: const Icon(Icons.arrow_upward, color: Colors.white),
-                  ),
-                  const SizedBox(height: Dimensions.paddingSizeSmall),
-                ],
-                if (AuthHelper.isLoggedIn() &&
-                    homeController.cashBackOfferList != null &&
-                    homeController.cashBackOfferList!.isNotEmpty &&
-                    homeController.showFavButton)
-                  Padding(
-                    padding: EdgeInsets.only(
-                        right: ResponsiveHelper.isDesktop(context) ? 50 : 0),
-                    child: InkWell(
-                      onTap: () => Get.dialog(const CashBackDialogWidget()),
-                      child: const CashBackLogoWidget(),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
+                  ],
+                  if (_showBackToTop) ...[
+                    FloatingActionButton(
+                      mini: true,
+                      onPressed: () => _scrollController.animateTo(0,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInOut),
+                      backgroundColor: Colors.grey.withValues(alpha: 0.5),
+                      child: const Icon(Icons.arrow_upward, color: Colors.white),
                     ),
-                  ),
-              ],
-            ),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
+                  ],
+                  if (AuthHelper.isLoggedIn() &&
+                      homeController.cashBackOfferList != null &&
+                      homeController.cashBackOfferList!.isNotEmpty &&
+                      homeController.showFavButton)
+                    Padding(
+                      padding: EdgeInsets.only(
+                          right: ResponsiveHelper.isDesktop(context) ? 50 : 0),
+                      child: InkWell(
+                        onTap: () => Get.dialog(const CashBackDialogWidget()),
+                        child: const CashBackLogoWidget(),
+                      ),
+                    ),
+                ],
+              );
+            }),
           ),
         );
       });
-    });
   }
 }
 

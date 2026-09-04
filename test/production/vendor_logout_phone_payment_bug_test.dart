@@ -61,7 +61,7 @@ void main() {
       expect(store.vendorType, isNotEmpty);
     });
 
-    test('Store.vendorType MUST recognize wholesale (جملة) and retail (تجزئة) from vendor_type or store_business_model', () {
+    test('Store.vendorType MUST recognize wholesale (جملة), factory (مصنع), and hide retailer (تجزئة)', () {
       final wholesaleStore = Store.fromJson({
         'id': 99,
         'name': 'Wholesale Market',
@@ -69,12 +69,19 @@ void main() {
       });
       expect(wholesaleStore.vendorType.toLowerCase(), anyOf(contains('wholesale'), contains('جملة')));
 
+      final factoryStore = Store.fromJson({
+        'id': 98,
+        'name': 'Modern Factory',
+        'vendor_type': 'factory',
+      });
+      expect(factoryStore.vendorType.toLowerCase(), anyOf(contains('factory'), contains('مصنع')));
+
       final retailStore = Store.fromJson({
         'id': 100,
         'name': 'Retail Shop',
         'store_business_model': 'retail',
       });
-      expect(retailStore.vendorType.toLowerCase(), anyOf(contains('retail'), contains('تجزئة')));
+      expect(retailStore.vendorType, isEmpty);
     });
 
     test('Store.vendorType in Zad MUST be hidden (empty string) when vendor_type is null, "null", or omitted', () {
@@ -116,7 +123,7 @@ void main() {
       expect(omittedZadStore.vendorType, isEmpty);
     });
 
-    test('Store.vendorType in Zad MUST be visible when vendor_type is provided (e.g. wholesale or retail)', () {
+    test('Store.vendorType in Zad MUST be visible for wholesale/factory and hidden for retailer', () {
       final zadWholesale = Store.fromJson({
         'id': 104,
         'name': 'Zad Central Wholesale',
@@ -127,6 +134,16 @@ void main() {
       expect(zadWholesale.vendorType, isNotEmpty);
       expect(zadWholesale.vendorType.toLowerCase(), anyOf(contains('wholesale'), contains('جملة')));
 
+      final zadFactory = Store.fromJson({
+        'id': 106,
+        'name': 'Zad Factory Store',
+        'module_id': 1,
+        'vendor_type': 'factory',
+      });
+      expect(zadFactory.isZad, isTrue);
+      expect(zadFactory.vendorType, isNotEmpty);
+      expect(zadFactory.vendorType.toLowerCase(), anyOf(contains('factory'), contains('مصنع')));
+
       final zadRetail = Store.fromJson({
         'id': 105,
         'name': 'Zad Corner Retail',
@@ -134,8 +151,7 @@ void main() {
         'vendor_type': 'retail',
       });
       expect(zadRetail.isZad, isTrue);
-      expect(zadRetail.vendorType, isNotEmpty);
-      expect(zadRetail.vendorType.toLowerCase(), anyOf(contains('retail'), contains('تجزئة')));
+      expect(zadRetail.vendorType, isEmpty);
     });
   });
 

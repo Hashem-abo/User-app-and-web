@@ -94,8 +94,11 @@ class _HighlightWidgetState extends State<HighlightWidget> {
                   },
                 ),
                 itemBuilder: (context, index, realIndex) {
+                  final bool isCurrent = advertisementController.currentIndex == index;
                   return advertisementController.advertisementList?[index].addType == 'video_promotion' ? HighlightVideoWidget(
+                    key: ValueKey('highlight_video_${advertisementController.advertisementList![index].id}'),
                     advertisement: advertisementController.advertisementList![index],
+                    isActive: isCurrent,
                   ) : HighlightStoreWidget(advertisement: advertisementController.advertisementList![index]);
                 },
               ),
@@ -246,7 +249,8 @@ class HighlightStoreWidget extends StatelessWidget {
 
 class HighlightVideoWidget extends StatefulWidget {
   final AdvertisementModel advertisement;
-  const HighlightVideoWidget({super.key, required this.advertisement});
+  final bool isActive;
+  const HighlightVideoWidget({super.key, required this.advertisement, this.isActive = true});
 
   @override
   State<HighlightVideoWidget> createState() => _HighlightVideoWidgetState();
@@ -254,51 +258,102 @@ class HighlightVideoWidget extends StatefulWidget {
 
 class _HighlightVideoWidgetState extends State<HighlightVideoWidget> {
 
-  late VideoPlayerController videoPlayerController;
+  VideoPlayerController? videoPlayerController;
   ChewieController? _chewieController;
+  bool _isInitializing = false;
 
   @override
   void initState() {
     super.initState();
-    initializePlayer();
+    if (widget.isActive) {
+      initializePlayer();
+    }
+  }
 
-    videoPlayerController.addListener(() {
-      if(videoPlayerController.value.duration == videoPlayerController.value.position){
-        if(GetPlatform.isWeb){
-          Future.delayed(const Duration(seconds: 4), () {
-            Get.find<AdvertisementController>().updateAutoPlayStatus(status: true, shouldUpdate: true);
-          });
-        }else{
-          Get.find<AdvertisementController>().updateAutoPlayStatus(status: true, shouldUpdate: true);
+  @override
+  void didUpdateWidget(covariant HighlightVideoWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive != oldWidget.isActive) {
+      if (widget.isActive) {
+        initializePlayer();
+      } else {
+        _disposeControllers();
+      }
+    }
+  }
+
+  void _disposeControllers() {
+    try {
+      videoPlayerController?.removeListener(_videoListener);
+      _chewieController?.dispose();
+      videoPlayerController?.dispose();
+    } catch (_) {}
+    _chewieController = null;
+    videoPlayerController = null;
+    _isInitializing = false;
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _videoListener() {
+    if (videoPlayerController != null && videoPlayerController!.value.isInitialized) {
+      if (videoPlayerController!.value.duration > Duration.zero &&
+          videoPlayerController!.value.position >= videoPlayerController!.value.duration) {
+        videoPlayerController?.removeListener(_videoListener);
+        final adController = Get.find<AdvertisementController>();
+        if (!adController.autoPlay) {
+          if (GetPlatform.isWeb) {
+            Future.delayed(const Duration(seconds: 4), () {
+              adController.updateAutoPlayStatus(status: true, shouldUpdate: true);
+            });
+          } else {
+            adController.updateAutoPlayStatus(status: true, shouldUpdate: true);
+          }
         }
       }
-    });
+    }
   }
 
   Future<void> initializePlayer() async {
-    videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
-      widget.advertisement.videoAttachmentFullUrl ?? "",
-    ));
+    if (!widget.isActive || _isInitializing || videoPlayerController != null) return;
+    final String? url = widget.advertisement.videoAttachmentFullUrl;
+    if (url == null || url.isEmpty) return;
 
-    await Future.wait([
-      videoPlayerController.initialize(),
-    ]);
-
-    _createChewieController();
-    setState(() {});
+    _isInitializing = true;
+    try {
+      final controller = VideoPlayerController.networkUrl(Uri.parse(url));
+      await controller.initialize();
+      if (!mounted || !widget.isActive) {
+        controller.dispose();
+        _isInitializing = false;
+        return;
+      }
+      videoPlayerController = controller;
+      controller.addListener(_videoListener);
+      _createChewieController();
+      _isInitializing = false;
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (_) {
+      _isInitializing = false;
+    }
   }
 
   void _createChewieController() {
+    if (videoPlayerController == null || !videoPlayerController!.value.isInitialized) return;
     _chewieController = ChewieController(
-      videoPlayerController: videoPlayerController,
+      videoPlayerController: videoPlayerController!,
       autoPlay: true,
-      aspectRatio: videoPlayerController.value.aspectRatio * (ResponsiveHelper.isDesktop(context) ? 1 : 1.3),
+      aspectRatio: videoPlayerController!.value.aspectRatio * (ResponsiveHelper.isDesktop(context) ? 1 : 1.3),
     );
     _chewieController?.setVolume(0);
   }
 
   @override
   void dispose() {
+    _disposeControllers();
     super.dispose();
   }
 

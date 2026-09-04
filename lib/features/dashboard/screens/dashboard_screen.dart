@@ -699,9 +699,12 @@ class DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _setPage(int pageIndex) {
+    if (_pageIndex == pageIndex) return;
     setState(() {
-      _pageController!.jumpToPage(pageIndex);
       _pageIndex = pageIndex;
+      if (_pageController != null && _pageController!.hasClients) {
+        _pageController!.jumpToPage(pageIndex);
+      }
     });
   }
 
@@ -724,7 +727,6 @@ class DashboardScreenState extends State<DashboardScreen> {
       CartController cartController) {
     List<Widget> navWidgets = [];
     final module = Get.find<SplashController>().module;
-    final globalCartCtrl = isGlobal ? Get.find<GlobalCartController>() : null;
 
     List<dynamic> configItems = [];
     if (module != null && module.bottomNavConfig != null) {
@@ -1102,18 +1104,6 @@ class DashboardScreenState extends State<DashboardScreen> {
       case 'discount':
         return Icons.discount;
 
-      case 'assignment':
-        return Icons.assignment;
-      case 'receipt':
-        return Icons.receipt;
-      case 'receipt_long':
-        return Icons.receipt_long;
-      case 'history':
-        return Icons.history;
-      case 'description':
-        return Icons.description;
-      case 'list_alt':
-        return Icons.list_alt;
       case 'track_changes':
         return Icons.track_changes;
 

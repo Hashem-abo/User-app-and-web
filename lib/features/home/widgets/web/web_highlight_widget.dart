@@ -84,8 +84,11 @@ class _WebHighlightWidgetState extends State<WebHighlightWidget> {
                   },
                 ),
                 itemBuilder: (context, index, realIndex) {
+                  final bool isCurrent = advertisementController.currentIndex == index;
                   return advertisementController.advertisementList?[index].addType == "video_promotion" ? HighlightVideoWidget(
+                    key: ValueKey('web_highlight_video_${advertisementController.advertisementList![index].id}'),
                     advertisement: advertisementController.advertisementList![index],
+                    isActive: isCurrent,
                   ) : HighlightStoreWidget(advertisement: advertisementController.advertisementList![index]);
                 },
               ),

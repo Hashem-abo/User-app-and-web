@@ -31,6 +31,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterL
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  PaintingBinding.instance.imageCache.maximumSize = 150;
+  PaintingBinding.instance.imageCache.maximumSizeBytes = 64 << 20; // 64 MB heap limit
   await initializeDateFormatting('ar', null);
   await initializeDateFormatting('en', null);
   await initializeDateFormatting('es', null);
@@ -159,8 +161,9 @@ class _MyAppState extends State<MyApp> {
                 Get.find<ProController>().maybeShowRenewOnRoute(routing.current);
               }
             },
-            defaultTransition: Transition.topLevel,
-            transitionDuration: const Duration(milliseconds: 280),
+            customTransition: CrossFadeTransition(),
+            defaultTransition: Transition.fade,
+            transitionDuration: const Duration(milliseconds: 300),
             builder: (BuildContext context, widget) {
               double fontSizeOffset = Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSizeOffset : 0.0;
               double fontScale = (14.0 - fontSizeOffset) / 14.0;
@@ -186,5 +189,33 @@ class _MyAppState extends State<MyApp> {
         });
       });
     });
+  }
+}
+
+class CrossFadeTransition extends CustomTransition {
+  @override
+  Widget buildTransition(
+    BuildContext context,
+    Curve? curve,
+    Alignment? alignment,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: animation,
+        curve: curve ?? Curves.easeInOutCubic,
+      ),
+      child: FadeTransition(
+        opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
+          CurvedAnimation(
+            parent: secondaryAnimation,
+            curve: curve ?? Curves.easeInOutCubic,
+          ),
+        ),
+        child: child,
+      ),
+    );
   }
 }

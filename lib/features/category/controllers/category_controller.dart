@@ -38,6 +38,7 @@ class CategoryController extends GetxController implements GetxService {
   bool get isLoading => _isLoading;
 
   bool _isCategoryLoaded = false;
+  bool get isCategoryLoaded => _isCategoryLoaded;
 
   final Map<int, List<CategoryModel>> _moduleCategoryList = {};
   final Map<int, List<bool>> _moduleInterestSelectedList = {};
@@ -86,15 +87,27 @@ class CategoryController extends GetxController implements GetxService {
     if (clearAllModuleCache) {
       _moduleCategoryList.clear();
       _moduleInterestSelectedList.clear();
+      _subCategoryCache.clear();
+      _subSubCategoryCache.clear();
+      _categoryDetailsCache.clear();
+      _categorySubCategoryCache.clear();
+      _subCategoryItemCache.clear();
+      _subCategoryStoreCache.clear();
+      _subCategoryItemTotalSize.clear();
+      _subCategoryStoreTotalSize.clear();
     }
     update();
   }
 
-  void clearCategoryItemList() {
+  void clearCategoryItemList({bool clearSessionCache = false}) {
     _categoryItemList = null;
     _categoryStoreList = null;
-    _subCategoryItemCache.clear();
-    _subCategoryStoreCache.clear();
+    if (clearSessionCache) {
+      _subCategoryItemCache.clear();
+      _subCategoryStoreCache.clear();
+      _subCategoryItemTotalSize.clear();
+      _subCategoryStoreTotalSize.clear();
+    }
     update();
   }
 
@@ -159,17 +172,45 @@ class CategoryController extends GetxController implements GetxService {
     update();
   }
 
+  final Map<String, List<CategoryModel>> _subCategoryCache = {};
+  final Map<String, List<CategoryModel>> _subSubCategoryCache = {};
+  final Map<String, CategoryModel> _categoryDetailsCache = {};
+  final Map<String, int> _subCategoryItemTotalSize = {};
+  final Map<String, int> _subCategoryStoreTotalSize = {};
+  int _subCategoryFetchGeneration = 0;
+
   void getSubCategoryList(String? categoryID) async {
     _subCategoryIndex = 0;
+    final int generation = ++_subCategoryFetchGeneration;
+
+    if (categoryID != null && _subCategoryCache.containsKey(categoryID)) {
+      // 0ms instant display from cache
+      _subCategoryList = _subCategoryCache[categoryID];
+      if (_subCategoryList!.isNotEmpty) {
+        _subCategoryIndex = 0;
+        getSubSubCategoryList(_subCategoryList![0].id.toString());
+      }
+      update();
+      // Background revalidation without blanking UI
+      _revalidateSubCategoryList(categoryID, generation);
+      return;
+    }
+
     _subCategoryList = null;
     _categoryItemList = null;
-    _subSubCategoryList = null; // Reset sub-sub categories
+    _subSubCategoryList = null;
     update();
+
     List<CategoryModel>? subCategoryList = await categoryServiceInterface.getSubCategoryList(categoryID);
+    if (_subCategoryFetchGeneration != generation) return;
+
     if (subCategoryList != null) {
-      _subCategoryList= [];
+      _subCategoryList = [];
       _subCategoryList!.addAll(subCategoryList);
-      if(_subCategoryList!.isNotEmpty){
+      if (categoryID != null) {
+        _subCategoryCache[categoryID] = _subCategoryList!;
+      }
+      if (_subCategoryList!.isNotEmpty) {
         _subCategoryIndex = 0;
         getSubSubCategoryList(_subCategoryList![0].id.toString());
       }
@@ -177,13 +218,31 @@ class CategoryController extends GetxController implements GetxService {
     update();
   }
 
+  void _revalidateSubCategoryList(String categoryID, int generation) async {
+    List<CategoryModel>? subCategoryList = await categoryServiceInterface.getSubCategoryList(categoryID);
+    if (_subCategoryFetchGeneration != generation) return;
+    if (subCategoryList != null) {
+      _subCategoryCache[categoryID] = subCategoryList;
+      _subCategoryList = subCategoryList;
+      update();
+    }
+  }
+
   void getSubSubCategoryList(String? categoryID) async {
+    if (categoryID != null && _subSubCategoryCache.containsKey(categoryID)) {
+      _subSubCategoryList = _subSubCategoryCache[categoryID];
+      update();
+      return;
+    }
     _subSubCategoryList = null;
     update();
     List<CategoryModel>? subCategoryList = await categoryServiceInterface.getSubCategoryList(categoryID);
     if (subCategoryList != null) {
       _subSubCategoryList = [];
       _subSubCategoryList!.addAll(subCategoryList);
+      if (categoryID != null) {
+        _subSubCategoryCache[categoryID] = _subSubCategoryList!;
+      }
     }
     update();
   }
@@ -215,11 +274,17 @@ class CategoryController extends GetxController implements GetxService {
   CategoryModel? get categoryModel => _categoryModel;
 
   void getCategoryDetails(String categoryID) async {
+    if (_categoryDetailsCache.containsKey(categoryID)) {
+      _categoryModel = _categoryDetailsCache[categoryID];
+      update();
+      return;
+    }
     _categoryModel = null;
     update();
     CategoryModel? category = await categoryServiceInterface.getCategoryDetails(categoryID);
     if (category != null) {
       _categoryModel = category;
+      _categoryDetailsCache[categoryID] = category;
     }
     update();
   }
@@ -232,9 +297,12 @@ class CategoryController extends GetxController implements GetxService {
     _subCategoryIndex = index;
     _subCategoryRequestGeneration++;
     String targetId = _subCategoryIndex == 0 ? (categoryID ?? '') : (_subCategoryList![index].id?.toString() ?? '');
+    String cacheKey = '${targetId}_$_type';
+
     if(_isStore) {
-      if (_subCategoryStoreCache.containsKey(targetId)) {
-        _categoryStoreList = _subCategoryStoreCache[targetId];
+      if (_subCategoryStoreCache.containsKey(cacheKey)) {
+        _categoryStoreList = _subCategoryStoreCache[cacheKey];
+        _restPageSize = _subCategoryStoreTotalSize[cacheKey];
         update();
         getCategoryStoreList(targetId, 1, _type, false);
       } else {
@@ -243,8 +311,9 @@ class CategoryController extends GetxController implements GetxService {
         getCategoryStoreList(targetId, 1, _type, true);
       }
     } else {
-      if (_subCategoryItemCache.containsKey(targetId)) {
-        _categoryItemList = _subCategoryItemCache[targetId];
+      if (_subCategoryItemCache.containsKey(cacheKey)) {
+        _categoryItemList = _subCategoryItemCache[cacheKey];
+        _pageSize = _subCategoryItemTotalSize[cacheKey];
         update();
         getCategoryItemList(targetId, 1, _type, false);
       } else {
@@ -258,13 +327,17 @@ class CategoryController extends GetxController implements GetxService {
   void getCategoryItemList(String? categoryID, int offset, String type, bool notify) async {
     _offset = offset;
     final int generation = _subCategoryRequestGeneration;
+    String cacheKey = '${categoryID ?? ''}_$type';
     if(offset == 1) {
       if(_type == type) {
         _isSearching = false;
       }
       _type = type;
-      if (!_subCategoryItemCache.containsKey(categoryID ?? '')) {
+      if (!_subCategoryItemCache.containsKey(cacheKey)) {
         _categoryItemList = null;
+      } else {
+        _categoryItemList = _subCategoryItemCache[cacheKey];
+        _pageSize = _subCategoryItemTotalSize[cacheKey];
       }
       if(notify) {
         update();
@@ -282,7 +355,10 @@ class CategoryController extends GetxController implements GetxService {
       _pageSize = categoryItem.totalSize;
       _isLoading = false;
       if (offset == 1 && categoryID != null) {
-        _subCategoryItemCache[categoryID] = List.from(_categoryItemList!);
+        _subCategoryItemCache[cacheKey] = List.from(_categoryItemList!);
+        if (_pageSize != null) {
+          _subCategoryItemTotalSize[cacheKey] = _pageSize!;
+        }
       }
     }
     update();
@@ -291,13 +367,17 @@ class CategoryController extends GetxController implements GetxService {
   void getCategoryStoreList(String? categoryID, int offset, String type, bool notify) async {
     _offset = offset;
     final int generation = _subCategoryRequestGeneration;
+    String cacheKey = '${categoryID ?? ''}_$type';
     if(offset == 1) {
       if(_type == type) {
         _isSearching = false;
       }
       _type = type;
-      if (!_subCategoryStoreCache.containsKey(categoryID ?? '')) {
+      if (!_subCategoryStoreCache.containsKey(cacheKey)) {
         _categoryStoreList = null;
+      } else {
+        _categoryStoreList = _subCategoryStoreCache[cacheKey];
+        _restPageSize = _subCategoryStoreTotalSize[cacheKey];
       }
       if(notify) {
         update();
@@ -315,7 +395,10 @@ class CategoryController extends GetxController implements GetxService {
       _restPageSize = categoryStore.totalSize;
       _isLoading = false;
       if (offset == 1 && categoryID != null) {
-        _subCategoryStoreCache[categoryID] = List.from(_categoryStoreList!);
+        _subCategoryStoreCache[cacheKey] = List.from(_categoryStoreList!);
+        if (_restPageSize != null) {
+          _subCategoryStoreTotalSize[cacheKey] = _restPageSize!;
+        }
       }
     }
     update();

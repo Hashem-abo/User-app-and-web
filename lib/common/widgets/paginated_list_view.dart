@@ -33,14 +33,23 @@ class _PaginatedListViewState extends State<PaginatedListView> {
     _offset = 1;
     _offsetList = [1];
 
-    widget.scrollController.addListener(() {
-      if (widget.scrollController.position.pixels == widget.scrollController.position.maxScrollExtent
-          && widget.totalSize != null && !_isLoading && widget.enabledPagination) {
-        if(mounted && !ResponsiveHelper.isDesktop(context)) {
-          _paginate();
-        }
+    widget.scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (widget.scrollController.hasClients &&
+        widget.scrollController.position.pixels == widget.scrollController.position.maxScrollExtent
+        && widget.totalSize != null && !_isLoading && widget.enabledPagination) {
+      if (mounted && !ResponsiveHelper.isDesktop(context)) {
+        _paginate();
       }
-    });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_scrollListener);
+    super.dispose();
   }
 
   void _paginate() async {

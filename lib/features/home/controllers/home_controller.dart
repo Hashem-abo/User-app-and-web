@@ -150,11 +150,7 @@ class HomeController extends GetxController implements GetxService {
       );
     }
     if (homepageModel.superBanners != null && homepageModel.superBanners!.isNotEmpty) {
-      for (final banner in homepageModel.superBanners!) {
-        if (banner.id != null) {
-          Get.find<SuperBannerController>().preloadSuperBanner(banner);
-        }
-      }
+      Get.find<SuperBannerController>().preloadSuperBanners(homepageModel.superBanners!);
     }
   }
 

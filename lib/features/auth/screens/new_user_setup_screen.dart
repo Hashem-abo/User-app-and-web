@@ -59,20 +59,28 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
       backgroundColor: ResponsiveHelper.isDesktop(context) ? Colors.transparent : Theme.of(context).cardColor,
       appBar: ResponsiveHelper.isDesktop(context) ? null : AppBar(leading: IconButton(
         onPressed: () => Get.back(),
-        icon: Icon(Icons.arrow_back_ios_rounded, color: Theme.of(context).textTheme.bodyLarge!.color),
+        icon: Icon(
+          Directionality.of(context) == TextDirection.rtl
+              ? Icons.arrow_forward_ios_rounded
+              : Icons.arrow_back_ios_rounded,
+          color: Theme.of(context).textTheme.bodyLarge!.color,
+        ),
       ), elevation: 0, backgroundColor: Theme.of(context).cardColor),
-      body: SafeArea(child: Align(
-        alignment: Alignment.center,
-        child: Container(
-          width: context.width > 700 ? 500 : context.width,
-          padding: context.width > 700 ? const EdgeInsets.all(50) : const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraLarge),
-          margin: context.width > 700 ? const EdgeInsets.all(50) : EdgeInsets.zero,
-          decoration: context.width > 700 ? BoxDecoration(
-            color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
-            boxShadow: ResponsiveHelper.isDesktop(context) ? null : [BoxShadow(color: Colors.grey[Get.isDarkMode ? 700 : 300]!, blurRadius: 5, spreadRadius: 1)],
-          ) : null,
-          child: SingleChildScrollView(
-            child: Form(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.translucent,
+        child: SafeArea(child: Align(
+          alignment: Alignment.center,
+          child: Container(
+            width: context.width > 700 ? 500 : context.width,
+            padding: context.width > 700 ? const EdgeInsets.all(50) : const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraLarge),
+            margin: context.width > 700 ? const EdgeInsets.all(50) : EdgeInsets.zero,
+            decoration: context.width > 700 ? BoxDecoration(
+              color: Theme.of(context).cardColor, borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+              boxShadow: ResponsiveHelper.isDesktop(context) ? null : [BoxShadow(color: Colors.grey[Get.isDarkMode ? 700 : 300]!, blurRadius: 5, spreadRadius: 1)],
+            ) : null,
+            child: SingleChildScrollView(
+              child: Form(
               key: _formKeyInfo,
               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
 
@@ -227,6 +235,7 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
                     buttonText: 'done'.tr,
                     isLoading: authController.isLoading,
                     onPressed: () async {
+                      if (authController.isLoading) return;
                       if(_formKeyInfo!.currentState!.validate()) {
                         if (_selectedGender == null) {
                           showCustomSnackBar('please_select_gender'.tr);
@@ -256,7 +265,7 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
           ),
 
         ),
-      )),
+      ))),
     );
   }
 

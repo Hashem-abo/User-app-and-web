@@ -14,8 +14,6 @@ class CategoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ScrollController scrollController = ScrollController();
-
     return GetBuilder<SplashController>(builder: (splashController) {
       bool isPharmacy = splashController.module != null && splashController.module!.moduleType.toString() == AppConstants.pharmacy;
       bool isFood = splashController.module != null && splashController.module!.moduleType.toString() == AppConstants.food;
@@ -60,7 +58,7 @@ class CategoryView extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Color(int.parse('0xFF${splashController.module!.categoryViewBgColor!.replaceAll('#', '')}')),
-                              Color(int.parse('0xFF${splashController.module!.categoryViewBgColor!.replaceAll('#', '')}')).withOpacity(0.05),
+                              Color(int.parse('0xFF${splashController.module!.categoryViewBgColor!.replaceAll('#', '')}')).withValues(alpha: 0.05),
                             ],
                           ) : null,
                           color: splashController.module?.categoryViewBgColor == null ? Theme.of(context).primaryColor.withValues(alpha: 0.25) : null,

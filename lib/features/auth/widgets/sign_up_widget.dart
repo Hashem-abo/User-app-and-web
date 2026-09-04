@@ -302,9 +302,14 @@ class SignUpWidgetState extends State<SignUpWidget> {
                   radius: 15,
                   isBold: true,
                   isLoading: authController.isLoading,
-                  onPressed: authController.acceptTerms
-                      ? () => _register(authController, _countryDialCode!)
-                      : null,
+                  onPressed: () {
+                    if (authController.isLoading) return;
+                    if (!authController.acceptTerms) {
+                      showCustomSnackBar('please_agree_with_terms_conditions'.tr);
+                      return;
+                    }
+                    _register(authController, _countryDialCode!);
+                  },
                   color: Theme.of(context).primaryColor,
                 ),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
@@ -357,6 +362,7 @@ class SignUpWidgetState extends State<SignUpWidget> {
   }
 
   void _register(AuthController authController, String countryCode) async {
+    if (authController.isLoading) return;
     SignUpBodyModel? signUpModel = await _prepareSignUpBody(countryCode);
 
     if (signUpModel == null) {
@@ -402,7 +408,7 @@ class SignUpWidgetState extends State<SignUpWidget> {
         Get.find<CartController>().getCartDataOnline();
       }
       final bool isPhoneVerificationRequired = Get.find<SplashController>().configModel?.centralizeLoginSetup?.phoneVerificationStatus ?? false;
-      bool isPhoneNotVerified = (status.authResponseModel != null && !status.authResponseModel!.isPhoneVerified!);
+      bool isPhoneNotVerified = (status.authResponseModel != null && status.authResponseModel!.isPhoneVerified == false);
       if (!isPhoneNotVerified && isPhoneVerificationRequired && _phoneController.text.trim().isNotEmpty) {
         isPhoneNotVerified = true;
       }
@@ -442,7 +448,7 @@ class SignUpWidgetState extends State<SignUpWidget> {
           }
         }
       } else if (status.authResponseModel != null &&
-          !status.authResponseModel!.isEmailVerified!) {
+          status.authResponseModel!.isEmailVerified == false) {
         List<int> encoded = utf8.encode(password);
         String data = base64Encode(encoded);
         if (ResponsiveHelper.isDesktop(context)) {

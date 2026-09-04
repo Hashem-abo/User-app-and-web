@@ -28,14 +28,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: titleWidget ?? Text(title, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.bodyLarge!.color)),
       centerTitle: true,
       leading: backButton ? IconButton(
-        icon: leadingIcon != null ? Image.asset(leadingIcon!, height: 22, width: 22) : const Icon(Icons.arrow_back_ios),
+        icon: leadingIcon != null ? Image.asset(leadingIcon!, height: 22, width: 22) : const Icon(Icons.arrow_back_ios_new, size: 20),
         color: Theme.of(context).textTheme.bodyLarge!.color,
         onPressed: () => onBackPressed != null ? onBackPressed!() : Navigator.pop(context),
       ) : const SizedBox(),
       backgroundColor: backgroundColor ?? Theme.of(context).cardColor,
       surfaceTintColor: backgroundColor ?? Theme.of(context).cardColor,
-      shadowColor: Theme.of(context).disabledColor.withValues(alpha: 0.5),
-      elevation: 2,
+      shadowColor: Theme.of(context).shadowColor.withValues(alpha: 0.15),
+      elevation: 0,
+      scrolledUnderElevation: 1,
       actions: showCart || onVegFilterTap != null ? [
         showCart ? IconButton(
           onPressed: () => Get.toNamed(RouteHelper.getCartRoute()),

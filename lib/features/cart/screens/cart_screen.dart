@@ -14,6 +14,7 @@ import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dar
 import 'package:sixam_mart/features/checkout/screens/checkout_screen.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:sixam_mart/features/pro/controllers/pro_controller.dart';
 import 'package:sixam_mart/features/pro/widgets/pro_cart_banner_widget.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
@@ -28,16 +29,13 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/util/app_constants.dart';
-import 'package:share_plus/share_plus.dart';
 import 'dart:convert';
 import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/common/widgets/item_widget.dart';
 import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
 import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/no_data_screen.dart';
@@ -49,7 +47,6 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/features/cart/widgets/web_cart_items_widget.dart';
 import 'package:sixam_mart/features/cart/widgets/web_suggested_item_view_widget.dart';
 import 'package:sixam_mart/features/cart/widgets/add_to_monthly_widget.dart';
-import 'package:sixam_mart/features/home/screens/home_screen.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:sixam_mart/features/favourite/controllers/wish_list_controller.dart';
 import 'package:sixam_mart/features/favourite/domain/models/wish_list_model.dart';
@@ -80,6 +77,10 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> initCall() async {
     _initialBottomSheetShowHide();
+    if (AuthHelper.isLoggedIn()) {
+      Get.find<ProfileController>().getUserInfo();
+      Get.find<ProController>().getProActiveOffer(moduleType: Get.find<SplashController>().module?.moduleType);
+    }
     if(Get.find<CartController>().cartList.isEmpty) {
       await Get.find<CartController>().getCartDataOnline();
     }

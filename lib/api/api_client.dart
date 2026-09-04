@@ -24,7 +24,7 @@ class ApiClient extends GetxService {
   final String appBaseUrl;
   final SharedPreferences sharedPreferences;
   static final String noInternetMessage = 'connection_to_api_server_failed'.tr;
-  final int timeoutInSeconds = 40;
+  final int timeoutInSeconds = 20;
 
   String? token;
   late Map<String, String> _mainHeaders;
@@ -34,10 +34,7 @@ class ApiClient extends GetxService {
     if (kDebugMode) {
       print('Token: $token');
     }
-    AddressModel? addressModel;
-    try {
-      addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
-    }catch(_) {}
+    AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
     int? moduleID;
     if(GetPlatform.isWeb && sharedPreferences.containsKey(AppConstants.moduleId)) {
       try {
@@ -146,6 +143,62 @@ class ApiClient extends GetxService {
 
   Map<String, String> getHeader() => _sanitizeHeaders(_mainHeaders);
 
+  bool _isAutoCacheable(String uri) {
+    return uri.contains('/config') ||
+        uri.contains('/banners') ||
+        uri.contains('/categories') ||
+        uri.contains('/modules') ||
+        uri.contains('/customer/landing-page') ||
+        uri.contains('/stores/details') ||
+        uri.contains('/items/details') ||
+        uri.contains('/dynamic-shelf') ||
+        uri.contains('/store-corner') ||
+        uri.contains('/brands') ||
+        uri.contains('/zone');
+  }
+
+  void _invalidateOnMutation(String uri) {
+    if (uri.contains('cart')) {
+      DataModuleManager().invalidatePatterns(['cart', 'checkout']);
+    } else if (uri.contains('address')) {
+      DataModuleManager().invalidatePatterns(['address', 'zone']);
+    } else if (uri.contains('order')) {
+      DataModuleManager().invalidatePatterns(['order', 'cart']);
+    } else if (uri.contains('favourite') || uri.contains('wish-list')) {
+      DataModuleManager().invalidatePatterns(['favourite', 'wish-list']);
+    } else if (uri.contains('profile') || uri.contains('customer/update')) {
+      DataModuleManager().invalidatePatterns(['customer/info', 'profile']);
+    }
+  }
+
+  void _revalidateInBackground(
+    String uri,
+    Map<String, dynamic>? query,
+    Map<String, String> headers,
+    String canonicalKey,
+    Duration? cacheTtl,
+    bool handleError,
+  ) {
+    DataModuleManager().coalesce<void>('REVALIDATE:$canonicalKey', () async {
+      try {
+        Uri requestUri = Uri.parse(appBaseUrl + uri);
+        if (query != null && query.isNotEmpty) {
+          requestUri = requestUri.replace(queryParameters: query.map((k, v) => MapEntry(k, v.toString())));
+        }
+        final http.Response httpResponse = await http
+            .get(requestUri, headers: headers)
+            .timeout(Duration(seconds: timeoutInSeconds));
+        final Response response = handleResponse(httpResponse, uri, handleError);
+        if (response.statusCode == 200) {
+          DataModuleManager().cache.put(canonicalKey, response, ttl: cacheTtl);
+          if (kDebugMode) {
+            log('====> [SWR Revalidated & Updated Cache] $canonicalKey');
+          }
+        }
+      } catch (_) {}
+    });
+  }
+
   Future<Response> getData(
     String uri, {
     Map<String, dynamic>? query,
@@ -160,6 +213,7 @@ class ApiClient extends GetxService {
       return Response(statusCode: -1, statusText: cancelToken.cancelReason ?? 'Request cancelled');
     }
 
+    final bool shouldCache = useCache || _isAutoCacheable(uri);
     Map<String, String> finalHeaders = _sanitizeHeaders(headers);
     int? currentModuleId = int.tryParse(finalHeaders[AppConstants.moduleId] ?? '');
     String? langCode = finalHeaders[AppConstants.localizationKey];
@@ -170,12 +224,16 @@ class ApiClient extends GetxService {
       languageCode: langCode,
     );
 
-    // 2. In-Memory LRU Cache lookup
-    if (useCache) {
-      final cached = DataModuleManager().cache.get(canonicalKey);
+    // 2. Smart In-Memory Cache with Stale-While-Revalidate (SWR)
+    if (shouldCache) {
+      final cached = DataModuleManager().cache.get(canonicalKey, allowStale: true);
       if (cached is Response) {
+        final bool isStale = DataModuleManager().cache.isStale(canonicalKey);
         if (kDebugMode) {
-          log('====> [LRU Cache Hit] $canonicalKey');
+          log('====> [LRU Cache Hit ${isStale ? "(Stale SWR)" : "(Fresh)"}] $canonicalKey');
+        }
+        if (isStale) {
+          _revalidateInBackground(uri, query, finalHeaders, canonicalKey, cacheTtl, handleError);
         }
         return cached;
       }
@@ -198,24 +256,23 @@ class ApiClient extends GetxService {
           requestUri = requestUri.replace(queryParameters: query.map((k, v) => MapEntry(k, v.toString())));
         }
 
-        client = http.Client();
+        final http.Response httpResponse;
         if (cancelToken != null) {
+          client = http.Client();
           cancelToken.onCancel(() {
             try {
-              client?.close(); // Closes socket immediately on cancel
+              client?.close();
             } catch (_) {}
           });
+          httpResponse = await client.get(requestUri, headers: finalHeaders).timeout(Duration(seconds: timeoutInSeconds));
+        } else {
+          httpResponse = await http.get(requestUri, headers: finalHeaders).timeout(Duration(seconds: timeoutInSeconds));
         }
-
-        final http.Response httpResponse = await client.get(
-          requestUri,
-          headers: finalHeaders,
-        ).timeout(Duration(seconds: timeoutInSeconds));
 
         final Response response = handleResponse(httpResponse, uri, handleError);
 
         // Store in LRU cache if successful
-        if (useCache && response.statusCode == 200) {
+        if (shouldCache && response.statusCode == 200) {
           DataModuleManager().cache.put(canonicalKey, response, ttl: cacheTtl);
         }
 
@@ -258,7 +315,11 @@ class ApiClient extends GetxService {
         body: jsonEncode(newBody),
         headers: finalHeaders,
       ).timeout(Duration(seconds: timeout ?? timeoutInSeconds));
-      return handleResponse(response, uri, handleError);
+      final Response result = handleResponse(response, uri, handleError);
+      if (result.statusCode == 200 || result.statusCode == 201) {
+        _invalidateOnMutation(uri);
+      }
+      return result;
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
@@ -312,7 +373,11 @@ class ApiClient extends GetxService {
 
       request.fields.addAll(body);
       http.Response response = await http.Response.fromStream(await request.send());
-      return handleResponse(response, uri, handleError);
+      final Response result = handleResponse(response, uri, handleError);
+      if (result.statusCode == 200 || result.statusCode == 201) {
+        _invalidateOnMutation(uri);
+      }
+      return result;
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
@@ -340,7 +405,11 @@ class ApiClient extends GetxService {
         body: jsonEncode(newBody),
         headers: finalHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
-      return handleResponse(response, uri, handleError);
+      final Response result = handleResponse(response, uri, handleError);
+      if (result.statusCode == 200 || result.statusCode == 201) {
+        _invalidateOnMutation(uri);
+      }
+      return result;
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
@@ -356,7 +425,11 @@ class ApiClient extends GetxService {
         Uri.parse(appBaseUrl+uri),
         headers: finalHeaders,
       ).timeout(Duration(seconds: timeoutInSeconds));
-      return handleResponse(response, uri, handleError);
+      final Response result = handleResponse(response, uri, handleError);
+      if (result.statusCode == 200 || result.statusCode == 201) {
+        _invalidateOnMutation(uri);
+      }
+      return result;
     } catch (e) {
       return Response(statusCode: 1, statusText: noInternetMessage);
     }

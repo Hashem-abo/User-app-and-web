@@ -10,6 +10,7 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 
 class CategoryTreeScreen extends StatefulWidget {
@@ -121,7 +122,7 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 5),
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withOpacity(0.1),
+                          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                         ),
                         child: Icon(Icons.camera_alt, size: 18, color: Theme.of(context).primaryColor),
@@ -153,6 +154,8 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                     bool isSelected = _selectedCategoryIndex == index;
                     return InkWell(
                       onTap: () {
+                        if (_selectedCategoryIndex == index) return;
+                        HapticFeedback.selectionClick();
                         setState(() {
                           _selectedCategoryIndex = index;
                         });
@@ -191,6 +194,7 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                     if (details.primaryVelocity! < -300 ) {
                       // Swiped Right -> Previous Category
                       if (_selectedCategoryIndex > 0) {
+                        HapticFeedback.selectionClick();
                         setState(() {
                           _selectedCategoryIndex--;
                         });
@@ -199,6 +203,7 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                     } else if (details.primaryVelocity! > 300) {
                       // Swiped Left -> Next Category
                       if (_selectedCategoryIndex < categoryController.categoryList!.length - 1) {
+                        HapticFeedback.selectionClick();
                         setState(() {
                           _selectedCategoryIndex++;
                         });
@@ -224,6 +229,8 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                           bool isSelected = categoryController.subCategoryIndex == index;
                           return InkWell(
                             onTap: () {
+                              if (categoryController.subCategoryIndex == index) return;
+                              HapticFeedback.selectionClick();
                               categoryController.setSubCategoryIndex(index, categoryController.subCategoryList![index].id.toString());
                               categoryController.getSubSubCategoryList(categoryController.subCategoryList![index].id.toString());
                             },
@@ -284,6 +291,7 @@ class _CategoryTreeScreenState extends State<CategoryTreeScreen> {
                             itemBuilder: (context, index) {
                               return InkWell(
                                 onTap: () {
+                                  HapticFeedback.selectionClick();
                                   Get.toNamed(RouteHelper.getCategoryItemRoute(
                                     categoryController.subSubCategoryList![index].id, 
                                     categoryController.subSubCategoryList![index].name!,

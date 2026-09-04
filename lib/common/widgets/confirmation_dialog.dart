@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:sixam_mart/features/order/controllers/order_controller.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -36,18 +37,25 @@ class ConfirmationDialog extends StatefulWidget {
 class _ConfirmationDialogState extends State<ConfirmationDialog> {
   bool _canInteract = false;
   bool _isLoading = false;
+  Timer? _canInteractTimer;
 
   @override
   void initState() {
     super.initState();
     // Protect against touch bleeding / tap-through from preceding tap event
-    Future.delayed(const Duration(milliseconds: 250), () {
+    _canInteractTimer = Timer(const Duration(milliseconds: 250), () {
       if (mounted) {
         setState(() {
           _canInteract = true;
         });
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _canInteractTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _handleConfirm() async {

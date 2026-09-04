@@ -357,6 +357,7 @@
   "help_support": "المساعدة والدعم",
   "logout": "تسجيل الخروج",
   "logging_out": "جارٍ تسجيل الخروج...",
+  "please_agree_with_terms_conditions": "يرجى الموافقة على الشروط والأحكام",
   "type_here": "اكتب هنا .....",
   "available": "متاح",
   "used": "مستخدم",
@@ -2465,5 +2466,8 @@
   "paste": "لصق",
   "scan_qr_to_pay": "امسح الباركود لإتمام الدفع",
   "wholesale": "جملة",
-  "retail": "تجزئة"
+  "wholesaler": "جملة",
+  "retail": "تجزئة",
+  "retailer": "تجزئة",
+  "factory": "مصنع"
 }

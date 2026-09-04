@@ -32,24 +32,28 @@ class OtpLoginWidget extends StatelessWidget {
           Text('hey_there_welcome_back'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
           const SizedBox(height: Dimensions.paddingSizeExtraOverLarge),
 
-          CustomTextField(
-            titleText: 'xxx-xxx-xxxxx',
-            controller: phoneController,
-            focusNode: phoneFocus,
-            inputAction: TextInputAction.done,
-            inputType: TextInputType.phone,
-            isPhone: true,
-            maxLength: 9,
-            onCountryChanged: onCountryChanged,
-            countryDialCode: countryDialCode ?? Get.find<LocalizationController>().locale.countryCode,
-            labelText: 'phone'.tr,
-            required: true,
-            validator: (value) => ValidateCheck.validateEmptyText(value, "please_enter_phone_number".tr),
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: CustomTextField(
+              titleText: 'xxx-xxx-xxxxx',
+              controller: phoneController,
+              focusNode: phoneFocus,
+              inputAction: TextInputAction.done,
+              inputType: TextInputType.phone,
+              isPhone: true,
+              maxLength: 9,
+              onCountryChanged: onCountryChanged,
+              countryDialCode: countryDialCode ?? Get.find<LocalizationController>().locale.countryCode,
+              labelText: 'phone'.tr,
+              required: true,
+              validator: (value) => ValidateCheck.validateEmptyText(value, "please_enter_phone_number".tr),
+              borderRadius: 15,
+            ),
           ),
           const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
           Align(
-            alignment: Alignment.centerLeft,
+            alignment: AlignmentDirectional.centerStart,
             child: InkWell(
               onTap: () => authController.toggleRememberMe(),
               child: Row(
@@ -79,7 +83,7 @@ class OtpLoginWidget extends StatelessWidget {
 
           CustomButton(
             buttonText: 'login'.tr,
-            radius: Dimensions.radiusDefault,
+            radius: 15,
             isBold: isDesktop ? false : true,
             isLoading: authController.isLoading,
             onPressed: onClickLoginButton,

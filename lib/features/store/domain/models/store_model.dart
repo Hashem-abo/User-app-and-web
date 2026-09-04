@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart/helper/vendor_type_helper.dart';
 
 class StoreModel {
   int? totalSize;
@@ -351,26 +352,21 @@ class Store {
         rawVendorType!.trim().isNotEmpty &&
         rawVendorType!.trim().toLowerCase() != 'null' &&
         rawVendorType!.trim().toLowerCase() != 'none') {
-      final normalized = rawVendorType!.trim().toLowerCase();
-      if (normalized == 'wholesale' || normalized == 'جملة') {
-        return 'wholesale'.tr;
+      if (VendorTypeHelper.isRetailer(rawVendorType)) {
+        return '';
       }
-      if (normalized == 'retail' || normalized == 'تجزئة') {
-        return 'retail'.tr;
-      }
-      return rawVendorType!.tr;
+      return VendorTypeHelper.resolveVendorType(rawVendorType);
     }
 
     if (storeBusinessModel != null &&
         storeBusinessModel!.trim().isNotEmpty &&
         storeBusinessModel!.trim().toLowerCase() != 'null' &&
         storeBusinessModel!.trim().toLowerCase() != 'none') {
-      final normalized = storeBusinessModel!.trim().toLowerCase();
-      if (normalized == 'wholesale' || normalized == 'جملة') {
-        return 'wholesale'.tr;
+      if (VendorTypeHelper.isRetailer(storeBusinessModel)) {
+        return '';
       }
-      if (normalized == 'retail' || normalized == 'تجزئة') {
-        return 'retail'.tr;
+      if (VendorTypeHelper.isWholesaler(storeBusinessModel) || VendorTypeHelper.isFactory(storeBusinessModel)) {
+        return VendorTypeHelper.resolveVendorType(storeBusinessModel);
       }
     }
 

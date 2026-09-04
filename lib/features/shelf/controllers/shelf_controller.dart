@@ -51,46 +51,52 @@ class ShelfController extends GetxController implements GetxService {
     update();
   }
 
-  Future<void> getShelfList(bool reload, {DataSourceEnum source = DataSourceEnum.client}) async {
+  Future<void> getShelfList(bool reload, {DataSourceEnum source = DataSourceEnum.client, bool isPagination = false}) async {
     int? currentModuleId = Get.find<SplashController>().module?.id;
 
     if (reload) {
       _offset = 1;
       _shelfList = null;
       update();
-    } else if (currentModuleId != null && _moduleShelfList.containsKey(currentModuleId)) {
-      _shelfList = _moduleShelfList[currentModuleId];
-      _pageSize = _modulePageSize[currentModuleId];
-      _offset = _moduleOffset[currentModuleId] ?? 1;
-      update();
+    } else if (!isPagination && currentModuleId != null && _moduleShelfList.containsKey(currentModuleId)) {
+      if (_shelfList != _moduleShelfList[currentModuleId]) {
+        _shelfList = _moduleShelfList[currentModuleId];
+        _pageSize = _modulePageSize[currentModuleId];
+        _offset = _moduleOffset[currentModuleId] ?? 1;
+        update();
+      }
       return;
-    } else {
-      // If not in cache and not reloading, clear the list to avoid showing old module's data
+    } else if (!isPagination) {
       _shelfList = null;
       _offset = 1;
       _pageSize = null;
     }
+
+    if (_isLoading) return;
     
     if (_shelfList == null || (_pageSize != null && _shelfList!.length < _pageSize!)) {
       _isLoading = true;
       update();
-      ShelfDataModel? shelfData = await shelfServiceInterface.getShelfList(source, offset: _offset);
-      if (shelfData != null && shelfData.shelves != null) {
-        if (_offset == 1) {
-          _shelfList = [];
+      try {
+        ShelfDataModel? shelfData = await shelfServiceInterface.getShelfList(source, offset: _offset);
+        if (shelfData != null && shelfData.shelves != null && shelfData.shelves!.isNotEmpty) {
+          if (_offset == 1) {
+            _shelfList = [];
+          }
+          _shelfList!.addAll(shelfData.shelves!);
+          _pageSize = shelfData.totalSize;
+          _offset = _offset + 1;
+          
+          if (currentModuleId != null) {
+            _moduleShelfList[currentModuleId] = _shelfList!;
+            _modulePageSize[currentModuleId] = _pageSize!;
+            _moduleOffset[currentModuleId] = _offset;
+          }
         }
-        _shelfList!.addAll(shelfData.shelves!);
-        _pageSize = shelfData.totalSize;
-        _offset = _offset + 1;
-        
-        if (currentModuleId != null) {
-          _moduleShelfList[currentModuleId] = _shelfList!;
-          _modulePageSize[currentModuleId] = _pageSize!;
-          _moduleOffset[currentModuleId] = _offset;
-        }
+      } finally {
+        _isLoading = false;
+        update();
       }
-      _isLoading = false;
-      update();
     }
   }
 

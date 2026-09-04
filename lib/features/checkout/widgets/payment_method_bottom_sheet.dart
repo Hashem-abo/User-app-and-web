@@ -14,7 +14,6 @@ import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/payment/widgets/offline_payment_button.dart';
-import 'package:sixam_mart/features/checkout/widgets/payment_onboarding_dialog.dart';
 
 class PaymentMethodBottomSheet extends StatefulWidget {
   final bool isCashOnDeliveryActive;
@@ -171,21 +170,37 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                             itemBuilder: (context, index){
                               bool isSelected = checkoutController.paymentMethodIndex == 2 && Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay! == checkoutController.digitalPaymentName;
 
-                              return paymentButtonView(
-                                padding: EdgeInsets.only(bottom: index == Get.find<SplashController>().configModel!.activePaymentMethodList!.length - 1 ? 0 : Dimensions.paddingSizeSmall),
-                                disablePayments: disablePayments,
-                                onTap: disablePayments ? null : () {
-                                  checkoutController.setPaymentMethod(2);
-                                  checkoutController.changeDigitalPaymentName(Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay!);
-                                  if(showChangeAmount) {
-                                    setState(() {
-                                      showChangeAmount = false;
-                                    });
-                                  }
-                                },
-                                title: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayTitle!,
-                                isSelected: isSelected,
-                                image: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayImageFullUrl,
+                              return Column(
+                                children: [
+                                  paymentButtonView(
+                                    padding: EdgeInsets.only(bottom: index == Get.find<SplashController>().configModel!.activePaymentMethodList!.length - 1 ? 0 : Dimensions.paddingSizeSmall),
+                                    disablePayments: disablePayments,
+                                    onTap: disablePayments ? null : () {
+                                      checkoutController.setPaymentMethod(2);
+                                      checkoutController.changeDigitalPaymentName(Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay!);
+                                      if(showChangeAmount) {
+                                        setState(() {
+                                          showChangeAmount = false;
+                                        });
+                                      }
+                                    },
+                                    title: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayTitle!,
+                                    isSelected: isSelected,
+                                    image: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayImageFullUrl,
+                                  ),
+                                  if (isSelected && (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak'))
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeLarge, right: Dimensions.paddingSizeLarge),
+                                      child: CustomTextField(
+                                        titleText: 'Purchase Code (كود الشراء)',
+                                        controller: checkoutController.purchaseCodeController,
+                                        inputType: TextInputType.number,
+                                        isNumber: true,
+                                        maxLength: 8,
+                                        showTitle: true,
+                                      ),
+                                    ),
+                                ],
                               );
                             },
                           ),
@@ -218,30 +233,8 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeLarge),
                 child: CustomButton(
-                  buttonText: 'continue'.tr,
-                  onPressed: () {
-                    final String? digitalName = checkoutController.digitalPaymentName;
-                    final bool isWalletGateway = checkoutController.paymentMethodIndex == 2 &&
-                        (digitalName == 'easy_wallet' || digitalName == 'floosak' ||
-                         (digitalName?.toLowerCase().contains('wallet') ?? false) ||
-                         (digitalName?.toLowerCase().contains('floosak') ?? false));
-                    if (isWalletGateway) {
-                      final digitalGateways = Get.find<SplashController>().configModel?.activePaymentMethodList;
-                      final selectedGateway = digitalGateways?.firstWhereOrNull((g) => g.getWay == checkoutController.digitalPaymentName);
-
-                      Get.back();
-                      Get.dialog(
-                        PaymentOnboardingDialog(
-                          paymentMethodName: checkoutController.digitalPaymentName ?? '',
-                          paymentTitle: selectedGateway?.getWayTitle ?? (checkoutController.digitalPaymentName == 'easy_wallet' ? 'Easy Wallet' : 'Floosak'),
-                          paymentImage: selectedGateway?.getWayImageFullUrl,
-                          totalPrice: widget.totalPrice,
-                        ),
-                      );
-                    } else {
-                      Get.back();
-                    }
-                  },
+                  buttonText: 'select'.tr,
+                  onPressed: () => Get.back(),
                 ),
               ),
             ),

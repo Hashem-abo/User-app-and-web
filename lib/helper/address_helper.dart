@@ -56,7 +56,10 @@ class AddressHelper {
     return rawAddress;
   }
 
+  static AddressModel? _cachedUserAddress;
+
   static Future<bool> saveUserAddressInSharedPref(AddressModel address) async {
+    _cachedUserAddress = address;
     SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
     List<int>? zoneIds = address.zoneIds;
     if ((zoneIds == null || zoneIds.isEmpty) && address.zoneId != null) {
@@ -85,22 +88,37 @@ class AddressHelper {
     return await sharedPreferences.setString(AppConstants.userAddress, userAddress);
   }
 
-  static AddressModel? getUserAddressFromSharedPref() {
-    SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
+  static AddressModel? getUserAddressFromSharedPref([SharedPreferences? pref]) {
+    if (_cachedUserAddress != null) {
+      return _cachedUserAddress;
+    }
+    SharedPreferences? sharedPreferences = pref ?? (Get.isRegistered<SharedPreferences>() ? Get.find<SharedPreferences>() : null);
+    if (sharedPreferences == null) {
+      return null;
+    }
     AddressModel? addressModel;
     try {
-      addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
-    }catch(e) {
+      String? addressString = sharedPreferences.getString(AppConstants.userAddress);
+      if (addressString != null && addressString.isNotEmpty) {
+        addressModel = AddressModel.fromJson(jsonDecode(addressString));
+        _cachedUserAddress = addressModel;
+      }
+    } catch(e) {
       if(!GetPlatform.isWeb) {
         debugPrint('Address Catch exception : $e');
       }
+      try {
+        sharedPreferences.remove(AppConstants.userAddress);
+      } catch (_) {}
+      _cachedUserAddress = null;
     }
     return addressModel;
   }
 
-  static bool clearAddressFromSharedPref() {
-    SharedPreferences sharedPreferences = Get.find<SharedPreferences>();
-    sharedPreferences.remove(AppConstants.userAddress);
+  static bool clearAddressFromSharedPref([SharedPreferences? pref]) {
+    _cachedUserAddress = null;
+    SharedPreferences? sharedPreferences = pref ?? (Get.isRegistered<SharedPreferences>() ? Get.find<SharedPreferences>() : null);
+    sharedPreferences?.remove(AppConstants.userAddress);
     return true;
   }
 

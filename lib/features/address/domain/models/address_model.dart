@@ -40,15 +40,23 @@ class AddressModel {
   });
 
   AddressModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? '');
     addressType = json['address_type'];
     contactPersonNumber = json['contact_person_number']?.toString();
     address = json['address'];
     additionalAddress = json['additional_address'];
     latitude = json['latitude']?.toString();
     longitude = json['longitude']?.toString();
-    zoneId = (json['zone_id'] != null && json['zone_id'] != 'null') ? int.parse(json['zone_id'].toString()) : null;
-    zoneIds = json['zone_ids']?.cast<int>();
+    zoneId = (json['zone_id'] != null && json['zone_id'] != 'null') ? int.tryParse(json['zone_id'].toString()) : null;
+    if (json['zone_ids'] != null) {
+      try {
+        if (json['zone_ids'] is List) {
+          zoneIds = (json['zone_ids'] as List).map((e) => int.tryParse(e.toString()) ?? 1).toList();
+        }
+      } catch (_) {
+        zoneIds = [1];
+      }
+    }
     if ((zoneIds == null || zoneIds!.isEmpty) && zoneId != null) {
       zoneIds = [zoneId!];
     }
@@ -56,14 +64,32 @@ class AddressModel {
     contactPersonName = json['contact_person_name'];
     streetNumber = json['road'];
     house = json['house'];
-    floor = json['floor'] ;
+    floor = json['floor'];
     if (json['zone_data'] != null) {
       zoneData = [];
-      json['zone_data'].forEach((v) {
-        zoneData!.add(ZoneData.fromJson(v));
-      });
+      try {
+        if (json['zone_data'] is List) {
+          for (var v in json['zone_data']) {
+            try {
+              if (v is Map<String, dynamic>) {
+                zoneData!.add(ZoneData.fromJson(v));
+              } else if (v is Map) {
+                zoneData!.add(ZoneData.fromJson(Map<String, dynamic>.from(v)));
+              }
+            } catch (_) {}
+          }
+        }
+      } catch (_) {}
     }
-    areaIds = json['area_ids']?.cast<int>();
+    if (json['area_ids'] != null) {
+      try {
+        if (json['area_ids'] is List) {
+          areaIds = (json['area_ids'] as List).map((e) => int.tryParse(e.toString()) ?? 0).toList();
+        }
+      } catch (_) {
+        areaIds = [];
+      }
+    }
     if(json['contact_person_email'] != null) {
       email = json['contact_person_email'];
     }
@@ -86,7 +112,14 @@ class AddressModel {
     data['house'] = house;
     data['floor'] = floor;
     if (zoneData != null) {
-      data['zone_data'] = zoneData!.map((v) => v.toJson()).toList();
+      data['zone_data'] = zoneData!.map((v) => {
+        'id': v.id,
+        'name': v.name,
+        'status': v.status,
+        'cash_on_delivery': v.cashOnDelivery,
+        'digital_payment': v.digitalPayment,
+        'offline_payment': v.offlinePayment,
+      }).toList();
     }
     data['area_ids'] = areaIds;
     if(email != null) {

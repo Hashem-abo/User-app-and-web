@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:sixam_mart/helper/vendor_type_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
+
+export 'package:sixam_mart/helper/vendor_type_helper.dart';
 
 class VendorTypeBadgeWidget extends StatelessWidget {
   final Store? store;
@@ -22,30 +24,33 @@ class VendorTypeBadgeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String type = '';
-    if (vendorType != null &&
-        vendorType!.trim().isNotEmpty &&
-        vendorType!.trim().toLowerCase() != 'null' &&
-        vendorType!.trim().toLowerCase() != 'none') {
-      final normalized = vendorType!.trim().toLowerCase();
-      if (normalized == 'wholesale' || normalized == 'جملة') {
-        type = 'wholesale'.tr;
-      } else if (normalized == 'retail' || normalized == 'تجزئة') {
-        type = 'retail'.tr;
-      } else {
-        type = vendorType!.tr;
-      }
+    String raw = '';
+    if (vendorType != null && vendorType!.trim().isNotEmpty) {
+      raw = vendorType!;
     } else if (store != null) {
-      type = store!.vendorType;
+      if (store!.rawVendorType != null && store!.rawVendorType!.trim().isNotEmpty) {
+        raw = store!.rawVendorType!;
+      } else if (store!.storeBusinessModel != null && store!.storeBusinessModel!.trim().isNotEmpty) {
+        raw = store!.storeBusinessModel!;
+      } else if (!store!.isZad && store!.vendorType.isNotEmpty) {
+        raw = store!.vendorType;
+      }
     }
 
-    if (type.trim().isEmpty ||
-        type.trim().toLowerCase() == 'null' ||
-        type.trim().toLowerCase() == 'none') {
+    // Hide if empty or retailer
+    if (VendorTypeHelper.isEmpty(raw) || VendorTypeHelper.isRetailer(raw)) {
+      return const SizedBox();
+    }
+
+    final String displayType = VendorTypeHelper.resolveVendorType(raw);
+    if (displayType.trim().isEmpty) {
       return const SizedBox();
     }
 
     final Color primaryColor = Theme.of(context).primaryColor;
+    final IconData badgeIcon = VendorTypeHelper.isFactory(raw)
+        ? Icons.precision_manufacturing_outlined
+        : Icons.storefront_outlined;
 
     return Container(
       padding: padding ?? const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
@@ -60,14 +65,14 @@ class VendorTypeBadgeWidget extends StatelessWidget {
         children: [
           if (showIcon) ...[
             Icon(
-              Icons.storefront_outlined,
+              badgeIcon,
               size: (fontSize ?? Dimensions.fontSizeExtraSmall) + 2,
               color: primaryColor,
             ),
             const SizedBox(width: 3),
           ],
           Text(
-            type,
+            displayType,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: robotoMedium.copyWith(

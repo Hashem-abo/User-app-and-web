@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get_connect/connect.dart';
@@ -110,11 +108,11 @@ class AuthRepository implements AuthRepositoryInterface{
   @override
   Future<bool> saveUserToken(String token, {bool alreadyInApp = false}) async {
     apiClient.token = token;
-    if(alreadyInApp && sharedPreferences.getString(AppConstants.userAddress) != null){
-      AddressModel? addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
+    if(alreadyInApp){
+      AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
       apiClient.updateHeader(
-        token, addressModel.zoneIds, addressModel.areaIds, sharedPreferences.getString(AppConstants.languageCode),
-        ModuleHelper.getModule()?.id, addressModel.latitude, addressModel.longitude,
+        token, addressModel?.zoneIds, addressModel?.areaIds, sharedPreferences.getString(AppConstants.languageCode),
+        ModuleHelper.getModule()?.id, addressModel?.latitude, addressModel?.longitude,
       );
     }else{
       apiClient.updateHeader(token, null, null, sharedPreferences.getString(AppConstants.languageCode), ModuleHelper.getModule()?.id, null, null);
@@ -213,13 +211,11 @@ class AuthRepository implements AuthRepositoryInterface{
     sharedPreferences.setStringList(AppConstants.cartList, []);
     apiClient.token = null;
     await guestLogin();
-    if(sharedPreferences.getString(AppConstants.userAddress) != null){
-      AddressModel? addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
-      apiClient.updateHeader(
-        null, addressModel.zoneIds, null, sharedPreferences.getString(AppConstants.languageCode), null,
-        addressModel.latitude, addressModel.longitude,
-      );
-    }
+    AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
+    apiClient.updateHeader(
+      null, addressModel?.zoneIds, null, sharedPreferences.getString(AppConstants.languageCode), null,
+      addressModel?.latitude, addressModel?.longitude,
+    );
     return true;
   }
 

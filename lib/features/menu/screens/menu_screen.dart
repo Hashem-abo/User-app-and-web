@@ -5,14 +5,11 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/auth/widgets/auth_dialog_widget.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/features/home/controllers/home_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
-import 'package:sixam_mart/features/rental_module/rental_cart_screen/controllers/taxi_cart_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
@@ -112,7 +109,8 @@ class _MenuScreenState extends State<MenuScreen> {
                           ),
                           if(isLoggedIn) Positioned(
                             bottom: 0,
-                            right: 0,
+                            right: ((profileController.userInfoModel?.proStatus ?? false) && (Get.find<SplashController>().configModel?.proMemberStatus ?? false)) ? null : 0,
+                            left: ((profileController.userInfoModel?.proStatus ?? false) && (Get.find<SplashController>().configModel?.proMemberStatus ?? false)) ? 0 : null,
                             child: Container(
                               height: 15,
                               width: 15,
@@ -247,7 +245,7 @@ class _MenuScreenState extends State<MenuScreen> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
                     children: [
@@ -296,7 +294,7 @@ Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
                     children: [
@@ -354,7 +352,7 @@ Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
                     borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 5, spreadRadius: 1)],
                   ),
                   child: Column(
                     children: [

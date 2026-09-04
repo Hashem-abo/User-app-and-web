@@ -57,30 +57,39 @@ class AuthController extends GetxController implements GetxService {
   Future<ResponseModel> registration(SignUpBodyModel signUpBody) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await authServiceInterface.registration(signUpBody);
-    _isLoading = false;
-    update();
-    return responseModel;
+    try {
+      ResponseModel responseModel = await authServiceInterface.registration(signUpBody);
+      return responseModel;
+    } finally {
+      _isLoading = false;
+      update();
+    }
   }
 
   Future<ResponseModel> login({required String emailOrPhone, required String password, required String loginType, required String fieldType, bool alreadyInApp = false}) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await authServiceInterface.login(emailOrPhone: emailOrPhone, password: password, loginType: loginType, fieldType: fieldType, alreadyInApp: alreadyInApp);
-    _getUserAndCartData(responseModel);
-    _isLoading = false;
-    update();
-    return responseModel;
+    try {
+      ResponseModel responseModel = await authServiceInterface.login(emailOrPhone: emailOrPhone, password: password, loginType: loginType, fieldType: fieldType, alreadyInApp: alreadyInApp);
+      _getUserAndCartData(responseModel);
+      return responseModel;
+    } finally {
+      _isLoading = false;
+      update();
+    }
   }
 
   Future<ResponseModel> otpLogin({required String phone, required String loginType, required String otp, required String verified, bool alreadyInApp = false}) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await authServiceInterface.otpLogin(phone: phone, otp: otp, loginType: loginType, verified: verified, alreadyInApp: alreadyInApp);
-    _getUserAndCartData(responseModel);
-    _isLoading = false;
-    update();
-    return responseModel;
+    try {
+      ResponseModel responseModel = await authServiceInterface.otpLogin(phone: phone, otp: otp, loginType: loginType, verified: verified, alreadyInApp: alreadyInApp);
+      _getUserAndCartData(responseModel);
+      return responseModel;
+    } finally {
+      _isLoading = false;
+      update();
+    }
   }
 
   void resetOtpView({bool isUpdate = true}) {
@@ -98,20 +107,26 @@ class AuthController extends GetxController implements GetxService {
   Future<ResponseModel> guestLogin() async {
     _guestLoading = true;
     update();
-    ResponseModel responseModel = await authServiceInterface.guestLogin();
-    _guestLoading = false;
-    update();
-    return responseModel;
+    try {
+      ResponseModel responseModel = await authServiceInterface.guestLogin();
+      return responseModel;
+    } finally {
+      _guestLoading = false;
+      update();
+    }
   }
 
   Future<ResponseModel> loginWithSocialMedia(SocialLogInBody socialLogInBody) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await authServiceInterface.loginWithSocialMedia(socialLogInBody, isCustomerVerificationOn: Get.find<SplashController>().configModel!.customerVerification!);
-    _getUserAndCartData(responseModel);
-    _isLoading = false;
-    update();
-    return responseModel;
+    try {
+      ResponseModel responseModel = await authServiceInterface.loginWithSocialMedia(socialLogInBody, isCustomerVerificationOn: Get.find<SplashController>().configModel!.customerVerification!);
+      _getUserAndCartData(responseModel);
+      return responseModel;
+    } finally {
+      _isLoading = false;
+      update();
+    }
   }
 
   void toggleIsNumberLogin({bool? value, bool willUpdate = true}){
@@ -129,19 +144,28 @@ class AuthController extends GetxController implements GetxService {
   Future<ResponseModel> updatePersonalInfo({required String name, required String? phone, required String loginType, required String? email, required String? referCode, required String? gender, bool alreadyInApp = false}) async {
     _isLoading = true;
     update();
-    ResponseModel responseModel = await authServiceInterface.updatePersonalInfo(name: name, phone: phone, email: email, loginType: loginType, referCode: referCode, gender: gender, alreadyInApp: alreadyInApp);
-    _getUserAndCartData(responseModel);
-    _isLoading = false;
-    update();
-    return responseModel;
+    try {
+      ResponseModel responseModel = await authServiceInterface.updatePersonalInfo(name: name, phone: phone, email: email, loginType: loginType, referCode: referCode, gender: gender, alreadyInApp: alreadyInApp);
+      _getUserAndCartData(responseModel);
+      return responseModel;
+    } finally {
+      _isLoading = false;
+      update();
+    }
   }
 
   void _getUserAndCartData(ResponseModel responseModel) {
-    if(responseModel.isSuccess && responseModel.authResponseModel != null && responseModel.authResponseModel!.isPhoneVerified!
-        && responseModel.authResponseModel!.isEmailVerified! && responseModel.authResponseModel!.isPersonalInfo!
+    if(responseModel.isSuccess && responseModel.authResponseModel != null
+        && (responseModel.authResponseModel!.isPhoneVerified ?? false)
+        && (responseModel.authResponseModel!.isEmailVerified ?? false)
+        && (responseModel.authResponseModel!.isPersonalInfo ?? false)
         && responseModel.authResponseModel!.isExistUser == null) {
-      Get.find<ProfileController>().getUserInfo();
-      Get.find<CartController>().getCartDataOnline();
+      if (Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().getUserInfo();
+      }
+      if (Get.isRegistered<CartController>()) {
+        Get.find<CartController>().getCartDataOnline();
+      }
     }
   }
 
@@ -323,73 +347,82 @@ class AuthController extends GetxController implements GetxService {
     return await authServiceInterface.saveDeviceToken();
   }
 
-  Future<void> firebaseVerifyPhoneNumber(String phoneNumber, String? token, String loginType, {bool fromSignUp = true, bool canRoute = true, UpdateUserModel? updateUserModel})async {
+  Future<void> firebaseVerifyPhoneNumber(String phoneNumber, String? token, String loginType, {bool fromSignUp = true, bool canRoute = true, UpdateUserModel? updateUserModel}) async {
     _isLoading = true;
     update();
 
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) {},
-      verificationFailed: (FirebaseAuthException e) {
-        _isLoading = false;
-        update();
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) {},
+        verificationFailed: (FirebaseAuthException e) {
+          _isLoading = false;
+          update();
 
-        if(Get.isDialogOpen!) {
-          Get.back();
-        }
-
-        if (token != null && token.isNotEmpty) {
-          saveUserToken(token);
-          Get.find<ProfileController>().getUserInfo();
-          Get.find<LocationController>().navigateToLocationScreen(fromSignUp ? RouteHelper.signUp : RouteHelper.initial);
-        } else {
-          Get.log('Firebase phone verification failed (${e.code}): ${e.message}');
-          if(e.code == 'invalid-phone-number') {
-            showCustomSnackBar('enter_a_valid_phone_number'.tr);
-          } else if (e.code == 'billing-not-enabled') {
-            showCustomSnackBar('firebase_verification_unavailable'.tr);
-          } else {
-            showCustomSnackBar('firebase_verification_failed'.tr);
-          }
-        }
-
-      },
-      codeSent: (String vId, int? resendToken) {
-
-        if(Get.isDialogOpen!) {
-          Get.back();
-        }
-
-        _isLoading = false;
-        update();
-        if(updateUserModel != null) {
-          updateUserModel.sessionInfo = vId;
-        }
-
-        if(canRoute) {
-          if(ResponsiveHelper.isDesktop(Get.context)) {
-
+          if(Get.isDialogOpen ?? false) {
             Get.back();
-            Get.dialog(VerificationScreen(
-              number: phoneNumber, email: null, token: token, fromSignUp: fromSignUp, fromForgetPassword: !fromSignUp,
-              loginType: loginType, password: '', firebaseSession: vId, userModel: updateUserModel,
-            ));
-          } else {
-            Get.toNamed(RouteHelper.getVerificationRoute(
-              phoneNumber, '', token, fromSignUp ? RouteHelper.signUp : RouteHelper.forgotPassword, '', loginType,
-              session: vId, updateUserModel: updateUserModel,
-            ));
           }
-        }
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        if(Get.isDialogOpen!) {
-          Get.back();
-        }
-        showCustomSnackBar('timed_out_please_try_again_after_few_minutes'.tr);
-      },
-    );
 
+          if (token != null && token.isNotEmpty) {
+            saveUserToken(token);
+            if (Get.isRegistered<ProfileController>()) {
+              Get.find<ProfileController>().getUserInfo();
+            }
+            if (Get.isRegistered<LocationController>()) {
+              Get.find<LocationController>().navigateToLocationScreen(fromSignUp ? RouteHelper.signUp : RouteHelper.initial);
+            }
+          } else {
+            Get.log('Firebase phone verification failed (${e.code}): ${e.message}');
+            if(e.code == 'invalid-phone-number') {
+              showCustomSnackBar('enter_a_valid_phone_number'.tr);
+            } else if (e.code == 'billing-not-enabled') {
+              showCustomSnackBar('firebase_verification_unavailable'.tr);
+            } else {
+              showCustomSnackBar('firebase_verification_failed'.tr);
+            }
+          }
+        },
+        codeSent: (String vId, int? resendToken) {
+          if(Get.isDialogOpen ?? false) {
+            Get.back();
+          }
+
+          _isLoading = false;
+          update();
+          if(updateUserModel != null) {
+            updateUserModel.sessionInfo = vId;
+          }
+
+          if(canRoute) {
+            if(ResponsiveHelper.isDesktop(Get.context)) {
+              Get.back();
+              Get.dialog(VerificationScreen(
+                number: phoneNumber, email: null, token: token, fromSignUp: fromSignUp, fromForgetPassword: !fromSignUp,
+                loginType: loginType, password: '', firebaseSession: vId, userModel: updateUserModel,
+              ));
+            } else {
+              Get.toNamed(RouteHelper.getVerificationRoute(
+                phoneNumber, '', token, fromSignUp ? RouteHelper.signUp : RouteHelper.forgotPassword, '', loginType,
+                session: vId, updateUserModel: updateUserModel,
+              ));
+            }
+          }
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          if(Get.isDialogOpen ?? false) {
+            Get.back();
+          }
+          showCustomSnackBar('timed_out_please_try_again_after_few_minutes'.tr);
+        },
+      );
+    } catch (e) {
+      _isLoading = false;
+      update();
+      if(Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      showCustomSnackBar('firebase_verification_failed'.tr);
+    }
   }
 
   Future<bool> saveProductRefCode(String code) async {

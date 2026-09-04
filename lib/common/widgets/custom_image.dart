@@ -35,7 +35,7 @@ class CustomImage extends StatelessWidget {
     if(image.toLowerCase().endsWith('.svg')) {
       return SvgPicture.network(
         image, height: height, width: width, fit: fit ?? BoxFit.contain,
-        color: color,
+        colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
         placeholderBuilder: (BuildContext context) => Image.asset(
           placeholder.isNotEmpty ? placeholder : (isNotification ? Images.notificationPlaceholder : Images.defultImage),
           height: height, width: width, fit: fit, color: color,
@@ -56,12 +56,22 @@ class CustomImage extends StatelessWidget {
       );
     }
 
+    final double dpr = MediaQuery.maybeOf(context)?.devicePixelRatio.clamp(1.0, 2.5) ?? 2.0;
+    final int memW = isUseMemCache
+        ? ((width != null && width!.isFinite && width! > 0) ? (width! * dpr).round() : 600).clamp(50, 800)
+        : 800;
+    final int memH = isUseMemCache
+        ? ((height != null && height!.isFinite && height! > 0) ? (height! * dpr).round() : 600).clamp(50, 800)
+        : 800;
+
     Widget imageWidget = CachedNetworkImage(
       color: color,
       imageUrl: kIsWeb ? '${AppConstants.baseUrl}/image-proxy?url=$image' : image,
       height: height, width: width, fit: fit,
-      memCacheHeight: isUseMemCache && height != null ? (height!.isFinite ? (height! * MediaQuery.of(context).devicePixelRatio).toInt() : 600) : null,
-      memCacheWidth: isUseMemCache && width != null ? (width!.isFinite ? (width! * MediaQuery.of(context).devicePixelRatio).toInt() : 600) : null,
+      memCacheHeight: memH,
+      memCacheWidth: memW,
+      maxHeightDiskCache: 1000,
+      maxWidthDiskCache: 1000,
       placeholder: (context, url) => _ShimmerPlaceholder(height: height, width: width),
       errorWidget: (context, url, error) => Image.asset(
         placeholder.isNotEmpty ? placeholder : (isNotification ? Images.notificationPlaceholder : Images.defultImage),
@@ -82,52 +92,19 @@ class CustomImage extends StatelessWidget {
   }
 }
 
-/// Lightweight shimmer/skeleton placeholder — no heavy third-party dependency needed
-class _ShimmerPlaceholder extends StatefulWidget {
+/// Lightweight static placeholder — zero tickers, zero rebuild overhead during list scrolling
+class _ShimmerPlaceholder extends StatelessWidget {
   final double? height;
   final double? width;
   const _ShimmerPlaceholder({this.height, this.width});
 
   @override
-  State<_ShimmerPlaceholder> createState() => _ShimmerPlaceholderState();
-}
-
-class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1100),
-    )..repeat(reverse: true);
-    _anim = CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut);
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final base = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF2A2A2A)
-        : const Color(0xFFE8E8E8);
-    final highlight = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFF3A3A3A)
-        : const Color(0xFFF5F5F5);
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (context, _) => Container(
-        height: widget.height,
-        width: widget.width,
-        color: Color.lerp(base, highlight, _anim.value),
-      ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      height: height,
+      width: width,
+      color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEFEFEF),
     );
   }
 }

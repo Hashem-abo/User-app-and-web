@@ -127,7 +127,7 @@ class ManualLoginWidget extends StatelessWidget {
           ),
 
           Align(
-            alignment: Alignment.centerRight,
+            alignment: AlignmentDirectional.centerEnd,
             child: TextButton(
               style: TextButton.styleFrom(padding: EdgeInsets.zero),
               onPressed: () {
@@ -195,7 +195,7 @@ class ManualLoginWidget extends StatelessWidget {
           flex: 6,
           child: Column(children: [
             Align(
-              alignment: Alignment.topLeft,
+              alignment: AlignmentDirectional.topStart,
               child: Text('login'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
             ),
             const SizedBox(height: Dimensions.paddingSizeDefault),

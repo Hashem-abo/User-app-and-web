@@ -121,8 +121,9 @@
   "about_us": "আমাদের সম্পর্কে",
   "terms_conditions": "টার্মস & কন্ডিশনস",
   "help_support": "হেল্প & সাপোর্ট",
-  "logout": "লগ আউট",
+  "logout": "লগআউট",
   "logging_out": "লগ আউট হচ্ছে...",
+  "please_agree_with_terms_conditions": "অনুগ্রহ করে শর্তাবলীতে সম্মত হন",
   "type_here": "এখানে লিখুন...",
   "available": "এভেইলেবল",
   "used": "ব্যবহৃত",
@@ -1659,5 +1660,10 @@
   "call_via_internet": "ইন্টারনেটের মাধ্যমে কল করুন",
   "cellular_call": "সেলুলার কল",
   "call_via_sim_card": "সিম কার্ডের মাধ্যমে কল করুন",
-  "delivery_man_offline_message": "ডেলিভারি পার্টনার বর্তমানে অনলাইনে নেই। অনুগ্রহ করে সেলুলার নেটওয়ার্কের মাধ্যমে কল করুন।"
+  "delivery_man_offline_message": "ডেলিভারি পার্টনার বর্তমানে অনলাইনে নেই। অনুগ্রহ করে সেলুলার নেটওয়ার্কের মাধ্যমে কল করুন।",
+  "wholesale": "পাইকারি",
+  "wholesaler": "পাইকারি",
+  "retail": "খুচরা",
+  "retailer": "খুচরা",
+  "factory": "কারখানা"
 }

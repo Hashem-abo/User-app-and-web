@@ -10,13 +10,13 @@ import 'package:sixam_mart/features/location/domain/models/zone_response_model.d
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class BannerView extends StatelessWidget {
@@ -44,7 +44,7 @@ class BannerView extends StatelessWidget {
                   enlargeCenterPage: false, // ahmed: Disable card scaling
                   disableCenter: false,
                   viewportFraction: 0.85, // ahmed: Show part of next banner
-                  autoPlayInterval: const Duration(seconds: 7),
+                  autoPlayInterval: const Duration(seconds: 5),
                   onPageChanged: (index, reason) {
                     bannerController.setCurrentIndex(index, true);
                   },
@@ -91,7 +91,14 @@ class BannerView extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 0)],
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context).shadowColor.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       margin: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeExtraSmall),
                       child: ClipRRect(
@@ -100,14 +107,12 @@ class BannerView extends StatelessWidget {
                           scale: isSelected ? 1.05 : 1.0, // ahmed: Reduced zoom to 5%
                           duration: const Duration(milliseconds: 1500), // ahmed: Delayed effect duration
                           curve: const Interval(0.5, 1.0, curve: Curves.easeOut), // ahmed: Wait 50% then zoom
-                          child: GetBuilder<SplashController>(builder: (splashController) {
-                            return CustomImage(
-                              image: '${bannerList[index]}',
-                              fit: BoxFit.cover,
-                              height: double.infinity, // ahmed: Force fill
-                              width: double.infinity,
-                            );
-                          }),
+                          child: CustomImage(
+                            image: '${bannerList[index]}',
+                            fit: BoxFit.cover,
+                            height: double.infinity,
+                            width: double.infinity,
+                          ),
                         ),
                       ),
                     ),
@@ -116,21 +121,24 @@ class BannerView extends StatelessWidget {
               ),
             ),
 
-            Positioned(
-              bottom: 10, left: 0, right: 0,
-              child: Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: 1),
-                  child: Text('${(bannerController.currentIndex) + 1}/${bannerList.length}',
-                      style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: 12),
+            if (bannerList.length > 1)
+              Positioned(
+                bottom: 10, left: 0, right: 0,
+                child: Center(
+                  child: AnimatedSmoothIndicator(
+                    activeIndex: bannerController.currentIndex,
+                    count: bannerList.length,
+                    effect: ExpandingDotsEffect(
+                      dotHeight: 5,
+                      dotWidth: 5,
+                      spacing: 4,
+                      expansionFactor: 3.5,
+                      activeDotColor: Theme.of(context).primaryColor,
+                      dotColor: Theme.of(context).primaryColor.withValues(alpha: 0.25),
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ) : Shimmer(
           duration: const Duration(seconds: 2),

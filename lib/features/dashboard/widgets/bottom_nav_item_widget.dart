@@ -42,8 +42,9 @@ class BottomNavItemWidget extends StatelessWidget {
             }
             onTap?.call();
           },
-          splashColor: selectedColor.withValues(alpha: 0.10),
-          highlightColor: selectedColor.withValues(alpha: 0.05),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          hoverColor: Colors.transparent,
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,
@@ -52,9 +53,9 @@ class BottomNavItemWidget extends StatelessWidget {
               Positioned(
                 top: 0,
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOutCubic,
-                  width: isSelected ? 28 : 0,
+                  duration: const Duration(milliseconds: 260),
+                  curve: Curves.easeOutBack,
+                  width: isSelected ? 24 : 0,
                   height: isSelected ? 3 : 0,
                   decoration: BoxDecoration(
                     color: isSelected ? selectedColor : Colors.transparent,
@@ -64,7 +65,7 @@ class BottomNavItemWidget extends StatelessWidget {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: selectedColor.withValues(alpha: 0.30),
+                              color: selectedColor.withValues(alpha: 0.35),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),
@@ -83,17 +84,23 @@ class BottomNavItemWidget extends StatelessWidget {
                       clipBehavior: Clip.none,
                       children: [
                         AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 200),
-                          transitionBuilder: (child, anim) => ScaleTransition(
-                            scale: anim,
-                            child: child,
+                          duration: const Duration(milliseconds: 220),
+                          transitionBuilder: (child, anim) => FadeTransition(
+                            opacity: anim,
+                            child: ScaleTransition(
+                              scale: Tween<double>(begin: 0.85, end: 1.0).animate(CurvedAnimation(
+                                parent: anim,
+                                curve: Curves.easeOutBack,
+                              )),
+                              child: child,
+                            ),
                           ),
                           child: iconUrl != null
                               ? CustomImage(
                                   key: ValueKey(isSelected),
                                   image: iconUrl!,
-                                  height: 26,
-                                  width: 26,
+                                  height: 24,
+                                  width: 24,
                                   color: isSelected ? selectedColor : unselectedColor,
                                 )
                               : iconData != null
@@ -103,13 +110,13 @@ class BottomNavItemWidget extends StatelessWidget {
                                           ? (selectedIconData ?? iconData)
                                           : iconData,
                                       color: isSelected ? selectedColor : unselectedColor,
-                                      size: 26,
+                                      size: 24,
                                     )
                                   : Image.asset(
                                       key: ValueKey(isSelected),
                                       isSelected ? selectedIcon! : unSelectedIcon!,
-                                      height: 26,
-                                      width: 26,
+                                      height: 24,
+                                      width: 24,
                                       color: isSelected ? selectedColor : unselectedColor,
                                     ),
                         ),

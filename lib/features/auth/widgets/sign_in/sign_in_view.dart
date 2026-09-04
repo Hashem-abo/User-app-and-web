@@ -174,6 +174,7 @@ class _SignInViewState extends State<SignInView> {
   }
   
   void _otpLogin(AuthController authController, String countryDialCode, CentralizeLoginType loginType) async {
+    if (authController.isLoading) return;
     String phone = _phoneController.text.trim();
     String numberWithCountryCode = countryDialCode+phone;
     PhoneValid phoneValid = await CustomValidator.isPhoneValid(numberWithCountryCode);
@@ -195,6 +196,7 @@ class _SignInViewState extends State<SignInView> {
   }
 
   void _login(AuthController authController, CentralizeLoginType loginType) async {
+    if (authController.isLoading) return;
     String phone = _phoneController.text.trim();
     String password = _passwordController.text.trim();
     String numberWithCountryCode = authController.countryDialCode + phone;
@@ -214,7 +216,7 @@ class _SignInViewState extends State<SignInView> {
           alreadyInApp: widget.backFromThis,
         ).then((status) async {
           if (status.isSuccess) {
-            if(status.isSuccess && !status.authResponseModel!.isPersonalInfo!) {
+            if(status.isSuccess && (status.authResponseModel?.isPersonalInfo == false)) {
               if(ResponsiveHelper.isDesktop(Get.context)) {
                 Get.back();
                 Get.dialog(NewUserSetupScreen(name: '', loginType: loginType.name, phone: numberWithCountryCode, email: '', backFromThis: widget.backFromThis));
@@ -244,7 +246,7 @@ class _SignInViewState extends State<SignInView> {
     }
 
     final bool isPhoneVerificationRequired = Get.find<SplashController>().configModel?.centralizeLoginSetup?.phoneVerificationStatus ?? false;
-    bool isPhoneNotVerified = (status.authResponseModel != null && !status.authResponseModel!.isPhoneVerified!);
+    bool isPhoneNotVerified = (status.authResponseModel != null && status.authResponseModel!.isPhoneVerified == false);
 
     // Check actual database status via /api/v1/customer/info in case backend returned is_phone_verified=1 due to business settings mismatch
     if (!isPhoneNotVerified && isPhoneVerificationRequired && status.authResponseModel?.token != null) {
@@ -268,7 +270,7 @@ class _SignInViewState extends State<SignInView> {
         Get.toNamed(RouteHelper.getVerificationRoute(phoneToVerify, null, token, RouteHelper.signUp, data, CentralizeLoginType.manual.name));
       }
       return;
-    } else if(status.authResponseModel != null && !status.authResponseModel!.isEmailVerified!) {
+    } else if(status.authResponseModel != null && status.authResponseModel!.isEmailVerified == false) {
       List<int> encoded = utf8.encode(password);
       String data = base64Encode(encoded);
       String token = status.authResponseModel!.token??'';
@@ -298,7 +300,7 @@ class _SignInViewState extends State<SignInView> {
     }
 
     final bool isPhoneVerificationRequired = Get.find<SplashController>().configModel?.centralizeLoginSetup?.phoneVerificationStatus ?? false;
-    bool isPhoneNotVerified = (response.authResponseModel != null && !response.authResponseModel!.isPhoneVerified!);
+    bool isPhoneNotVerified = (response.authResponseModel != null && response.authResponseModel!.isPhoneVerified == false);
 
     if (!isPhoneNotVerified && isPhoneVerificationRequired && response.authResponseModel?.token != null) {
       await Get.find<ProfileController>().getUserInfo();

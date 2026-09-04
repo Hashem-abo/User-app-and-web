@@ -36,7 +36,6 @@ import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/not_logged_in_screen.dart';
 import 'package:sixam_mart/features/checkout/widgets/checkout_screen_shimmer_view.dart';
 import 'package:sixam_mart/features/checkout/widgets/payment_method_bottom_sheet.dart';
-import 'package:sixam_mart/features/checkout/widgets/payment_onboarding_dialog.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/checkout/widgets/bottom_section.dart';
 import 'package:sixam_mart/features/checkout/widgets/top_section.dart';
@@ -119,9 +118,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     if(isLoggedIn) {
-      if(Get.find<ProfileController>().userInfoModel == null) {
-        Get.find<ProfileController>().getUserInfo();
-      }
+      Get.find<ProfileController>().getUserInfo();
 
       Get.find<CouponController>().getCouponList();
 
@@ -155,7 +152,11 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     //   Get.find<CartController>().cartList[0].item!.storeId,
     // );
     if (AuthHelper.isLoggedIn()) {
-      Get.find<ProController>().getProActiveOffer(moduleType: Get.find<SplashController>().module?.moduleType);
+      String? moduleType = Get.find<SplashController>().module?.moduleType;
+      if (moduleType == null && _cartList != null && _cartList!.isNotEmpty) {
+        moduleType = _cartList!.first?.item?.moduleType;
+      }
+      Get.find<ProController>().getProActiveOffer(moduleType: moduleType);
     }
     Get.find<CheckoutController>().tipController.text = Get.find<CheckoutController>().selectedTips != -1 ? AppConstants.tips[Get.find<CheckoutController>().selectedTips] : '';
 
@@ -648,19 +649,8 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             showCustomSnackBar('you_must_upload_prescription_for_this_order'.tr);
           } else if(!_isCashOnDeliveryActive! && !_isDigitalPaymentActive! && !_isWalletActive && !_isOfflinePaymentActive) {
             showCustomSnackBar('no_payment_method_is_enabled'.tr);
-          }else if(checkoutController.paymentMethodIndex == 1 && !checkoutController.isPartialPay && ((Get.find<ProfileController>().userInfoModel?.walletBalance ?? 0) < total)) {
-            showCustomSnackBar('you_do_not_have_sufficient_balance_in_wallet'.tr);
-          }else if(checkoutController.paymentMethodIndex == 2 && (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak' || (checkoutController.digitalPaymentName?.toLowerCase().contains('wallet') ?? false) || (checkoutController.digitalPaymentName?.toLowerCase().contains('floosak') ?? false)) && checkoutController.purchaseCodeController.text.trim().isEmpty) {
-            final digitalGateways = Get.find<SplashController>().configModel?.activePaymentMethodList;
-            final selectedGateway = digitalGateways?.firstWhereOrNull((g) => g.getWay == checkoutController.digitalPaymentName);
-            Get.dialog(
-              PaymentOnboardingDialog(
-                paymentMethodName: checkoutController.digitalPaymentName ?? '',
-                paymentTitle: selectedGateway?.getWayTitle ?? (checkoutController.digitalPaymentName == 'easy_wallet' ? 'Easy Wallet' : 'Floosak'),
-                paymentImage: selectedGateway?.getWayImageFullUrl,
-                totalPrice: total,
-              ),
-            );
+          }else if(checkoutController.paymentMethodIndex == 2 && (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak') && checkoutController.purchaseCodeController.text.trim().isEmpty) {
+            showCustomSnackBar('Please enter your Purchase Code'.tr);
           }else if(checkoutController.paymentMethodIndex == -1) {
             if(ResponsiveHelper.isDesktop(context)){
               if(_isCashOnDeliveryActive! || _isDigitalPaymentActive! || _isWalletActive || _isOfflinePaymentActive){
@@ -822,7 +812,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                 saverDeliveryType: checkoutController.saverDeliveryType,
                 monthlySubscribe: checkoutController.monthlySubscribe,
                 pickupCenterName: checkoutController.orderType == 'pickup_center' ? checkoutController.selectedPickupCenter?.name : null,
-                phone: checkoutController.orderType == 'pickup_center' ? (checkoutController.selectedPickupCenter?.phone ?? finalAddress!.contactPersonNumber ?? Get.find<ProfileController>().userInfoModel?.phone) : finalAddress!.contactPersonNumber,
+                phone: checkoutController.orderType == 'pickup_center' ? (checkoutController.selectedPickupCenter?.phone ?? finalAddress.contactPersonNumber ?? Get.find<ProfileController>().userInfoModel?.phone) : finalAddress.contactPersonNumber,
               );
 
               if(checkoutController.paymentMethodIndex == 3){
@@ -1511,7 +1501,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
         bool isCouponFree = Get.find<CouponController>().freeDelivery;
         bool isGuestNoAddress = AuthHelper.isGuestLoggedIn() && (Get.find<CheckoutController>().guestAddress == null && Get.find<CheckoutController>().orderType != 'take_away');
 
-        bool isFree = (orderType == 'take_away' || s.freeDelivery! || isAdminFreeAll || isAdminFreeOver || isCouponFree || isGuestNoAddress);
+        bool isFree = (orderType == 'take_away' || isStoreFree || isAdminFreeAll || isAdminFreeOver || isCouponFree || isGuestNoAddress);
 
         if (!isFree) {
           totalBaseDeliveryCharge += baseFee;
