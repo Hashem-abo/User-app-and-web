@@ -61,8 +61,8 @@ class Packages {
   Packages.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     packageName = json['package_name'];
-    price = json['price'].toDouble();
-    validity = json['validity'];
+    price = json['price'] != null ? double.tryParse(json['price'].toString()) : 0.0;
+    validity = json['validity'] != null ? int.tryParse(json['validity'].toString()) : null;
     maxOrder = json['max_order'];
     maxProduct = json['max_product'];
     pos = json['pos'];

@@ -55,8 +55,9 @@ class _ItemViewAllScreenState extends State<ItemViewAllScreen> {
 
       if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300 && items != null && !itemController.isLoading) {
 
-        int pageSize = (itemController.pageSize! / 10).ceil();
-        if (itemController.offset < pageSize) {
+        final totalSize = itemController.pageSize ?? 0;
+        final int pageSize = (totalSize / 25).ceil();
+        if (pageSize > 0 && itemController.offset < pageSize) {
           itemController.setOffset(itemController.offset + 1);
           debugPrint('end of the page, offset: ${itemController.offset}');
 

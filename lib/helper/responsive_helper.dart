@@ -18,7 +18,7 @@ class ResponsiveHelper {
   static bool isMobile(BuildContext? context) {
     if (context == null) return !kIsWeb;
     final size = MediaQuery.of(context).size.width;
-    if (size < 650 || !kIsWeb) {
+    if (size < 650) {
       return true;
     } else {
       return false;

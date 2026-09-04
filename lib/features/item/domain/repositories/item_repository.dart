@@ -9,6 +9,7 @@ import 'package:sixam_mart/features/item/domain/models/common_condition_model.da
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/item/domain/repositories/item_repository_interface.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart/api/data_module_manager.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/common/models/response_model.dart';
 
@@ -93,9 +94,6 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<ItemModel?> _getPopularItemList({required String type, required DataSourceEnum source, required int offset, String? search, List<int>? categoryIds, List<String>? filter, int? rating, double? minPrice, double? maxPrice, int? moduleId}) async { // + ahmed
     ItemModel? popularItemList;
-    String moduleParam = moduleId != null ? moduleId.toString() : Get.find<SplashController>().module!.id.toString(); // + ahmed
-    String cacheId = '${AppConstants.popularItemUri}?type=$type-$moduleParam'; // + ahmed
-
     final filterString = filter != null ? jsonEncode(filter) : [];
     final categoryIdsString = categoryIds != null ? jsonEncode(categoryIds) : [];
 
@@ -111,6 +109,7 @@ class ItemRepository implements ItemRepositoryInterface {
       if (maxPrice != null) 'max_price': maxPrice.toString(),
     };
 
+    String cacheId = DataModuleManager.buildCanonicalKey(AppConstants.popularItemUri, query: query, moduleId: moduleId ?? Get.find<SplashController>().module?.id);
     String uri = Uri.parse(AppConstants.popularItemUri).replace(queryParameters: query).toString();
 
     switch(source) {
@@ -142,9 +141,6 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<ItemModel?> _getReviewedItemList({required String type, required DataSourceEnum source, required int offset, String? search, List<int>? categoryIds, List<String>? filter, int? rating, double? minPrice, double? maxPrice, int? moduleId}) async {
     ItemModel? itemModel;
-    String moduleParam = moduleId != null ? moduleId.toString() : Get.find<SplashController>().module!.id!.toString(); // + ahmed
-    String cacheId = '${AppConstants.reviewedItemUri}?type=$type&offset=$offset&limit=12-$moduleParam'; // + ahmed: Added moduleParam and offset
-
     final filterString = filter != null ? jsonEncode(filter) : [];
     final categoryIdsString = categoryIds != null ? jsonEncode(categoryIds) : [];
 
@@ -160,6 +156,7 @@ class ItemRepository implements ItemRepositoryInterface {
       if (maxPrice != null) 'max_price': maxPrice.toString(),
     };
 
+    String cacheId = DataModuleManager.buildCanonicalKey(AppConstants.reviewedItemUri, query: query, moduleId: moduleId ?? Get.find<SplashController>().module?.id);
     String uri = Uri.parse(AppConstants.reviewedItemUri).replace(queryParameters: query).toString();
 
     switch(source) {
@@ -191,9 +188,6 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<ItemModel?> _getDiscountedItemList({required String type, required DataSourceEnum source, required int offset, String? search, List<int>? categoryIds, List<String>? filter, int? rating, double? minPrice, double? maxPrice, int? moduleId}) async {
     ItemModel? discountedItem;
-    String moduleParam = moduleId != null ? moduleId.toString() : Get.find<SplashController>().module!.id!.toString(); // + ahmed
-    String cacheId = '${AppConstants.discountedItemsUri}?type=$type&offset=1&limit=12-$moduleParam';
-
     final filterString = filter != null ? jsonEncode(filter) : [];
     final categoryIdsString = categoryIds != null ? jsonEncode(categoryIds) : [];
 
@@ -209,6 +203,7 @@ class ItemRepository implements ItemRepositoryInterface {
       if (maxPrice != null) 'max_price': maxPrice.toString(),
     };
 
+    String cacheId = DataModuleManager.buildCanonicalKey(AppConstants.discountedItemsUri, query: query, moduleId: moduleId ?? Get.find<SplashController>().module?.id);
     String uri = Uri.parse(AppConstants.discountedItemsUri).replace(queryParameters: query).toString();
 
     switch(source) {
@@ -288,8 +283,6 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<ItemModel?> _getPaginatedRecommendedItemList({required String type, required DataSourceEnum source, required int offset, String? search, List<int>? categoryIds, List<String>? filter, int? rating, double? minPrice, double? maxPrice, int? moduleId}) async {
     ItemModel? recommendedItem;
-    String moduleParam = moduleId != null ? moduleId.toString() : Get.find<SplashController>().module!.id!.toString();
-    String cacheId = '${AppConstants.storeRecommendedItemUri}?type=$type&offset=$offset&limit=25-$moduleParam';
 
     final filterString = filter != null ? jsonEncode(filter) : [];
     final categoryIdsString = categoryIds != null ? jsonEncode(categoryIds) : [];
@@ -306,6 +299,8 @@ class ItemRepository implements ItemRepositoryInterface {
       if (maxPrice != null) 'max_price': maxPrice.toString(),
     };
 
+    // Central canonical cache key preventing cache collision across modules/filters
+    String cacheId = DataModuleManager.buildCanonicalKey(AppConstants.storeRecommendedItemUri, query: query, moduleId: moduleId ?? Get.find<SplashController>().module?.id);
     String uri = Uri.parse(AppConstants.storeRecommendedItemUri).replace(queryParameters: query).toString();
 
     switch(source) {
@@ -335,8 +330,6 @@ class ItemRepository implements ItemRepositoryInterface {
 
   Future<ItemModel?> _getLatestItemList({required String type, required DataSourceEnum source, required int offset, String? search, List<int>? categoryIds, List<String>? filter, int? rating, double? minPrice, double? maxPrice, int? moduleId}) async {
     ItemModel? latestItem;
-    String moduleParam = moduleId != null ? moduleId.toString() : Get.find<SplashController>().module!.id!.toString();
-    String cacheId = '${AppConstants.latestItemUri}?type=$type&offset=$offset&limit=25-$moduleParam';
 
     final filterString = filter != null ? jsonEncode(filter) : [];
     final categoryIdsString = categoryIds != null ? jsonEncode(categoryIds) : [];
@@ -353,6 +346,8 @@ class ItemRepository implements ItemRepositoryInterface {
       if (maxPrice != null) 'max_price': maxPrice.toString(),
     };
 
+    // Central canonical cache key preventing cache collision across modules/filters
+    String cacheId = DataModuleManager.buildCanonicalKey(AppConstants.latestItemUri, query: query, moduleId: moduleId ?? Get.find<SplashController>().module?.id);
     String uri = Uri.parse(AppConstants.latestItemUri).replace(queryParameters: query).toString();
 
     switch(source) {

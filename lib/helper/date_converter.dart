@@ -83,12 +83,28 @@ class DateConverter {
   }
 
   static String dateTimeStringToDateOnly(String dateTime) {
-    return _formatForLocale(
-        'dd MMM yyyy', DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime));
+    try {
+      return _formatForLocale(
+          'dd MMM yyyy', DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime));
+    } catch (_) {
+      try {
+        return _formatForLocale('dd MMM yyyy', DateTime.parse(dateTime).toLocal());
+      } catch (_) {
+        return dateTime;
+      }
+    }
   }
 
   static DateTime dateTimeStringToDate(String dateTime) {
-    return DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime);
+    try {
+      return DateFormat('yyyy-MM-dd HH:mm:ss').parse(dateTime);
+    } catch (_) {
+      try {
+        return DateTime.parse(dateTime).toLocal();
+      } catch (_) {
+        return DateTime.now();
+      }
+    }
   }
 
   static DateTime isoStringToLocalDate(String dateTime) {
@@ -132,7 +148,16 @@ class DateConverter {
   }
 
   static String convertTimeToTime(String time) {
-    return _formatForLocale(_timeFormatter(), DateFormat('HH:mm').parse(time));
+    if (time.trim().isEmpty) return '';
+    try {
+      return _formatForLocale(_timeFormatter(), DateFormat('HH:mm').parse(time));
+    } catch (_) {
+      try {
+        return _formatForLocale(_timeFormatter(), DateFormat('HH:mm:ss').parse(time));
+      } catch (_) {
+        return time;
+      }
+    }
   }
 
   static DateTime convertStringTimeToDate(String time) {

@@ -251,20 +251,20 @@ void main() {
     });
   });
 
-  group('[DATA PARSING BUG] Packages.fromJson crashes on null or string price', () {
-    test('CRASH REPRODUCTION: Packages price is null or string decimal', () {
+  group('[DATA PARSING BUG] Packages.fromJson handles null or string price safely', () {
+    test('Packages price parses null as 0.0 and string decimal accurately', () {
       final json1 = <String, dynamic>{'id': 1, 'package_name': 'Free Plan', 'price': null};
       final json2 = <String, dynamic>{'id': 2, 'package_name': 'Pro Plan', 'price': '99.99'};
 
-      // In production line 64: price = json['price'].toDouble();
-      // Throws NoSuchMethodError
-      expect(() => Packages.fromJson(json1), throwsNoSuchMethodError);
-      expect(() => Packages.fromJson(json2), throwsNoSuchMethodError);
+      final p1 = Packages.fromJson(json1);
+      final p2 = Packages.fromJson(json2);
+      expect(p1.price, equals(0.0));
+      expect(p2.price, equals(99.99));
     });
   });
 
-  group('[DATA PARSING BUG] ActiveProducts.fromJson crashes on null or string discountAmount / price', () {
-    test('CRASH REPRODUCTION: ActiveProducts discount_amount or price is null or string decimal', () {
+  group('[DATA PARSING BUG] ActiveProducts.fromJson handles null or string discountAmount / price', () {
+    test('ActiveProducts safely parses null discount_amount and string price', () {
       final json = <String, dynamic>{
         'id': 50,
         'flash_sale_id': 1,
@@ -272,24 +272,26 @@ void main() {
         'price': '49.99',        // String decimal
       };
 
-      // In production lines 121-122: discountAmount = json['discount_amount'].toDouble();
-      expect(() => ActiveProducts.fromJson(json), throwsNoSuchMethodError);
+      final activeProduct = ActiveProducts.fromJson(json);
+      expect(activeProduct.discountAmount, equals(0.0));
+      expect(activeProduct.price, equals(49.99));
     });
   });
 
-  group('[DATA PARSING BUG] Distance.fromJson crashes on null or string value', () {
-    test('CRASH REPRODUCTION: Distance value is null or string', () {
+  group('[DATA PARSING BUG] Distance.fromJson handles null or string value safely', () {
+    test('Distance parses null value as 0.0 and string value as double', () {
       final json1 = <String, dynamic>{'text': '5.2 km', 'value': null};
       final json2 = <String, dynamic>{'text': '10 km', 'value': '10000'};
 
-      // In production line 95: value = json['value'].toDouble();
-      expect(() => Distance.fromJson(json1), throwsNoSuchMethodError);
-      expect(() => Distance.fromJson(json2), throwsNoSuchMethodError);
+      final d1 = Distance.fromJson(json1);
+      final d2 = Distance.fromJson(json2);
+      expect(d1.value, equals(0.0));
+      expect(d2.value, equals(10000.0));
     });
   });
 
-  group('[DATA PARSING BUG] CashBackModel.fromJson crashes on MySQL decimal strings', () {
-    test('CRASH REPRODUCTION: cashback_amount or min_purchase is string decimal', () {
+  group('[DATA PARSING BUG] CashBackModel.fromJson handles MySQL decimal strings', () {
+    test('CashBackModel safely converts string decimals to double', () {
       final json = <String, dynamic>{
         'id': 88,
         'title': 'Weekend Cashback',
@@ -297,8 +299,9 @@ void main() {
         'min_purchase': '100.00',   // String from DB
       };
 
-      // In production line 42: cashbackAmount = json['cashback_amount']?.toDouble();
-      expect(() => CashBackModel.fromJson(json), throwsNoSuchMethodError);
+      final cashback = CashBackModel.fromJson(json);
+      expect(cashback.cashbackAmount, equals(15.0));
+      expect(cashback.minPurchase, equals(100.0));
     });
   });
 

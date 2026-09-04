@@ -79,9 +79,9 @@ class Products {
     sold = json['sold'];
     availableStock = json['available_stock'];
     discountType = json['discount_type'];
-    discount = json['discount']?.toDouble();
-    discountAmount = json['discount_amount']?.toDouble();
-    price = json['price']?.toDouble();
+    discount = json['discount'] != null ? double.tryParse(json['discount'].toString()) : null;
+    discountAmount = json['discount_amount'] != null ? double.tryParse(json['discount_amount'].toString()) : null;
+    price = json['price'] != null ? double.tryParse(json['price'].toString()) : null;
     status = json['status'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];

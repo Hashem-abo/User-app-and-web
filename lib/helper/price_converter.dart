@@ -8,11 +8,12 @@ import 'package:sixam_mart/util/styles.dart';
 
 class PriceConverter {
   static String convertPrice(double? price, {double? discount, String? discountType, bool forDM = false, bool isFoodVariation = false, String? formatedStringPrice, bool forTaxi = false, bool forMenuWallet = false}) {
+    price ??= 0.0;
     if(discount != null && discountType != null){
       if(discountType == 'amount' && !isFoodVariation) {
-        price = price! - discount;
+        price = price - discount;
       }else if(discountType == 'percent') {
-        price = price! - ((discount / 100) * price);
+        price = price - ((discount / 100) * price);
       }
     }
     bool isRightSide = Get.find<SplashController>().configModel!.currencySymbolDirection == 'right';
@@ -23,23 +24,24 @@ class PriceConverter {
           '${isRightSide ? ' ${Get.find<SplashController>().configModel!.currencySymbol!}' : ''}';
     }
 
-    if(forTaxi && price! > 100000) {
+    if(forTaxi && price > 100000) {
       return '${isRightSide ? '' : '${Get.find<SplashController>().configModel!.currencySymbol!} '}'
           '${intl.NumberFormat.compact().format(price)}'
           '${isRightSide ? ' ${Get.find<SplashController>().configModel!.currencySymbol!}' : ''}';
     }
     return '${isRightSide ? '' : '${Get.find<SplashController>().configModel!.currencySymbol!} '}'
-        '${formatedStringPrice ?? toFixed(price!).toStringAsFixed(forDM ? 0 : Get.find<SplashController>().configModel!.digitAfterDecimalPoint!)
+        '${formatedStringPrice ?? toFixed(price).toStringAsFixed(forDM ? 0 : Get.find<SplashController>().configModel!.digitAfterDecimalPoint!)
         .replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}'
         '${isRightSide ? ' ${Get.find<SplashController>().configModel!.currencySymbol!}' : ''}';
   }
 
   static Widget convertAnimationPrice(double? price, {double? discount, String? discountType, bool forDM = false, TextStyle? textStyle}) {
+    price ??= 0.0;
     if(discount != null && discountType != null){
       if(discountType == 'amount') {
-        price = price! - discount;
+        price = price - discount;
       }else if(discountType == 'percent') {
-        price = price! - ((discount / 100) * price);
+        price = price - ((discount / 100) * price);
       }
     }
     bool isRightSide = Get.find<SplashController>().configModel!.currencySymbolDirection == 'right';
@@ -47,7 +49,7 @@ class PriceConverter {
       textDirection: isRightSide ? TextDirection.rtl : TextDirection.ltr,
       child: AnimatedFlipCounter(
         duration: const Duration(milliseconds: 500),
-        value: toFixed(price!),
+        value: toFixed(price),
         textStyle: textStyle ?? robotoMedium,
         fractionDigits: forDM ? 0 : Get.find<SplashController>().configModel!.digitAfterDecimalPoint!,
         prefix: isRightSide ? '' : '${Get.find<SplashController>().configModel!.currencySymbol!} ',

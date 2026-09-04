@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
 
 class CustomButton extends StatelessWidget {
@@ -39,7 +40,10 @@ class CustomButton extends StatelessWidget {
     return Center(child: SizedBox(width: width ?? Dimensions.webMaxWidth, child: Padding(
       padding: margin == null ? const EdgeInsets.all(0) : margin!,
       child: TextButton(
-        onPressed: isLoading ? null : onPressed as void Function()?,
+        onPressed: isLoading ? null : onPressed == null ? null : () {
+          HapticFeedback.lightImpact();
+          (onPressed as void Function())();
+        },
         style: flatButtonStyle,
         child: isLoading ?
         Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [

@@ -14,6 +14,7 @@ import 'package:sixam_mart/features/auth/widgets/sign_in/otp_login_widget.dart';
 import 'package:sixam_mart/features/auth/widgets/social_login_widget.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
+import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/verification/domein/enum/verification_type_enum.dart';
 import 'package:sixam_mart/features/verification/screens/verification_screen.dart';
@@ -241,21 +242,38 @@ class _SignInViewState extends State<SignInView> {
     if(GetPlatform.isWeb){
       await Get.find<FavouriteController>().getFavouriteList();
     }
-    if(status.authResponseModel != null && !status.authResponseModel!.isPhoneVerified!) {
+
+    final bool isPhoneVerificationRequired = Get.find<SplashController>().configModel?.centralizeLoginSetup?.phoneVerificationStatus ?? false;
+    bool isPhoneNotVerified = (status.authResponseModel != null && !status.authResponseModel!.isPhoneVerified!);
+
+    // Check actual database status via /api/v1/customer/info in case backend returned is_phone_verified=1 due to business settings mismatch
+    if (!isPhoneNotVerified && isPhoneVerificationRequired && status.authResponseModel?.token != null) {
+      await Get.find<ProfileController>().getUserInfo();
+      final userInfo = Get.find<ProfileController>().userInfoModel;
+      if (userInfo != null && userInfo.isPhoneVerified == false) {
+        isPhoneNotVerified = true;
+      }
+    }
+
+    String phoneToVerify = email.isNotEmpty ? email : (phone.startsWith('+') ? phone : (authController.countryDialCode + phone));
+
+    if(isPhoneNotVerified) {
+      await authController.clearSharedData(removeToken: true);
       List<int> encoded = utf8.encode(password);
       String data = base64Encode(encoded);
       String token = status.authResponseModel!.token??'';
       if(Get.find<SplashController>().configModel!.firebaseOtpVerification!) {
-        Get.find<AuthController>().firebaseVerifyPhoneNumber(phone, token, CentralizeLoginType.manual.name, fromSignUp: true);
+        Get.find<AuthController>().firebaseVerifyPhoneNumber(phoneToVerify, token, CentralizeLoginType.manual.name, fromSignUp: true);
       } else {
-        Get.toNamed(RouteHelper.getVerificationRoute(phone, null, token, RouteHelper.signUp, data, CentralizeLoginType.manual.name),
-        );
+        Get.toNamed(RouteHelper.getVerificationRoute(phoneToVerify, null, token, RouteHelper.signUp, data, CentralizeLoginType.manual.name));
       }
+      return;
     } else if(status.authResponseModel != null && !status.authResponseModel!.isEmailVerified!) {
       List<int> encoded = utf8.encode(password);
       String data = base64Encode(encoded);
       String token = status.authResponseModel!.token??'';
       Get.toNamed(RouteHelper.getVerificationRoute(null, email, token, RouteHelper.signUp, data, CentralizeLoginType.manual.name));
+      return;
     } else {
       if(widget.backFromThis) {
         if(ResponsiveHelper.isDesktop(Get.context) || widget.fromResetPassword){
@@ -278,23 +296,39 @@ class _SignInViewState extends State<SignInView> {
     if(GetPlatform.isWeb && response.authResponseModel == null){
       await Get.find<FavouriteController>().getFavouriteList();
     }
-    if(response.authResponseModel != null && !response.authResponseModel!.isPhoneVerified!) {
+
+    final bool isPhoneVerificationRequired = Get.find<SplashController>().configModel?.centralizeLoginSetup?.phoneVerificationStatus ?? false;
+    bool isPhoneNotVerified = (response.authResponseModel != null && !response.authResponseModel!.isPhoneVerified!);
+
+    if (!isPhoneNotVerified && isPhoneVerificationRequired && response.authResponseModel?.token != null) {
+      await Get.find<ProfileController>().getUserInfo();
+      final userInfo = Get.find<ProfileController>().userInfoModel;
+      if (userInfo != null && userInfo.isPhoneVerified == false) {
+        isPhoneNotVerified = true;
+      }
+    }
+
+    String phoneToVerify = phone.startsWith('+') ? phone : (countryDialCode + phone);
+
+    if(isPhoneNotVerified) {
+      await authController.clearSharedData(removeToken: true);
       if(Get.find<SplashController>().configModel!.firebaseOtpVerification!) {
-        Get.find<AuthController>().firebaseVerifyPhoneNumber(countryDialCode + phone, '', CentralizeLoginType.otp.name, fromSignUp: true);
+        Get.find<AuthController>().firebaseVerifyPhoneNumber(phoneToVerify, '', CentralizeLoginType.otp.name, fromSignUp: true);
       } else {
         if(ResponsiveHelper.isDesktop(Get.context)) {
           Get.back();
           Get.dialog(VerificationScreen(
-            number: countryDialCode + phone, email: null, token: '', fromSignUp: true,
+            number: phoneToVerify, email: null, token: '', fromSignUp: true,
             fromForgetPassword: false, loginType: CentralizeLoginType.otp.name, password: '',
           ));
         } else {
           Get.toNamed(RouteHelper.getVerificationRoute(
-            countryDialCode + phone, null, '', RouteHelper.signUp, null, CentralizeLoginType.otp.name,
+            phoneToVerify, null, '', RouteHelper.signUp, null, CentralizeLoginType.otp.name,
             backFromThis: widget.backFromThis,
           ));
         }
       }
+      return;
     } else {
       if(widget.backFromThis) {
         if(ResponsiveHelper.isDesktop(Get.context)){

@@ -1,65 +1,90 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
+import 'package:get/get.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 
+class PusherHelper {
+  static PusherChannelsClient? pusherClient;
 
-class PusherHelper{
+  static Future<void> initializePusher() async {
+    final splashController = Get.isRegistered<SplashController>() ? Get.find<SplashController>() : null;
+    final config = splashController?.configModel;
 
-  static PusherChannelsClient?  pusherClient;
+    // Check if websocket is enabled in the backend config
+    if (config?.websocketEnabled != true) {
+      log('Pusher: WebSocket is not enabled in backend config');
+      return;
+    }
 
-  static Future<void> initializePusher() async{
-    PusherChannelsOptions testOptions = PusherChannelsOptions.fromHost(
-      host: '192.168.1.62',
-      scheme: 'ws',
-      key: '6ammart',
-      port: 6001,
-    );
+    // Determine host: prefer config websocketUrl, fallback to AppConstants.baseUrl host
+    String host = (config?.websocketUrl != null && config!.websocketUrl!.trim().isNotEmpty)
+        ? config.websocketUrl!.trim()
+        : Uri.parse(AppConstants.baseUrl).host;
 
-    // if(Get.find<SplashController>().configModel!.webSocketStatus??false) {
+    // Strip out any protocol scheme if present in host
+    if (host.contains('://')) {
+      host = Uri.parse(host).host;
+    }
+
+    bool isHttps = AppConstants.baseUrl.startsWith('https') || (config?.websocketUrl?.startsWith('wss') ?? false);
+    String scheme = isHttps ? 'wss' : 'ws';
+    int port = config?.websocketPort ?? (isHttps ? 443 : 6001);
+    String key = (config?.websocketKey != null && config!.websocketKey!.trim().isNotEmpty)
+        ? config.websocketKey!.trim()
+        : '6ammart';
+
+    try {
+      if (pusherClient != null) {
+        await pusherClient?.disconnect();
+        pusherClient = null;
+      }
+
+      PusherChannelsOptions options = PusherChannelsOptions.fromHost(
+        host: host,
+        scheme: scheme,
+        key: key,
+        port: port,
+      );
+
+      log('Pusher: Initializing connection to $scheme://$host:$port with key: $key');
+
       pusherClient = PusherChannelsClient.websocket(
-        options: testOptions,
+        options: options,
         connectionErrorHandler: (exception, trace, refresh) async {
-          log('=================$exception');
-          // Get.find<SplashController>().setPusherStatus('Disconnected');
-          refresh();
+          log('Pusher connection error: $exception');
         },
       );
 
+      pusherClient?.lifecycleStream.listen((event) {
+        if (event == PusherChannelsClientLifeCycleState.establishedConnection) {
+          log('=================Pusher Connected');
+        } else if (event == PusherChannelsClientLifeCycleState.disconnected ||
+            event == PusherChannelsClientLifeCycleState.connectionError) {
+          log('=================Pusher Disconnected: $event');
+        }
+      });
+
       await pusherClient?.connect();
-    // }
-
-
-    String? pusherChannelId =  pusherClient?.channelsManager.channelsConnectionDelegate.socketId;
-      if(pusherChannelId != null){
-        print('=================Pusher Connected');
-        // Get.find<SplashController>().setPusherStatus('Connected');
-      }
-
-
-     pusherClient?.lifecycleStream.listen((event) {
-       // Get.find<SplashController>().setPusherStatus('Disconnected');
-
-       print('=================Pusher DisConnected');
-     });
-
-
+    } catch (e) {
+      log('Pusher initialize error: $e');
+    }
   }
 
-  // late PrivateChannel pusherDriverLocation;
   PublicChannel? publicChannel;
 
-  void pusherDriverStatus({required String deliverymanId, required Function(RecordLocationBodyModel) onLocationReceived}){
+  void pusherDriverStatus({required String deliverymanId, required Function(RecordLocationBodyModel) onLocationReceived}) {
+    if (pusherClient == null) {
+      log('Pusher: Cannot subscribe, pusherClient is null');
+      return;
+    }
 
     String channel = 'dm_location_$deliverymanId';
-
     log('========channel is: $channel');
 
-    // _publicChannel = pusherClient!.publicChannel('pusher:subscribe');
     publicChannel = pusherClient!.publicChannel(channel);
-
-    // _publicChannel.subscribe();
     publicChannel?.subscribeIfNotUnsubscribed();
-    // FIX: PublicChannel uses 'pusher:subscription_succeeded' event via bind()
 
     publicChannel?.bind('pusher:subscription_succeeded').listen((_) {
       log('=======Public Subscribed');
@@ -71,28 +96,29 @@ class PusherHelper{
 
     publicChannel?.bind(channel).listen((event) {
       log('===========pusherDriverStatus bind is: ${event.data}');
-      onLocationReceived(RecordLocationBodyModel(
-        latitude: jsonDecode(event.data)['latitude'],
-        longitude: jsonDecode(event.data)['longitude'],
-        location: jsonDecode(event.data)['location'],
-      ));
-      // Get.find<OrderController>().setPusherLocation(RecordLocationBodyModel(
-      //   latitude: jsonDecode(event.data)['latitude'],
-      //   longitude: jsonDecode(event.data)['longitude'],
-      //   location: jsonDecode(event.data)['location'],
-      // ));
+      if (event.data != null) {
+        try {
+          final data = jsonDecode(event.data);
+          onLocationReceived(RecordLocationBodyModel(
+            latitude: data['latitude']?.toString(),
+            longitude: data['longitude']?.toString(),
+            location: data['location']?.toString(),
+          ));
+        } catch (e) {
+          log('Error parsing driver location: $e');
+        }
+      }
     });
-
-
   }
 
-
-  void pusherDisconnectPusher(){
-    publicChannel?.unsubscribe();
-    pusherClient?.disconnect();
+  void pusherDisconnectPusher() {
+    try {
+      publicChannel?.unsubscribe();
+      pusherClient?.disconnect();
+    } catch (e) {
+      log('Error disconnecting pusher: $e');
+    }
   }
-
-
 }
 
 class RecordLocationBodyModel {

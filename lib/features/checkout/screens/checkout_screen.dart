@@ -36,6 +36,7 @@ import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/not_logged_in_screen.dart';
 import 'package:sixam_mart/features/checkout/widgets/checkout_screen_shimmer_view.dart';
 import 'package:sixam_mart/features/checkout/widgets/payment_method_bottom_sheet.dart';
+import 'package:sixam_mart/features/checkout/widgets/payment_onboarding_dialog.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/checkout/widgets/bottom_section.dart';
 import 'package:sixam_mart/features/checkout/widgets/top_section.dart';
@@ -175,10 +176,17 @@ class CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     guestContactPersonNameController.dispose();
     guestContactPersonNumberController.dispose();
+    guestEmailController.dispose();
+    guestPasswordController.dispose();
+    guestConfirmPasswordController.dispose();
+    guestNumberNode.dispose();
+    guestEmailNode.dispose();
+    guestPasswordNode.dispose();
+    guestConfirmPasswordNode.dispose();
+
+    super.dispose();
   }
 
 
@@ -640,8 +648,19 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             showCustomSnackBar('you_must_upload_prescription_for_this_order'.tr);
           } else if(!_isCashOnDeliveryActive! && !_isDigitalPaymentActive! && !_isWalletActive && !_isOfflinePaymentActive) {
             showCustomSnackBar('no_payment_method_is_enabled'.tr);
-          }else if(checkoutController.paymentMethodIndex == 2 && (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak') && checkoutController.purchaseCodeController.text.trim().isEmpty) {
-            showCustomSnackBar('Please enter your Purchase Code'.tr);
+          }else if(checkoutController.paymentMethodIndex == 1 && !checkoutController.isPartialPay && ((Get.find<ProfileController>().userInfoModel?.walletBalance ?? 0) < total)) {
+            showCustomSnackBar('you_do_not_have_sufficient_balance_in_wallet'.tr);
+          }else if(checkoutController.paymentMethodIndex == 2 && (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak' || (checkoutController.digitalPaymentName?.toLowerCase().contains('wallet') ?? false) || (checkoutController.digitalPaymentName?.toLowerCase().contains('floosak') ?? false)) && checkoutController.purchaseCodeController.text.trim().isEmpty) {
+            final digitalGateways = Get.find<SplashController>().configModel?.activePaymentMethodList;
+            final selectedGateway = digitalGateways?.firstWhereOrNull((g) => g.getWay == checkoutController.digitalPaymentName);
+            Get.dialog(
+              PaymentOnboardingDialog(
+                paymentMethodName: checkoutController.digitalPaymentName ?? '',
+                paymentTitle: selectedGateway?.getWayTitle ?? (checkoutController.digitalPaymentName == 'easy_wallet' ? 'Easy Wallet' : 'Floosak'),
+                paymentImage: selectedGateway?.getWayImageFullUrl,
+                totalPrice: total,
+              ),
+            );
           }else if(checkoutController.paymentMethodIndex == -1) {
             if(ResponsiveHelper.isDesktop(context)){
               if(_isCashOnDeliveryActive! || _isDigitalPaymentActive! || _isWalletActive || _isOfflinePaymentActive){

@@ -40,15 +40,27 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
     super.initState();
 
     _tabController = TabController(length: 2, initialIndex: 0, vsync: this);
+    _tabController!.addListener(() {
+      if (!_tabController!.indexIsChanging) {
+        if (_tabController!.index == 1 && Get.find<CategoryController>().categoryStoreList == null) {
+          Get.find<CategoryController>().getCategoryStoreList(
+            widget.categoryID, 1, Get.find<CategoryController>().type, true,
+          );
+        } else if (_tabController!.index == 0 && Get.find<CategoryController>().categoryItemList == null) {
+          Get.find<CategoryController>().getCategoryItemList(
+            widget.categoryID, 1, Get.find<CategoryController>().type, true,
+          );
+        }
+      }
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Get.find<CategoryController>().getCategoryDetails(widget.categoryID!);
       if(!widget.isSubSub) {
         Get.find<CategoryController>().getSubCategoryList(widget.categoryID);
       }
 
-      Get.find<CategoryController>().getCategoryStoreList(
-        widget.categoryID, 1, Get.find<CategoryController>().type, false,
-      );
+      // Initial tab is items (0); fetch items lazily
       Get.find<CategoryController>().getCategoryItemList(
         widget.categoryID, 1, Get.find<CategoryController>().type, false,
       );

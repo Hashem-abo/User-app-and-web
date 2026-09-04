@@ -171,37 +171,21 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                             itemBuilder: (context, index){
                               bool isSelected = checkoutController.paymentMethodIndex == 2 && Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay! == checkoutController.digitalPaymentName;
 
-                              return Column(
-                                children: [
-                                  paymentButtonView(
-                                    padding: EdgeInsets.only(bottom: index == Get.find<SplashController>().configModel!.activePaymentMethodList!.length - 1 ? 0 : Dimensions.paddingSizeSmall),
-                                    disablePayments: disablePayments,
-                                    onTap: disablePayments ? null : () {
-                                      checkoutController.setPaymentMethod(2);
-                                      checkoutController.changeDigitalPaymentName(Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay!);
-                                      if(showChangeAmount) {
-                                        setState(() {
-                                          showChangeAmount = false;
-                                        });
-                                      }
-                                    },
-                                    title: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayTitle!,
-                                    isSelected: isSelected,
-                                    image: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayImageFullUrl,
-                                  ),
-                                  if (isSelected && (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak'))
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeLarge, right: Dimensions.paddingSizeLarge),
-                                      child: CustomTextField(
-                                        titleText: 'Purchase Code (كود الشراء)',
-                                        controller: checkoutController.purchaseCodeController,
-                                        inputType: TextInputType.number,
-                                        isNumber: true,
-                                        maxLength: 8,
-                                        showTitle: true,
-                                      ),
-                                    ),
-                                ],
+                              return paymentButtonView(
+                                padding: EdgeInsets.only(bottom: index == Get.find<SplashController>().configModel!.activePaymentMethodList!.length - 1 ? 0 : Dimensions.paddingSizeSmall),
+                                disablePayments: disablePayments,
+                                onTap: disablePayments ? null : () {
+                                  checkoutController.setPaymentMethod(2);
+                                  checkoutController.changeDigitalPaymentName(Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWay!);
+                                  if(showChangeAmount) {
+                                    setState(() {
+                                      showChangeAmount = false;
+                                    });
+                                  }
+                                },
+                                title: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayTitle!,
+                                isSelected: isSelected,
+                                image: Get.find<SplashController>().configModel!.activePaymentMethodList![index].getWayImageFullUrl,
                               );
                             },
                           ),
@@ -236,8 +220,11 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                 child: CustomButton(
                   buttonText: 'continue'.tr,
                   onPressed: () {
+                    final String? digitalName = checkoutController.digitalPaymentName;
                     final bool isWalletGateway = checkoutController.paymentMethodIndex == 2 &&
-                        (checkoutController.digitalPaymentName == 'easy_wallet' || checkoutController.digitalPaymentName == 'floosak');
+                        (digitalName == 'easy_wallet' || digitalName == 'floosak' ||
+                         (digitalName?.toLowerCase().contains('wallet') ?? false) ||
+                         (digitalName?.toLowerCase().contains('floosak') ?? false));
                     if (isWalletGateway) {
                       final digitalGateways = Get.find<SplashController>().configModel?.activePaymentMethodList;
                       final selectedGateway = digitalGateways?.firstWhereOrNull((g) => g.getWay == checkoutController.digitalPaymentName);

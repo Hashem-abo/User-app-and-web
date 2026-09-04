@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:get/get_connect/http/src/request/request.dart';
+import 'package:sixam_mart/api/cancellation_token.dart';
+import 'package:sixam_mart/api/data_module_manager.dart';
 import 'package:sixam_mart/api/api_checker.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/common/models/error_response.dart';
@@ -144,23 +146,87 @@ class ApiClient extends GetxService {
 
   Map<String, String> getHeader() => _sanitizeHeaders(_mainHeaders);
 
-  Future<Response> getData(String uri, {Map<String, dynamic>? query, Map<String, String>? headers, bool handleError = true}) async {
-    try {
-      Map<String, String> finalHeaders = _sanitizeHeaders(headers);
-      if (kDebugMode) {
-        log('====> API Call: $uri\nHeader: $finalHeaders');
-      }
-      http.Response response = await http.get(
-        Uri.parse(appBaseUrl+uri),
-        headers: finalHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
-      return handleResponse(response, uri, handleError);
-    } catch (e) {
-      if (kDebugMode) {
-        print('------------${e.toString()}');
-      }
-      return Response(statusCode: 1, statusText: noInternetMessage);
+  Future<Response> getData(
+    String uri, {
+    Map<String, dynamic>? query,
+    Map<String, String>? headers,
+    bool handleError = true,
+    CancellationToken? cancelToken,
+    bool useCache = false,
+    Duration? cacheTtl,
+  }) async {
+    // 1. Immediate cancellation check
+    if (cancelToken != null && cancelToken.isCancelled) {
+      return Response(statusCode: -1, statusText: cancelToken.cancelReason ?? 'Request cancelled');
     }
+
+    final String canonicalKey = DataModuleManager.buildCanonicalKey(uri, query: query);
+
+    // 2. In-Memory LRU Cache lookup
+    if (useCache) {
+      final cached = DataModuleManager().cache.get(canonicalKey);
+      if (cached is Response) {
+        if (kDebugMode) {
+          log('====> [LRU Cache Hit] $canonicalKey');
+        }
+        return cached;
+      }
+    }
+
+    // 3. In-flight Request Coalescing (Thundering Herd Protection)
+    return DataModuleManager().coalesce<Response>('GET:$canonicalKey', () async {
+      http.Client? client;
+      try {
+        if (cancelToken != null && cancelToken.isCancelled) {
+          return Response(statusCode: -1, statusText: cancelToken.cancelReason ?? 'Request cancelled');
+        }
+
+        Map<String, String> finalHeaders = _sanitizeHeaders(headers);
+        if (kDebugMode) {
+          log('====> API Call: $uri\nHeader: $finalHeaders');
+        }
+
+        Uri requestUri = Uri.parse(appBaseUrl + uri);
+        if (query != null && query.isNotEmpty) {
+          requestUri = requestUri.replace(queryParameters: query.map((k, v) => MapEntry(k, v.toString())));
+        }
+
+        client = http.Client();
+        if (cancelToken != null) {
+          cancelToken.onCancel(() {
+            try {
+              client?.close(); // Closes socket immediately on cancel
+            } catch (_) {}
+          });
+        }
+
+        final http.Response httpResponse = await client.get(
+          requestUri,
+          headers: finalHeaders,
+        ).timeout(Duration(seconds: timeoutInSeconds));
+
+        final Response response = handleResponse(httpResponse, uri, handleError);
+
+        // Store in LRU cache if successful
+        if (useCache && response.statusCode == 200) {
+          DataModuleManager().cache.put(canonicalKey, response, ttl: cacheTtl);
+        }
+
+        return response;
+      } catch (e) {
+        if (cancelToken != null && cancelToken.isCancelled) {
+          return Response(statusCode: -1, statusText: cancelToken.cancelReason ?? 'Request cancelled');
+        }
+        if (kDebugMode) {
+          print('------------${e.toString()}');
+        }
+        return Response(statusCode: 1, statusText: noInternetMessage);
+      } finally {
+        try {
+          client?.close();
+        } catch (_) {}
+      }
+    });
   }
 
   Future<Response> postData(String uri, dynamic body, {Map<String, String>? headers, int? timeout, bool handleError = true}) async {

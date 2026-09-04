@@ -273,13 +273,13 @@ class ItemWidget extends StatelessWidget {
 
                           SizedBox(height: (!isStore && desktop) || (!isStore && (item!.ratingCount! > 0)) ? 3 : 0),
 
-                          isStore && (store != null && store!.ratingCount! > 0) ? Row(children: [
+                          isStore ? (store != null && store!.ratingCount != null && store!.ratingCount! > 0 ? Row(children: [
 
                             Icon(Icons.star, size: 16, color: Theme.of(context).primaryColor),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                             Text(
-                              store!.avgRating!.toStringAsFixed(1),
+                              store!.avgRating?.toStringAsFixed(1) ?? '0.0',
                               style: robotoMedium,
                             ),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -289,15 +289,15 @@ class ItemWidget extends StatelessWidget {
                               style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
                             ),
 
-                          ]) : Row(children: [
+                          ]) : const SizedBox()) : (item != null ? Row(children: [
                             Flexible(child: Text(
                               PriceConverter.convertPrice(item!.price, discount: discount, discountType: discountType),
                               style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.ltr,
                               maxLines: 1, overflow: TextOverflow.ellipsis,
                             )),
-                            SizedBox(width: discount! > 0 ? Dimensions.paddingSizeExtraSmall : 0),
+                            SizedBox(width: (discount ?? 0) > 0 ? Dimensions.paddingSizeExtraSmall : 0),
 
-                            discount > 0 ? Flexible(child: Text(
+                            (discount ?? 0) > 0 ? Flexible(child: Text(
                               PriceConverter.convertPrice(item!.price),
                               style: robotoMedium.copyWith(
                                 fontSize: Dimensions.fontSizeOverSmall,
@@ -306,7 +306,7 @@ class ItemWidget extends StatelessWidget {
                               ), textDirection: TextDirection.ltr,
                               maxLines: 1, overflow: TextOverflow.ellipsis,
                             )) : const SizedBox(),
-                          ]),
+                          ]) : const SizedBox()),
 
                         ]),
                       ),
@@ -315,11 +315,11 @@ class ItemWidget extends StatelessWidget {
 
                         const SizedBox(),
 
-                        CartCountView(
+                        !isStore && item != null ? CartCountView(
                           item: item!,
                           index: index,
                           isCampaign: isCampaign,
-                        ),
+                        ) : const SizedBox(),
 
                       ]),
 

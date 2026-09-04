@@ -60,10 +60,13 @@ class ZoneData {
     if (json['formated_coordinates'] != null) {
       formatedCoordinates = [];
       json['formated_coordinates'].forEach((v) {
-        formatedCoordinates!.add(LatLng(
-          double.parse(v['lat'].toString()),
-          double.parse(v['lng'].toString()),
-        ));
+        if (v != null && v['lat'] != null && v['lng'] != null) {
+          final lat = double.tryParse(v['lat'].toString());
+          final lng = double.tryParse(v['lng'].toString());
+          if (lat != null && lng != null) {
+            formatedCoordinates!.add(LatLng(lat, lng));
+          }
+        }
       });
     }
     if (json['districts'] != null) {
@@ -322,21 +325,21 @@ class Pivot {
   Pivot.fromJson(Map<String, dynamic> json) {
     zoneId = json['zone_id'];
     moduleId = json['module_id'];
-    perKmShippingCharge = json['per_km_shipping_charge']?.toDouble();
-    minimumShippingCharge = json['minimum_shipping_charge']?.toDouble();
-    maximumShippingCharge =  json['maximum_shipping_charge']?.toDouble();
-    maximumCodOrderAmount = json['maximum_cod_order_amount']?.toDouble();
+    perKmShippingCharge = json['per_km_shipping_charge'] != null ? double.tryParse(json['per_km_shipping_charge'].toString()) : null;
+    minimumShippingCharge = json['minimum_shipping_charge'] != null ? double.tryParse(json['minimum_shipping_charge'].toString()) : null;
+    maximumShippingCharge = json['maximum_shipping_charge'] != null ? double.tryParse(json['maximum_shipping_charge'].toString()) : null;
+    maximumCodOrderAmount = json['maximum_cod_order_amount'] != null ? double.tryParse(json['maximum_cod_order_amount'].toString()) : null;
     deliveryChargeType = json['delivery_charge_type'];
     fixedShippingCharge = double.tryParse(json['fixed_shipping_charge'].toString()) ?? 0.0;
-    perKmShippingChargeGroup = json['per_km_shipping_charge_group']?.toDouble();
-    minimumShippingChargeGroup = json['minimum_shipping_charge_group']?.toDouble();
+    perKmShippingChargeGroup = json['per_km_shipping_charge_group'] != null ? double.tryParse(json['per_km_shipping_charge_group'].toString()) : null;
+    minimumShippingChargeGroup = json['minimum_shipping_charge_group'] != null ? double.tryParse(json['minimum_shipping_charge_group'].toString()) : null;
     final dynamic rawMinDeliveryTime = json['minimum_delivery_time'];
     if (rawMinDeliveryTime is Map<String, dynamic>) {
       minimumDeliveryTime = MinimumDeliveryTime.fromJson(rawMinDeliveryTime);
     } else if (rawMinDeliveryTime != null) {
       minimumDeliveryTime = MinimumDeliveryTime(value: rawMinDeliveryTime.toString(), unit: 'min');
     }
-    minimumDeliveryCharge = json['minimum_delivery_charge']?.toDouble();
+    minimumDeliveryCharge = json['minimum_delivery_charge'] != null ? double.tryParse(json['minimum_delivery_charge'].toString()) : null;
 
     pickupCenterStatus = json['pickup_center_status'] != null ? int.tryParse(json['pickup_center_status'].toString()) : 0;
     pickupCenterChargeType = json['pickup_center_charge_type']?.toString();

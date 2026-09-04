@@ -276,6 +276,7 @@ class _HomeScreenState extends State<HomeScreen>
     });
 
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      // Only rebuild if widget is still active (mounted guard)
       if (mounted) {
         setState(() {
           _currentHintIndex++;
@@ -318,7 +319,9 @@ class _HomeScreenState extends State<HomeScreen>
               double overlap = -distance;
               ratio = ((50.0 - overlap) / 50.0).clamp(0.0, 1.0);
             }
-            if (ratio != _appBarRatio) {
+            // Only setState when ratio changes meaningfully (threshold = 0.02)
+            // Prevents rebuilding on every micro-scroll tick
+            if ((ratio - _appBarRatio).abs() > 0.02) {
               setState(() {
                 _appBarRatio = ratio;
               });

@@ -64,7 +64,7 @@ class ReviewWidget extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    RatingBar(rating: review.rating!.toDouble(), ratingCount: null, size: 14),
+                    RatingBar(rating: (review.rating ?? 0).toDouble(), ratingCount: null, size: 14),
                     const SizedBox(width: Dimensions.paddingSizeSmall),
                     Text(
                       DateConverter.stringToLocalDateOnly(review.createdAt ?? ''),

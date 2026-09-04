@@ -10,13 +10,30 @@ import 'package:flutter/material.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:get/get.dart';
 
-class CategoryView extends StatelessWidget {
+class CategoryView extends StatefulWidget {
   const CategoryView({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    ScrollController scrollController = ScrollController();
+  State<CategoryView> createState() => _CategoryViewState();
+}
 
+class _CategoryViewState extends State<CategoryView> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return GetBuilder<SplashController>(builder: (splashController) {
       bool isPharmacy = splashController.module != null && splashController.module!.moduleType.toString() == 'pharmacy';
       bool isFood = splashController.module != null && splashController.module!.moduleType.toString() == 'food';
@@ -29,7 +46,7 @@ class CategoryView extends StatelessWidget {
                   child: SizedBox(
                     height: 120, // Enough height for the new design
                     child: categoryController.categoryList != null ? ListView.builder(
-                      controller: scrollController,
+                      controller: _scrollController,
                       itemCount: categoryController.categoryList!.length > 15 ? 15 : categoryController.categoryList!.length,
                       padding: const EdgeInsets.only(left: Dimensions.paddingSizeSmall, top: Dimensions.paddingSizeDefault),
                       physics: const BouncingScrollPhysics(),
@@ -107,6 +124,7 @@ class CategoryView extends StatelessWidget {
   }
 }
 
+
 class PharmacyCategoryView extends StatelessWidget {
   final CategoryController categoryController;
   const PharmacyCategoryView({super.key, required this.categoryController});
@@ -161,29 +179,47 @@ class PharmacyCategoryView extends StatelessWidget {
   }
 }
 
-class FoodCategoryView extends StatelessWidget {
+class FoodCategoryView extends StatefulWidget {
   final CategoryController categoryController;
   const FoodCategoryView({super.key, required this.categoryController});
 
   @override
+  State<FoodCategoryView> createState() => _FoodCategoryViewState();
+}
+
+class _FoodCategoryViewState extends State<FoodCategoryView> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ScrollController scrollController = ScrollController();
     return Stack(children: [
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         SizedBox(
           height: 160,
-          child: categoryController.categoryList != null ? ListView.builder(
-            controller: scrollController,
+          child: widget.categoryController.categoryList != null ? ListView.builder(
+            controller: _scrollController,
             physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
-            itemCount: categoryController.categoryList!.length,
+            itemCount: widget.categoryController.categoryList!.length,
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault, left: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault),
                 child: InkWell(
                   onTap: () => Get.toNamed(RouteHelper.getCategoryItemRoute(
-                    categoryController.categoryList![index].id, categoryController.categoryList![index].name!,
+                    widget.categoryController.categoryList![index].id, widget.categoryController.categoryList![index].name!,
                   )),
                   borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                   child: SizedBox(
@@ -193,14 +229,14 @@ class FoodCategoryView extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(Dimensions.radiusDefault), // ahmed: Square
                         child: CustomImage(
-                          image: '${categoryController.categoryList![index].imageFullUrl}',
+                          image: '${widget.categoryController.categoryList![index].imageFullUrl}',
                           height: 60, width: double.infinity, fit: BoxFit.cover,
                         ),
                       ),
                       const SizedBox(height: Dimensions.paddingSizeSmall),
 
                       Expanded(child: Text(
-                        categoryController.categoryList![index].name!,
+                        widget.categoryController.categoryList![index].name!,
                         style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color),
                         maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center,
                       )),
@@ -209,13 +245,14 @@ class FoodCategoryView extends StatelessWidget {
                 ),
               );
             },
-          ) : CategoryShimmer(categoryController: categoryController),
+          ) : CategoryShimmer(categoryController: widget.categoryController),
         ),
       ]),
 
     ]);
   }
 }
+
 
 class CategoryShimmer extends StatelessWidget {
   final CategoryController categoryController;

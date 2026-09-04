@@ -280,7 +280,8 @@ class RouteHelper {
       List<int> encoded = utf8.encode(jsonEncode(updateUserModel.toJson()));
       userModel = base64Encode(encoded);
     }
-    return '$verification?page=$page&number=$number&email=$email&token=$token&pass=$pass&login_type=$loginType&session=$authSession&user_model=$userModel&back_from_this=${backFromThis.toString()}';
+    String encodedNumber = Uri.encodeComponent(number ?? '');
+    return '$verification?page=$page&number=$encodedNumber&email=$email&token=$token&pass=$pass&login_type=$loginType&session=$authSession&user_model=$userModel&back_from_this=${backFromThis.toString()}';
   }
 
   static String getAccessLocationRoute(String page) => '$accessLocation?page=$page';
@@ -539,13 +540,13 @@ class RouteHelper {
     )),
     GetPage(name: payment, page: () {
       OrderModel order = OrderModel(
-        id: int.parse(Get.parameters['id']!), orderType: Get.parameters['type'], userId: int.parse(Get.parameters['user']!),
-        orderAmount: double.parse(Get.parameters['amount']!),
+        id: int.tryParse(Get.parameters['id'] ?? '') ?? 0, orderType: Get.parameters['type'], userId: int.tryParse(Get.parameters['user'] ?? '') ?? 0,
+        orderAmount: double.tryParse(Get.parameters['amount'] ?? '') ?? 0.0,
       );
       bool isCodActive = Get.parameters['cod-delivery'] == 'true';
       String addFundUrl = '';
       String subscriptionUrl = '';
-      String paymentMethod = Get.parameters['payment-method']!;
+      String paymentMethod = Get.parameters['payment-method'] ?? '';
       if(Get.parameters['add-fund-url'] != null && Get.parameters['add-fund-url'] != 'null'){
         addFundUrl = Get.parameters['add-fund-url']!;
       }
@@ -646,7 +647,7 @@ class RouteHelper {
     ))),
     GetPage(name: searchStoreItem, page: () => getRoute(StoreItemSearchScreen(storeID: Get.parameters['id']))),
     GetPage(name: order, page: () => getRoute(const OrderScreen())),
-    GetPage(name: itemDetails, page: () => getRoute(Get.arguments ?? ItemDetailsScreen(itemId: int.parse(Get.parameters['id']!), inStorePage: Get.parameters['page'] == 'restaurant'))),
+    GetPage(name: itemDetails, page: () => getRoute(Get.arguments ?? ItemDetailsScreen(itemId: int.tryParse(Get.parameters['id'] ?? '') ?? 0, inStorePage: Get.parameters['page'] == 'restaurant'))),
     GetPage(name: wallet, page: () {
       return getRoute(WalletScreen(
         fundStatus: Get.parameters['flag'] ?? Get.parameters['payment_status'],
@@ -671,8 +672,8 @@ class RouteHelper {
         user = User.fromJson(jsonDecode(utf8.decode(base64Url.decode(Get.parameters['user']!.replaceAll(' ', '+')))));
       }
       return getRoute(ChatScreen(
-        notificationBody: notificationBody, user: user, index: Get.parameters['index'] != 'null' ? int.parse(Get.parameters['index']!) : null, fromNotification: Get.parameters['from'] == 'true',
-        conversationID: (Get.parameters['conversation_id'] != null && Get.parameters['conversation_id'] != 'null') ? int.parse(Get.parameters['conversation_id']!) : null,
+        notificationBody: notificationBody, user: user, index: Get.parameters['index'] != 'null' ? int.tryParse(Get.parameters['index'] ?? '') : null, fromNotification: Get.parameters['from'] == 'true',
+        conversationID: (Get.parameters['conversation_id'] != null && Get.parameters['conversation_id'] != 'null') ? int.tryParse(Get.parameters['conversation_id']!) : null,
         orderChatModel: orderChat,
       ));
     }),
@@ -685,14 +686,14 @@ class RouteHelper {
       PlaceOrderBodyModel orderBody = PlaceOrderBodyModel.fromJson(jsonDecode(utf8.decode(decode)));
 
       return OfflinePaymentScreen(
-        placeOrderBody: orderBody, zoneId: int.parse(Get.parameters['zone_id']!),
-        total: double.parse(Get.parameters['total']!),
-        maxCodOrderAmount: (Get.parameters['max_cod_amount'] != null && Get.parameters['max_cod_amount'] != 'null') ? double.parse(Get.parameters['max_cod_amount']!) : null,
+        placeOrderBody: orderBody, zoneId: int.tryParse(Get.parameters['zone_id'] ?? '') ?? 0,
+        total: double.tryParse(Get.parameters['total'] ?? '') ?? 0.0,
+        maxCodOrderAmount: (Get.parameters['max_cod_amount'] != null && Get.parameters['max_cod_amount'] != 'null') ? double.tryParse(Get.parameters['max_cod_amount']!) : null,
         fromCart: Get.parameters['from_cart'] == 'true', isCashOnDeliveryActive: Get.parameters['cod_active'] == 'true', forParcel : Get.parameters['for_parcel'] == 'true',
       );
     },
     ),
-    GetPage(name: flashSaleDetailsScreen, page: () => FlashSaleDetailsScreen(id: int.parse(Get.parameters['id']!))),
+    GetPage(name: flashSaleDetailsScreen, page: () => FlashSaleDetailsScreen(id: int.tryParse(Get.parameters['id'] ?? '') ?? 0)),
     GetPage(name: guestTrackOrderScreen, page: () => GuestTrackOrderScreen(
       orderId: Get.parameters['order_id']!, number: Get.parameters['number']!,
     )),
@@ -700,7 +701,7 @@ class RouteHelper {
     GetPage(name: followedStores, page: () => getRoute(const FollowedStoresScreen())),
     GetPage(name: brands, page: () => const BrandsScreen()),
     GetPage(name: brandsItemScreen, page: () => BrandsItemScreen(
-      brandId: int.parse(Get.parameters['brandId']!), brandName: Get.parameters['brandName']!,
+      brandId: int.tryParse(Get.parameters['brandId'] ?? '') ?? 0, brandName: Get.parameters['brandName'] ?? '',
     )),
 
     GetPage(name: subscriptionSuccess, page: () => SubscriptionSuccessOrFailedScreen(success: Get.parameters['flag'] == 'success', fromSubscription: Get.parameters['from_subscription'] == 'true', storeId: (Get.parameters['store_id'] != null && Get.parameters['store_id'] != 'null') ? int.parse(Get.parameters['store_id']!) : null)),

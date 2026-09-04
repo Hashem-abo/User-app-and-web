@@ -39,9 +39,9 @@ class CashBackModel {
     cashbackType = json['cashback_type'];
     sameUserLimit = json['same_user_limit'];
     totalUsed = json['total_used'];
-    cashbackAmount = json['cashback_amount']?.toDouble();
-    minPurchase = json['min_purchase']?.toDouble();
-    maxDiscount = json['max_discount']?.toDouble();
+    cashbackAmount = json['cashback_amount'] != null ? double.tryParse(json['cashback_amount'].toString()) : null;
+    minPurchase = json['min_purchase'] != null ? double.tryParse(json['min_purchase'].toString()) : null;
+    maxDiscount = json['max_discount'] != null ? double.tryParse(json['max_discount'].toString()) : null;
     startDate = json['start_date'];
     endDate = json['end_date'];
     status = json['status'];

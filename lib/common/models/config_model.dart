@@ -94,6 +94,9 @@ class ConfigModel {
   ParcelCancellationBasicSetup? parcelCancellationBasicSetup;
   ParcelReturnTimeFee? parcelReturnTimeFee;
   bool? websocketEnabled;
+  String? websocketUrl;
+  int? websocketPort;
+  String? websocketKey;
   String? splashScreenImageFullUrl;
   bool? productQuestionStatus;
   bool? enableAiOrderBatching;
@@ -197,6 +200,9 @@ class ConfigModel {
     this.parcelCancellationBasicSetup,
     this.parcelReturnTimeFee,
     this.websocketEnabled,
+    this.websocketUrl,
+    this.websocketPort,
+    this.websocketKey,
     this.splashScreenImageFullUrl,
     this.productQuestionStatus,
     this.enableAiOrderBatching,
@@ -335,6 +341,9 @@ class ConfigModel {
     parcelCancellationBasicSetup = json['parcel_cancellation_basic_setup'] != null ? ParcelCancellationBasicSetup.fromJson(json['parcel_cancellation_basic_setup']) : null;
     parcelReturnTimeFee = json['parcel_return_time_fee'] != null ? ParcelReturnTimeFee.fromJson(json['parcel_return_time_fee']) : null;
     websocketEnabled = json['websocket_status'] == 1;
+    websocketUrl = json['websocket_url'];
+    websocketPort = json['websocket_port'] != null ? int.tryParse(json['websocket_port'].toString()) : null;
+    websocketKey = json['websocket_key'];
     splashScreenImageFullUrl = json['splash_screen_image_full_url'];
     productQuestionStatus = json['product_question_status'] == 1;
     enableAiOrderBatching = json['enable_ai_order_batching'] == 1 || json['enable_ai_order_batching'] == true || json['enable_ai_order_batching'] == '1';
@@ -476,6 +485,10 @@ class ConfigModel {
     if (parcelReturnTimeFee != null) {
       data['parcel_return_time_fee'] = parcelReturnTimeFee!.toJson();
     }
+    data['websocket_status'] = websocketEnabled == true ? 1 : 0;
+    data['websocket_url'] = websocketUrl;
+    data['websocket_port'] = websocketPort;
+    data['websocket_key'] = websocketKey;
     data['product_question_status'] = productQuestionStatus;
     data['enable_ai_order_batching'] = enableAiOrderBatching;
     data['batched_max_stores'] = batchedMaxStores;

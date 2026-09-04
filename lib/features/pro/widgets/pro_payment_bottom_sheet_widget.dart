@@ -1,6 +1,5 @@
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/custom_text_field.dart';
 import 'package:sixam_mart/features/checkout/widgets/payment_onboarding_dialog.dart';
 import 'package:sixam_mart/features/pro/controllers/pro_controller.dart';
 import 'package:sixam_mart/features/pro/domain/models/pro_plan_model.dart';
@@ -24,13 +23,7 @@ class ProPaymentBottomSheetWidget extends StatefulWidget {
 
 class _ProPaymentBottomSheetWidgetState extends State<ProPaymentBottomSheetWidget> {
   int _selectedDigitalIndex = -1;
-  final TextEditingController _purchaseCodeController = TextEditingController();
-
-  @override
-  void dispose() {
-    _purchaseCodeController.dispose();
-    super.dispose();
-  }
+  bool _isWalletSelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -86,35 +79,40 @@ class _ProPaymentBottomSheetWidgetState extends State<ProPaymentBottomSheetWidge
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 if(!hasWallet && !hasDigital) Text('no_payment_method_is_enabled'.tr, style: robotoRegular.copyWith(color: Theme.of(context).hintColor)),
 
-                if(hasWallet) Container(
-                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                    border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
-                  ),
-                  child: Row(children: [
-                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('wallet_balance'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
-                      Text(PriceConverter.convertPrice(walletBalance), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
-                    ])),
-                    OutlinedButton(
-                      onPressed: () {
-                        if(!canPayWallet) {
-                          showCustomSnackBar('you_do_not_have_sufficient_balance_in_wallet'.tr);
-                          return;
-                        }
-                        Get.back();
-                        Get.find<ProController>().subscribePlan(widget.plan, 'wallet', 'wallet', widget.isRenew);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Theme.of(context).primaryColor),
-                        foregroundColor: Theme.of(context).primaryColor,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
-                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
+                if(hasWallet) InkWell(
+                  onTap: () {
+                    setState(() {
+                      _isWalletSelected = true;
+                      _selectedDigitalIndex = -1;
+                    });
+                  },
+                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      border: Border.all(
+                        color: _isWalletSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                        width: _isWalletSelected ? 1.5 : 1.0,
                       ),
-                      child: Text('apply'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).primaryColor)),
+                      color: _isWalletSelected ? Theme.of(context).primaryColor.withValues(alpha: 0.05) : null,
                     ),
-                  ]),
+                    child: Row(children: [
+                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('wallet_balance'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor)),
+                        Text(PriceConverter.convertPrice(walletBalance), style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
+                      ])),
+                      Container(
+                        width: 22, height: 22,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _isWalletSelected ? Theme.of(context).primaryColor : Colors.transparent,
+                          border: Border.all(color: _isWalletSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.5), width: 1.5),
+                        ),
+                        child: _isWalletSelected ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
+                      ),
+                    ]),
+                  ),
                 ),
 
                 if(hasDigital) ...[
@@ -138,45 +136,31 @@ class _ProPaymentBottomSheetWidgetState extends State<ProPaymentBottomSheetWidge
                           itemBuilder: (context, index) {
                             final paymentMethod = paymentMethods[index];
                             final bool isSelected = _selectedDigitalIndex == index;
-                            final bool isWalletGateway = paymentMethod.getWay == 'easy_wallet' || paymentMethod.getWay == 'floosak';
 
-                            return Column(
-                              children: [
-                                InkWell(
-                                  onTap: () => setState(() => _selectedDigitalIndex = index),
-                                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                                  child: Container(
-                                    margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
-                                    padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                                    child: Row(children: [
-                                      CustomImage(height: 20, width: 40, fit: BoxFit.contain, image: paymentMethod.getWayImageFullUrl ?? ''),
-                                      const SizedBox(width: Dimensions.paddingSizeSmall),
-                                      Expanded(child: Text(paymentMethod.getWayTitle ?? '', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault))),
-                                      Container(
-                                        width: 22, height: 22,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
-                                          border: Border.all(color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.5), width: 1.5),
-                                        ),
-                                        child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
-                                      ),
-                                    ]),
-                                  ),
-                                ),
-                                if (isSelected && isWalletGateway)
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault),
-                                    child: CustomTextField(
-                                      titleText: 'Purchase Code (كود الشراء)',
-                                      controller: _purchaseCodeController,
-                                      inputType: TextInputType.number,
-                                      isNumber: true,
-                                      maxLength: 8,
-                                      showTitle: true,
+                            return InkWell(
+                              onTap: () => setState(() {
+                                _selectedDigitalIndex = index;
+                                _isWalletSelected = false;
+                              }),
+                              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                                padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                                child: Row(children: [
+                                  CustomImage(height: 20, width: 40, fit: BoxFit.contain, image: paymentMethod.getWayImageFullUrl ?? ''),
+                                  const SizedBox(width: Dimensions.paddingSizeSmall),
+                                  Expanded(child: Text(paymentMethod.getWayTitle ?? '', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault))),
+                                  Container(
+                                    width: 22, height: 22,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: isSelected ? Theme.of(context).primaryColor : Colors.transparent,
+                                      border: Border.all(color: isSelected ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.5), width: 1.5),
                                     ),
+                                    child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 14) : null,
                                   ),
-                              ],
+                                ]),
+                              ),
                             );
                           },
                         ),
@@ -187,41 +171,53 @@ class _ProPaymentBottomSheetWidgetState extends State<ProPaymentBottomSheetWidge
             ),
           ),
 
-          if(hasDigital) ...[
+          if(hasDigital || hasWallet) ...[
             const SizedBox(height: Dimensions.paddingSizeDefault),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _selectedDigitalIndex == -1 ? null : () {
-                  final paymentMethod = paymentMethods[_selectedDigitalIndex];
-                  final bool isWalletGateway = paymentMethod.getWay == 'easy_wallet' || paymentMethod.getWay == 'floosak';
+                onPressed: (!_isWalletSelected && _selectedDigitalIndex == -1) ? null : () {
+                  if (_isWalletSelected) {
+                    if(!canPayWallet) {
+                      showCustomSnackBar('you_do_not_have_sufficient_balance_in_wallet'.tr);
+                      return;
+                    }
+                    Get.back();
+                    Get.find<ProController>().subscribePlan(widget.plan, 'wallet', 'wallet', widget.isRenew);
+                  } else if (_selectedDigitalIndex != -1) {
+                    final paymentMethod = paymentMethods[_selectedDigitalIndex];
+                    final String? getWay = paymentMethod.getWay;
+                    final bool isWalletGateway = getWay == 'easy_wallet' || getWay == 'floosak' ||
+                        (getWay?.toLowerCase().contains('wallet') ?? false) ||
+                        (getWay?.toLowerCase().contains('floosak') ?? false);
 
-                  if (isWalletGateway) {
-                    Get.back();
-                    Get.dialog(
-                      PaymentOnboardingDialog(
-                        paymentMethodName: paymentMethod.getWay ?? '',
-                        paymentTitle: paymentMethod.getWayTitle ?? (paymentMethod.getWay == 'easy_wallet' ? 'Easy Wallet' : 'Floosak'),
-                        paymentImage: paymentMethod.getWayImageFullUrl,
-                        totalPrice: totalPrice,
-                        onVerifyAndPlaceOrder: (code) async {
-                          final response = await Get.find<ProController>().subscribePlan(
-                            widget.plan,
-                            'digital_payment',
-                            paymentMethod.getWay ?? '',
-                            widget.isRenew,
-                            purchaseCode: code,
-                          );
-                          return response.statusCode == 200;
-                        },
-                        onOrderSuccess: () {
-                          Get.find<ProController>().showPlanSubscribeState(widget.isRenew);
-                        },
-                      ),
-                    );
-                  } else {
-                    Get.back();
-                    Get.find<ProController>().subscribePlan(widget.plan, 'digital_payment', paymentMethod.getWay ?? '', widget.isRenew);
+                    if (isWalletGateway) {
+                      Get.back();
+                      Get.dialog(
+                        PaymentOnboardingDialog(
+                          paymentMethodName: paymentMethod.getWay ?? '',
+                          paymentTitle: paymentMethod.getWayTitle ?? (paymentMethod.getWay == 'easy_wallet' ? 'Easy Wallet' : 'Floosak'),
+                          paymentImage: paymentMethod.getWayImageFullUrl,
+                          totalPrice: totalPrice,
+                          onVerifyAndPlaceOrder: (code) async {
+                            final response = await Get.find<ProController>().subscribePlan(
+                              widget.plan,
+                              'digital_payment',
+                              paymentMethod.getWay ?? '',
+                              widget.isRenew,
+                              purchaseCode: code,
+                            );
+                            return response.statusCode == 200;
+                          },
+                          onOrderSuccess: () {
+                            Get.find<ProController>().showPlanSubscribeState(widget.isRenew);
+                          },
+                        ),
+                      );
+                    } else {
+                      Get.back();
+                      Get.find<ProController>().subscribePlan(widget.plan, 'digital_payment', paymentMethod.getWay ?? '', widget.isRenew);
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -231,7 +227,7 @@ class _ProPaymentBottomSheetWidgetState extends State<ProPaymentBottomSheetWidge
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
                   elevation: 0,
                 ),
-                child: Text('proceed'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Colors.white)),
+                child: Text('continue'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Colors.white)),
               ),
             ),
           ],

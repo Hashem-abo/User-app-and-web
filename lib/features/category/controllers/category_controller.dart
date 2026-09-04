@@ -204,8 +204,11 @@ class CategoryController extends GetxController implements GetxService {
     update();
   }
 
+  int _subCategoryRequestGeneration = 0;
+
   void setSubCategoryIndex(int index, String? categoryID) {
     _subCategoryIndex = index;
+    _subCategoryRequestGeneration++;
     if(_isStore) {
       getCategoryStoreList(_subCategoryIndex == 0 ? categoryID : _subCategoryList![index].id.toString(), 1, _type, true);
     }else {
@@ -215,6 +218,7 @@ class CategoryController extends GetxController implements GetxService {
 
   void getCategoryItemList(String? categoryID, int offset, String type, bool notify) async {
     _offset = offset;
+    final int generation = _subCategoryRequestGeneration;
     if(offset == 1) {
       if(_type == type) {
         _isSearching = false;
@@ -226,6 +230,9 @@ class CategoryController extends GetxController implements GetxService {
       _categoryItemList = null;
     }
     ItemModel? categoryItem = await categoryServiceInterface.getCategoryItemList(categoryID, offset, type);
+    // Guard against stale responses from rapid subcategory switching
+    if (_subCategoryRequestGeneration != generation) return;
+
     if (categoryItem != null) {
       if (offset == 1) {
         _categoryItemList = [];
@@ -239,6 +246,7 @@ class CategoryController extends GetxController implements GetxService {
 
   void getCategoryStoreList(String? categoryID, int offset, String type, bool notify) async {
     _offset = offset;
+    final int generation = _subCategoryRequestGeneration;
     if(offset == 1) {
       if(_type == type) {
         _isSearching = false;
@@ -250,6 +258,9 @@ class CategoryController extends GetxController implements GetxService {
       _categoryStoreList = null;
     }
     StoreModel? categoryStore = await categoryServiceInterface.getCategoryStoreList(categoryID, offset, type);
+    // Guard against stale responses from rapid subcategory switching
+    if (_subCategoryRequestGeneration != generation) return;
+
     if (categoryStore != null) {
       if (offset == 1) {
         _categoryStoreList = [];

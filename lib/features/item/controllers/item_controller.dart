@@ -1,3 +1,6 @@
+import 'package:sixam_mart/api/cancellation_token.dart';
+import 'package:sixam_mart/api/data_module_manager.dart';
+import 'package:sixam_mart/common/models/tab_pagination_state.dart';
 import 'package:sixam_mart/common/enums/data_source_enum.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
@@ -192,34 +195,39 @@ class ItemController extends GetxController implements GetxService {
   String _nationalFilterType = 'latest';
   String get nationalFilterType => _nationalFilterType;
 
-  // Cache for national filters
-  final Map<String, List<Item>?> _nationalAggregatedItemListCache = {};
-  final Map<String, List<String>> _nationalOffsetListCache = {};
-  final Map<String, int> _nationalOffsetCache = {};
-  final Map<String, int> _nationalCurrentModuleIndexCache = {};
+  // Isolated state per national tab
+  final Map<String, TabPaginationState<Item>> _nationalTabStates = {};
+
+  TabPaginationState<Item> _getNationalTabState(String type) {
+    return _nationalTabStates.putIfAbsent(type, () => TabPaginationState<Item>(tabKey: type));
+  }
 
   void setNationalFilterType(String type) {
     if (_nationalFilterType != type) {
-      // Save current state
-      _nationalAggregatedItemListCache[_nationalFilterType] = _nationalAggregatedItemList;
-      _nationalOffsetListCache[_nationalFilterType] = List.from(_offsetList);
-      _nationalOffsetCache[_nationalFilterType] = _offset;
-      _nationalCurrentModuleIndexCache[_nationalFilterType] = _currentAggregatedModuleIndex;
+      // 1. Cancel in-flight socket connection of the old tab immediately
+      final oldTabState = _getNationalTabState(_nationalFilterType);
+      oldTabState.cancelInFlight();
 
+      // 2. Switch active filter type
       _nationalFilterType = type;
 
-      // Restore from cache or fetch new
-      if (_nationalAggregatedItemListCache.containsKey(type)) {
-        _nationalAggregatedItemList = _nationalAggregatedItemListCache[type];
-        _offsetList = _nationalOffsetListCache[type] ?? [];
-        _offset = _nationalOffsetCache[type] ?? 1;
-        _currentAggregatedModuleIndex = _nationalCurrentModuleIndexCache[type] ?? 0;
+      // 3. Invalidate previous generation in DataModuleManager
+      DataModuleManager().nextGeneration('national_products_tab');
+
+      // 4. Retrieve new tab's isolated state
+      final newTabState = _getNationalTabState(type);
+
+      // 5. Restore from isolated tab cache if available (0ms instant UI)
+      if (newTabState.items != null && newTabState.items!.isNotEmpty) {
+        _nationalAggregatedItemList = newTabState.items;
+        _offset = newTabState.offset;
+        _currentAggregatedModuleIndex = newTabState.currentModuleIndex;
         update();
       } else {
-        _offsetList = [];
-        _offset = 1;
         _nationalAggregatedItemList = null;
+        _offset = 1;
         _currentAggregatedModuleIndex = 0;
+        update();
         getNationalAggregatedItemList(offset: '1', notify: true, dataSource: DataSourceEnum.local);
       }
     }
@@ -238,11 +246,11 @@ class ItemController extends GetxController implements GetxService {
     _offset = 1;
     _nationalAggregatedItemList = null;
     
-    // Clear cache on fresh initialization
-    _nationalAggregatedItemListCache.clear();
-    _nationalOffsetListCache.clear();
-    _nationalOffsetCache.clear();
-    _nationalCurrentModuleIndexCache.clear();
+    // Clear cache & cancel active tokens on fresh initialization
+    for (var state in _nationalTabStates.values) {
+      state.cancelInFlight();
+    }
+    _nationalTabStates.clear();
 
 
     var splashController = Get.find<SplashController>();
@@ -467,12 +475,20 @@ class ItemController extends GetxController implements GetxService {
     _isDiscountedItemListLoaded = false;
     _currentAggregatedModuleIndex = 0;
     _aggregatedModuleIds = [];
-   // _isAggregating = false;
-    //_popularInFlightOffsets.clear();
-   // _reviewedInFlightOffsets.clear();
-   // _discountedInFlightOffsets.clear();
-   // _nationalInFlightOffsets.clear();
-    //update();
+
+    // Production-ready: Cancel active sockets and clear isolated tab states
+    for (var state in _nationalTabStates.values) {
+      state.cancelInFlight();
+    }
+    _nationalTabStates.clear();
+    _popularInFlightOffsets.clear();
+    _reviewedInFlightOffsets.clear();
+    _discountedInFlightOffsets.clear();
+    _nationalInFlightOffsets.clear();
+
+    DataModuleManager().invalidateContext('national_products_tab');
+    DataModuleManager().invalidateContext('items_list');
+    update();
   }
 
   List<Item>? _similarProductList;
@@ -776,19 +792,24 @@ class ItemController extends GetxController implements GetxService {
     }
   }
 
-  // New method for National Products Aggregation
+  // New method for National Products Aggregation with Tab State Isolation & Socket Cancellation
   Future<void> getNationalAggregatedItemList({required String offset, DataSourceEnum dataSource = DataSourceEnum.local, bool notify = false, bool fromLocalTransition = false}) async {
-      _isAggregating = true; // Ensure flag is set
+      _isAggregating = true;
 
-      if (!fromLocalTransition && dataSource == DataSourceEnum.local && _nationalAggregatedItemList != null) {
-        if (!_nationalInFlightOffsets.contains("client_1")) {
+      final targetType = _nationalFilterType;
+      final tabState = _getNationalTabState(targetType);
+
+      if (!fromLocalTransition && dataSource == DataSourceEnum.local && tabState.items != null && tabState.items!.isNotEmpty) {
+        _nationalAggregatedItemList = tabState.items;
+        if (notify) update();
+        if (!tabState.inFlightOffsets.contains("client_1")) {
           getNationalAggregatedItemList(notify: notify, dataSource: DataSourceEnum.client, offset: '1', fromLocalTransition: true);
         }
         return;
       }
 
       String inFlightKey = "${dataSource.name}_$offset";
-      if (_nationalInFlightOffsets.contains(inFlightKey)) {
+      if (tabState.inFlightOffsets.contains(inFlightKey)) {
         return;
       }
 
@@ -801,21 +822,26 @@ class ItemController extends GetxController implements GetxService {
       }
 
       if(offset == '1' && (dataSource == DataSourceEnum.local && !fromLocalTransition)) {
-        if (_currentAggregatedModuleIndex == 0) {
-          _offsetList = [];
+        if (tabState.currentModuleIndex == 0) {
+          tabState.loadedOffsets.clear();
+          tabState.offset = 1;
           _offset = 1;
           _nationalAggregatedItemList = null;
           if(notify) update();
         } else {
-           _offsetList = [];
+          tabState.loadedOffsets.clear();
         }
       }
 
-      if (!_offsetList.contains(offset) || fromLocalTransition) {
+      if (!tabState.loadedOffsets.contains(offset) || fromLocalTransition) {
         if (!fromLocalTransition) {
-          _offsetList.add(offset);
+          tabState.loadedOffsets.add(offset);
         }
-        _nationalInFlightOffsets.add(inFlightKey);
+        tabState.inFlightOffsets.add(inFlightKey);
+
+        // Allocate a dedicated cancellation token for this fetch operation
+        final cancelToken = tabState.createNewToken();
+        final currentGeneration = tabState.requestGeneration;
 
         try {
           // Lazily populate other modules if they weren't available during init
@@ -832,52 +858,60 @@ class ItemController extends GetxController implements GetxService {
           }
 
           if (_aggregatedModuleIds.isEmpty) {
-            _nationalAggregatedItemList = [];
-            _isLoading = false;
-            Future.microtask(() => update());
+            tabState.items = [];
+            if (_nationalFilterType == targetType) {
+              _nationalAggregatedItemList = [];
+              _isLoading = false;
+              Future.microtask(() => update());
+            }
             return;
           }
 
           int? currentModuleId;
-          if (_currentAggregatedModuleIndex < _aggregatedModuleIds.length) {
-            currentModuleId = _aggregatedModuleIds[_currentAggregatedModuleIndex];
+          if (tabState.currentModuleIndex < _aggregatedModuleIds.length) {
+            currentModuleId = _aggregatedModuleIds[tabState.currentModuleIndex];
           }
 
           ItemModel? itemModel;
-          if (_nationalFilterType == 'latest') {
+          if (targetType == 'latest') {
             itemModel = await itemServiceInterface.getLatestItemList(
-              type: _popularType, source: dataSource, offset: _offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
+              type: _popularType, source: dataSource, offset: tabState.offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
               rating: _rating, minPrice: _selectedMinPrice, maxPrice: _selectedMaxPrice, moduleId: currentModuleId,
             );
-          } else if (_nationalFilterType == 'popular') {
+          } else if (targetType == 'popular') {
             itemModel = await itemServiceInterface.getPopularItemList(
-              type: _popularType, source: dataSource, offset: _offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
+              type: _popularType, source: dataSource, offset: tabState.offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
               rating: _rating, minPrice: _selectedMinPrice, maxPrice: _selectedMaxPrice, moduleId: currentModuleId,
             );
-          } else if (_nationalFilterType == 'recommended') {
+          } else if (targetType == 'recommended') {
             itemModel = await itemServiceInterface.getPaginatedRecommendedItemList(
-              type: _popularType, source: dataSource, offset: _offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
+              type: _popularType, source: dataSource, offset: tabState.offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
               rating: _rating, minPrice: _selectedMinPrice, maxPrice: _selectedMaxPrice, moduleId: currentModuleId,
             );
-          } else if (_nationalFilterType == 'discounted') {
+          } else if (targetType == 'discounted') {
             itemModel = await itemServiceInterface.getDiscountedItemList(
-              type: _popularType, source: dataSource, offset: _offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
+              type: _popularType, source: dataSource, offset: tabState.offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
               rating: _rating, minPrice: _selectedMinPrice, maxPrice: _selectedMaxPrice, moduleId: currentModuleId,
             );
-          } else if (_nationalFilterType == 'most-reviewed') {
+          } else if (targetType == 'most-reviewed') {
             itemModel = await itemServiceInterface.getReviewedItemList(
-              type: _popularType, source: dataSource, offset: _offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
+              type: _popularType, source: dataSource, offset: tabState.offset, search: _searchController.text, categoryIds: _selectedCategoryIds, filter: _filter,
               rating: _rating, minPrice: _selectedMinPrice, maxPrice: _selectedMaxPrice, moduleId: currentModuleId,
             );
           }
 
-          _prepareNationalAggregatedItems(itemModel, offset, fromLocalTransition: fromLocalTransition);
+          // GUARD: If cancelled or user moved away to another tab, safely discard without corrupting UI!
+          if (cancelToken.isCancelled || _nationalFilterType != targetType || tabState.requestGeneration != currentGeneration) {
+            return;
+          }
+
+          _prepareNationalAggregatedItems(itemModel, offset, tabState, targetType, fromLocalTransition: fromLocalTransition);
 
           if(dataSource == DataSourceEnum.local) {
             getNationalAggregatedItemList(notify : notify, dataSource: DataSourceEnum.client, offset: '1', fromLocalTransition: true);
           }
         } finally {
-          _nationalInFlightOffsets.remove(inFlightKey);
+          tabState.inFlightOffsets.remove(inFlightKey);
         }
       } else {
         if(isLoading) {
@@ -887,47 +921,55 @@ class ItemController extends GetxController implements GetxService {
       }
   }
 
-  void _prepareNationalAggregatedItems(ItemModel? itemModel, String offset, {bool fromLocalTransition = false}) {
+  void _prepareNationalAggregatedItems(ItemModel? itemModel, String offset, TabPaginationState<Item> tabState, String targetType, {bool fromLocalTransition = false}) {
     if (itemModel != null) {
       if (offset == '1' && !fromLocalTransition) {
-        if (_currentAggregatedModuleIndex == 0) {
-          _nationalAggregatedItemList = [];
+        if (tabState.currentModuleIndex == 0) {
+          tabState.items = [];
         }
       }
-      _nationalAggregatedItemList ??= [];
-      _nationalAggregatedItemList!.addAll(itemModel.items!);
+      tabState.items ??= [];
+      tabState.items!.addAll(itemModel.items!);
+
+      if (_nationalFilterType == targetType) {
+        _nationalAggregatedItemList = tabState.items;
+      }
       
       // Aggregation Logic
-       if (itemModel.items!.isEmpty && _currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) {
-         //  print('DEBUG: [National] Empty result for module index $_currentAggregatedModuleIndex, switching to next...');
-           _currentAggregatedModuleIndex++;
-           _offset = 1; 
-           _offsetList = [];
-           getNationalAggregatedItemList(offset: '1', dataSource: DataSourceEnum.client, notify: true);
-           return; 
-       } else if (itemModel.totalSize! <= itemModel.offset! * int.parse(itemModel.limit!)) {
-       //    print('DEBUG: [National] End of list for module index $_currentAggregatedModuleIndex, preparing next...');
-           if (_currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) {
-             _currentAggregatedModuleIndex++;
-             _offset = 0; 
-             _offsetList = [];
-           }
-       }
+      final limitInt = int.tryParse(itemModel.limit ?? '25') ?? 25;
+      final totalSizeInt = itemModel.totalSize ?? 0;
+      final offsetInt = itemModel.offset ?? 1;
 
+      if (itemModel.items!.isEmpty && tabState.currentModuleIndex < _aggregatedModuleIds.length - 1) {
+          tabState.currentModuleIndex++;
+          tabState.offset = 1; 
+          tabState.loadedOffsets.clear();
+          getNationalAggregatedItemList(offset: '1', dataSource: DataSourceEnum.client, notify: true);
+          return; 
+      } else if (totalSizeInt <= offsetInt * limitInt) {
+          if (tabState.currentModuleIndex < _aggregatedModuleIds.length - 1) {
+            tabState.currentModuleIndex++;
+            tabState.offset = 0; 
+            tabState.loadedOffsets.clear();
+          }
+      }
+
+      tabState.totalSize = itemModel.totalSize;
       _pageSize = itemModel.totalSize;
       _isLoading = false;
     } else {
-      if (_currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) {
-        //  print('DEBUG: [National] Error/Null result for module index $_currentAggregatedModuleIndex, switching to next...');
-          _currentAggregatedModuleIndex++;
-          _offset = 1; 
-          _offsetList = [];
+      if (tabState.currentModuleIndex < _aggregatedModuleIds.length - 1) {
+          tabState.currentModuleIndex++;
+          tabState.offset = 1; 
+          tabState.loadedOffsets.clear();
           getNationalAggregatedItemList(offset: '1', dataSource: DataSourceEnum.client, notify: true);
           return;
       }
       _isLoading = false;
     }
-    update();
+    if (_nationalFilterType == targetType) {
+      update();
+    }
   }
 
   Future<void> getReviewedItemList({required String offset, DataSourceEnum dataSource = DataSourceEnum.local, bool notify = false, bool firstTimeCategoryLoad = false, bool reload = false, bool fromLocalTransition = false}) async {

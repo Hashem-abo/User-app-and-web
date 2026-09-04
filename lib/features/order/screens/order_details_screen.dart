@@ -198,7 +198,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
               referrerBonusAmount = order.referrerBonusAmount ?? 0;
               if(prescriptionOrder) {
                 double orderAmount = order.orderAmount ?? 0;
-                itemsPrice = (orderAmount + discount) - ((taxIncluded ? 0 : tax) + deliveryCharge) - additionalCharge;
+                itemsPrice = (orderAmount + discount + couponDiscount + referrerBonusAmount) - ((taxIncluded ? 0 : tax) + deliveryCharge + dmTips + additionalCharge + extraPackagingCharge);
               } else{
                 for(OrderDetailsModel orderDetails in orderController.orderDetails!) {
                   if(orderDetails.addOns != null) {

@@ -30,7 +30,7 @@ class UserReviewWidget extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          RatingBar(rating: review.rating!.toDouble(), ratingCount: null, size: 18),
+          RatingBar(rating: (review.rating ?? 0).toDouble(), ratingCount: null, size: 18),
 
           Row(children: [
             Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -57,7 +57,7 @@ class UserReviewWidget extends StatelessWidget {
         ]),
 
         Text(
-          '${'purchased_since'.tr} ${DateConverter.containTAndZToUTCFormat(review.createdAt!)}',
+          '${'purchased_since'.tr} ${DateConverter.containTAndZToUTCFormat(review.createdAt ?? '')}',
           style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor),
         ),
         

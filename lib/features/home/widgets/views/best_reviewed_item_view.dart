@@ -32,10 +32,6 @@ class _BestReviewItemViewState extends State<BestReviewItemView> {
 
   @override
   Widget build(BuildContext context) {
-    var controller = Get.find<ItemController>();
-    if (controller.reviewedItemList == null) {
-      controller.getReviewedItemList(offset: '1');
-    }
     return GetBuilder<ItemController>(builder: (itemController) {
       List<Item>? reviewItemList = itemController.reviewedItemList;
       bool isFood = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food';

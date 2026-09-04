@@ -77,12 +77,15 @@ class DashboardScreenState extends State<DashboardScreen> {
   late bool _isLogin;
   bool active = false;
 
-  double _fabBottom = 100;
-  double _fabRight = 16;
+  // FAB position — ValueNotifier so only the FAB widget rebuilds on drag
+  final ValueNotifier<Offset> _fabPosition = ValueNotifier(const Offset(16, 100));
 
   // ── Floating-ad scroll visibility ──────────────────────────────────────────
   bool _isScrollingContent = false;
   Timer? _scrollHideTimer;
+
+  // Track last module type to avoid rebuilding _screens unnecessarily
+  String? _lastModuleType;
 
   @override
   void initState() {
@@ -116,18 +119,33 @@ class DashboardScreenState extends State<DashboardScreen> {
     }
 
     _pageIndex = widget.pageIndex;
-
     _pageController = PageController(initialPage: widget.pageIndex);
 
-    String? modType =
-        Get.find<SplashController>().module?.moduleType.toString();
-    bool isGlobal = modType == AppConstants.globalShopping;
+    // Build screens once during init
+    _buildScreens();
+  }
+
+  @override
+  void dispose() {
+    _fabPosition.dispose();
+    _scrollHideTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Rebuild _screens only when module type actually changes
+  void _buildScreens({bool isParcel = false, bool isTaxi = false, bool isGlobal = false}) {
     _screens = [
       const HomeScreen(),
-      isGlobal ? const GlobalHomeScreen() : const CategoryTreeScreen(),
+      isParcel
+          ? const AddressScreen(fromDashboard: true)
+          : isTaxi
+              ? const VehicleFavouriteScreen()
+              : isGlobal
+                  ? const GlobalHomeScreen()
+                  : const CategoryTreeScreen(),
       isGlobal ? const GlobalOrderListScreen() : const OrderScreen(),
       isGlobal ? const GlobalCartScreen() : const CartScreen(fromNav: true),
-      const FavouriteScreen(),
+      isTaxi ? const OrderScreen(index: 1) : const FavouriteScreen(),
       const MenuScreen(),
       const AllStoreScreen(
           isPopular: true,
@@ -139,10 +157,11 @@ class DashboardScreenState extends State<DashboardScreen> {
       const ItemViewAllScreen(
           isSpecial: true, isPopular: false, backButton: false),
       const ItemCampaignScreen(isJustForYou: false, backButton: false),
-      ServiceBookingListScreen(), // Index 9
+      const ServiceBookingListScreen(), // Index 9
       const TrendsScreen(), // Index 10
     ];
   }
+
 
   void _showRegistrationSuccessBottomSheet() {
     bool canShowBottomSheet =
@@ -219,32 +238,12 @@ class DashboardScreenState extends State<DashboardScreen> {
               AppConstants.globalShopping);
       isParcel = isParcel && !isTaxiWithCache;
 
-      _screens = [
-        const HomeScreen(),
-        isParcel
-            ? const AddressScreen(fromDashboard: true)
-            : isTaxi
-                ? const VehicleFavouriteScreen()
-                : isGlobal
-                    ? const GlobalHomeScreen()
-                    : const CategoryTreeScreen(),
-        isGlobal ? const GlobalOrderListScreen() : const OrderScreen(),
-        isGlobal ? const GlobalCartScreen() : const CartScreen(fromNav: true),
-        isTaxi ? const OrderScreen(index: 1) : const FavouriteScreen(),
-        const MenuScreen(),
-        const AllStoreScreen(
-            isPopular: true,
-            isFeatured: false,
-            isNearbyStore: true,
-            isTopOfferStore: false,
-            isRecommendedStore: false,
-            backButton: false),
-        const ItemViewAllScreen(
-            isSpecial: true, isPopular: false, backButton: false),
-        const ItemCampaignScreen(isJustForYou: false, backButton: false),
-        ServiceBookingListScreen(), // Index 9
-        const TrendsScreen(), // Index 10
-      ];
+      // Only rebuild _screens when the module type actually changes (performance)
+      final String newModuleKey = '${splashController.module?.moduleType}_${isParcel}_${isTaxi}_${isGlobal}';
+      if (newModuleKey != _lastModuleType) {
+        _lastModuleType = newModuleKey;
+        _buildScreens(isParcel: isParcel, isTaxi: isTaxi, isGlobal: isGlobal);
+      }
 
       return PopScope(
         canPop: false,
@@ -335,85 +334,67 @@ class DashboardScreenState extends State<DashboardScreen> {
                       },
                     ),
                     FloatingAdWidget(isScrolling: _isScrollingContent),
-                    Positioned(
-                      bottom: _fabBottom,
-                      right: _fabRight,
-                      child: AnimatedScale(
-                        scale: _isScrollingContent ? 0.0 : 1.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: IgnorePointer(
-                          ignoring: _isScrollingContent,
-                          child: GestureDetector(
-                            onPanUpdate: (details) {
-                              setState(() {
-                                _fabBottom -= details.delta.dy;
-                                _fabRight -= details.delta.dx;
-                              });
-                            },
-                            onPanEnd: (details) {
-                              setState(() {
-                                _fabRight = 16;
-                              });
-                            },
-                            onTap: () => Get.to(() => const AIChatScreen()),
-                            child: Container(
-                              height: 70,
-                              width: 70,
-                              padding: const EdgeInsets.all(3),
-                              // decoration: BoxDecoration(
-                              //   shape: BoxShape.circle,
-                              //   gradient: LinearGradient(
-                              //     colors: [
-                              //       Theme.of(context).primaryColor,
-                              //       Theme.of(context)
-                              //           .primaryColor
-                              //           .withOpacity(0.5)
-                              //     ],
-                              //     begin: Alignment.topLeft,
-                              //     end: Alignment.bottomRight,
-                              //   ),
-                              //   boxShadow: [
-                              //     BoxShadow(
-                              //       color: Theme.of(context)
-                              //           .primaryColor
-                              //           .withOpacity(0.4),
-                              //       blurRadius: 10,
-                              //       spreadRadius: 2,
-                              //       offset: const Offset(0, 4),
-                              //     )
-                              //   ],
-                              // ),
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  // color: Colors.white,
-                                ),
-                                padding: const EdgeInsets.all(2),
-                                child: ClipOval(
-                                  child: (splashController.configModel
-                                              ?.splashScreenImageFullUrl !=
-                                          null)
-                                      ? CustomImage(
-                                          image: splashController.configModel!
-                                              .splashScreenImageFullUrl!,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : Image.asset(Images.ucleSul,
-                                          fit: BoxFit.cover),
-                                ),
+                    // FAB — uses ValueListenableBuilder so ONLY this widget
+                    // rebuilds on drag, NOT the entire Scaffold/PageView
+                    ValueListenableBuilder<Offset>(
+                      valueListenable: _fabPosition,
+                      builder: (context, fabPos, _) {
+                        return Positioned(
+                          bottom: fabPos.dy,
+                          right: fabPos.dx,
+                          child: AnimatedScale(
+                            scale: _isScrollingContent ? 0.0 : 1.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: IgnorePointer(
+                              ignoring: _isScrollingContent,
+                              child: GestureDetector(
+                                onPanUpdate: (details) {
+                                  _fabPosition.value = Offset(
+                                    (fabPos.dx - details.delta.dx).clamp(0.0, double.infinity),
+                                    (fabPos.dy - details.delta.dy).clamp(80.0, double.infinity),
+                                  );
+                                },
+                                onPanEnd: (_) {
+                                  // Snap right edge back to 16 on release
+                                  _fabPosition.value = Offset(16, _fabPosition.value.dy);
+                                },
+                                onTap: () => Get.to(() => const AIChatScreen()),
+                                child: Container(
+                                  height: 70,
+                                  width: 70,
+                                  padding: const EdgeInsets.all(3),
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                    ),
+                                    padding: const EdgeInsets.all(2),
+                                    child: ClipOval(
+                                      child: (splashController.configModel
+                                                  ?.splashScreenImageFullUrl !=
+                                              null)
+                                          ? CustomImage(
+                                              image: splashController.configModel!
+                                                  .splashScreenImageFullUrl!,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(Images.ucleSul,
+                                              fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                )
+                                    .animate(
+                                        onPlay: (controller) =>
+                                            controller.repeat(reverse: true))
+                                    .scale(
+                                        begin: const Offset(1, 1),
+                                        end: const Offset(1.1, 1.1),
+                                        duration: 1500.ms,
+                                        curve: Curves.easeInOut),
                               ),
-                            )
-                                .animate(
-                                    onPlay: (controller) =>
-                                        controller.repeat(reverse: true))
-                                .scale(
-                                    begin: const Offset(1, 1),
-                                    end: const Offset(1.1, 1.1),
-                                    duration: 1500.ms,
-                                    curve: Curves.easeInOut),
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     ),
                     ResponsiveHelper.isDesktop(context) || keyboardVisible || _pageIndex == 3
                         ? const SizedBox()
@@ -427,7 +408,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                                   children: [
                                     Container(
                                       width: size.width,
-                                      height: GetPlatform.isIOS ? 80 : 65,
+                                      height: GetPlatform.isIOS ? 88 : 72,
                                       decoration: BoxDecoration(
                                         boxShadow: [
                                           BoxShadow(

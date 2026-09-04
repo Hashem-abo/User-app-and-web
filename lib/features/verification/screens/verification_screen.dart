@@ -62,7 +62,12 @@ class VerificationScreenState extends State<VerificationScreen> {
 
     Get.find<VerificationController>().updateVerificationCode('', canUpdate: false);
     if(widget.number != null && widget.number!.isNotEmpty) {
-      _number = widget.number!.startsWith('+') ? widget.number : '+${widget.number!.substring(1, widget.number!.length)}';
+      String cleanNumber = widget.number!.trim();
+      if (cleanNumber.startsWith('+')) {
+        _number = cleanNumber;
+      } else {
+        _number = '+$cleanNumber';
+      }
     }
     _email = widget.email;
     _startTimer();

@@ -92,7 +92,7 @@ class Distance {
 
   Distance.fromJson(Map<String, dynamic> json) {
     text = json['text'];
-    value = json['value'].toDouble();
+    value = json['value'] != null ? double.tryParse(json['value'].toString()) : 0.0;
   }
 
   Map<String, dynamic> toJson() {

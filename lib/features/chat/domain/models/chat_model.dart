@@ -120,7 +120,7 @@ class Order {
 
   Order.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    orderAmount = json['order_amount']?.toDouble();
+    orderAmount = json['order_amount'] != null ? double.tryParse(json['order_amount'].toString()) : null;
     orderStatus = json['order_status'];
     createdAt = json['created_at'];
     detailsCount = json['details_count'];

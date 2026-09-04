@@ -168,7 +168,7 @@ class Store {
     latitude = json['latitude'];
     longitude = json['longitude'];
     address = json['address'];
-    minimumOrder = json['minimum_order'] == null ? 0 : json['minimum_order']?.toDouble();
+    minimumOrder = json['minimum_order'] != null ? double.tryParse(json['minimum_order'].toString()) ?? 0 : 0;
     currency = json['currency'];
     freeDelivery = json['free_delivery'];
     coverPhotoFullUrl = json['cover_photo_full_url'] ?? '';
@@ -176,16 +176,15 @@ class Store {
     takeAway = json['take_away'];
     scheduleOrder = json['schedule_order'];
     avgRating = json['avg_rating'] != null ? double.parse(json['avg_rating'].toString()) : null;
-    tax = json['tax']?.toDouble();
+    tax = json['tax'] != null ? double.tryParse(json['tax'].toString()) : null;
     ratingCount = json['rating_count'];
     selfDeliverySystem = json['self_delivery_system'];
     posSystem = json['pos_system'];
-    minimumShippingCharge = json['minimum_shipping_charge']?.toDouble();
-    maximumShippingCharge = /*(json['maximum_shipping_charge'] != null && json['maximum_shipping_charge'] == 0) ? null : */
-        json['maximum_shipping_charge']?.toDouble();
-    perKmShippingCharge = json['per_km_shipping_charge'] != null ? json['per_km_shipping_charge'].toDouble() : 0;
-    perKmShippingChargeGroup = json['per_km_shipping_charge_group'] != null ? json['per_km_shipping_charge_group'].toDouble() : 0;
-    minimumShippingChargeGroup = json['minimum_shipping_charge_group'] != null ? json['minimum_shipping_charge_group'].toDouble() : 0;
+    minimumShippingCharge = json['minimum_shipping_charge'] != null ? double.tryParse(json['minimum_shipping_charge'].toString()) : null;
+    maximumShippingCharge = json['maximum_shipping_charge'] != null ? double.tryParse(json['maximum_shipping_charge'].toString()) : null;
+    perKmShippingCharge = json['per_km_shipping_charge'] != null ? double.tryParse(json['per_km_shipping_charge'].toString()) ?? 0 : 0;
+    perKmShippingChargeGroup = json['per_km_shipping_charge_group'] != null ? double.tryParse(json['per_km_shipping_charge_group'].toString()) ?? 0 : 0;
+    minimumShippingChargeGroup = json['minimum_shipping_charge_group'] != null ? double.tryParse(json['minimum_shipping_charge_group'].toString()) ?? 0 : 0;
     open = json['open'];
     active = json['active'];
     featured = json['featured'] != null ? int.tryParse(json['featured'].toString()) : 0;
@@ -199,7 +198,7 @@ class Store {
       module = ModuleModel.fromJson(json['module']);
     }
     orderPlaceToScheduleInterval = json['order_place_to_schedule_interval'];
-    categoryIds = json['category_ids'] != null ? json['category_ids'].cast<int>() : [];
+    categoryIds = json['category_ids'] != null ? List<int>.from(json['category_ids'].map((e) => int.tryParse(e.toString()) ?? 0)) : [];
     discount = json['discount'] != null ? Discount.fromJson(json['discount']) : null;
     if (json['schedules'] != null) {
       schedules = <Schedules>[];
@@ -221,7 +220,7 @@ class Store {
       });
     }
     extraPackagingStatus = json['extra_packaging_status'] ?? false;
-    extraPackagingAmount = json['extra_packaging_amount']?.toDouble() ?? 0;
+    extraPackagingAmount = json['extra_packaging_amount'] != null ? double.tryParse(json['extra_packaging_amount'].toString()) ?? 0 : 0;
     if (json['ratings'] != null && json['ratings'] != 0) {
       ratings = [];
       json['ratings'].forEach((v) {
@@ -231,7 +230,7 @@ class Store {
     reviewsCommentsCount = json['reviews_comments_count'];
     storeSubscription = json['store_sub'] != null ? StoreSubscription.fromJson(json['store_sub']) : null;
     storeBusinessModel = json['store_business_model'];
-    distance = json['distance']?.toDouble();
+    distance = json['distance'] != null ? double.tryParse(json['distance'].toString()) : null;
     storeOpeningTime = json['current_opening_time'];
     metaTitle = json['meta_title'];
     metaDescription = json['meta_description'];

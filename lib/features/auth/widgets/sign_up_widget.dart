@@ -401,8 +401,13 @@ class SignUpWidgetState extends State<SignUpWidget> {
       if (ResponsiveHelper.isDesktop(context)) {
         Get.find<CartController>().getCartDataOnline();
       }
-      if (status.authResponseModel != null &&
-          !status.authResponseModel!.isPhoneVerified!) {
+      final bool isPhoneVerificationRequired = Get.find<SplashController>().configModel?.centralizeLoginSetup?.phoneVerificationStatus ?? false;
+      bool isPhoneNotVerified = (status.authResponseModel != null && !status.authResponseModel!.isPhoneVerified!);
+      if (!isPhoneNotVerified && isPhoneVerificationRequired && _phoneController.text.trim().isNotEmpty) {
+        isPhoneNotVerified = true;
+      }
+
+      if (isPhoneNotVerified) {
         List<int> encoded = utf8.encode(password);
         String data = base64Encode(encoded);
         if (Get.find<SplashController>()

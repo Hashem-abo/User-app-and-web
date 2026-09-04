@@ -112,7 +112,9 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    PusherHelper.initializePusher();
+    if (Get.find<SplashController>().configModel?.websocketEnabled == true) {
+      PusherHelper.initializePusher();
+    }
     _loadData();
   }
 

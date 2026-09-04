@@ -306,14 +306,20 @@ class SearchController extends GetxController implements GetxService {
               _storeResultText = query;
               _searchStoreList = [];
               _allStoreList = [];
-              _searchStoreList!.addAll(StoreModel.fromJson(response.body).stores!);
-              _allStoreList!.addAll(StoreModel.fromJson(response.body).stores!);
+              final stores = StoreModel.fromJson(response.body).stores;
+              if (stores != null) {
+                _searchStoreList!.addAll(stores);
+                _allStoreList!.addAll(stores);
+              }
             } else {
               _itemResultText = query;
               _searchItemList = [];
               _allItemList = [];
-              _searchItemList!.addAll(ItemModel.fromJson(response.body).items!);
-              _allItemList!.addAll(ItemModel.fromJson(response.body).items!);
+              final items = ItemModel.fromJson(response.body).items;
+              if (items != null) {
+                _searchItemList!.addAll(items);
+                _allItemList!.addAll(items);
+              }
             }
           }
         }
@@ -323,7 +329,7 @@ class SearchController extends GetxController implements GetxService {
   }
 
   Future<void> searchByAiData(String? query, bool fromHome) async {
-    if(query!.isNotEmpty && (query != _itemResultText || fromHome)) {
+    if(query != null && query.isNotEmpty && (query != _itemResultText || fromHome)) {
       _searchHomeText = query;
       _searchText = query;
       _rating = -1;
@@ -351,8 +357,11 @@ class SearchController extends GetxController implements GetxService {
           _itemResultText = query;
           _searchItemList = [];
           _allItemList = [];
-          _searchItemList!.addAll(ItemModel.fromJson(response.body).items!);
-          _allItemList!.addAll(ItemModel.fromJson(response.body).items!);
+          final items = ItemModel.fromJson(response.body).items;
+          if (items != null) {
+            _searchItemList!.addAll(items);
+            _allItemList!.addAll(items);
+          }
         }
       }
       update();
@@ -466,11 +475,19 @@ class SearchController extends GetxController implements GetxService {
     }
     _searchSuggestionModel = await searchServiceInterface.getSearchSuggestions(searchText);
     if(_searchSuggestionModel != null) {
-      for (var item in _searchSuggestionModel!.items!) {
-        items.add(item.name!);
+      if (_searchSuggestionModel!.items != null) {
+        for (var item in _searchSuggestionModel!.items!) {
+          if (item.name != null) {
+            items.add(item.name!);
+          }
+        }
       }
-      for (var store in _searchSuggestionModel!.stores!) {
-        items.add(store.name!);
+      if (_searchSuggestionModel!.stores != null) {
+        for (var store in _searchSuggestionModel!.stores!) {
+          if (store.name != null) {
+            items.add(store.name!);
+          }
+        }
       }
     }
     return items;

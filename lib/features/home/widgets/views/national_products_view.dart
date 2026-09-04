@@ -25,9 +25,8 @@ class _NationalProductsViewState extends State<NationalProductsView> {
   void initState() {
     super.initState();
     ItemController itemController = Get.find<ItemController>();
-    // Initialize with default popular items
+    // Initialize with default national aggregated items
     itemController.setOffset(1);
-    itemController.clearFilters(isPopular: true, isSpecial: false);
     // + ahmed
     itemController.initNationalProductsAggregation();
     itemController.getNationalAggregatedItemList(notify: false, offset: '1', dataSource: DataSourceEnum.local);

@@ -5,18 +5,19 @@ import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 class ValidateCheck{
 
   static String? validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return '\u26A0 ${'email_field_is_required'.tr}';
+    }
     const pattern = r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'"
         r'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-'
         r'\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*'
         r'[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4]'
         r'[0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9]'
-        r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\'
-        r'x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
+        r'[0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f'
+        r'\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])';
     final kEmailValid = RegExp(pattern);
-    bool isValid = kEmailValid.hasMatch(value.toString());
-    if (value!.isEmpty) {
-      return '\u26A0 ${'email_field_is_required'.tr}';
-    } else if (isValid == false) {
+    bool isValid = kEmailValid.hasMatch(value);
+    if (!isValid) {
       return '\u26A0 ${"enter_valid_email_address".tr}';
     }
     return null;
@@ -55,15 +56,18 @@ class ValidateCheck{
   }
 
   static String? loyaltyCheck(String? value, int? minimumExchangePoint, int? point) {
-    int amount = 0;
-    if(value != null && value.isNotEmpty) {
-      amount = int.parse(value);
-    }
-    if (value == null || value.isEmpty) {
+    if (value == null || value.trim().isEmpty) {
       return 'this_field_is_required'.tr;
-    }else if(amount < minimumExchangePoint!){
-      return '${'please_exchange_more_then'.tr} $minimumExchangePoint ${'points'.tr}';
-    }else if(point! < amount){
+    }
+    int? amount = int.tryParse(value.trim());
+    if (amount == null) {
+      return 'enter_valid_number'.tr;
+    }
+    int minPoint = minimumExchangePoint ?? 0;
+    int availablePoint = point ?? 0;
+    if (amount < minPoint) {
+      return '${'please_exchange_more_then'.tr} $minPoint ${'points'.tr}';
+    } else if (availablePoint < amount) {
       return 'you_do_not_have_enough_point_to_exchange'.tr;
     }
     return null;

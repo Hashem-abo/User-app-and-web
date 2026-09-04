@@ -79,14 +79,18 @@ class ItemService implements ItemServiceInterface {
   List<bool> initializeCartAddonActiveList(List<AddOn>? addOnIds, List<AddOns>? addOns) {
     List<int?> addOnIdList = [];
     List<bool> addOnActiveList = [];
-    for (var addOnId in addOnIds!) {
-      addOnIdList.add(addOnId.id);
+    if (addOnIds != null) {
+      for (var addOnId in addOnIds) {
+        addOnIdList.add(addOnId.id);
+      }
     }
-    for (var addOn in addOns!) {
-      if(addOnIdList.contains(addOn.id)) {
-        addOnActiveList.add(true);
-      }else {
-        addOnActiveList.add(false);
+    if (addOns != null) {
+      for (var addOn in addOns) {
+        if(addOnIdList.contains(addOn.id)) {
+          addOnActiveList.add(true);
+        }else {
+          addOnActiveList.add(false);
+        }
       }
     }
     return addOnActiveList;
@@ -96,14 +100,19 @@ class ItemService implements ItemServiceInterface {
   List<int?> initializeCartAddonsQtyList(List<AddOn>? addOnIds, List<AddOns>? addOns) {
     List<int?> addOnIdList = [];
     List<int?> addOnQtyList = [];
-    for (var addOnId in addOnIds!) {
-      addOnIdList.add(addOnId.id);
+    if (addOnIds != null) {
+      for (var addOnId in addOnIds) {
+        addOnIdList.add(addOnId.id);
+      }
     }
-    for (var addOn in addOns!) {
-      if(addOnIdList.contains(addOn.id)) {
-        addOnQtyList.add(addOnIds[addOnIdList.indexOf(addOn.id)].quantity);
-      }else {
-        addOnQtyList.add(1);
+    if (addOns != null) {
+      for (var addOn in addOns) {
+        if(addOnIdList.contains(addOn.id)) {
+          int idIndex = addOnIdList.indexOf(addOn.id);
+          addOnQtyList.add(addOnIds != null && idIndex < addOnIds.length ? addOnIds[idIndex].quantity : 1);
+        }else {
+          addOnQtyList.add(1);
+        }
       }
     }
     return addOnQtyList;
@@ -112,8 +121,10 @@ class ItemService implements ItemServiceInterface {
   @override
   List<bool> collapseVariation(List<FoodVariation>? foodVariations) {
     List<bool> collapseVariation = [];
-    for(int index=0; index<foodVariations!.length; index++){
-      collapseVariation.add(true);
+    if (foodVariations != null) {
+      for(int index=0; index<foodVariations.length; index++){
+        collapseVariation.add(true);
+      }
     }
     return collapseVariation;
   }
@@ -122,18 +133,22 @@ class ItemService implements ItemServiceInterface {
   List<int> initializeCartVariationIndexes(List<Variation>? variation, List<ChoiceOptions>? choiceOptions) {
     List<int> variationIndex = [];
     List<String> variationTypes = [];
-    if(variation!.isNotEmpty && variation[0].type != null) {
+    if(variation != null && variation.isNotEmpty && variation[0].type != null) {
       variationTypes.addAll(variation[0].type!.split('-'));
     }
     int varIndex = 0;
-    for (var choiceOption in choiceOptions!) {
-      for(int index=0; index<choiceOption.options!.length; index++) {
-        if(choiceOption.options![index].trim().replaceAll(' ', '') == variationTypes[varIndex].trim()) {
-          variationIndex.add(index);
-          break;
+    if (choiceOptions != null) {
+      for (var choiceOption in choiceOptions) {
+        if (choiceOption.options != null && varIndex < variationTypes.length) {
+          for(int index=0; index<choiceOption.options!.length; index++) {
+            if(choiceOption.options![index].trim().replaceAll(' ', '') == variationTypes[varIndex].trim()) {
+              variationIndex.add(index);
+              break;
+            }
+          }
         }
+        varIndex++;
       }
-      varIndex++;
     }
     return variationIndex;
   }
@@ -163,8 +178,10 @@ class ItemService implements ItemServiceInterface {
   @override
   List<bool> initializeCollapseVariation(List<FoodVariation>? foodVariations) {
     List<bool> collapseVariation = [];
-    for(int index=0; index<foodVariations!.length; index++) {
-      collapseVariation.add(true);
+    if (foodVariations != null) {
+      for(int index=0; index<foodVariations.length; index++) {
+        collapseVariation.add(true);
+      }
     }
     return collapseVariation;
   }
@@ -172,8 +189,10 @@ class ItemService implements ItemServiceInterface {
   @override
   List<int> initializeVariationIndexes(List<ChoiceOptions>? choiceOptions) {
     List<int> variationIndex = [];
-    for(int i=0; i<choiceOptions!.length; i++) {
-      variationIndex.add(0);
+    if (choiceOptions != null) {
+      for(int i=0; i<choiceOptions.length; i++) {
+        variationIndex.add(0);
+      }
     }
     return variationIndex;
   }
@@ -181,8 +200,10 @@ class ItemService implements ItemServiceInterface {
   @override
   List<bool> initializeAddonActiveList(List<AddOns>? addOns) {
     List<bool> addOnActiveList = [];
-    for(int i=0; i<addOns!.length; i++) {
-      addOnActiveList.add(false);
+    if (addOns != null) {
+      for(int i=0; i<addOns.length; i++) {
+        addOnActiveList.add(false);
+      }
     }
     return addOnActiveList;
   }
@@ -190,8 +211,10 @@ class ItemService implements ItemServiceInterface {
   @override
   List<int> initializeAddonQtyList(List<AddOns>? addOns) {
     List<int> addOnQtyList = [];
-    for(int i=0; i<addOns!.length; i++) {
-      addOnQtyList.add(1);
+    if (addOns != null) {
+      for(int i=0; i<addOns.length; i++) {
+        addOnQtyList.add(1);
+      }
     }
     return addOnQtyList;
   }
@@ -243,7 +266,7 @@ class ItemService implements ItemServiceInterface {
         }
       }
 
-      if(moduleStock && (totalCartQtyOtherVariations + quantity + 1) > stock!) {
+      if(moduleStock && (stock != null && (totalCartQtyOtherVariations + quantity + 1) > stock)) {
         showCustomSnackBar('out_of_stock'.tr);
       }else {
         if(quantityLimit != null && quantityLimit != 0){

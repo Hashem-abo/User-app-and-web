@@ -599,9 +599,9 @@ class CheckoutController extends GetxController implements GetxService {
         LatLng storeLatLng = LatLng(double.parse(store.latitude!), double.parse(store.longitude!));
         Response response = await checkoutServiceInterface.getDistanceInMeter(storeLatLng, originLatLng);
         try {
-          if (response.statusCode == 200) {
-            final double distanceMater = response.body['distanceMeters']?.toDouble();
-            dist = distanceMater / 1000;
+          if (response.statusCode == 200 && response.body != null && response.body['distanceMeters'] != null) {
+            final double? distanceMater = double.tryParse(response.body['distanceMeters'].toString());
+            dist = (distanceMater != null) ? distanceMater / 1000 : Geolocator.distanceBetween(storeLatLng.latitude, storeLatLng.longitude, originLatLng.latitude, originLatLng.longitude) / 1000;
             dur = parseDuration(response.body['duration']?.toString() ?? '');
           } else {
             dist = Geolocator.distanceBetween(storeLatLng.latitude, storeLatLng.longitude, originLatLng.latitude, originLatLng.longitude) / 1000;
@@ -625,9 +625,9 @@ class CheckoutController extends GetxController implements GetxService {
         // Fallback for non-store flows or empty stores (though shouldn't happen here)
         Response response = await checkoutServiceInterface.getDistanceInMeter(originLatLng, destinationLatLng);
         try {
-          if (response.statusCode == 200) {
-            final double distanceMater = response.body['distanceMeters']?.toDouble();
-            _distance = distanceMater / 1000;
+          if (response.statusCode == 200 && response.body != null && response.body['distanceMeters'] != null) {
+            final double? distanceMater = double.tryParse(response.body['distanceMeters'].toString());
+            _distance = (distanceMater != null) ? distanceMater / 1000 : Geolocator.distanceBetween(originLatLng.latitude, originLatLng.longitude, destinationLatLng.latitude, destinationLatLng.longitude) / 1000;
             _estimatedDuration = parseDuration(response.body['duration']?.toString() ?? '');
           } else {
             _distance = Geolocator.distanceBetween(originLatLng.latitude, originLatLng.longitude, destinationLatLng.latitude, destinationLatLng.longitude) / 1000;

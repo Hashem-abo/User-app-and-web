@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:sixam_mart/common/enums/data_source_enum.dart';
+import 'package:sixam_mart/api/data_module_manager.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
@@ -600,6 +601,9 @@ class SplashController extends GetxController implements GetxService {
         Vibration.vibrate(duration: 30);
       }
       await Get.find<SplashController>().setModule(_moduleList![index]);
+      DataModuleManager().invalidateContext('home_module');
+      DataModuleManager().invalidateContext('national_products_tab');
+      DataModuleManager().clearMemoryCache();
 
       if(_module!.moduleType.toString() == AppConstants.globalShopping) {
         Get.find<GlobalCartController>().getCartList();

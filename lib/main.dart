@@ -160,7 +160,7 @@ class _MyAppState extends State<MyApp> {
               }
             },
             defaultTransition: Transition.topLevel,
-            transitionDuration: const Duration(milliseconds: 500),
+            transitionDuration: const Duration(milliseconds: 280),
             builder: (BuildContext context, widget) {
               double fontSizeOffset = Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSizeOffset : 0.0;
               double fontScale = (14.0 - fontSizeOffset) / 14.0;
