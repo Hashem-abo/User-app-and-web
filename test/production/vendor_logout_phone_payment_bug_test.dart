@@ -60,6 +60,22 @@ void main() {
       final store = Store.fromJson(jsonResponse);
       expect(store.vendorType, isNotEmpty);
     });
+
+    test('Store.vendorType MUST recognize wholesale (جملة) and retail (تجزئة) from vendor_type or store_business_model', () {
+      final wholesaleStore = Store.fromJson({
+        'id': 99,
+        'name': 'Wholesale Market',
+        'vendor_type': 'wholesale',
+      });
+      expect(wholesaleStore.vendorType.toLowerCase(), anyOf(contains('wholesale'), contains('جملة')));
+
+      final retailStore = Store.fromJson({
+        'id': 100,
+        'name': 'Retail Shop',
+        'store_business_model': 'retail',
+      });
+      expect(retailStore.vendorType.toLowerCase(), anyOf(contains('retail'), contains('تجزئة')));
+    });
   });
 
   group('FEATURE & BUG TEST 2: ConfirmationDialog Logout Semantics & Button Placement', () {

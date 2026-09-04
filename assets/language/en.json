@@ -2282,5 +2282,7 @@
   "reenter_code": "Re-enter Code",
   "back_to_wallet_details": "Back to Wallet Details",
   "paste": "Paste",
-  "scan_qr_to_pay": "Scan QR Code to Pay"
+  "scan_qr_to_pay": "Scan QR Code to Pay",
+  "wholesale": "Wholesale",
+  "retail": "Retail"
 }

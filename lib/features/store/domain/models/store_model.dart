@@ -94,6 +94,7 @@ class Store {
   int? verifiedSeller;
   String? moduleType;
   ModuleModel? module;
+  String? rawVendorType;
 
   Store({
     this.id,
@@ -155,6 +156,7 @@ class Store {
     this.metaImage,
     this.moduleType,
     this.module,
+    this.rawVendorType,
   });
 
   Store.fromJson(Map<String, dynamic> json) {
@@ -235,6 +237,7 @@ class Store {
     metaDescription = json['meta_description'];
     metaImage = json['meta_image'];
     verifiedSeller = json['verified_seller'] != null ? int.tryParse(json['verified_seller'].toString()) : null;
+    rawVendorType = json['vendor_type']?.toString() ?? json['store_type']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -308,10 +311,30 @@ class Store {
     if (module != null) {
       data['module'] = module!.toJson();
     }
+    data['vendor_type'] = rawVendorType;
     return data;
   }
 
   String get vendorType {
+    if (rawVendorType != null && rawVendorType!.trim().isNotEmpty) {
+      final normalized = rawVendorType!.trim().toLowerCase();
+      if (normalized == 'wholesale' || normalized == 'جملة') {
+        return 'wholesale'.tr;
+      }
+      if (normalized == 'retail' || normalized == 'تجزئة') {
+        return 'retail'.tr;
+      }
+      return rawVendorType!.tr;
+    }
+    if (storeBusinessModel != null && storeBusinessModel!.trim().isNotEmpty) {
+      final normalized = storeBusinessModel!.trim().toLowerCase();
+      if (normalized == 'wholesale' || normalized == 'جملة') {
+        return 'wholesale'.tr;
+      }
+      if (normalized == 'retail' || normalized == 'تجزئة') {
+        return 'retail'.tr;
+      }
+    }
     if (module?.moduleName != null && module!.moduleName!.trim().isNotEmpty) {
       return module!.moduleName!;
     }
