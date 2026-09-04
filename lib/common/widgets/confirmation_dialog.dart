@@ -79,13 +79,16 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    bool isActualLogout = widget.isLogOut &&
+        (widget.title == null || widget.title == 'logout'.tr || widget.description == 'are_you_sure_to_logout'.tr);
+
     String effectiveIcon = widget.icon;
-    if (widget.isLogOut && (effectiveIcon == Images.support || effectiveIcon.isEmpty)) {
+    if (isActualLogout && (effectiveIcon == Images.support || effectiveIcon.isEmpty)) {
       effectiveIcon = Images.logOut;
     }
 
     String? effectiveTitle = widget.title;
-    if (effectiveTitle == null && widget.isLogOut) {
+    if (effectiveTitle == null && isActualLogout) {
       effectiveTitle = 'logout'.tr;
     }
 
@@ -142,8 +145,8 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
                   child: Text(
-                    _isLoading && widget.isLogOut
-                        ? 'logging_out'.tr
+                    _isLoading
+                        ? (isActualLogout ? 'logging_out'.tr : 'loading'.tr)
                         : widget.description,
                     style: robotoRegular.copyWith(
                       fontSize: Dimensions.fontSizeDefault,
@@ -158,11 +161,11 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
                 if (!widget.isLogOut && Get.isRegistered<OrderController>())
                   GetBuilder<OrderController>(builder: (orderController) {
                     return !orderController.isLoading
-                        ? _buildActionButtons(context)
+                        ? _buildActionButtons(context, isActualLogout)
                         : const Center(child: CircularProgressIndicator());
                   })
                 else
-                  _buildActionButtons(context),
+                  _buildActionButtons(context, isActualLogout),
               ]),
             ),
           ),
@@ -171,7 +174,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, bool isActualLogout) {
     return Row(children: [
       // CANCEL / NO BUTTON (Neutral secondary style)
       Expanded(
@@ -209,8 +212,8 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
       Expanded(
         child: CustomButton(
           buttonText: _isLoading
-              ? (widget.isLogOut ? 'logging_out'.tr : 'loading'.tr)
-              : (widget.confirmButtonText ?? (widget.isLogOut ? 'logout'.tr : 'yes'.tr)),
+              ? (isActualLogout ? 'logging_out'.tr : 'loading'.tr)
+              : (widget.confirmButtonText ?? (isActualLogout ? 'logout'.tr : 'yes'.tr)),
           isLoading: _isLoading,
           color: widget.isLogOut ? Theme.of(context).colorScheme.error : Theme.of(context).primaryColor,
           textColor: Colors.white,
