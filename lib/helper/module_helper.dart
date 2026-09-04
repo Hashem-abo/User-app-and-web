@@ -65,6 +65,39 @@ class ModuleHelper {
     return fallbackKey.tr;
   }
 
+  /// Returns whether a module, item, or store corresponds to the Zad module (grocery / module 1).
+  static bool isZad({
+    int? moduleId,
+    String? moduleType,
+    String? moduleName,
+  }) {
+    if (moduleId == 1) {
+      return true;
+    }
+    if (moduleType == 'zad') {
+      return true;
+    }
+    if (moduleName != null) {
+      final name = moduleName.trim().toLowerCase();
+      if (name.contains('zad') || name.contains('زاد')) {
+        return true;
+      }
+    }
+    if (Get.isRegistered<SplashController>()) {
+      final module = getModule() ?? getCacheModule();
+      if (module != null) {
+        if (moduleId == null || moduleId == module.id) {
+          if (module.id == 1) return true;
+          final name = (module.moduleName ?? '').trim().toLowerCase();
+          if (name.contains('zad') || name.contains('زاد') || module.moduleType == 'zad') {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   /// Returns whether a module, item, or store corresponds to Grocery (e.g. Zad) or Pharmacy.
   static bool isGroceryOrPharmacy({
     Item? item,

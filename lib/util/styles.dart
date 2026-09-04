@@ -5,33 +5,33 @@ import 'package:flutter/material.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 
 TextStyle get robotoRegular => TextStyle(
-  fontFamily: Get.find<ThemeController>().fontFamily,
+  fontFamily: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontFamily : 'Roboto',
   fontWeight: FontWeight.w400,
-  fontSize: Get.find<ThemeController>().fontSize,
+  fontSize: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSize : Dimensions.fontSizeDefault,
 );
 
 TextStyle get robotoMedium => TextStyle(
-  fontFamily: Get.find<ThemeController>().fontFamily,
+  fontFamily: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontFamily : 'Roboto',
   fontWeight: FontWeight.w500,
-  fontSize: Get.find<ThemeController>().fontSize,
+  fontSize: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSize : Dimensions.fontSizeDefault,
 );
 
 TextStyle get robotoSemiBold => TextStyle(
-  fontFamily: Get.find<ThemeController>().fontFamily,
+  fontFamily: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontFamily : 'Roboto',
   fontWeight: FontWeight.w600,
-  fontSize: Get.find<ThemeController>().fontSize,
+  fontSize: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSize : Dimensions.fontSizeDefault,
 );
 
 TextStyle get robotoBold => TextStyle(
-  fontFamily: Get.find<ThemeController>().fontFamily,
+  fontFamily: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontFamily : 'Roboto',
   fontWeight: FontWeight.w700,
-  fontSize: Get.find<ThemeController>().fontSize,
+  fontSize: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSize : Dimensions.fontSizeDefault,
 );
 
 TextStyle get robotoBlack => TextStyle(
-  fontFamily: Get.find<ThemeController>().fontFamily,
+  fontFamily: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontFamily : 'Roboto',
   fontWeight: FontWeight.w900,
-  fontSize: Get.find<ThemeController>().fontSize,
+  fontSize: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSize : Dimensions.fontSizeDefault,
 );
 
 final BoxDecoration riderContainerDecoration = BoxDecoration(

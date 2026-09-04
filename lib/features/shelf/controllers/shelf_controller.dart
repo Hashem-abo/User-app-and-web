@@ -24,6 +24,33 @@ class ShelfController extends GetxController implements GetxService {
   final Map<int, int> _modulePageSize = {};
   final Map<int, int> _moduleOffset = {};
 
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleShelfList.containsKey(moduleId)) {
+      _shelfList = _moduleShelfList[moduleId];
+      _pageSize = _modulePageSize[moduleId];
+      _offset = _moduleOffset[moduleId] ?? 1;
+    } else {
+      _shelfList = null;
+      _pageSize = null;
+      _offset = 1;
+    }
+    _isLoading = false;
+    update();
+  }
+
+  void clearShelfList({bool clearAllModuleCache = false}) {
+    _shelfList = null;
+    _pageSize = null;
+    _offset = 1;
+    _isLoading = false;
+    if (clearAllModuleCache) {
+      _moduleShelfList.clear();
+      _modulePageSize.clear();
+      _moduleOffset.clear();
+    }
+    update();
+  }
+
   Future<void> getShelfList(bool reload, {DataSourceEnum source = DataSourceEnum.client}) async {
     int? currentModuleId = Get.find<SplashController>().module?.id;
 

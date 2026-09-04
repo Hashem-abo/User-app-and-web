@@ -51,7 +51,8 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<StoreModel?> _getStoreList(int offset, String filterBy, String storeType, {required DataSourceEnum source}) async {
     StoreModel? storeModel;
-    String cacheId = '${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=12-${Get.find<SplashController>().module!.id!}';
+    int? moduleId = Get.find<SplashController>().module?.id;
+    String cacheId = '${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=12-${moduleId ?? 0}';
 
     switch(source) {
       case DataSourceEnum.client:
@@ -73,7 +74,8 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getPopularStoreList(String type, {required DataSourceEnum source}) async {
     List<Store>? popularStoreList;
-    String cacheId = '${AppConstants.popularStoreUri}?type=$type}-${Get.find<SplashController>().module!.id!}';
+    int? moduleId = Get.find<SplashController>().module?.id;
+    String cacheId = '${AppConstants.popularStoreUri}?type=$type-${moduleId ?? 0}';
 
     switch(source) {
       case DataSourceEnum.client:
@@ -97,7 +99,8 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getLatestStoreList(String type, {required DataSourceEnum source}) async {
     List<Store>? latestStoreList;
-    String cacheId = '${AppConstants.popularStoreUri}?type=$type-${Get.find<SplashController>().module!.id!}';
+    int? moduleId = Get.find<SplashController>().module?.id;
+    String cacheId = '${AppConstants.latestStoreUri}?type=$type-${moduleId ?? 0}';
 
     switch(source) {
       case DataSourceEnum.client:
@@ -121,7 +124,8 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getTopOfferStoreList({required DataSourceEnum source, String? filterBy, String? sortBy}) async {
     List<Store>? topOfferStoreList;
-    String cacheId = '${AppConstants.topOfferStoreUri}-${Get.find<SplashController>().module!.id!}';
+    int? moduleId = Get.find<SplashController>().module?.id;
+    String cacheId = '${AppConstants.topOfferStoreUri}-${moduleId ?? 0}';
 
     switch(source) {
       case DataSourceEnum.client:

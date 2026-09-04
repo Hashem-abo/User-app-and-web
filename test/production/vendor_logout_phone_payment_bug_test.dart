@@ -53,7 +53,7 @@ void main() {
         'id': 12,
         'name': 'Bait Al-Shawayah',
         'featured': 0,
-        'module_id': 1,
+        'module_id': 3,
         'store_business_model': 'restaurant',
       };
 
@@ -75,6 +75,67 @@ void main() {
         'store_business_model': 'retail',
       });
       expect(retailStore.vendorType.toLowerCase(), anyOf(contains('retail'), contains('تجزئة')));
+    });
+
+    test('Store.vendorType in Zad MUST be hidden (empty string) when vendor_type is null, "null", or omitted', () {
+      final nullZadStore = Store.fromJson({
+        'id': 101,
+        'name': 'Zad Fresh Market',
+        'module_id': 1,
+        'vendor_type': null,
+        'store_business_model': 'commission',
+        'module': {
+          'id': 1,
+          'module_name': 'Zad',
+          'module_type': 'grocery',
+        },
+      });
+      expect(nullZadStore.isZad, isTrue);
+      expect(nullZadStore.vendorType, isEmpty);
+
+      final stringNullZadStore = Store.fromJson({
+        'id': 102,
+        'name': 'Zad Express',
+        'module_id': 1,
+        'vendor_type': 'null',
+        'module': {
+          'id': 1,
+          'module_name': 'زاد',
+          'module_type': 'grocery',
+        },
+      });
+      expect(stringNullZadStore.isZad, isTrue);
+      expect(stringNullZadStore.vendorType, isEmpty);
+
+      final omittedZadStore = Store.fromJson({
+        'id': 103,
+        'name': 'Al-Baraka Zad',
+        'module_id': 1,
+      });
+      expect(omittedZadStore.isZad, isTrue);
+      expect(omittedZadStore.vendorType, isEmpty);
+    });
+
+    test('Store.vendorType in Zad MUST be visible when vendor_type is provided (e.g. wholesale or retail)', () {
+      final zadWholesale = Store.fromJson({
+        'id': 104,
+        'name': 'Zad Central Wholesale',
+        'module_id': 1,
+        'vendor_type': 'wholesale',
+      });
+      expect(zadWholesale.isZad, isTrue);
+      expect(zadWholesale.vendorType, isNotEmpty);
+      expect(zadWholesale.vendorType.toLowerCase(), anyOf(contains('wholesale'), contains('جملة')));
+
+      final zadRetail = Store.fromJson({
+        'id': 105,
+        'name': 'Zad Corner Retail',
+        'module_id': 1,
+        'vendor_type': 'retail',
+      });
+      expect(zadRetail.isZad, isTrue);
+      expect(zadRetail.vendorType, isNotEmpty);
+      expect(zadRetail.vendorType.toLowerCase(), anyOf(contains('retail'), contains('تجزئة')));
     });
   });
 

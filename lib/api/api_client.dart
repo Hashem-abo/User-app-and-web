@@ -160,7 +160,15 @@ class ApiClient extends GetxService {
       return Response(statusCode: -1, statusText: cancelToken.cancelReason ?? 'Request cancelled');
     }
 
-    final String canonicalKey = DataModuleManager.buildCanonicalKey(uri, query: query);
+    Map<String, String> finalHeaders = _sanitizeHeaders(headers);
+    int? currentModuleId = int.tryParse(finalHeaders[AppConstants.moduleId] ?? '');
+    String? langCode = finalHeaders[AppConstants.localizationKey];
+    final String canonicalKey = DataModuleManager.buildCanonicalKey(
+      uri,
+      query: query,
+      moduleId: currentModuleId,
+      languageCode: langCode,
+    );
 
     // 2. In-Memory LRU Cache lookup
     if (useCache) {
@@ -181,7 +189,6 @@ class ApiClient extends GetxService {
           return Response(statusCode: -1, statusText: cancelToken.cancelReason ?? 'Request cancelled');
         }
 
-        Map<String, String> finalHeaders = _sanitizeHeaders(headers);
         if (kDebugMode) {
           log('====> API Call: $uri\nHeader: $finalHeaders');
         }

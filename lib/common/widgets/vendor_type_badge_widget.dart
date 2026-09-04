@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -21,11 +22,26 @@ class VendorTypeBadgeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String type = (vendorType != null && vendorType!.isNotEmpty)
-        ? vendorType!
-        : (store != null ? store!.vendorType : '');
+    String type = '';
+    if (vendorType != null &&
+        vendorType!.trim().isNotEmpty &&
+        vendorType!.trim().toLowerCase() != 'null' &&
+        vendorType!.trim().toLowerCase() != 'none') {
+      final normalized = vendorType!.trim().toLowerCase();
+      if (normalized == 'wholesale' || normalized == 'جملة') {
+        type = 'wholesale'.tr;
+      } else if (normalized == 'retail' || normalized == 'تجزئة') {
+        type = 'retail'.tr;
+      } else {
+        type = vendorType!.tr;
+      }
+    } else if (store != null) {
+      type = store!.vendorType;
+    }
 
-    if (type.isEmpty) {
+    if (type.trim().isEmpty ||
+        type.trim().toLowerCase() == 'null' ||
+        type.trim().toLowerCase() == 'none') {
       return const SizedBox();
     }
 

@@ -31,9 +31,25 @@ class CampaignController extends GetxController implements GetxService {
     }
   }
 
-  void itemAndBasicCampaignNull(){
+  void switchModule(int? moduleId) {
+    if (moduleId != null && (_moduleBasicCampaignList.containsKey(moduleId) || _moduleItemCampaignList.containsKey(moduleId))) {
+      _basicCampaignList = _moduleBasicCampaignList[moduleId];
+      _itemCampaignList = _moduleItemCampaignList[moduleId];
+    } else {
+      _basicCampaignList = null;
+      _itemCampaignList = null;
+    }
+    update();
+  }
+
+  void itemAndBasicCampaignNull({bool clearAll = false}) {
     _itemCampaignList = null;
     _basicCampaignList = null;
+    if (clearAll) {
+      _moduleBasicCampaignList.clear();
+      _moduleItemCampaignList.clear();
+    }
+    update();
   }
 
   Future<void> getBasicCampaignList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {

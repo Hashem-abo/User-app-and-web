@@ -23,6 +23,33 @@ class StoreCornerController extends GetxController implements GetxService {
   final Map<int, int> _modulePageSize = {};
   final Map<int, int> _moduleOffset = {};
 
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleStoreCornerList.containsKey(moduleId)) {
+      _storeCornerList = _moduleStoreCornerList[moduleId];
+      _pageSize = _modulePageSize[moduleId];
+      _offset = _moduleOffset[moduleId] ?? 1;
+    } else {
+      _storeCornerList = null;
+      _pageSize = null;
+      _offset = 1;
+    }
+    _isLoading = false;
+    update();
+  }
+
+  void clearStoreCornerList({bool clearAllModuleCache = false}) {
+    _storeCornerList = null;
+    _pageSize = null;
+    _offset = 1;
+    _isLoading = false;
+    if (clearAllModuleCache) {
+      _moduleStoreCornerList.clear();
+      _modulePageSize.clear();
+      _moduleOffset.clear();
+    }
+    update();
+  }
+
   Future<void> getStoreCornerList(bool reload) async {
     int? currentModuleId = Get.find<SplashController>().module?.id;
     if (reload) {

@@ -44,6 +44,9 @@ class BannerController extends GetxController implements GetxService {
     _bannerDataList = null;
     _featuredBannerDataList = null;
     _promotionalBanner = null;
+    _moduleBannerImageList.clear();
+    _moduleBannerDataList.clear();
+    _modulePromotionalBanner.clear();
     update();
   }
 
@@ -95,11 +98,33 @@ class BannerController extends GetxController implements GetxService {
     update();
   }
 
+  final Map<int, PromotionalBanner> _modulePromotionalBanner = {};
+
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleBannerImageList.containsKey(moduleId)) {
+      _bannerImageList = _moduleBannerImageList[moduleId];
+      _bannerDataList = _moduleBannerDataList[moduleId];
+      _promotionalBanner = _modulePromotionalBanner[moduleId];
+      _isBannerLoaded = true;
+      _isPromotionalBannerLoaded = _promotionalBanner != null;
+    } else {
+      _bannerImageList = null;
+      _bannerDataList = null;
+      _promotionalBanner = null;
+      _isBannerLoaded = false;
+      _isPromotionalBannerLoaded = false;
+    }
+    update();
+  }
+
   void clearBanner() {
     _bannerImageList = null;
+    _bannerDataList = null;
+    _promotionalBanner = null;
     _isBannerLoaded = false;
     _isFeaturedBannerLoaded = false;
     _isPromotionalBannerLoaded = false;
+    update();
   }
 
   Future<void> getBannerList(bool reload, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
@@ -261,6 +286,10 @@ class BannerController extends GetxController implements GetxService {
     if (promotionalBanner != null) {
       _promotionalBanner = promotionalBanner;
       _isPromotionalBannerLoaded = true;
+      int? currentModuleId = Get.find<SplashController>().module?.id;
+      if (currentModuleId != null) {
+        _modulePromotionalBanner[currentModuleId] = promotionalBanner;
+      }
       update();
     }
   }

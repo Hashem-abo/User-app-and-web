@@ -236,7 +236,15 @@ class Store {
     metaDescription = json['meta_description'];
     metaImage = json['meta_image'];
     verifiedSeller = json['verified_seller'] != null ? int.tryParse(json['verified_seller'].toString()) : null;
-    rawVendorType = json['vendor_type']?.toString() ?? json['store_type']?.toString();
+    final parsedVendorType = json['vendor_type']?.toString() ?? json['store_type']?.toString();
+    if (parsedVendorType != null &&
+        parsedVendorType.trim().isNotEmpty &&
+        parsedVendorType.trim().toLowerCase() != 'null' &&
+        parsedVendorType.trim().toLowerCase() != 'none') {
+      rawVendorType = parsedVendorType.trim();
+    } else {
+      rawVendorType = null;
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -314,8 +322,35 @@ class Store {
     return data;
   }
 
+  bool get isZad {
+    if (moduleId == 1) return true;
+    if (module?.id == 1) return true;
+    final name = (module?.moduleName ?? '').trim().toLowerCase();
+    if (name.contains('zad') || name.contains('زاد')) return true;
+    if (moduleType == 'zad' || module?.moduleType == 'zad') return true;
+
+    if (Get.isRegistered<SplashController>()) {
+      final splash = Get.find<SplashController>();
+      final curModule = splash.module ?? splash.cacheModule;
+      if (curModule != null) {
+        final curName = (curModule.moduleName ?? '').trim().toLowerCase();
+        final isCurZad = curModule.id == 1 ||
+            curName.contains('zad') ||
+            curName.contains('زاد') ||
+            curModule.moduleType == 'zad';
+        if (isCurZad && (moduleId == null || moduleId == curModule.id)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   String get vendorType {
-    if (rawVendorType != null && rawVendorType!.trim().isNotEmpty) {
+    if (rawVendorType != null &&
+        rawVendorType!.trim().isNotEmpty &&
+        rawVendorType!.trim().toLowerCase() != 'null' &&
+        rawVendorType!.trim().toLowerCase() != 'none') {
       final normalized = rawVendorType!.trim().toLowerCase();
       if (normalized == 'wholesale' || normalized == 'جملة') {
         return 'wholesale'.tr;
@@ -325,7 +360,11 @@ class Store {
       }
       return rawVendorType!.tr;
     }
-    if (storeBusinessModel != null && storeBusinessModel!.trim().isNotEmpty) {
+
+    if (storeBusinessModel != null &&
+        storeBusinessModel!.trim().isNotEmpty &&
+        storeBusinessModel!.trim().toLowerCase() != 'null' &&
+        storeBusinessModel!.trim().toLowerCase() != 'none') {
       final normalized = storeBusinessModel!.trim().toLowerCase();
       if (normalized == 'wholesale' || normalized == 'جملة') {
         return 'wholesale'.tr;
@@ -334,6 +373,12 @@ class Store {
         return 'retail'.tr;
       }
     }
+
+    // In Zad (grocery / module 1), if vendor_type is null or not explicitly set, hide it completely.
+    if (isZad) {
+      return '';
+    }
+
     if (module?.moduleName != null && module!.moduleName!.trim().isNotEmpty) {
       return module!.moduleName!;
     }
@@ -353,7 +398,12 @@ class Store {
         return splash.module!.moduleName ?? (splash.module!.moduleType != null ? splash.module!.moduleType!.tr : '');
       }
     }
-    if (storeBusinessModel != null && storeBusinessModel!.trim().isNotEmpty) {
+    if (storeBusinessModel != null &&
+        storeBusinessModel!.trim().isNotEmpty &&
+        storeBusinessModel!.trim().toLowerCase() != 'null' &&
+        storeBusinessModel!.trim().toLowerCase() != 'none' &&
+        storeBusinessModel!.trim().toLowerCase() != 'commission' &&
+        storeBusinessModel!.trim().toLowerCase() != 'subscription') {
       return storeBusinessModel!.tr;
     }
     if (Get.isRegistered<SplashController>() && Get.find<SplashController>().module != null) {

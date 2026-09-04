@@ -66,16 +66,36 @@ class CategoryController extends GetxController implements GetxService {
   int _offset = 1;
   int get offset => _offset;
 
-  void clearCategoryList() {
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleCategoryList.containsKey(moduleId)) {
+      _categoryList = _moduleCategoryList[moduleId];
+      _interestSelectedList = _moduleInterestSelectedList[moduleId];
+      _isCategoryLoaded = true;
+    } else {
+      _categoryList = null;
+      _interestSelectedList = null;
+      _isCategoryLoaded = false;
+    }
+    update();
+  }
+
+  void clearCategoryList({bool clearAllModuleCache = false}) {
     _categoryList = null;
-    _moduleCategoryList.clear();
-    _moduleInterestSelectedList.clear();
+    _interestSelectedList = null;
     _isCategoryLoaded = false;
+    if (clearAllModuleCache) {
+      _moduleCategoryList.clear();
+      _moduleInterestSelectedList.clear();
+    }
+    update();
   }
 
   void clearCategoryItemList() {
     _categoryItemList = null;
     _categoryStoreList = null;
+    _subCategoryItemCache.clear();
+    _subCategoryStoreCache.clear();
+    update();
   }
 
   Future<void> getCategoryList(bool reload, {bool allCategory = false, DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
@@ -205,14 +225,33 @@ class CategoryController extends GetxController implements GetxService {
   }
 
   int _subCategoryRequestGeneration = 0;
+  final Map<String, List<Item>> _subCategoryItemCache = {};
+  final Map<String, List<Store>> _subCategoryStoreCache = {};
 
   void setSubCategoryIndex(int index, String? categoryID) {
     _subCategoryIndex = index;
     _subCategoryRequestGeneration++;
+    String targetId = _subCategoryIndex == 0 ? (categoryID ?? '') : (_subCategoryList![index].id?.toString() ?? '');
     if(_isStore) {
-      getCategoryStoreList(_subCategoryIndex == 0 ? categoryID : _subCategoryList![index].id.toString(), 1, _type, true);
-    }else {
-      getCategoryItemList(_subCategoryIndex == 0 ? categoryID : _subCategoryList![index].id.toString(), 1, _type, true);
+      if (_subCategoryStoreCache.containsKey(targetId)) {
+        _categoryStoreList = _subCategoryStoreCache[targetId];
+        update();
+        getCategoryStoreList(targetId, 1, _type, false);
+      } else {
+        _categoryStoreList = null;
+        update();
+        getCategoryStoreList(targetId, 1, _type, true);
+      }
+    } else {
+      if (_subCategoryItemCache.containsKey(targetId)) {
+        _categoryItemList = _subCategoryItemCache[targetId];
+        update();
+        getCategoryItemList(targetId, 1, _type, false);
+      } else {
+        _categoryItemList = null;
+        update();
+        getCategoryItemList(targetId, 1, _type, true);
+      }
     }
   }
 
@@ -224,10 +263,12 @@ class CategoryController extends GetxController implements GetxService {
         _isSearching = false;
       }
       _type = type;
+      if (!_subCategoryItemCache.containsKey(categoryID ?? '')) {
+        _categoryItemList = null;
+      }
       if(notify) {
         update();
       }
-      _categoryItemList = null;
     }
     ItemModel? categoryItem = await categoryServiceInterface.getCategoryItemList(categoryID, offset, type);
     // Guard against stale responses from rapid subcategory switching
@@ -240,6 +281,9 @@ class CategoryController extends GetxController implements GetxService {
       _categoryItemList!.addAll(categoryItem.items!);
       _pageSize = categoryItem.totalSize;
       _isLoading = false;
+      if (offset == 1 && categoryID != null) {
+        _subCategoryItemCache[categoryID] = List.from(_categoryItemList!);
+      }
     }
     update();
   }
@@ -252,10 +296,12 @@ class CategoryController extends GetxController implements GetxService {
         _isSearching = false;
       }
       _type = type;
+      if (!_subCategoryStoreCache.containsKey(categoryID ?? '')) {
+        _categoryStoreList = null;
+      }
       if(notify) {
         update();
       }
-      _categoryStoreList = null;
     }
     StoreModel? categoryStore = await categoryServiceInterface.getCategoryStoreList(categoryID, offset, type);
     // Guard against stale responses from rapid subcategory switching
@@ -268,6 +314,9 @@ class CategoryController extends GetxController implements GetxService {
       _categoryStoreList!.addAll(categoryStore.stores!);
       _restPageSize = categoryStore.totalSize;
       _isLoading = false;
+      if (offset == 1 && categoryID != null) {
+        _subCategoryStoreCache[categoryID] = List.from(_categoryStoreList!);
+      }
     }
     update();
   }

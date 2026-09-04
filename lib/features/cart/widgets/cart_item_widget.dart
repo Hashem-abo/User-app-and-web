@@ -18,9 +18,7 @@ import 'package:sixam_mart/common/widgets/quantity_button.dart';
 import 'package:sixam_mart/features/cart/widgets/show_alternatives_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/cart/screens/similar_items_screen.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
@@ -145,7 +143,12 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                 ),
                 SlidableAction(
                   onPressed: (context) {
-                    Get.find<CartController>().removeFromCart(widget.cartIndex, item: widget.cart.item);
+                    Get.find<CartController>().removeFromCart(
+                      widget.cartIndex,
+                      item: widget.cart.item,
+                      cartId: widget.cart.id,
+                      cartModel: widget.cart,
+                    );
                   },
                   backgroundColor: const Color(0xFFE53935),
                   borderRadius: BorderRadius.horizontal(
@@ -214,7 +217,12 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                           ),
                           InkWell(
                             onTap: () {
-                              Get.find<CartController>().removeFromCart(widget.cartIndex, item: widget.cart.item);
+                              Get.find<CartController>().removeFromCart(
+                                widget.cartIndex,
+                                item: widget.cart.item,
+                                cartId: widget.cart.id,
+                                cartModel: widget.cart,
+                              );
                             },
                             child: Row(children: [
                               Icon(CupertinoIcons.delete, color: Theme.of(context).colorScheme.error, size: 14),
@@ -360,11 +368,29 @@ class _CartItemWidgetState extends State<CartItemWidget> {
 
                         widget.isAvailable ? Row(children: [
                           QuantityButton(
-                            onTap: cartController.isLoading ? null : () {
-                              if (widget.cart.quantity! > 1) {
-                                Get.find<CartController>().setQuantity(false, widget.cartIndex, widget.cart.stock, widget.cart.quantityLimit);
-                              }else {
-                                Get.find<CartController>().removeFromCart(widget.cartIndex, item: widget.cart.item);
+                            onTap: () {
+                              int liveIndex = cartController.cartList.indexOf(widget.cart);
+                              if (liveIndex == -1 && widget.cart.id != null) {
+                                liveIndex = cartController.cartList.indexWhere((c) => c.id == widget.cart.id);
+                              }
+                              if (liveIndex == -1) liveIndex = widget.cartIndex;
+                              if (liveIndex < 0 || liveIndex >= cartController.cartList.length) return;
+
+                              if (cartController.cartList[liveIndex].quantity! > 1) {
+                                cartController.setQuantity(
+                                  false, liveIndex,
+                                  cartController.cartList[liveIndex].stock,
+                                  cartController.cartList[liveIndex].quantityLimit,
+                                  cartId: cartController.cartList[liveIndex].id,
+                                  cartModel: cartController.cartList[liveIndex],
+                                );
+                              } else {
+                                cartController.removeFromCart(
+                                  liveIndex,
+                                  item: cartController.cartList[liveIndex].item,
+                                  cartId: cartController.cartList[liveIndex].id,
+                                  cartModel: cartController.cartList[liveIndex],
+                                );
                               }
                             },
                             isIncrement: false,
@@ -377,12 +403,27 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                           ),
 
                           QuantityButton(
-                            onTap: cartController.isLoading ? null : () {
-                              Get.find<CartController>().forcefullySetModule(Get.find<CartController>().cartList[0].item!.moduleId!);
-                              Get.find<CartController>().setQuantity(true, widget.cartIndex, widget.cart.stock, widget.cart.quantityLimit);
+                            onTap: () {
+                              int liveIndex = cartController.cartList.indexOf(widget.cart);
+                              if (liveIndex == -1 && widget.cart.id != null) {
+                                liveIndex = cartController.cartList.indexWhere((c) => c.id == widget.cart.id);
+                              }
+                              if (liveIndex == -1) liveIndex = widget.cartIndex;
+                              if (liveIndex < 0 || liveIndex >= cartController.cartList.length) return;
+
+                              int? modId = widget.cart.item?.moduleId ?? (cartController.cartList.isNotEmpty ? cartController.cartList[0].item?.moduleId : null);
+                              if (modId != null) {
+                                cartController.forcefullySetModule(modId);
+                              }
+                              cartController.setQuantity(
+                                true, liveIndex,
+                                cartController.cartList[liveIndex].stock,
+                                cartController.cartList[liveIndex].quantityLimit,
+                                cartId: cartController.cartList[liveIndex].id,
+                                cartModel: cartController.cartList[liveIndex],
+                              );
                             },
                             isIncrement: true,
-                            color: cartController.isLoading ? Theme.of(context).disabledColor : null,
                           ),
                         ]) : Wrap(
                           spacing: Dimensions.paddingSizeExtraSmall,
@@ -392,7 +433,12 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                           children: [
                             InkWell(
                               onTap: () {
-                                Get.find<CartController>().removeFromCart(widget.cartIndex, item: widget.cart.item);
+                                cartController.removeFromCart(
+                                  widget.cartIndex,
+                                  item: widget.cart.item,
+                                  cartId: widget.cart.id,
+                                  cartModel: widget.cart,
+                                );
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: 5),

@@ -88,13 +88,34 @@ class FlashSaleController extends GetxController implements GetxService {
     update();
   }
 
-  void setEmptyFlashSale({bool fromModule = false}) {
+  final Map<int, FlashSaleModel> _moduleFlashSaleModel = {};
+
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleFlashSaleModel.containsKey(moduleId)) {
+      _flashSaleModel = _moduleFlashSaleModel[moduleId];
+    } else {
+      _flashSaleModel = null;
+    }
+    update();
+  }
+
+  void setEmptyFlashSale({bool fromModule = false, bool clearAll = false}) {
     if(fromModule) {
       _flashSaleModel = null;
+      if (clearAll) {
+        _moduleFlashSaleModel.clear();
+      }
+      update();
     }
   }
 
   Future<void> getFlashSale(bool reload, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(!reload && !fromRecall && currentModuleId != null && _moduleFlashSaleModel.containsKey(currentModuleId)) {
+      _flashSaleModel = _moduleFlashSaleModel[currentModuleId];
+      if(notify) update();
+      return;
+    }
     if(_flashSaleModel == null || reload && !fromRecall) {
       _flashSaleModel = null;
     }
@@ -118,6 +139,10 @@ class FlashSaleController extends GetxController implements GetxService {
   void _prepareFlashModel(FlashSaleModel? flashSaleModel) {
     if (flashSaleModel != null) {
       _flashSaleModel = flashSaleModel;
+      int? currentModuleId = Get.find<SplashController>().module?.id;
+      if (currentModuleId != null) {
+        _moduleFlashSaleModel[currentModuleId] = flashSaleModel;
+      }
       if(_flashSaleModel?.endDate != null) {
         DateTime endTime = DateFormat('yyyy-MM-ddTHH:mm:ss.SSS').parse(_flashSaleModel!.endDate!, true).toLocal();
         _duration = endTime.difference(DateTime.now());

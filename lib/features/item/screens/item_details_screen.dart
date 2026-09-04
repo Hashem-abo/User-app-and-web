@@ -1336,7 +1336,8 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                              if(_localQuantity > 1) {
                                setState(() => _localQuantity--);
                              } else if(_localQuantity == 1 && cartIndex != -1) {
-                               cartController.removeFromCart(cartIndex);
+                               var cartItem = (cartIndex >= 0 && cartIndex < cartController.cartList.length) ? cartController.cartList[cartIndex] : null;
+                               cartController.removeFromCart(cartIndex, cartId: cartItem?.id, cartModel: cartItem);
                                setState(() => _isEditing = false);
                              }
                           },
@@ -1419,7 +1420,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                               List<int?> listOfAddonQty = _getSelectedAddonQtnList(addOnIdList: addOnIdList);
 
                               OnlineCart onlineCart = OnlineCart(
-                                cartId: (cartIndex != -1) ? cartController.cartList[cartIndex].id : null,
+                                cartId: (cartIndex >= 0 && cartIndex < cartController.cartList.length) ? cartController.cartList[cartIndex].id : null,
                                 itemId: item.id,
                                 itemCampaignId: widget.isCampaign ? item.id : null,
                                 price: priceWithAddons.toString(),
@@ -1689,15 +1690,19 @@ class QuantityButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: cartController.isLoading ? null : () {
+      onTap: () {
         if(isExistInCart) {
-          if (!isIncrement && quantity! > 1) {
-            Get.find<CartController>().setQuantity(false, cartIndex, stock, quantityLimit);
-          } else if (isIncrement && quantity! > 0) {
-            if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
-              Get.find<CartController>().setQuantity(true, cartIndex, stock, quantityLimit);
-            }else {
-              showCustomSnackBar('out_of_stock'.tr);
+          int resolvedIndex = (cartIndex >= 0 && cartIndex < cartController.cartList.length) ? cartIndex : -1;
+          if (resolvedIndex != -1) {
+            var cartItem = cartController.cartList[resolvedIndex];
+            if (!isIncrement && quantity! > 1) {
+              cartController.setQuantity(false, resolvedIndex, stock, quantityLimit, cartId: cartItem.id, cartModel: cartItem);
+            } else if (isIncrement && quantity! > 0) {
+              if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
+                cartController.setQuantity(true, resolvedIndex, stock, quantityLimit, cartId: cartItem.id, cartModel: cartItem);
+              }else {
+                showCustomSnackBar('out_of_stock'.tr);
+              }
             }
           }
         } else {

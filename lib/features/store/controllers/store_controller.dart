@@ -80,7 +80,39 @@ class StoreController extends GetxController implements GetxService {
   Store? _store;
   Store? get store => _store;
 
-  void clearStoreLists() {
+  final Map<int, List<Store>> _modulePopularStoreList = {};
+  final Map<int, List<Store>> _moduleLatestStoreList = {};
+  final Map<int, List<Store>> _moduleFeaturedStoreList = {};
+  final Map<int, List<Store>> _moduleTopOfferStoreList = {};
+  final Map<int, StoreModel> _moduleStoreModel = {};
+
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _modulePopularStoreList.containsKey(moduleId)) {
+      _popularStoreList = _modulePopularStoreList[moduleId];
+      _latestStoreList = _moduleLatestStoreList[moduleId];
+      _featuredStoreList = _moduleFeaturedStoreList[moduleId];
+      _topOfferStoreList = _moduleTopOfferStoreList[moduleId];
+      _storeModel = _moduleStoreModel[moduleId];
+      _isPopularStoreListLoaded = _popularStoreList != null;
+      _isLatestStoreListLoaded = _latestStoreList != null;
+      _isTopOfferStoreListLoaded = _topOfferStoreList != null;
+    } else {
+      _popularStoreList = null;
+      _latestStoreList = null;
+      _featuredStoreList = null;
+      _topOfferStoreList = null;
+      _visitAgainStoreList = null;
+      _recommendedStoreList = null;
+      _storeModel = null;
+      _isPopularStoreListLoaded = false;
+      _isLatestStoreListLoaded = false;
+      _isTopOfferStoreListLoaded = false;
+      _isRecommendedStoreListLoaded = false;
+    }
+    update();
+  }
+
+  void clearStoreLists({bool clearAllModuleCache = false}) {
     _popularStoreList = null;
     _latestStoreList = null;
     _topOfferStoreList = null;
@@ -92,6 +124,13 @@ class StoreController extends GetxController implements GetxService {
     _isLatestStoreListLoaded = false;
     _isTopOfferStoreListLoaded = false;
     _isRecommendedStoreListLoaded = false;
+    if (clearAllModuleCache) {
+      _modulePopularStoreList.clear();
+      _moduleLatestStoreList.clear();
+      _moduleFeaturedStoreList.clear();
+      _moduleTopOfferStoreList.clear();
+      _moduleStoreModel.clear();
+    }
     update();
   }
 
@@ -180,10 +219,15 @@ class StoreController extends GetxController implements GetxService {
   String get topOfferSort => _topOfferSort;
 
   bool _isPopularStoreListLoaded = false;
+  bool get isPopularStoreListLoaded => _isPopularStoreListLoaded;
   bool _isLatestStoreListLoaded = false;
+  bool get isLatestStoreListLoaded => _isLatestStoreListLoaded;
   bool _isTopOfferStoreListLoaded = false;
+  bool get isTopOfferStoreListLoaded => _isTopOfferStoreListLoaded;
   bool _isRecommendedStoreListLoaded = false;
-  final bool _isFeaturedStoreListLoaded = false;
+  bool get isRecommendedStoreListLoaded => _isRecommendedStoreListLoaded;
+  bool _isFeaturedStoreListLoaded = false;
+  bool get isFeaturedStoreListLoaded => _isFeaturedStoreListLoaded;
 
   bool _isAvailableItems = false;
   bool get isAvailableItems => _isAvailableItems;
@@ -309,6 +353,10 @@ class StoreController extends GetxController implements GetxService {
     if (storeModel != null) {
       if (offset == 1) {
         _storeModel = storeModel;
+        int? currentModuleId = Get.find<SplashController>().module?.id;
+        if (currentModuleId != null) {
+          _moduleStoreModel[currentModuleId] = storeModel;
+        }
       }else {
         _storeModel!.totalSize = storeModel.totalSize;
         _storeModel!.offset = storeModel.offset;
@@ -334,7 +382,10 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getPopularStoreList(bool reload, String type, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
-    if(!reload && !fromRecall && _isPopularStoreListLoaded && _popularStoreList != null && _popularStoreList!.isNotEmpty) {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(!reload && !fromRecall && currentModuleId != null && _modulePopularStoreList.containsKey(currentModuleId) && _modulePopularStoreList[currentModuleId]!.isNotEmpty) {
+      _popularStoreList = _modulePopularStoreList[currentModuleId];
+      _isPopularStoreListLoaded = true;
       if(notify) update();
       return;
     }
@@ -352,6 +403,9 @@ class StoreController extends GetxController implements GetxService {
         if (popularStoreList != null) {
           _popularStoreList = [];
           _popularStoreList!.addAll(popularStoreList);
+          if (currentModuleId != null) {
+            _modulePopularStoreList[currentModuleId] = _popularStoreList!;
+          }
         }
         update();
         getPopularStoreList(false, type, notify, dataSource: DataSourceEnum.client, fromRecall: true);
@@ -361,6 +415,9 @@ class StoreController extends GetxController implements GetxService {
           _popularStoreList = [];
           _popularStoreList!.addAll(popularStoreList);
           _isPopularStoreListLoaded = true;
+          if (currentModuleId != null) {
+            _modulePopularStoreList[currentModuleId] = _popularStoreList!;
+          }
         }
         update();
       }
@@ -369,7 +426,10 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getLatestStoreList(bool reload, String type, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
-    if(!reload && !fromRecall && _isLatestStoreListLoaded && _latestStoreList != null && _latestStoreList!.isNotEmpty) {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(!reload && !fromRecall && currentModuleId != null && _moduleLatestStoreList.containsKey(currentModuleId) && _moduleLatestStoreList[currentModuleId]!.isNotEmpty) {
+      _latestStoreList = _moduleLatestStoreList[currentModuleId];
+      _isLatestStoreListLoaded = true;
       if(notify) update();
       return;
     }
@@ -387,6 +447,9 @@ class StoreController extends GetxController implements GetxService {
         if (latestStoreList != null) {
           _latestStoreList = [];
           _latestStoreList!.addAll(latestStoreList);
+          if (currentModuleId != null) {
+            _moduleLatestStoreList[currentModuleId] = _latestStoreList!;
+          }
         }
         update();
         getLatestStoreList(false, type, notify, fromRecall: true, dataSource: DataSourceEnum.client);
@@ -396,6 +459,9 @@ class StoreController extends GetxController implements GetxService {
           _latestStoreList = [];
           _latestStoreList!.addAll(latestStoreList);
           _isLatestStoreListLoaded = true;
+          if (currentModuleId != null) {
+            _moduleLatestStoreList[currentModuleId] = _latestStoreList!;
+          }
         }
         update();
       }
@@ -403,7 +469,10 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getTopOfferStoreList(bool reload, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
-    if(!reload && !fromRecall && _isTopOfferStoreListLoaded && _topOfferStoreList != null && _topOfferStoreList!.isNotEmpty) {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(!reload && !fromRecall && currentModuleId != null && _moduleTopOfferStoreList.containsKey(currentModuleId) && _moduleTopOfferStoreList[currentModuleId]!.isNotEmpty) {
+      _topOfferStoreList = _moduleTopOfferStoreList[currentModuleId];
+      _isTopOfferStoreListLoaded = true;
       if(notify) update();
       return;
     }
@@ -420,6 +489,9 @@ class StoreController extends GetxController implements GetxService {
         if (latestStoreList != null) {
           _topOfferStoreList = [];
           _topOfferStoreList!.addAll(latestStoreList);
+          if (currentModuleId != null) {
+            _moduleTopOfferStoreList[currentModuleId] = _topOfferStoreList!;
+          }
         }
         update();
         getTopOfferStoreList(false, notify, dataSource: DataSourceEnum.client, fromRecall: true);
@@ -429,6 +501,9 @@ class StoreController extends GetxController implements GetxService {
           _topOfferStoreList = [];
           _topOfferStoreList!.addAll(latestStoreList);
           _isTopOfferStoreListLoaded = true;
+          if (currentModuleId != null) {
+            _moduleTopOfferStoreList[currentModuleId] = _topOfferStoreList!;
+          }
         }
         update();
       }
@@ -446,6 +521,13 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getFeaturedStoreList({DataSourceEnum dataSource = DataSourceEnum.local}) async {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if (dataSource == DataSourceEnum.local && currentModuleId != null && _moduleFeaturedStoreList.containsKey(currentModuleId) && _moduleFeaturedStoreList[currentModuleId]!.isNotEmpty) {
+      _featuredStoreList = _moduleFeaturedStoreList[currentModuleId];
+      update();
+      getFeaturedStoreList(dataSource: DataSourceEnum.client);
+      return;
+    }
     List<Store>? stores;
     if(dataSource == DataSourceEnum.local) {
       stores = await storeServiceInterface.getFeaturedStoreList(source: dataSource);
@@ -471,6 +553,10 @@ class StoreController extends GetxController implements GetxService {
             }
           }
         }
+      }
+      int? currentModuleId = Get.find<SplashController>().module?.id;
+      if (currentModuleId != null) {
+        _moduleFeaturedStoreList[currentModuleId] = _featuredStoreList!;
       }
     }
     update();

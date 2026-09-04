@@ -12,6 +12,8 @@ import 'package:sixam_mart/features/home/controllers/store_corner_controller.dar
 import 'package:sixam_mart/features/item/controllers/campaign_controller.dart';
 import 'package:sixam_mart/features/home/controllers/super_banner_controller.dart';
 
+import 'package:sixam_mart/api/data_module_manager.dart';
+
 class HomeController extends GetxController implements GetxService {
   final HomeServiceInterface homeServiceInterface;
   HomeController({required this.homeServiceInterface});
@@ -26,6 +28,7 @@ class HomeController extends GetxController implements GetxService {
   bool get showFavButton => _showFavButton;
 
   final Map<int, double> _moduleScrollOffsets = {};
+  final Map<int, HomepageModel> _moduleHomepageCache = {};
   
   void saveScrollOffset(int moduleId, double offset) {
     _moduleScrollOffsets[moduleId] = offset;
@@ -33,6 +36,16 @@ class HomeController extends GetxController implements GetxService {
   
   double getScrollOffset(int moduleId) {
     return _moduleScrollOffsets[moduleId] ?? 0.0;
+  }
+
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleHomepageCache.containsKey(moduleId)) {
+      _populateHomepageData(_moduleHomepageCache[moduleId]!);
+    }
+  }
+
+  void clearHomepageCache() {
+    _moduleHomepageCache.clear();
   }
 
   Future<void> getCashBackOfferList() async {
@@ -76,14 +89,38 @@ class HomeController extends GetxController implements GetxService {
   }
 
   Future<void> getHomepageData() async {
+    int? targetModuleId = Get.find<SplashController>().module?.id;
+    int generation = DataModuleManager().nextGeneration('home_module');
+
+    // 1. Instant UI from in-memory cache if available (0ms transition)
+    if (targetModuleId != null && _moduleHomepageCache.containsKey(targetModuleId)) {
+      _populateHomepageData(_moduleHomepageCache[targetModuleId]!);
+    }
+
+    // 2. Local storage / DB cache
     HomepageModel? cachedHomepageModel = await homeServiceInterface.getHomepageData(source: DataSourceEnum.local);
+    if (!DataModuleManager().isGenerationActive('home_module', generation) ||
+        Get.find<SplashController>().module?.id != targetModuleId) {
+      return;
+    }
     if(cachedHomepageModel != null) {
+      if (targetModuleId != null) {
+        _moduleHomepageCache[targetModuleId] = cachedHomepageModel;
+      }
       _populateHomepageData(cachedHomepageModel);
     }
 
+    // 3. Network fresh fetch
     HomepageModel? freshHomepageModel = await homeServiceInterface.getHomepageData(source: DataSourceEnum.client);
     if(freshHomepageModel != null) {
-      _populateHomepageData(freshHomepageModel);
+      if (targetModuleId != null) {
+        _moduleHomepageCache[targetModuleId] = freshHomepageModel;
+      }
+      // Only populate active UI if user is still on targetModule and generation is active
+      if (DataModuleManager().isGenerationActive('home_module', generation) &&
+          Get.find<SplashController>().module?.id == targetModuleId) {
+        _populateHomepageData(freshHomepageModel);
+      }
     }
   }
 

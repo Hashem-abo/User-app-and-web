@@ -80,6 +80,9 @@ class ItemController extends GetxController implements GetxService {
   
   List<int?> _addOnQtyList = [];
   List<int?> get addOnQtyList => _addOnQtyList;
+
+  final Set<int> _directAddingItemIds = {};
+  bool isDirectAdding(int? itemId) => itemId != null && _directAddingItemIds.contains(itemId);
   
   final String _popularType = 'all';
   String get popularType => _popularType;
@@ -459,7 +462,34 @@ class ItemController extends GetxController implements GetxService {
     }
   }
 
-  void clearItemLists() {
+  final Map<int, BasicMedicineModel> _moduleBasicMedicineModel = {};
+  final Map<int, List<CommonConditionModel>> _moduleCommonConditions = {};
+  final Map<int, ItemModel> _moduleFeaturedCategoriesItem = {};
+
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleBasicMedicineModel.containsKey(moduleId)) {
+      _basicMedicineModel = _moduleBasicMedicineModel[moduleId];
+      _commonConditions = _moduleCommonConditions[moduleId];
+      _featuredCategoriesItem = _moduleFeaturedCategoriesItem[moduleId];
+    } else {
+      _basicMedicineModel = null;
+      _commonConditions = null;
+      _conditionWiseProduct = null;
+      _featuredCategoriesItem = null;
+    }
+    _popularItemList = null;
+    _reviewedItemList = null;
+    _discountedItemList = null;
+    _recommendedItemList = null;
+    _nationalAggregatedItemList = null;
+    _reviewedCategoriesList = null;
+    _isPopularItemListLoaded = false;
+    _isReviewedItemListLoaded = false;
+    _isDiscountedItemListLoaded = false;
+    update();
+  }
+
+  void clearItemLists({bool clearAllModuleCache = false}) {
     _popularItemList = null;
     _nationalAggregatedItemList = null;
     _reviewedItemList = null;
@@ -470,11 +500,21 @@ class ItemController extends GetxController implements GetxService {
     _similarProductList = null;
     _sameTypeProductList = null;
     _storeProductList = null;
+    _basicMedicineModel = null;
+    _commonConditions = null;
+    _conditionWiseProduct = null;
+    _reviewedCategoriesList = null;
     _isPopularItemListLoaded = false;
     _isReviewedItemListLoaded = false;
     _isDiscountedItemListLoaded = false;
     _currentAggregatedModuleIndex = 0;
     _aggregatedModuleIds = [];
+
+    if (clearAllModuleCache) {
+      _moduleBasicMedicineModel.clear();
+      _moduleCommonConditions.clear();
+      _moduleFeaturedCategoriesItem.clear();
+    }
 
     // Production-ready: Cancel active sockets and clear isolated tab states
     for (var state in _nationalTabStates.values) {
@@ -1213,6 +1253,12 @@ class ItemController extends GetxController implements GetxService {
   }
 
   Future<void> getFeaturedCategoriesItemList(bool reload, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(!reload && !fromRecall && currentModuleId != null && _moduleFeaturedCategoriesItem.containsKey(currentModuleId)) {
+      _featuredCategoriesItem = _moduleFeaturedCategoriesItem[currentModuleId];
+      if(notify) update();
+      return;
+    }
     if(reload) {
       _featuredCategoriesItem = null;
     }
@@ -1222,10 +1268,16 @@ class ItemController extends GetxController implements GetxService {
     if(_featuredCategoriesItem == null || reload || fromRecall) {
       if(dataSource == DataSourceEnum.local) {
         _featuredCategoriesItem = await itemServiceInterface.getFeaturedCategoriesItemList(dataSource);
+        if (currentModuleId != null && _featuredCategoriesItem != null) {
+          _moduleFeaturedCategoriesItem[currentModuleId] = _featuredCategoriesItem!;
+        }
         update();
         getFeaturedCategoriesItemList(false, notify, dataSource: DataSourceEnum.client, fromRecall: true);
       } else {
         _featuredCategoriesItem = await itemServiceInterface.getFeaturedCategoriesItemList(dataSource);
+        if (currentModuleId != null && _featuredCategoriesItem != null) {
+          _moduleFeaturedCategoriesItem[currentModuleId] = _featuredCategoriesItem!;
+        }
         update();
       }
     }
@@ -1314,6 +1366,12 @@ class ItemController extends GetxController implements GetxService {
   }
 
   Future<void> getBasicMedicine(bool reload, bool notify, {DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false}) async {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(!reload && !fromRecall && currentModuleId != null && _moduleBasicMedicineModel.containsKey(currentModuleId)) {
+      _basicMedicineModel = _moduleBasicMedicineModel[currentModuleId];
+      if(notify) update();
+      return;
+    }
     if(reload) {
       _basicMedicineModel = null;
     }
@@ -1323,11 +1381,17 @@ class ItemController extends GetxController implements GetxService {
     if(_basicMedicineModel == null || reload || fromRecall) {
       if(dataSource == DataSourceEnum.local) {
         _basicMedicineModel = await itemServiceInterface.getBasicMedicine(DataSourceEnum.local);
+        if (currentModuleId != null && _basicMedicineModel != null) {
+          _moduleBasicMedicineModel[currentModuleId] = _basicMedicineModel!;
+        }
         _isLoading = false;
         update();
         getBasicMedicine(false, notify, fromRecall: true, dataSource: DataSourceEnum.client);
       } else {
         _basicMedicineModel = await itemServiceInterface.getBasicMedicine(DataSourceEnum.client);
+        if (currentModuleId != null && _basicMedicineModel != null) {
+          _moduleBasicMedicineModel[currentModuleId] = _basicMedicineModel!;
+        }
         _isLoading = false;
         update();
       }
@@ -1349,6 +1413,12 @@ class ItemController extends GetxController implements GetxService {
   }
 
   Future<void> getCommonConditions(bool notify) async {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if(currentModuleId != null && _moduleCommonConditions.containsKey(currentModuleId) && _moduleCommonConditions[currentModuleId]!.isNotEmpty) {
+      _commonConditions = _moduleCommonConditions[currentModuleId];
+      if(notify) update();
+      return;
+    }
     _commonConditions = [];
     if(notify) {
       update();
@@ -1356,6 +1426,9 @@ class ItemController extends GetxController implements GetxService {
     List<CommonConditionModel>? conditions = await itemServiceInterface.getCommonConditions();
     if (conditions != null) {
       _commonConditions!.addAll(conditions);
+      if (currentModuleId != null) {
+        _moduleCommonConditions[currentModuleId] = _commonConditions!;
+      }
       _isLoading = false;
     }
     update();
@@ -1398,8 +1471,14 @@ class ItemController extends GetxController implements GetxService {
             Get.find<StoreController>().getStoreDetails(Store(id: _item!.storeId), false).then((store) {
               if (store != null) {
                 _item!.storeDetails = {
+                  ...?_item!.storeDetails,
+                  'id': store.id,
+                  'name': store.name,
                   'logo_full_url': store.logoFullUrl,
                   'total_items': store.itemCount,
+                  'active': store.active,
+                  'open': store.open,
+                  'zone_id': store.zoneId,
                 };
                 _item!.storeName = store.name;
                 update();
@@ -1434,8 +1513,14 @@ class ItemController extends GetxController implements GetxService {
           Get.find<StoreController>().getStoreDetails(Store(id: _item!.storeId), false).then((store) {
             if (store != null) {
               _item!.storeDetails = {
+                ...?_item!.storeDetails,
+                'id': store.id,
+                'name': store.name,
                 'logo_full_url': store.logoFullUrl,
                 'total_items': store.itemCount,
+                'active': store.active,
+                'open': store.open,
+                'zone_id': store.zoneId,
               };
               _item!.storeName = store.name;
               update();
@@ -1679,7 +1764,14 @@ class ItemController extends GetxController implements GetxService {
   }
 
   void itemDirectlyAddToCart(Item? item, BuildContext context, {bool inStore = false, bool isCampaign = false}) {
-    getItemDetails(itemId: item!.id!, item: item, isCampaign: isCampaign, fetchSimilarItems: false).then((value) {
+    if (item == null || item.id == null) return;
+    if (_directAddingItemIds.contains(item.id) || Get.find<CartController>().isItemAdding(item.id)) {
+      return;
+    }
+    _directAddingItemIds.add(item.id!);
+    update();
+
+    getItemDetails(itemId: item.id!, item: item, isCampaign: isCampaign, fetchSimilarItems: false).then((value) {
       bool hasVariations = (_item?.choiceOptions != null && _item!.choiceOptions!.isNotEmpty)
           || (_item?.variations != null && _item!.variations!.isNotEmpty)
           || (_item?.foodVariations != null && _item!.foodVariations!.isNotEmpty);
@@ -1747,6 +1839,9 @@ class ItemController extends GetxController implements GetxService {
           Dialog(child: ItemBottomSheet(itemId: _item!.id!, inStorePage: inStore, isCampaign: isCampaign, item: _item)),
         );
       }
+    }).whenComplete(() {
+      _directAddingItemIds.remove(item.id);
+      update();
     });
   }
   

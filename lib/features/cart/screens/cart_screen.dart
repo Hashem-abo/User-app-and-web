@@ -720,11 +720,12 @@ class _CartScreenState extends State<CartScreen> {
                                                   itemCount: groupedCart[selectedStoreId]!.length,
                                                   itemBuilder: (context, i) {
                                                     int index = groupedCart[selectedStoreId]![i];
+                                                    if (index < 0 || index >= cartController.cartList.length) return const SizedBox();
                                                     return CartItemWidget(
                                                       cart: cartController.cartList[index],
                                                       cartIndex: index,
-                                                      addOns: cartController.addOnsList[index],
-                                                      isAvailable: cartController.availableList[index],
+                                                      addOns: index < cartController.addOnsList.length ? cartController.addOnsList[index] : [],
+                                                      isAvailable: index < cartController.availableList.length ? cartController.availableList[index] : true,
                                                       showDivider: i != groupedCart[selectedStoreId]!.length - 1,
                                                     );
                                                   },
@@ -814,11 +815,12 @@ class _CartScreenState extends State<CartScreen> {
                                                           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                                                           itemBuilder: (context, i) {
                                                             int index = indices[i];
+                                                            if (index < 0 || index >= cartController.cartList.length) return const SizedBox();
                                                             return CartItemWidget(
                                                               cart: cartController.cartList[index],
                                                               cartIndex: index,
-                                                              addOns: cartController.addOnsList[index],
-                                                              isAvailable: cartController.availableList[index],
+                                                              addOns: index < cartController.addOnsList.length ? cartController.addOnsList[index] : [],
+                                                              isAvailable: index < cartController.availableList.length ? cartController.availableList[index] : true,
                                                               showDivider: i != indices.length - 1,
                                                             );
                                                           },
@@ -1308,7 +1310,7 @@ class CheckoutButton extends StatelessWidget {
                     buttonText: 'proceed_to_checkout'.tr,
                     radius: 15,
                     height: 55,
-                    onPressed: allUnavailable ? null : () {
+                    onPressed: allUnavailable ? null : () async {
                       Get.find<CheckoutController>().updateFirstTime();
                       Get.find<CheckoutController>().updateFirstTimeCodActive();
 
@@ -1319,7 +1321,7 @@ class CheckoutButton extends StatelessWidget {
                             return ConfirmationDialog(
                               icon: Images.warning,
                               description: 'some_items_unavailable_proceed_anyway'.tr,
-                              onYesPressed: () {
+                              onYesPressed: () async {
                                 Get.back();
                                 List<int> toRemove = [];
                                 for(int i=0; i<cartController.cartList.length; i++) {
@@ -1353,6 +1355,8 @@ class CheckoutButton extends StatelessWidget {
                                 }
                                 Get.find<CouponController>().removeCouponData(false);
 
+                                await cartController.flushPendingQuantityUpdates();
+
                                 if (isFoodOrGrocery && selectedStoreId != null) {
                                   List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
                                   Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
@@ -1384,6 +1388,8 @@ class CheckoutButton extends StatelessWidget {
                         }
                         Get.find<CouponController>().removeCouponData(false);
                         
+                        await cartController.flushPendingQuantityUpdates();
+
                         if (isFoodOrGrocery && selectedStoreId != null) {
                           List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
                           

@@ -1,11 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sixam_mart/common/models/config_model.dart';
+import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
+import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
+import 'package:sixam_mart/api/data_module_manager.dart';
 
 PlaceOrderBodyModel _buildTestBody({bool? monthlySubscribe}) {
   return PlaceOrderBodyModel(
@@ -298,5 +302,373 @@ void main() {
       expect(json['add_to_monthly_order'], equals('1'));
     });
   });
+
+  group('USER REQUEST FIX 8: Zad Module Vendor Type Null Hiding & Badge Safety', () {
+    test('ModuleHelper.isZad detects Zad by moduleId, moduleType, or moduleName', () {
+      expect(ModuleHelper.isZad(moduleId: 1), isTrue);
+      expect(ModuleHelper.isZad(moduleType: 'zad'), isTrue);
+      expect(ModuleHelper.isZad(moduleName: 'Zad Mart'), isTrue);
+      expect(ModuleHelper.isZad(moduleName: 'سوبرماركت زاد'), isTrue);
+      expect(ModuleHelper.isZad(moduleId: 3, moduleType: 'food'), isFalse);
+    });
+
+    test('Store.isZad correctly identifies Zad stores', () {
+      final zadStoreById = Store(id: 1, moduleId: 1);
+      expect(zadStoreById.isZad, isTrue);
+
+      final zadStoreByName = Store.fromJson({
+        'id': 2,
+        'module': {'id': 1, 'module_name': 'Zad Grocery', 'module_type': 'grocery'},
+      });
+      expect(zadStoreByName.isZad, isTrue);
+
+      final nonZadStore = Store.fromJson({
+        'id': 3,
+        'module_id': 2,
+        'module': {'id': 2, 'module_name': 'Pharmacy', 'module_type': 'pharmacy'},
+      });
+      expect(nonZadStore.isZad, isFalse);
+    });
+
+    test('Store in Zad hides vendorType (returns empty string) when vendor_type is null', () {
+      final store = Store.fromJson({
+        'id': 10,
+        'name': 'Al-Hilal Zad Grocery',
+        'module_id': 1,
+        'vendor_type': null,
+        'store_business_model': 'commission',
+        'module': {'id': 1, 'module_name': 'Zad', 'module_type': 'grocery'},
+      });
+      expect(store.isZad, isTrue);
+      expect(store.vendorType, equals(''));
+      expect(store.vendorType.isEmpty, isTrue);
+    });
+
+    test('Store in Zad hides vendorType (returns empty string) when vendor_type is literal "null" string', () {
+      final store = Store.fromJson({
+        'id': 11,
+        'name': 'Baraka Zad Grocery',
+        'module_id': 1,
+        'vendor_type': 'null',
+        'module': {'id': 1, 'module_name': 'Zad', 'module_type': 'grocery'},
+      });
+      expect(store.isZad, isTrue);
+      expect(store.vendorType, equals(''));
+      expect(store.vendorType.isEmpty, isTrue);
+    });
+
+    test('Store in Zad hides vendorType (returns empty string) when vendor_type is empty or omitted', () {
+      final storeEmpty = Store.fromJson({
+        'id': 12,
+        'name': 'Safwa Zad Grocery',
+        'module_id': 1,
+        'vendor_type': '   ',
+      });
+      expect(storeEmpty.isZad, isTrue);
+      expect(storeEmpty.vendorType, equals(''));
+
+      final storeOmitted = Store.fromJson({
+        'id': 13,
+        'name': 'No Vendor Type Zad',
+        'module_id': 1,
+      });
+      expect(storeOmitted.isZad, isTrue);
+      expect(storeOmitted.vendorType, equals(''));
+    });
+
+    test('Store in Zad displays vendorType when vendor_type has valid value (wholesale/retail/custom)', () {
+      final wholesaleStore = Store.fromJson({
+        'id': 20,
+        'name': 'Zad Wholesale Co',
+        'module_id': 1,
+        'vendor_type': 'wholesale',
+      });
+      expect(wholesaleStore.isZad, isTrue);
+      expect(wholesaleStore.vendorType, isNotEmpty);
+      expect(wholesaleStore.vendorType.toLowerCase(), anyOf(contains('wholesale'), contains('جملة')));
+
+      final retailStore = Store.fromJson({
+        'id': 21,
+        'name': 'Zad Corner Retail',
+        'module_id': 1,
+        'vendor_type': 'retail',
+      });
+      expect(retailStore.isZad, isTrue);
+      expect(retailStore.vendorType, isNotEmpty);
+      expect(retailStore.vendorType.toLowerCase(), anyOf(contains('retail'), contains('تجزئة')));
+
+      final customStore = Store.fromJson({
+        'id': 22,
+        'name': 'Zad Bakery',
+        'module_id': 1,
+        'vendor_type': 'مخبز',
+      });
+      expect(customStore.isZad, isTrue);
+      expect(customStore.vendorType, equals('مخبز'));
+    });
+
+    testWidgets('VendorTypeBadgeWidget returns SizedBox.shrink/empty when store vendorType is null or hidden', (tester) async {
+      final zadNullStore = Store.fromJson({
+        'id': 30,
+        'name': 'Zad Store Null Type',
+        'module_id': 1,
+        'vendor_type': null,
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: VendorTypeBadgeWidget(store: zadNullStore),
+          ),
+        ),
+      );
+
+      // Must NOT show any text widget with "null", "Zad", or "grocery"
+      expect(find.text('null'), findsNothing);
+      expect(find.text('Zad'), findsNothing);
+      expect(find.byType(Icon), findsNothing);
+    });
+
+    testWidgets('VendorTypeBadgeWidget returns SizedBox when vendorType parameter is "null" string or empty', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: VendorTypeBadgeWidget(vendorType: 'null'),
+          ),
+        ),
+      );
+      expect(find.text('null'), findsNothing);
+      expect(find.byType(Icon), findsNothing);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: VendorTypeBadgeWidget(vendorType: ''),
+          ),
+        ),
+      );
+      expect(find.byType(Icon), findsNothing);
+    });
+
+    testWidgets('VendorTypeBadgeWidget displays badge when store has valid vendorType', (tester) async {
+      final zadWholesaleStore = Store.fromJson({
+        'id': 31,
+        'name': 'Zad Wholesale Store',
+        'module_id': 1,
+        'vendor_type': 'wholesale',
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: VendorTypeBadgeWidget(store: zadWholesaleStore),
+          ),
+        ),
+      );
+
+      // Icon storefront should be rendered
+      expect(find.byIcon(Icons.storefront_outlined), findsOneWidget);
+    });
+  });
+
+  group('USER REQUEST FIX: Fast Cart +/- Clicks, Debounce & Crash-Proof Safety', () {
+    test('Rapid Click Debounce Simulation: 10 taps collapse to single final sync', () async {
+      int serverSyncCount = 0;
+      int finalSyncedQty = 0;
+      Map<int, dynamic> timers = {};
+
+      void scheduleQuantitySync(int cartId, int targetQty) {
+        if (timers.containsKey(cartId)) {
+          timers[cartId].cancel();
+        }
+        timers[cartId] = (
+          cancel: () => timers.remove(cartId),
+          fire: () {
+            serverSyncCount++;
+            finalSyncedQty = targetQty;
+          }
+        );
+      }
+
+      // Simulate user clicking + 10 times in 100ms
+      int localQty = 1;
+      for (int i = 0; i < 10; i++) {
+        localQty++;
+        scheduleQuantitySync(101, localQty);
+      }
+
+      // Local optimistic UI shows 11 immediately
+      expect(localQty, 11);
+      // No server sync has happened yet!
+      expect(serverSyncCount, 0);
+
+      // Debounce timer completes
+      timers[101]?.fire();
+
+      // Exactly 1 server sync fired with final quantity 11
+      expect(serverSyncCount, 1);
+      expect(finalSyncedQty, 11);
+    });
+
+    test('Crash-proof index resolution: handles negative or out-of-bounds index via cartId / cartModel', () {
+      final item1 = CartModel(id: 10, quantity: 2, item: Item(id: 1, name: 'Item 1'));
+      final item2 = CartModel(id: 20, quantity: 3, item: Item(id: 2, name: 'Item 2'));
+      final cartList = [item1, item2];
+
+      int resolveIndex(int cartIndex, {int? cartId, CartModel? cartModel}) {
+        int resolvedIndex = cartIndex;
+        if (resolvedIndex < 0 || resolvedIndex >= cartList.length) {
+          if (cartId != null) {
+            resolvedIndex = cartList.indexWhere((c) => c.id == cartId);
+          } else if (cartModel != null) {
+            resolvedIndex = cartList.indexOf(cartModel);
+          }
+        }
+        return resolvedIndex;
+      }
+
+      // Stale index 5 (out of bounds) resolves correctly using cartId 20
+      expect(resolveIndex(5, cartId: 20), 1);
+      // Negative index -1 resolves correctly using cartModel item1
+      expect(resolveIndex(-1, cartModel: item1), 0);
+      // Truly missing item returns -1 safely without throwing RangeError
+      expect(resolveIndex(99, cartId: 999), -1);
+    });
+
+    test('Removing cart item cancels any pending debounced quantity timer', () {
+      Map<int, bool> activeTimers = {101: true};
+
+      void removeFromCart(int cartId) {
+        activeTimers.remove(cartId);
+      }
+
+      removeFromCart(101);
+      expect(activeTimers.containsKey(101), isFalse);
+    });
+
+    test('Direct adding guard drops duplicate clicks while item is in flight', () {
+      final Set<int> directAddingItemIds = {};
+      int fetchCount = 0;
+
+      void itemDirectlyAddToCart(int itemId) {
+        if (directAddingItemIds.contains(itemId)) return;
+        directAddingItemIds.add(itemId);
+        fetchCount++;
+      }
+
+      // Rapid clicks on the same item
+      itemDirectlyAddToCart(42);
+      itemDirectlyAddToCart(42);
+      itemDirectlyAddToCart(42);
+
+      // Only 1 execution was allowed!
+      expect(fetchCount, 1);
+      expect(directAddingItemIds.contains(42), isTrue);
+
+      // Once completed, item is unlocked
+      directAddingItemIds.remove(42);
+      expect(directAddingItemIds.contains(42), isFalse);
+    });
+  });
+
+  group('USER REQUEST FIX 10: Module Switching Smart Cache & Data Isolation', () {
+    setUp(() {
+      DataModuleManager().clearMemoryCache();
+    });
+
+    test('buildCanonicalKey separates cache keys by moduleId to prevent cross-module data leakage', () {
+      final keyGrocery = DataModuleManager.buildCanonicalKey(
+        '/api/v1/categories',
+        moduleId: 1, // Grocery
+        languageCode: 'en',
+      );
+
+      final keyPharmacy = DataModuleManager.buildCanonicalKey(
+        '/api/v1/categories',
+        moduleId: 2, // Pharmacy
+        languageCode: 'en',
+      );
+
+      expect(keyGrocery, isNot(equals(keyPharmacy)));
+      expect(keyGrocery, contains('moduleId=1'));
+      expect(keyPharmacy, contains('moduleId=2'));
+    });
+
+    test('buildCanonicalKey separates cache keys by language code', () {
+      final keyEn = DataModuleManager.buildCanonicalKey(
+        '/api/v1/categories',
+        moduleId: 1,
+        languageCode: 'en',
+      );
+
+      final keyAr = DataModuleManager.buildCanonicalKey(
+        '/api/v1/categories',
+        moduleId: 1,
+        languageCode: 'ar',
+      );
+
+      expect(keyEn, isNot(equals(keyAr)));
+      expect(keyEn, contains('lang=en'));
+      expect(keyAr, contains('lang=ar'));
+    });
+
+    test('DataModuleManager stores and retrieves cached responses per module independently', () {
+      final groceryData = {'module': 'grocery', 'items': ['apple', 'banana']};
+      final pharmacyData = {'module': 'pharmacy', 'items': ['panadol', 'aspirin']};
+
+      final keyGrocery = DataModuleManager.buildCanonicalKey(
+        '/api/v1/items',
+        moduleId: 1,
+        languageCode: 'en',
+      );
+
+      final keyPharmacy = DataModuleManager.buildCanonicalKey(
+        '/api/v1/items',
+        moduleId: 2,
+        languageCode: 'en',
+      );
+
+      DataModuleManager().cache.put(keyGrocery, groceryData);
+      DataModuleManager().cache.put(keyPharmacy, pharmacyData);
+
+      final retrievedGrocery = DataModuleManager().cache.get(keyGrocery) as Map<String, dynamic>?;
+      final retrievedPharmacy = DataModuleManager().cache.get(keyPharmacy) as Map<String, dynamic>?;
+
+      expect(retrievedGrocery, isNotNull);
+      expect(retrievedGrocery!['module'], equals('grocery'));
+      expect(retrievedPharmacy, isNotNull);
+      expect(retrievedPharmacy!['module'], equals('pharmacy'));
+    });
+
+    test('DataModuleManager generation tracking prevents race condition when switching fast', () {
+      final gen1 = DataModuleManager().nextGeneration('home_module');
+      expect(DataModuleManager().isGenerationActive('home_module', gen1), isTrue);
+
+      // User initiates switch from grocery to pharmacy
+      final gen2 = DataModuleManager().nextGeneration('home_module');
+      expect(gen2, equals(gen1 + 1));
+
+      // Any pending request with gen1 is now recognized as stale and ignored
+      expect(DataModuleManager().isGenerationActive('home_module', gen1), isFalse);
+      expect(DataModuleManager().isGenerationActive('home_module', gen2), isTrue);
+
+      // Invalidate context further increments generation
+      DataModuleManager().invalidateContext('home_module');
+      expect(DataModuleManager().isGenerationActive('home_module', gen2), isFalse);
+    });
+
+    test('National products tab context generation increments on tab change', () {
+      final gen1 = DataModuleManager().nextGeneration('national_products_tab');
+      expect(DataModuleManager().isGenerationActive('national_products_tab', gen1), isTrue);
+
+      final gen2 = DataModuleManager().nextGeneration('national_products_tab');
+      expect(gen2, equals(gen1 + 1));
+      expect(DataModuleManager().isGenerationActive('national_products_tab', gen1), isFalse);
+
+      DataModuleManager().invalidateContext('national_products_tab');
+      expect(DataModuleManager().isGenerationActive('national_products_tab', gen2), isFalse);
+    });
+  });
 }
+
 

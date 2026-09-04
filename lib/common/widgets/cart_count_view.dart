@@ -19,33 +19,55 @@ class CartCountView extends StatelessWidget {
     return GetBuilder<CartController>(builder: (cartController) {
       int cartQty = cartController.cartQuantity(item.id!);
       int cartIndex = cartController.isExistInCart(item.id, cartController.cartVariant(item.id!), false, null);
-      return cartQty != 0 ? Center(
+      if (cartIndex == -1 && cartQty != 0) {
+        cartIndex = cartController.cartList.indexWhere((c) => c.item?.id == item.id);
+      }
+      bool isValidCartIndex = cartIndex >= 0 && cartIndex < cartController.cartList.length;
+
+      return (cartQty != 0 && isValidCartIndex) ? Center(
         child: Container(
           width: 100,
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
-            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
           ),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             InkWell(
-              onTap: cartController.isLoading ? null : () {
-                if (cartController.cartList[cartIndex].quantity! > 1) {
-                  cartController.setDirectlyAddToCartIndex(index);
-                  cartController.setQuantity(false, cartIndex, cartController.cartList[cartIndex].stock, cartController.cartList[cartIndex].item!.quantityLimit);
-                }else {
-                  cartController.removeFromCart(cartIndex);
+              onTap: () {
+                int liveIndex = cartController.isExistInCart(item.id, cartController.cartVariant(item.id!), false, null);
+                if (liveIndex == -1) {
+                  liveIndex = cartController.cartList.indexWhere((c) => c.item?.id == item.id);
+                }
+                if (liveIndex < 0 || liveIndex >= cartController.cartList.length) return;
+                var targetCartItem = cartController.cartList[liveIndex];
+                int currentQty = targetCartItem.quantity ?? 1;
+                cartController.setDirectlyAddToCartIndex(index);
+                if (currentQty > 1) {
+                  cartController.setQuantity(
+                    false, liveIndex,
+                    targetCartItem.stock,
+                    targetCartItem.item?.quantityLimit ?? targetCartItem.quantityLimit,
+                    cartId: targetCartItem.id,
+                    cartModel: targetCartItem,
+                  );
+                } else {
+                  cartController.removeFromCart(
+                    liveIndex,
+                    item: targetCartItem.item,
+                    cartId: targetCartItem.id,
+                    cartModel: targetCartItem,
+                  );
                 }
               },
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardColor,
                   shape: BoxShape.circle,
-                  // border: Border.all(color: Theme.of(context).primaryColor),
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
                 ),
                 padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                child: Icon(
+                child: const Icon(
                   Icons.remove, size: 16,
                 ),
               ),
@@ -53,26 +75,40 @@ class CartCountView extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-              child: cartController.isLoading && cartController.directAddCartItemIndex == index
-                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator())
-                  : Text(cartQty.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
-              ) ,
+              child: Text(
+                cartQty.toString(),
+                style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
+              ),
             ),
 
             InkWell(
-              onTap: cartController.isLoading ? null : () {
-                if (item.quantityLimit != null && item.quantityLimit != 0 && cartQty >= item.quantityLimit!) {
-                  showCustomSnackBar('${'maximum_quantity_limit'.tr} ${item.quantityLimit}');
+              onTap: () {
+                int liveIndex = cartController.isExistInCart(item.id, cartController.cartVariant(item.id!), false, null);
+                if (liveIndex == -1) {
+                  liveIndex = cartController.cartList.indexWhere((c) => c.item?.id == item.id);
+                }
+                if (liveIndex < 0 || liveIndex >= cartController.cartList.length) return;
+                var targetCartItem = cartController.cartList[liveIndex];
+                int currentQty = targetCartItem.quantity ?? 1;
+                int? limit = item.quantityLimit ?? targetCartItem.quantityLimit ?? targetCartItem.item?.quantityLimit;
+                if (limit != null && limit != 0 && currentQty >= limit) {
+                  showCustomSnackBar('${'maximum_quantity_limit'.tr} $limit');
                 } else {
                   cartController.setDirectlyAddToCartIndex(index);
-                  cartController.setQuantity(true, cartIndex, cartController.cartList[cartIndex].stock, cartController.cartList[cartIndex].quantityLimit);
+                  cartController.setQuantity(
+                    true, liveIndex,
+                    targetCartItem.stock,
+                    limit,
+                    cartId: targetCartItem.id,
+                    cartModel: targetCartItem,
+                  );
                 }
               },
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).disabledColor,
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
                   border: Border.all(color: Theme.of(context).cardColor),
                 ),
                 padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
@@ -83,19 +119,27 @@ class CartCountView extends StatelessWidget {
             ),
           ]),
         ),
-      ) : InkWell(
-        onTap: () {
-          Get.find<ItemController>().itemDirectlyAddToCart(item, context, isCampaign: isCampaign);
-        },
-        child: child ?? Container(
-          height: 25, width: 25,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle, color: Theme.of(context).cardColor,
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+      ) : GetBuilder<ItemController>(builder: (itemController) {
+        bool isAdding = cartController.isItemAdding(item.id) || itemController.isDirectAdding(item.id);
+        return InkWell(
+          onTap: isAdding ? null : () {
+            itemController.itemDirectlyAddToCart(item, context, isCampaign: isCampaign);
+          },
+          child: child ?? Container(
+            height: 25, width: 25,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle, color: Theme.of(context).cardColor,
+              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+            ),
+            child: isAdding
+                ? const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: SizedBox(height: 14, width: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                  )
+                : Icon(Icons.add, size: 20, color: Theme.of(context).primaryColor),
           ),
-          child: Icon(Icons.add, size: 20, color: Theme.of(context).primaryColor),
-        ),
-      );
+        );
+      });
     });
   }
 }

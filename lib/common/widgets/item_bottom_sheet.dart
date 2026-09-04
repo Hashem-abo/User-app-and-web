@@ -533,6 +533,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                 ? 'out_of_stock'.tr : widget.isCampaign ? 'order_now'.tr
                                 : (itemController.cartIndex != -1) ? 'update_in_cart'.tr : 'add_to_cart'.tr,
                             onPressed: (stock != null && stock! <= 0) ? null : () async {
+                              if (cartController.isLoading || cartController.isItemAdding(item.id)) return;
                               String? invalid;
                               if(_newVariation) {
                                 for(int index=0; index<item.foodVariations!.length; index++) {

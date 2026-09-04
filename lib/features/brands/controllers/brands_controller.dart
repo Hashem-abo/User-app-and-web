@@ -4,6 +4,8 @@ import 'package:sixam_mart/features/brands/domain/models/brands_model.dart';
 import 'package:sixam_mart/features/brands/domain/services/brands_service_interface.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+
 class BrandsController extends GetxController implements GetxService {
   final BrandsServiceInterface brandsServiceInterface;
   BrandsController({required this.brandsServiceInterface});
@@ -23,7 +25,33 @@ class BrandsController extends GetxController implements GetxService {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  final Map<int, List<BrandModel>> _moduleBrandList = {};
+
+  void switchModule(int? moduleId) {
+    if (moduleId != null && _moduleBrandList.containsKey(moduleId)) {
+      _brandList = _moduleBrandList[moduleId];
+    } else {
+      _brandList = null;
+    }
+    update();
+  }
+
+  void clearBrandList({bool clearAll = false}) {
+    _brandList = null;
+    if (clearAll) {
+      _moduleBrandList.clear();
+    }
+    update();
+  }
+
   Future<void> getBrandList({DataSourceEnum dataSource = DataSourceEnum.local}) async {
+    int? currentModuleId = Get.find<SplashController>().module?.id;
+    if (dataSource == DataSourceEnum.local && currentModuleId != null && _moduleBrandList.containsKey(currentModuleId)) {
+      _brandList = _moduleBrandList[currentModuleId];
+      update();
+      getBrandList(dataSource: DataSourceEnum.client);
+      return;
+    }
     List<BrandModel>? brandList;
     if(dataSource == DataSourceEnum.local) {
       brandList = await brandsServiceInterface.getBrandList(DataSourceEnum.local);
@@ -40,6 +68,10 @@ class BrandsController extends GetxController implements GetxService {
     if (brandList != null) {
       _brandList = [];
       _brandList!.addAll(brandList);
+      int? currentModuleId = Get.find<SplashController>().module?.id;
+      if (currentModuleId != null) {
+        _moduleBrandList[currentModuleId] = _brandList!;
+      }
     }
     update();
   }

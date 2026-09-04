@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 import 'package:sixam_mart/common/enums/data_source_enum.dart';
 import 'package:sixam_mart/api/data_module_manager.dart';
@@ -21,7 +20,9 @@ import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
+import 'package:sixam_mart/features/shelf/controllers/shelf_controller.dart';
+import 'package:sixam_mart/features/home/controllers/store_corner_controller.dart';
+import 'package:sixam_mart/features/brands/controllers/brands_controller.dart';
 import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/features/splash/domain/models/landing_model.dart';
 import 'package:sixam_mart/common/models/config_model.dart';
@@ -451,10 +452,27 @@ class SplashController extends GetxController implements GetxService {
     _firstTimeConnectionCheck = isChecked;
   }
 
+  void syncModuleControllers(int? newModuleId) {
+    DataModuleManager().invalidateContext('home_module');
+    DataModuleManager().invalidateContext('national_products_tab');
+    if (Get.isRegistered<BannerController>()) Get.find<BannerController>().switchModule(newModuleId);
+    if (Get.isRegistered<CategoryController>()) Get.find<CategoryController>().switchModule(newModuleId);
+    if (Get.isRegistered<ShelfController>()) Get.find<ShelfController>().switchModule(newModuleId);
+    if (Get.isRegistered<StoreCornerController>()) Get.find<StoreCornerController>().switchModule(newModuleId);
+    if (Get.isRegistered<StoreController>()) Get.find<StoreController>().switchModule(newModuleId);
+    if (Get.isRegistered<ItemController>()) Get.find<ItemController>().switchModule(newModuleId);
+    if (Get.isRegistered<FlashSaleController>()) Get.find<FlashSaleController>().switchModule(newModuleId);
+    if (Get.isRegistered<BrandsController>()) Get.find<BrandsController>().switchModule(newModuleId);
+    if (Get.isRegistered<CampaignController>()) Get.find<CampaignController>().switchModule(newModuleId);
+    if (Get.isRegistered<HomeController>()) Get.find<HomeController>().switchModule(newModuleId);
+  }
+
   Future<void> setModule(ModuleModel? module, {bool notify = true}) async {
     _isFloatingAdClosed = false;
     _module = module;
     splashServiceInterface.setModule(module);
+
+    syncModuleControllers(module?.id);
 
     AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
     Get.find<ApiClient>().updateHeader(
@@ -482,7 +500,7 @@ class SplashController extends GetxController implements GetxService {
         if(cacheModule!.moduleType.toString() == AppConstants.globalShopping) {
           Get.find<GlobalCartController>().getCartList();
         } else {
-          Get.find<CartController>().filterCartForModuleLocal(module == null ? null : module.id);
+          Get.find<CartController>().filterCartForModuleLocal(module.id);
           Get.find<CartController>().getCartDataOnline();
         }
       }
@@ -597,32 +615,24 @@ class SplashController extends GetxController implements GetxService {
   Future<void> switchModule(int index, bool fromPhone) async {
     if(_module == null || _module!.id != _moduleList![index].id) {
       bool? hasVibrator = await Vibration.hasVibrator();
-      if (hasVibrator ?? false) {
+      if (hasVibrator == true) {
         Vibration.vibrate(duration: 30);
       }
       await Get.find<SplashController>().setModule(_moduleList![index]);
-      DataModuleManager().invalidateContext('home_module');
-      DataModuleManager().invalidateContext('national_products_tab');
-      DataModuleManager().clearMemoryCache();
 
       if(_module!.moduleType.toString() == AppConstants.globalShopping) {
         Get.find<GlobalCartController>().getCartList();
       } else if(_module!.moduleType.toString() != AppConstants.taxi) {
         Get.find<CartController>().getCartDataOnline();
-        Get.find<ItemController>().clearItemLists();
-        Get.find<BannerController>().clearBanner();
-        Get.find<CategoryController>().clearCategoryList();
-        Get.find<CampaignController>().itemAndBasicCampaignNull();
-        Get.find<FlashSaleController>().setEmptyFlashSale(fromModule: true);
-        Get.find<StoreController>().getPopularStoreList(true, 'all', false);
-        Get.find<StoreController>().getLatestStoreList(true, 'all', false);
+        Get.find<StoreController>().getPopularStoreList(false, 'all', false);
+        Get.find<StoreController>().getLatestStoreList(false, 'all', false);
         Get.find<StoreController>().getFeaturedStoreList();
 
         if(AuthHelper.isLoggedIn()) {
           Get.find<HomeController>().getCashBackOfferList();
           await _showInterestPage();
         }
-        HomeScreen.loadData(true, fromModule: true);
+        HomeScreen.loadData(false, fromModule: true);
       } else {
         if(AuthHelper.isLoggedIn()) {
           Get.find<HomeController>().getCashBackOfferList();
