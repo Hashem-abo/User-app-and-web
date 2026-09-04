@@ -440,20 +440,14 @@ Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               InkWell(
                 onTap: () async {
                   if(AuthHelper.isLoggedIn()) {
-                    Get.dialog(ConfirmationDialog(icon: Images.support, description: 'are_you_sure_to_logout'.tr, isLogOut: true, onYesPressed: () async {
-                      Get.find<AuthController>().resetOtpView();
-                      Get.find<ProfileController>().clearUserInfo();
-                      Get.find<AuthController>().socialLogout();
-                      Get.find<CartController>().clearCartList(canRemoveOnline: false);
-                      Get.find<FavouriteController>().removeFavourite();
-                      await Get.find<AuthController>().clearSharedData();
-                      Get.find<HomeController>().forcefullyNullCashBackOffers();
-                      if(Get.find<SplashController>().module != null) {
-                        Get.find<TaxiCartController>().getCarCartList();
-                      }
-                      Get.offAllNamed(RouteHelper.getInitialRoute());
-                      showCustomSnackBar('logout_successful'.tr, isError: false);
-                    }), useSafeArea: false);
+                    Get.dialog(ConfirmationDialog(
+                      icon: Images.logOut,
+                      description: 'are_you_sure_to_logout'.tr,
+                      isLogOut: true,
+                      onYesPressed: () async {
+                        await Get.find<AuthController>().logout();
+                      },
+                    ), useSafeArea: false);
                   }else {
                     Get.find<FavouriteController>().removeFavourite();
                     await Get.toNamed(RouteHelper.getSignInRoute(Get.currentRoute));

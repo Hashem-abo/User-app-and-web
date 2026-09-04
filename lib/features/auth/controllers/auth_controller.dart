@@ -15,6 +15,10 @@ import 'package:sixam_mart/features/auth/domain/models/signup_body_model.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/auth/domain/services/auth_service_interface.dart';
 import 'package:sixam_mart/features/verification/screens/verification_screen.dart';
+import 'package:flutter/foundation.dart';
+import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
+import 'package:sixam_mart/features/home/controllers/home_controller.dart';
+import 'package:sixam_mart/features/rental_module/rental_cart_screen/controllers/taxi_cart_controller.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 
@@ -181,9 +185,64 @@ class AuthController extends GetxController implements GetxService {
   }
 
   Future<void> socialLogout() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn.instance;
-    googleSignIn.disconnect();
-    await FacebookAuth.instance.logOut();
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.disconnect();
+    } catch (e) {
+      debugPrint('GoogleSignIn disconnect error on logout: $e');
+    }
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn.instance;
+      await googleSignIn.signOut();
+    } catch (e) {
+      debugPrint('GoogleSignIn signOut error on logout: $e');
+    }
+    try {
+      await FacebookAuth.instance.logOut();
+    } catch (e) {
+      debugPrint('FacebookAuth logOut error on logout: $e');
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      resetOtpView();
+      if (Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().clearUserInfo();
+      }
+      await socialLogout();
+      if (Get.isRegistered<CartController>()) {
+        Get.find<CartController>().clearCartList(canRemoveOnline: false);
+      }
+      if (Get.isRegistered<FavouriteController>()) {
+        Get.find<FavouriteController>().removeFavourite();
+      }
+      if (Get.isRegistered<HomeController>()) {
+        Get.find<HomeController>().forcefullyNullCashBackOffers();
+      }
+      if (Get.isRegistered<TaxiCartController>() && Get.isRegistered<SplashController>() && Get.find<SplashController>().module != null) {
+        Get.find<TaxiCartController>().getCarCartList();
+      }
+
+      try {
+        await clearSharedData().timeout(const Duration(seconds: 4));
+      } catch (e) {
+        debugPrint('clearSharedData timeout or error during logout: $e');
+      }
+
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+
+      Get.offAllNamed(RouteHelper.getInitialRoute());
+      showCustomSnackBar('logout_successful'.tr, isError: false);
+    } catch (e) {
+      debugPrint('Logout error: $e');
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      Get.offAllNamed(RouteHelper.getInitialRoute());
+    }
   }
 
   Future<bool> clearSharedAddress() async {
