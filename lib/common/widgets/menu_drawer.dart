@@ -134,19 +134,14 @@ class MenuDrawerState extends State<MenuDrawer> with SingleTickerProviderStateMi
     _menuList.add(Menu(icon: Images.logOut, title: AuthHelper.isLoggedIn() ? 'logout'.tr : 'sign_in'.tr, onTap: () {
       Get.back();
       if(AuthHelper.isLoggedIn()) {
-        Get.dialog(ConfirmationDialog(icon: Images.support, description: 'are_you_sure_to_logout'.tr, isLogOut: true, onYesPressed: () async {
-          Get.find<AuthController>().resetOtpView();
-          Get.find<ProfileController>().clearUserInfo();
-          await Get.find<AuthController>().clearSharedData();
-          Get.find<CartController>().clearCartList();
-          Get.find<AuthController>().socialLogout();
-          Get.find<FavouriteController>().removeFavourite();
-          if(ResponsiveHelper.isDesktop(Get.context)) {
-            Get.offAllNamed(RouteHelper.getInitialRoute());
-          }else{
-            Get.offAllNamed(RouteHelper.getInitialRoute());
-          }
-        }), useSafeArea: false);
+        Get.dialog(ConfirmationDialog(
+          icon: Images.logOut,
+          description: 'are_you_sure_to_logout'.tr,
+          isLogOut: true,
+          onYesPressed: () async {
+            await Get.find<AuthController>().logout();
+          },
+        ), useSafeArea: false);
       }else {
         Get.find<FavouriteController>().removeFavourite();
         if(ResponsiveHelper.isDesktop(context)){

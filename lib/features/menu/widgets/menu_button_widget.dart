@@ -32,18 +32,14 @@ class MenuButtonWidget extends StatelessWidget {
         if(isLogout) {
           Get.back();
           if(AuthHelper.isLoggedIn()) {
-            Get.dialog(ConfirmationDialog(icon: Images.support, description: 'are_you_sure_to_logout'.tr, isLogOut: true, onYesPressed: () {
-              Get.find<ProfileController>().clearUserInfo();
-              Get.find<AuthController>().clearSharedData();
-              Get.find<AuthController>().socialLogout();
-              Get.find<CartController>().clearCartList();
-              Get.find<FavouriteController>().removeFavourite();
-              if(!ResponsiveHelper.isDesktop(context)) {
-                Get.offAllNamed(RouteHelper.getInitialRoute());
-              } else{
-                Get.dialog(const Center(child: AuthDialogWidget(exitFromApp: false, backFromThis: false)));
-              }
-            }), useSafeArea: false);
+            Get.dialog(ConfirmationDialog(
+              icon: Images.logOut,
+              description: 'are_you_sure_to_logout'.tr,
+              isLogOut: true,
+              onYesPressed: () async {
+                await Get.find<AuthController>().logout();
+              },
+            ), useSafeArea: false);
           }else {
             if (!ResponsiveHelper.isDesktop(context)) {
               Get.find<FavouriteController>().removeFavourite();
