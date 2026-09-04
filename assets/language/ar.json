@@ -2469,5 +2469,10 @@
   "wholesaler": "جملة",
   "retail": "تجزئة",
   "retailer": "تجزئة",
-  "factory": "مصنع"
+  "factory": "مصنع",
+  "reorder_failed": "فشل إعادة الطلب. يُرجى المحاولة مرة أخرى.",
+  "are_you_sure_to_remove_this_item": "هل أنت متأكد من إزالة هذا المنتج؟",
+  "show_alternatives": "عرض البدائل"
+
+
 }

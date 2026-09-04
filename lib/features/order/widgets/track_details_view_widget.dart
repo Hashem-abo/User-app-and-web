@@ -9,6 +9,7 @@ import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 class TrackDetailsViewWidget extends StatelessWidget {
   final String? status;
@@ -38,7 +39,7 @@ class TrackDetailsViewWidget extends StatelessWidget {
 
         Align(alignment: Alignment.centerLeft, child: Text(
           takeAway ? Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-              ? 'store'.tr : 'store'.tr : (track.store != null && track.store!.moduleId == 1) ? 'grocery_track'.tr : 'delivery_man'.tr,
+              ? 'store'.tr : 'store'.tr : (track.store != null && ModuleHelper.isGrocery(moduleId: track.store!.moduleId)) ? 'grocery_track'.tr : 'delivery_man'.tr,
           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
         )),
         const SizedBox(height: Dimensions.paddingSizeExtraSmall),

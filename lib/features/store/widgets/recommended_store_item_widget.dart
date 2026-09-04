@@ -152,8 +152,10 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                           PriceConverter.convertPrice(item.price, discount: discount, discountType: discountType),
                           style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).primaryColor), textDirection: TextDirection.ltr, 
                         ),
+                        const SizedBox(height: 2),
                         
                         Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             // Previous Price
                             if(discount > 0) ...[
@@ -165,7 +167,7 @@ class RecommendedStoreItemWidget extends StatelessWidget {
                                   decoration: TextDecoration.lineThrough,
                                 ), textDirection: TextDirection.ltr,
                               ),
-                              const SizedBox(width: 2),
+                              const SizedBox(width: 6),
                             ],
 
                              // Discount Percentage

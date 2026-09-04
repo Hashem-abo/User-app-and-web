@@ -52,11 +52,11 @@ class StoreRepository implements StoreRepositoryInterface {
   Future<StoreModel?> _getStoreList(int offset, String filterBy, String storeType, {required DataSourceEnum source}) async {
     StoreModel? storeModel;
     int? moduleId = Get.find<SplashController>().module?.id;
-    String cacheId = '${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=12-${moduleId ?? 0}';
+    String cacheId = '${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=10-${moduleId ?? 0}';
 
     switch(source) {
       case DataSourceEnum.client:
-        Response response = await apiClient.getData('${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=12');
+        Response response = await apiClient.getData('${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=10');
         if(response.statusCode == 200){
           storeModel = StoreModel.fromJson(response.body);
           LocalClient.organize(DataSourceEnum.client, cacheId, jsonEncode(response.body), apiClient.getHeader());
@@ -148,13 +148,13 @@ class StoreRepository implements StoreRepositoryInterface {
 
   Future<List<Store>?> _getFeaturedStoreList({required DataSourceEnum source}) async {
     List<Store>? featuredStoreList;
-    String cacheId = '${AppConstants.storeUri}/all?featured=1&offset=1&limit=12-${Get.find<SplashController>().module?.id??''}';
+    String cacheId = '${AppConstants.storeUri}/all?featured=1&offset=1&limit=10-${Get.find<SplashController>().module?.id??''}';
     Map<String, String> header = (Get.find<SplashController>().module == null && Get.find<SplashController>().configModel!.module == null) ? HeaderHelper.featuredHeader() : apiClient.getHeader();
 
     switch(source) {
       case DataSourceEnum.client:
         Response response = await apiClient.getData(
-          '${AppConstants.storeUri}/all?featured=1&offset=1&limit=12',
+          '${AppConstants.storeUri}/all?featured=1&offset=1&limit=10',
           headers: Get.find<SplashController>().module == null && Get.find<SplashController>().configModel!.module == null ? HeaderHelper.featuredHeader() : null,
         );
         if (response.statusCode == 200) {

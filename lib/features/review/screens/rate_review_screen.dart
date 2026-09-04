@@ -11,6 +11,7 @@ import 'package:sixam_mart/features/review/widgets/deliver_man_review_widget.dar
 import 'package:sixam_mart/features/review/widgets/item_review_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 class RateReviewScreen extends StatefulWidget {
   final List<OrderDetailsModel> orderDetailsList;
@@ -83,11 +84,11 @@ class RateReviewScreenState extends State<RateReviewScreen> with TickerProviderS
                     unselectedLabelStyle: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
                     tabs: widget.orderDetailsList.isNotEmpty ? widget.deliveryMan != null ? [
                       Tab(text: widget.orderDetailsList.length > 1 ? 'items'.tr : 'item'.tr),
-                      Tab(text: (widget.orderDetailsList.isNotEmpty && widget.orderDetailsList[0].itemDetails!.moduleId == 1) ? 'Vendor' : 'delivery_man'.tr),
+                      Tab(text: (widget.orderDetailsList.isNotEmpty && ModuleHelper.isGrocery(moduleId: widget.orderDetailsList[0].itemDetails!.moduleId)) ? 'Vendor' : 'delivery_man'.tr),
                     ] : [
                       Tab(text: widget.orderDetailsList.length > 1 ? 'items'.tr : 'item'.tr),
                     ] : [
-                      Tab(text: (widget.orderDetailsList.isNotEmpty && widget.orderDetailsList[0].itemDetails!.moduleId == 1) ? 'Vendor' : 'delivery_man'.tr),
+                      Tab(text: (widget.orderDetailsList.isNotEmpty && ModuleHelper.isGrocery(moduleId: widget.orderDetailsList[0].itemDetails!.moduleId)) ? 'Vendor' : 'delivery_man'.tr),
                     ],
                   ),
                 ),

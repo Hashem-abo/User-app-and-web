@@ -118,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: isLoggedIn ? Dimensions.paddingSizeSmall : 0),
 
                     (isLoggedIn && Get.find<SplashController>().configModel?.monthlyOrderRemainder == 1) ? ProfileButtonWidget(
-                      icon: Icons.calendar_month_outlined, title: 'my_items'.tr,
+                      icon: Icons.calendar_month_outlined, title: 'monthly_cart_list'.tr,
                       onTap: () => Get.toNamed(RouteHelper.getMyItemsRoute()),
                     ) : const SizedBox(),
                     SizedBox(height: (isLoggedIn && Get.find<SplashController>().configModel?.monthlyOrderRemainder == 1) ? Dimensions.paddingSizeSmall : 0),

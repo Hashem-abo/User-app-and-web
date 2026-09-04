@@ -98,6 +98,7 @@ class Images {
   static const String debitIcon = 'assets/image/debit.png';
   static const String walletCreditIcon = 'assets/image/wallet_credit.png';
   static const String walletDebitIcon = 'assets/image/wallet_debit.png';
+  static const String monthlyCart = 'assets/image/monthly_cart.png';
   static const String profileIcon = 'assets/image/profile_icon.png';
   static const String addressIcon = 'assets/image/address_icon.png';
   static const String languageIcon = 'assets/image/language_icon.png';

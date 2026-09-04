@@ -161,6 +161,9 @@ class StoreController extends GetxController implements GetxService {
   List<int> _loadedCategoryIndexes = [];
   List<int> get loadedCategoryIndexes => _loadedCategoryIndexes;
 
+  final Map<int, ItemModel> _categoryStoreItemModelCache = {};
+  Map<int, ItemModel> get categoryStoreItemModelCache => _categoryStoreItemModelCache;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -716,6 +719,7 @@ class StoreController extends GetxController implements GetxService {
     _categoryLoading = {};
     _loadedCategoryIndexes = [];
     _categoryIndex = 0;
+    _categoryStoreItemModelCache.clear();
   }
 
   Future<void> initializeCategoryData(int? storeId) async {
@@ -828,21 +832,28 @@ class StoreController extends GetxController implements GetxService {
   }
 
   Future<void> getStoreItemList(int? storeID, int offset, String type, bool notify) async {
-    if (offset == 1 && _loadedCategoryIndexes.isNotEmpty) {
+    bool isFood = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food';
+    if (isFood && offset == 1 && _loadedCategoryIndexes.isNotEmpty) {
       _type = type;
       await reloadCategoryData();
       return;
     }
-    if(offset == 1 || _storeItemModel == null) {
-      _type = type;
-      _storeItemModel = null;
-      if(notify) {
-        update();
-      }
-    }
+
     int selectedCategoryId = 0;
     if (_store != null && _categoryList != null && _categoryList!.isNotEmpty && _categoryIndex < _categoryList!.length) {
       selectedCategoryId = _categoryList![_categoryIndex].id ?? 0;
+    }
+
+    if(offset == 1) {
+      _type = type;
+      if (_categoryStoreItemModelCache.containsKey(selectedCategoryId)) {
+        _storeItemModel = _categoryStoreItemModelCache[selectedCategoryId];
+      } else {
+        _storeItemModel = null;
+      }
+      if(notify) {
+        update();
+      }
     }
 
     if (selectedCategoryId == -1) {
@@ -876,10 +887,12 @@ class StoreController extends GetxController implements GetxService {
     if (storeItemModel != null) {
       if (offset == 1) {
         _storeItemModel = storeItemModel;
+        _categoryStoreItemModelCache[selectedCategoryId] = storeItemModel;
       } else if (_storeItemModel != null) {
         _storeItemModel!.items!.addAll(storeItemModel.items!);
         _storeItemModel!.totalSize = storeItemModel.totalSize;
         _storeItemModel!.offset = storeItemModel.offset;
+        _categoryStoreItemModelCache[selectedCategoryId] = _storeItemModel!;
       }
     }
     update();
@@ -929,8 +942,32 @@ class StoreController extends GetxController implements GetxService {
       _storeSearchItemModel = null;
       getStoreSearchItemList(_searchText, _store!.id.toString(), 1, type);
     } else {
-      _storeItemModel = null;
-      getStoreItemList(_store!.id, 1, Get.find<StoreController>().type, false);
+      int selectedCategoryId = 0;
+      if (_categoryList != null && _categoryList!.isNotEmpty && index < _categoryList!.length) {
+        selectedCategoryId = _categoryList![index].id ?? 0;
+      }
+
+      if (selectedCategoryId == -1) {
+        final favouriteController = Get.find<FavouriteController>();
+        List<Item> storeFavorites = [];
+        if (favouriteController.wishItemList != null) {
+          for (var item in favouriteController.wishItemList!) {
+            if (item != null && item.storeId == _store?.id) {
+              storeFavorites.add(item);
+            }
+          }
+        }
+        _storeItemModel = ItemModel(
+          items: storeFavorites,
+          totalSize: storeFavorites.length,
+          offset: 1,
+        );
+      } else if (_categoryStoreItemModelCache.containsKey(selectedCategoryId) && _categoryStoreItemModelCache[selectedCategoryId] != null) {
+        _storeItemModel = _categoryStoreItemModelCache[selectedCategoryId];
+      } else {
+        _storeItemModel = null;
+        getStoreItemList(_store!.id, 1, Get.find<StoreController>().type, false);
+      }
     }
     update();
   }

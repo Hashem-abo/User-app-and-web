@@ -3,25 +3,72 @@ import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
 import 'package:sixam_mart/common/models/config_model.dart';
 import 'package:sixam_mart/util/app_constants.dart';
-
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 
 class ModuleHelper {
 
   static ModuleModel? getModule() {
-    return Get.find<SplashController>().module;
+    return Get.isRegistered<SplashController>() ? Get.find<SplashController>().module : null;
   }
 
   static ModuleModel? getCacheModule() {
-    return Get.find<SplashController>().cacheModule;
+    return Get.isRegistered<SplashController>() ? Get.find<SplashController>().cacheModule : null;
   }
 
   static Module getModuleConfig(String? moduleType) {
     return Get.find<SplashController>().getModuleConfig(moduleType);
   }
 
-  /// Returns whether unit should be displayed for an item, especially in the Zad module (grocery / module 1).
-  static bool isUnitVisible(Item? item) {
+  /// Dynamically resolves the module type from moduleId by searching SplashController.moduleList.
+  static String? getModuleTypeById(int? moduleId) {
+    if (moduleId == null) return null;
+    if (Get.isRegistered<SplashController>()) {
+      final splash = Get.find<SplashController>();
+      final list = splash.moduleList;
+      if (list != null) {
+        for (final m in list) {
+          if (m.id == moduleId) {
+            return m.moduleType;
+          }
+        }
+      }
+      final curModule = splash.module ?? splash.cacheModule;
+      if (curModule?.id == moduleId) {
+        return curModule?.moduleType;
+      }
+    }
+    return null;
+  }
+
+  /// Dynamically resolves the ModuleModel from moduleId.
+  static ModuleModel? getModuleById(int? moduleId) {
+    if (moduleId == null) return null;
+    if (Get.isRegistered<SplashController>()) {
+      final splash = Get.find<SplashController>();
+      final list = splash.moduleList;
+      if (list != null) {
+        for (final m in list) {
+          if (m.id == moduleId) {
+            return m;
+          }
+        }
+      }
+      final curModule = splash.module ?? splash.cacheModule;
+      if (curModule?.id == moduleId) {
+        return curModule;
+      }
+    }
+    return null;
+  }
+
+  /// Returns whether a module is grocery dynamically.
+  static bool isGrocery({int? moduleId, String? moduleType, dynamic item}) {
+    final String? type = moduleType ?? item?.moduleType ?? getModuleTypeById(moduleId ?? item?.moduleId) ?? getModule()?.moduleType ?? getCacheModule()?.moduleType;
+    return type == AppConstants.grocery || type == 'grocery';
+  }
+
+  /// Returns whether unit should be displayed for an item.
+  static bool isUnitVisible(dynamic item) {
     return isUnitVisibleForType(
       unitType: item?.unitType,
       moduleId: item?.moduleId,
@@ -34,15 +81,26 @@ class ModuleHelper {
     if (unitType == null || unitType.trim().isEmpty) {
       return false;
     }
-    if (moduleId == 1 || moduleType == AppConstants.grocery) {
+    
+    // Dynamically resolve module type
+    String? type = moduleType;
+    if (type == null && moduleId != null) {
+      type = getModuleTypeById(moduleId);
+    }
+    type ??= getModule()?.moduleType ?? getCacheModule()?.moduleType;
+
+    // Do NOT show unit in food or ecommerce module
+    if (type == AppConstants.food || type == AppConstants.ecommerce || type == 'food' || type == 'ecommerce') {
+      return false;
+    }
+
+    // Show unit for grocery
+    if (type == AppConstants.grocery || type == 'grocery') {
       return true;
     }
-    final module = getModule() ?? getCacheModule();
-    if (module?.id == 1 || module?.moduleType == AppConstants.grocery) {
-      return true;
-    }
+
     if (Get.isRegistered<SplashController>()) {
-      final config = getModuleConfig(moduleType ?? module?.moduleType);
+      final config = getModuleConfig(type);
       if (config.unit == true) {
         return true;
       }
@@ -54,9 +112,6 @@ class ModuleHelper {
   }
 
   /// Returns a localized label for the pro benefit minimum-order field.
-  /// [moduleType] is optional; when null the active module is used.
-  /// [fallbackKey] is the translation key to use when no module-specific
-  /// override is needed.
   static String proMinSpendLabel({String? moduleType, required String fallbackKey}) {
     final String? type = moduleType ?? getModule()?.moduleType;
     if (type == AppConstants.parcel) {
@@ -65,21 +120,22 @@ class ModuleHelper {
     return fallbackKey.tr;
   }
 
-  /// Returns whether a module, item, or store corresponds to the Zad module (grocery / module 1).
+  /// Returns whether a module, item, or store corresponds to the Zad / Grocery module dynamically.
   static bool isZad({
     int? moduleId,
     String? moduleType,
     String? moduleName,
   }) {
-    if (moduleId == 1) {
+    if (moduleType == 'zad' || moduleType == AppConstants.grocery || moduleType == 'grocery') {
       return true;
     }
-    if (moduleType == 'zad') {
+    final resolvedType = getModuleTypeById(moduleId);
+    if (resolvedType == AppConstants.grocery || resolvedType == 'grocery' || resolvedType == 'zad') {
       return true;
     }
     if (moduleName != null) {
       final name = moduleName.trim().toLowerCase();
-      if (name.contains('zad') || name.contains('زاد')) {
+      if (name.contains('zad') || name.contains('زاد') || name.contains('grocery')) {
         return true;
       }
     }
@@ -87,9 +143,11 @@ class ModuleHelper {
       final module = getModule() ?? getCacheModule();
       if (module != null) {
         if (moduleId == null || moduleId == module.id) {
-          if (module.id == 1) return true;
+          if (module.moduleType == AppConstants.grocery || module.moduleType == 'grocery' || module.moduleType == 'zad') {
+            return true;
+          }
           final name = (module.moduleName ?? '').trim().toLowerCase();
-          if (name.contains('zad') || name.contains('زاد') || module.moduleType == 'zad') {
+          if (name.contains('zad') || name.contains('زاد') || name.contains('grocery')) {
             return true;
           }
         }
@@ -98,44 +156,29 @@ class ModuleHelper {
     return false;
   }
 
-  /// Returns whether a module, item, or store corresponds to Grocery (e.g. Zad) or Pharmacy.
+  /// Returns whether a module, item, or store corresponds to Grocery (e.g. Zad) or Pharmacy dynamically.
   static bool isGroceryOrPharmacy({
     Item? item,
     int? moduleId,
     String? moduleType,
   }) {
     final String? directType = moduleType ?? item?.moduleType;
-    if (directType == AppConstants.grocery || directType == AppConstants.pharmacy) {
+    if (directType == AppConstants.grocery || directType == AppConstants.pharmacy || directType == 'grocery' || directType == 'pharmacy') {
       return true;
     }
 
     final int? directId = moduleId ?? item?.moduleId;
-    if (directId == 1 || directId == 2) {
-      return true;
-    }
-
-    if (directId != null && Get.isRegistered<SplashController>()) {
-      final splash = Get.find<SplashController>();
-      final List<ModuleModel>? list = splash.moduleList;
-      if (list != null) {
-        for (final m in list) {
-          if (m.id == directId) {
-            if (m.moduleType == AppConstants.grocery || m.moduleType == AppConstants.pharmacy) {
-              return true;
-            }
-            break;
-          }
-        }
+    if (directId != null) {
+      final resolvedType = getModuleTypeById(directId);
+      if (resolvedType == AppConstants.grocery || resolvedType == AppConstants.pharmacy || resolvedType == 'grocery' || resolvedType == 'pharmacy') {
+        return true;
       }
     }
 
     if (Get.isRegistered<SplashController>()) {
       final module = getModule() ?? getCacheModule();
       if (module != null) {
-        if (module.moduleType == AppConstants.grocery || module.moduleType == AppConstants.pharmacy) {
-          return true;
-        }
-        if (module.id == 1 || module.id == 2) {
+        if (module.moduleType == AppConstants.grocery || module.moduleType == AppConstants.pharmacy || module.moduleType == 'grocery' || module.moduleType == 'pharmacy') {
           return true;
         }
       }

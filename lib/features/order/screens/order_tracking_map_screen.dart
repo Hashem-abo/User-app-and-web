@@ -28,6 +28,7 @@ import 'package:sixam_mart/features/order/widgets/track_details_view_widget.dart
 import 'package:sixam_mart/features/order/widgets/tracking_stepper_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
 
@@ -181,7 +182,7 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
           child: FooterView(
             child: Center(child: SizedBox(width: Dimensions.webMaxWidth, height: ResponsiveHelper.isDesktop(context) ? 700 : MediaQuery.of(context).size.height * 0.85, child: Stack(children: [
 
-              (track.store != null && track.store!.moduleId == 1) ? const SizedBox() : MouseRegion(
+              (track.store != null && ModuleHelper.isGrocery(moduleId: track.store!.moduleId)) ? const SizedBox() : MouseRegion(
                 onEnter: (event) => onEntered(true),
                 onExit: (event) => onEntered(false),
                 child: GoogleMap(
@@ -208,14 +209,14 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
                 ),
               ),
 
-              _isLoading && (track.store == null || track.store!.moduleId != 1) ? const CustomLoaderWidget() : const SizedBox(),
+              _isLoading && (track.store == null || !ModuleHelper.isGrocery(moduleId: track.store!.moduleId)) ? const CustomLoaderWidget() : const SizedBox(),
 
               Positioned(
                 top: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
                 child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away', isPickupCenter: track.orderType == 'pickup_center'),
               ),
 
-              (track.store != null && track.store!.moduleId == 1) ? const SizedBox() : Positioned(
+              (track.store != null && ModuleHelper.isGrocery(moduleId: track.store!.moduleId)) ? const SizedBox() : Positioned(
                 right: 15, bottom: track.orderType != 'take_away' && track.deliveryMan == null ? 150 : 220,
                 child: InkWell(
                   onTap: () => _checkPermission(() async {

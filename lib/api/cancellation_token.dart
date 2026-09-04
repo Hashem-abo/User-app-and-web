@@ -1,4 +1,3 @@
-import 'dart:async';
 
 /// Exception thrown when an operation is cancelled via [CancellationToken].
 class CancellationException implements Exception {

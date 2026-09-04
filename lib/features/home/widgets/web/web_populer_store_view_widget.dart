@@ -131,11 +131,13 @@ class PopularStoreShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 6,
-      padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
+    return SizedBox(
+      height: 210,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 6,
+        padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
       itemBuilder: (context, index) {
         return Padding(
           padding: const EdgeInsets.only(right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeExtraSmall),
@@ -221,6 +223,7 @@ class PopularStoreShimmer extends StatelessWidget {
           ),
         );
       },
+    ),
     );
   }
 }

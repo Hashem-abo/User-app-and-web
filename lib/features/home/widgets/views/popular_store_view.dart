@@ -33,7 +33,7 @@ class _PopularStoreViewState extends State<PopularStoreView> {
       child: GetBuilder<StoreController>(builder: (storeController) {
         List<Store>? storeList = storeController.popularStoreList;
 
-        return (storeList != null && storeList.isEmpty) ? const SizedBox() : (storeList != null ? Column(children: [
+        return (storeList != null && storeList.isEmpty) ? const SizedBox() : Column(children: [
           Padding(
             padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault, right: Dimensions.paddingSizeDefault, bottom: Dimensions.paddingSizeDefault),
             child: TitleWidget(
@@ -44,7 +44,7 @@ class _PopularStoreViewState extends State<PopularStoreView> {
 
           SizedBox(
             height: 205, // ahmed: Increased height for new card design
-            child: ListView.builder(
+            child: storeList != null ? ListView.builder(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemCount: storeList.length,
@@ -57,10 +57,10 @@ class _PopularStoreViewState extends State<PopularStoreView> {
                   ),
                 );
               },
-            ),
+            ) : const PopularStoreShimmer(),
           ),
 
-        ]) : const PopularStoreShimmer());
+        ]);
       }),
     );
   }

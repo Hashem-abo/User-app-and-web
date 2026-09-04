@@ -234,13 +234,24 @@ class ItemWidget extends StatelessWidget {
                                 const SizedBox(width: 4),
                               ],
                               Expanded(
-                                child: Text(
-                                  isStore ? store!.address ?? '' : item!.storeName ?? '',
-                                  style: robotoRegular.copyWith(
-                                    fontSize: Dimensions.fontSizeExtraSmall,
-                                    color: Theme.of(context).disabledColor,
-                                  ),
-                                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        isStore ? store!.address ?? '' : item!.storeName ?? '',
+                                        style: robotoRegular.copyWith(
+                                          fontSize: Dimensions.fontSizeExtraSmall,
+                                          color: Theme.of(context).disabledColor,
+                                        ),
+                                        maxLines: 1, overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if ((!isStore && ((item?.verifiedSeller == 1) || (item?.storeDetails?['verified_seller'] == 1) || (item?.storeDetails?['verified_seller'] == '1') || (item?.storeDetails?['verified_seller'] == true))) || (isStore && store?.verifiedSeller == 1)) ...[
+                                      const SizedBox(width: 3),
+                                      Icon(Icons.verified, color: Theme.of(context).primaryColor, size: 12),
+                                    ],
+                                  ],
                                 ),
                               ),
                             ],

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/vendor_type_helper.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 class StoreModel {
   int? totalSize;
@@ -324,27 +325,11 @@ class Store {
   }
 
   bool get isZad {
-    if (moduleId == 1) return true;
-    if (module?.id == 1) return true;
-    final name = (module?.moduleName ?? '').trim().toLowerCase();
-    if (name.contains('zad') || name.contains('زاد')) return true;
-    if (moduleType == 'zad' || module?.moduleType == 'zad') return true;
-
-    if (Get.isRegistered<SplashController>()) {
-      final splash = Get.find<SplashController>();
-      final curModule = splash.module ?? splash.cacheModule;
-      if (curModule != null) {
-        final curName = (curModule.moduleName ?? '').trim().toLowerCase();
-        final isCurZad = curModule.id == 1 ||
-            curName.contains('zad') ||
-            curName.contains('زاد') ||
-            curModule.moduleType == 'zad';
-        if (isCurZad && (moduleId == null || moduleId == curModule.id)) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return ModuleHelper.isZad(
+      moduleId: moduleId ?? module?.id,
+      moduleType: moduleType ?? module?.moduleType,
+      moduleName: module?.moduleName,
+    );
   }
 
   String get vendorType {

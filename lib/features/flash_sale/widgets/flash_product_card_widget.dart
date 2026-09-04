@@ -13,6 +13,7 @@ import 'package:sixam_mart/common/widgets/cart_count_view.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/discount_tag.dart';
 import 'package:sixam_mart/common/widgets/organic_tag.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 class FlashProductCardWidget extends StatelessWidget {
   final Products product;
@@ -106,7 +107,7 @@ class FlashProductCardWidget extends StatelessWidget {
                 children: [
                   Text(product.item!.name ?? '', maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: robotoMedium),
 
-                  (Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && product.item!.unitType != null) ? Text(
+                  ModuleHelper.isUnitVisible(product.item) ? Text(
                     '(${ product.item!.unitType ?? ''})',
                     style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall),
                   ) : const SizedBox(),

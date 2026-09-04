@@ -54,7 +54,7 @@ class BottomNavItemWidget extends StatelessWidget {
                 top: 0,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 260),
-                  curve: Curves.easeOutBack,
+                  curve: Curves.easeInOut,
                   width: isSelected ? 24 : 0,
                   height: isSelected ? 3 : 0,
                   decoration: BoxDecoration(
@@ -66,11 +66,11 @@ class BottomNavItemWidget extends StatelessWidget {
                         ? [
                             BoxShadow(
                               color: selectedColor.withValues(alpha: 0.35),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 1),
                             ),
                           ]
-                        : [],
+                        : null,
                   ),
                 ),
               ),

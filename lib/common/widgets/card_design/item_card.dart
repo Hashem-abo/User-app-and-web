@@ -478,11 +478,22 @@ class _ItemCardState extends State<ItemCard> {
                                        ),
                                       const SizedBox(width: 4),
                                       Expanded(
-                                        child: Text(
-                                          widget.item != null ? widget.item!.storeName ?? '' : widget.store!.name ?? '',
-                                          style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor),
-                                          textAlign: TextAlign.right,
-                                          maxLines: 1, overflow: TextOverflow.ellipsis,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                widget.item != null ? widget.item!.storeName ?? '' : widget.store!.name ?? '',
+                                                style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor),
+                                                textAlign: TextAlign.right,
+                                                maxLines: 1, overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            if ((widget.item?.verifiedSeller == 1) || (widget.store?.verifiedSeller == 1) || (widget.item?.storeDetails?['verified_seller'] == 1) || (widget.item?.storeDetails?['verified_seller'] == '1') || (widget.item?.storeDetails?['verified_seller'] == true)) ...[
+                                              const SizedBox(width: 3),
+                                              Icon(Icons.verified, color: Theme.of(context).primaryColor, size: 12),
+                                            ],
+                                          ],
                                         ),
                                       ),
                                       if (hasRating) ...[
@@ -533,6 +544,10 @@ class _ItemCardState extends State<ItemCard> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
+                                    if ((widget.item?.verifiedSeller == 1) || (widget.store?.verifiedSeller == 1) || (widget.item?.storeDetails?['verified_seller'] == 1) || (widget.item?.storeDetails?['verified_seller'] == '1') || (widget.item?.storeDetails?['verified_seller'] == true)) ...[
+                                      const SizedBox(width: 4),
+                                      Icon(Icons.verified, color: Theme.of(context).primaryColor, size: 14),
+                                    ],
                                   ],
                                 ),
 

@@ -5,6 +5,7 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 class DeliveryManWidget extends StatelessWidget {
   final DeliveryMan? deliveryMan;
@@ -24,7 +25,7 @@ class DeliveryManWidget extends StatelessWidget {
         )],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(moduleId == 1 ? 'Vendor' : 'delivery_man'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+        Text(ModuleHelper.isGrocery(moduleId: moduleId) ? 'Vendor' : 'delivery_man'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
         ListTile(
           leading: ClipOval(
             child: CustomImage(

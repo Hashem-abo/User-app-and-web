@@ -210,27 +210,14 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                       if(!widget.isAvailable)
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Text(
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text(
                             'not_available_now'.tr,
                             style: robotoRegular.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeOverSmall),
+                            maxLines: 1, overflow: TextOverflow.ellipsis,
                           ),
-                          InkWell(
-                            onTap: () {
-                              Get.find<CartController>().removeFromCart(
-                                widget.cartIndex,
-                                item: widget.cart.item,
-                                cartId: widget.cart.id,
-                                cartModel: widget.cart,
-                              );
-                            },
-                            child: Row(children: [
-                              Icon(CupertinoIcons.delete, color: Theme.of(context).colorScheme.error, size: 14),
-                              const SizedBox(width: 2),
-                              Text('delete'.tr, style: robotoMedium.copyWith(color: Theme.of(context).colorScheme.error, fontSize: Dimensions.fontSizeOverSmall)),
-                            ]),
-                          ),
-                        ]),
+                        ),
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Flexible(
                           child: Text(
@@ -271,7 +258,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                       (genericName.isNotEmpty) ? Padding(
                         padding: const EdgeInsets.only(top: 2.0),
                         child: Row(children: [
-                          Flexible(
+                          Expanded(
                             child: Text(
                               genericName,
                               style: robotoMedium.copyWith(
@@ -319,20 +306,25 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                             showAddonsVariations = !showAddonsVariations;
                           });
                         },
-                        child: Row(spacing: Dimensions.paddingSizeExtraSmall, children: [
-                          Text('${variationCount > 0 ? '$variationCount ${'variations'.tr}' : ''}'
-                              '${addonCount > 0 ? ', $addonCount ${'addons'.tr}' : ''}',
-                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
+                        child: Row(children: [
+                          Expanded(
+                            child: Text('${variationCount > 0 ? '$variationCount ${'variations'.tr}' : ''}'
+                                '${addonCount > 0 ? ', $addonCount ${'addons'.tr}' : ''}',
+                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
+                              maxLines: 1, overflow: TextOverflow.ellipsis,
+                            ),
                           ),
+                          const SizedBox(width: 4),
 
                           Container(
+                            padding: const EdgeInsets.all(2),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.grey.shade200,
                             ),
                             child: Icon(
                               showAddonsVariations ? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined,
-                              size: 20, color: showAddonsVariations ? Theme.of(context).primaryColor : Theme.of(context).disabledColor,
+                              size: 14, color: showAddonsVariations ? Theme.of(context).primaryColor : Theme.of(context).disabledColor,
                             ),
                           ),
                         ]),

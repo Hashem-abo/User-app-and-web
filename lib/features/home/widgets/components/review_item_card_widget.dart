@@ -17,6 +17,7 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/discount_tag.dart';
 import 'package:sixam_mart/common/widgets/hover/on_hover.dart';
 import 'package:sixam_mart/common/widgets/organic_tag.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 class ReviewItemCard extends StatelessWidget {
   final bool isFeatured;
@@ -257,7 +258,7 @@ class ReviewItemCard extends StatelessWidget {
                               Text("(${item!.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
                             ]) : const SizedBox(),
 
-                            (Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item!.unitType != null) ? Text(
+                            ModuleHelper.isUnitVisible(item) ? Text(
                               '(${item!.unitType ?? ''})',
                               style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
                             ) : const SizedBox(),

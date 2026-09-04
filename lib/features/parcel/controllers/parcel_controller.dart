@@ -362,7 +362,8 @@ class ParcelController extends GetxController implements GetxService {
         charge = surgePriceType == 'percent' ? charge + (charge * (surgePrice / 100)) : charge + surgePrice;
       }
     }
-    return PriceConverter.toFixed(charge);
+    double rounded = (charge / 100).ceilToDouble() * 100;
+    return PriceConverter.toFixed(rounded);
   }
 
   // Parcel has no item subtotal, so the Pro discount applies on the delivery charge (the parcel order amount).
