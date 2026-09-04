@@ -10,6 +10,7 @@ import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -212,7 +213,8 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                             Expanded(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Text(
-                                  item.name!, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
+                                  '${item.name!}${ModuleHelper.isUnitVisible(item) ? ' (${item.unitType})' : ''}',
+                                  style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
                                   maxLines: 2, overflow: TextOverflow.ellipsis,
                                 ),
                                 InkWell(
@@ -240,7 +242,8 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                 Text(
                                   '${PriceConverter.convertPrice(startingPrice, discount: initialDiscount, discountType: discountType)}'
                                       '${endingPrice != null ? ' - ${PriceConverter.convertPrice(endingPrice, discount: initialDiscount,
-                                      discountType: discountType)}' : ''}',
+                                      discountType: discountType)}' : ''}'
+                                      '${ModuleHelper.isUnitVisible(item) ? ' / ${item.unitType}' : ''}',
                                   style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge), textDirection: TextDirection.ltr,
                                 ),
                                 price > priceWithDiscount ? Text(
@@ -295,25 +298,50 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
 
                           const SizedBox(height: Dimensions.paddingSizeLarge),
 
-                          ((Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item.unitType != null)
+                          ((ModuleHelper.isUnitVisible(item))
                               || (Get.find<SplashController>().configModel!.moduleConfig!.module!.vegNonVeg! && Get.find<SplashController>().configModel!.toggleVegNonVeg!)) ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeSmall),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
-                                    color: Theme.of(context).cardColor,
-                                    boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.2), blurRadius: 5)]
-                                ),
-                                child: Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! ? Text(
-                                  item.unitType ?? '',
-                                  style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor),
-                                ) : Row(mainAxisSize: MainAxisSize.min, children: [
-                                  Image.asset(item.veg == 1 ? Images.vegLogo : Images.nonVegLogo, height: 20, width: 20),
-                                  const SizedBox(width: Dimensions.paddingSizeSmall),
-                                  Text(item.veg == 1 ? 'veg'.tr : 'non_veg'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault)),
-                                ]),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (ModuleHelper.isUnitVisible(item))
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeSmall),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
+                                          color: Theme.of(context).cardColor,
+                                          boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.2), blurRadius: 5)]
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.scale_outlined, size: 14, color: Theme.of(context).primaryColor),
+                                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                          Text(
+                                            '${'unit'.tr}: ${item.unitType}',
+                                            style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (ModuleHelper.isUnitVisible(item) && (Get.find<SplashController>().configModel!.moduleConfig!.module!.vegNonVeg! && Get.find<SplashController>().configModel!.toggleVegNonVeg!))
+                                    const SizedBox(width: Dimensions.paddingSizeSmall),
+                                  if (Get.find<SplashController>().configModel!.moduleConfig!.module!.vegNonVeg! && Get.find<SplashController>().configModel!.toggleVegNonVeg!)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeSmall),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(Dimensions.radiusExtraLarge),
+                                          color: Theme.of(context).cardColor,
+                                          boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.2), blurRadius: 5)]
+                                      ),
+                                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                        Image.asset(item.veg == 1 ? Images.vegLogo : Images.nonVegLogo, height: 20, width: 20),
+                                        const SizedBox(width: Dimensions.paddingSizeSmall),
+                                        Text(item.veg == 1 ? 'veg'.tr : 'non_veg'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                                      ]),
+                                    ),
+                                ],
                               ),
                               const SizedBox(height: Dimensions.paddingSizeLarge),
                             ],
@@ -435,6 +463,11 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                 withAddonCost,
                                 textStyle: robotoBold.copyWith(color: Theme.of(context).primaryColor),
                               ),
+                              if (ModuleHelper.isUnitVisible(item))
+                                Text(
+                                  ' / ${itemController.quantity} ${item.unitType}',
+                                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
+                                ),
                             ]),
                           ]);
                         }
@@ -471,7 +504,17 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                 isIncrement: false,
                                 fromSheet: true,
                               ),
-                              Text(itemController.quantity.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(itemController.quantity.toString(), style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                                  if (ModuleHelper.isUnitVisible(item))
+                                    Text(
+                                      item.unitType ?? '',
+                                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor),
+                                    ),
+                                ],
+                              ),
                               QuantityButton(
                                 onTap: () => itemController.setQuantity(true, stock, item.quantityLimit, getxSnackBar: true),
                                 isIncrement: true,

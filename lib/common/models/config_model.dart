@@ -336,7 +336,7 @@ class ConfigModel {
     adminFreeDelivery = json['admin_free_delivery'] != null ? AdminFreeDelivery.fromJson(json['admin_free_delivery']) : null;
     isSmsActive = json['is_sms_active'];
     isMailActive = json['is_mail_active'];
-    monthlyOrderRemainder = json['monthly_order_reminder'];
+    monthlyOrderRemainder = int.tryParse(json['monthly_order_reminder']?.toString() ?? json['monthly_order_remainder']?.toString() ?? json['monthly_order_status']?.toString() ?? '') ?? (json['monthly_order_reminder'] == 1 || json['monthly_order_reminder'] == true || json['monthly_order_reminder'] == '1' || json['monthly_order_remainder'] == 1 || json['monthly_order_remainder'] == true || json['monthly_order_remainder'] == '1' ? 1 : 0);
     parcelCancellationStatus = json['parcel_cancellation_status'];
     parcelCancellationBasicSetup = json['parcel_cancellation_basic_setup'] != null ? ParcelCancellationBasicSetup.fromJson(json['parcel_cancellation_basic_setup']) : null;
     parcelReturnTimeFee = json['parcel_return_time_fee'] != null ? ParcelReturnTimeFee.fromJson(json['parcel_return_time_fee']) : null;

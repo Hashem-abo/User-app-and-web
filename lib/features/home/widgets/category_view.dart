@@ -62,7 +62,7 @@ class _CategoryViewState extends State<CategoryView> {
                               width: 90, // Wider for text
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                color: Theme.of(context).primaryColor.withOpacity(0.05), // Light gray/primary tint background
+                                color: Theme.of(context).primaryColor.withValues(alpha: 0.05), // Light gray/primary tint background
                               ),
                               child: Column(children: [
                                 Padding(

@@ -15,6 +15,7 @@ import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -1352,13 +1353,28 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                             ),
                           ),
                         ),
-                        
-                        SizedBox(
-                          width: 40,
+                        Container(
+                          constraints: const BoxConstraints(minWidth: 40),
+                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
                           child: Center(
-                            child: Text(
-                              _localQuantity.toString(),
-                              style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _localQuantity.toString(),
+                                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge),
+                                ),
+                                if (ModuleHelper.isUnitVisible(item))
+                                  Text(
+                                    item.unitType!,
+                                    style: robotoRegular.copyWith(
+                                      fontSize: Dimensions.fontSizeOverSmall,
+                                      color: Theme.of(context).disabledColor,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              ],
                             ),
                           ),
                         ),
@@ -1368,7 +1384,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                              if(!Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > _localQuantity) {
                                 setState(() => _localQuantity++);
                              } else {
-                               showCustomSnackBar('out_of_stock'.tr);
+                                showCustomSnackBar('out_of_stock'.tr);
                              }
                           },
                           child: Container(
@@ -1388,7 +1404,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
                         Row(children: [
                         Text(
-                          PriceConverter.convertPrice( priceWithAddons * _localQuantity ),
+                          PriceConverter.convertPrice( priceWithAddons * _localQuantity ) + (ModuleHelper.isUnitVisible(item) ? ' / $_localQuantity ${item.unitType}' : ''),
                           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
                           textDirection: TextDirection.ltr,
                         ),

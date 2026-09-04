@@ -21,6 +21,7 @@ import 'package:sixam_mart/features/checkout/widgets/note_prescription_section.d
 import 'package:sixam_mart/features/checkout/widgets/partial_pay_view.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/cart/widgets/add_to_monthly_widget.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
 class BottomSection extends StatelessWidget {
@@ -403,8 +404,12 @@ class BottomSection extends StatelessWidget {
   }
 
   bool _isGroceryOrPharmacy(List<CartModel?>? cartList) {
-    final String? moduleType = (cartList != null && cartList.isNotEmpty) ? cartList[0]?.item?.moduleType : null;
-    return moduleType == AppConstants.grocery || moduleType == AppConstants.pharmacy;
+    final item = (cartList != null && cartList.isNotEmpty) ? cartList[0]?.item : null;
+    return ModuleHelper.isGroceryOrPharmacy(
+      item: item,
+      moduleId: item?.moduleId ?? checkoutController.store?.moduleId,
+      moduleType: item?.moduleType ?? checkoutController.store?.module?.moduleType,
+    );
   }
 
   bool _hasCampaignOrFlashSaleItem(List<CartModel?>? cartList) {

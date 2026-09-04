@@ -240,6 +240,11 @@ class PlaceOrderBodyModel {
     _purchaseCode = json['purchase_code'];
     _productReferrerId = json['product_referrer_id'];
     _saverDeliveryType = json['delivery_type'];
+    _monthlySubscribe = json['monthly_subscribe'] == '1' || json['monthly_subscribe'] == 1 || json['monthly_subscribe'] == true
+        || json['is_monthly_subscribe'] == '1' || json['is_monthly_subscribe'] == 1 || json['is_monthly_subscribe'] == true
+        || json['monthly_order'] == '1' || json['monthly_order'] == 1 || json['monthly_order'] == true
+        || json['monthly_purchase'] == '1' || json['monthly_purchase'] == 1 || json['monthly_purchase'] == true
+        || json['add_to_monthly'] == '1' || json['add_to_monthly'] == 1 || json['add_to_monthly'] == true;
   }
 
   Map<String, String> toJson() {
@@ -330,6 +335,12 @@ class PlaceOrderBodyModel {
     if (_monthlySubscribe != null) {
       data['monthly_subscribe'] = _monthlySubscribe! ? '1' : '0';
       data['is_monthly_subscribe'] = _monthlySubscribe! ? '1' : '0';
+      data['monthly_order'] = _monthlySubscribe! ? '1' : '0';
+      data['is_monthly_order'] = _monthlySubscribe! ? '1' : '0';
+      data['monthly_purchase'] = _monthlySubscribe! ? '1' : '0';
+      data['is_monthly_purchase'] = _monthlySubscribe! ? '1' : '0';
+      data['add_to_monthly'] = _monthlySubscribe! ? '1' : '0';
+      data['add_to_monthly_order'] = _monthlySubscribe! ? '1' : '0';
     }
     if (_pickupCenterName != null) {
       data['pickup_center_name'] = _pickupCenterName!;

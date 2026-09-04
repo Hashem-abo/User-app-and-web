@@ -98,10 +98,12 @@ class MonthlyReorderSection extends StatelessWidget {
                 const SizedBox(width: 10),
 
                 // ── Animated toggle switch ───────────────────────────────
-                _AnimatedToggle(
-                  value: isChecked,
-                  activeColor: primaryColor,
-                  onChanged: (_) => controller.toggleMonthlySubscribe(),
+                IgnorePointer(
+                  child: _AnimatedToggle(
+                    value: isChecked,
+                    activeColor: primaryColor,
+                    onChanged: (_) {},
+                  ),
                 ),
               ]),
             ),
@@ -130,6 +132,7 @@ class _AnimatedToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color trackOff = Theme.of(context).disabledColor.withValues(alpha: 0.35);
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => onChanged(!value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),

@@ -27,6 +27,7 @@ import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:sixam_mart/common/widgets/store_verified_avatar.dart';
 import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 import 'package:sixam_mart/helper/item_helper.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -201,7 +202,7 @@ class ItemWidget extends StatelessWidget {
                                 ? Image.asset(item != null && item!.veg == 0 ? Images.nonVegImage : Images.vegImage,
                                 height: 10, width: 10, fit: BoxFit.contain) : const SizedBox(),
 
-                            (Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item != null && item!.unitType != null) ? Text(
+                            (!isStore && ModuleHelper.isUnitVisible(item)) ? Text(
                               '(${ item!.unitType ?? ''})',
                               style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor),
                             ) : const SizedBox(),
@@ -291,7 +292,7 @@ class ItemWidget extends StatelessWidget {
 
                           ]) : const SizedBox()) : (item != null ? Row(children: [
                             Flexible(child: Text(
-                              PriceConverter.convertPrice(item!.price, discount: discount, discountType: discountType),
+                              PriceConverter.convertPrice(item!.price, discount: discount, discountType: discountType) + (!isStore && ModuleHelper.isUnitVisible(item) ? ' / ${item!.unitType}' : ''),
                               style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.ltr,
                               maxLines: 1, overflow: TextOverflow.ellipsis,
                             )),

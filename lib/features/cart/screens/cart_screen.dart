@@ -1194,8 +1194,15 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   bool _isGroceryOrPharmacy(CartController cartController) {
-    final String? moduleType = cartController.cartList.isNotEmpty ? cartController.cartList[0].item?.moduleType : null;
-    return moduleType == AppConstants.grocery || moduleType == AppConstants.pharmacy;
+    if (cartController.cartList.isEmpty) {
+      return ModuleHelper.isGroceryOrPharmacy();
+    }
+    final item = cartController.cartList[0].item;
+    return ModuleHelper.isGroceryOrPharmacy(
+      item: item,
+      moduleId: item?.moduleId,
+      moduleType: item?.moduleType,
+    );
   }
 
   bool _hasCampaignOrFlashSaleItem(CartController cartController) {

@@ -275,6 +275,11 @@ class CheckoutController extends GetxController implements GetxService {
     update();
   }
 
+  void setMonthlySubscribe(bool value) {
+    _monthlySubscribe = value;
+    update();
+  }
+
   List<String> getMonthlyReorderPolicy() => checkoutServiceInterface.getMonthlyReorderPolicy();
 
   void _setSaverDeliveryData() {

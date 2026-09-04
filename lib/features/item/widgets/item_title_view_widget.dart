@@ -23,6 +23,7 @@ import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/features/review/widgets/review_widget.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/util/app_constants.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
 
 class ItemTitleViewWidget extends StatefulWidget {
@@ -147,9 +148,9 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
 
                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                ((Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && widget.item!.unitType != null)
-                || (Get.find<SplashController>().configModel!.moduleConfig!.module!.vegNonVeg! && Get.find<SplashController>().configModel!.toggleVegNonVeg!)) ? Text(
-                  Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! ? '(${widget.item!.unitType})'
+                (ModuleHelper.isUnitVisible(widget.item)
+                || ((Get.find<SplashController>().configModel?.moduleConfig?.module?.vegNonVeg ?? false) && (Get.find<SplashController>().configModel?.toggleVegNonVeg ?? false))) ? Text(
+                  ModuleHelper.isUnitVisible(widget.item) ? '(${widget.item!.unitType})'
                       : widget.item!.veg == 0 ? '(${'non_veg'.tr})' : '(${'veg'.tr})',
                   style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor),
                 ) : const SizedBox(),
@@ -240,6 +241,9 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                  if (widget.item!.wishlistCount != null && widget.item!.wishlistCount! > 0) {
                   statusList.add({'text': '${widget.item!.wishlistCount} ${'favorites'.tr}', 'icon': Icons.favorite});
                 }
+                if (ModuleHelper.isUnitVisible(widget.item)) {
+                  statusList.add({'text': '${'unit'.tr}: ${widget.item!.unitType}', 'icon': Icons.scale_outlined});
+                }
               }
             } catch (e) {
               print('Error preparing status list: $e');
@@ -298,20 +302,44 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
         ) : const SizedBox(),
         SizedBox(height: (itemController.item!.genericName != null && itemController.item!.genericName!.isNotEmpty) ? Dimensions.paddingSizeSmall : 0),
 
-        (widget.item?.moduleId == 1) ? const SizedBox() : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: 3),
-            decoration: BoxDecoration(
-              color: widget.inStock ? Colors.red.shade50 : Colors.green.shade50, borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          if (ModuleHelper.isUnitVisible(widget.item)) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: 4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.2)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.scale_outlined, size: 14, color: Theme.of(context).primaryColor),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${'unit'.tr}: ${widget.item!.unitType}',
+                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
+                  ),
+                ],
+              ),
             ),
-            child: Text(widget.inStock ? 'out_of_stock'.tr : 'in_stock'.tr, style: robotoRegular.copyWith(
-              color: Theme.of(context).disabledColor,
-              fontSize: Dimensions.fontSizeOverSmall,
-            )),
-          ),
-          const SizedBox(width: Dimensions.paddingSizeDefault),
+            const SizedBox(width: Dimensions.paddingSizeSmall),
+          ],
+          if (widget.item?.moduleId != 1) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: 3),
+              decoration: BoxDecoration(
+                color: widget.inStock ? Colors.red.shade50 : Colors.green.shade50, borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+              ),
+              child: Text(widget.inStock ? 'out_of_stock'.tr : 'in_stock'.tr, style: robotoRegular.copyWith(
+                color: Theme.of(context).disabledColor,
+                fontSize: Dimensions.fontSizeOverSmall,
+              )),
+            ),
+            const SizedBox(width: Dimensions.paddingSizeDefault),
 
-          OrganicTag(item: widget.item!, fromDetails: true),
+            OrganicTag(item: widget.item!, fromDetails: true),
+          ],
         ]),
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
@@ -335,7 +363,8 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
 
           Text(
             '${PriceConverter.convertPrice(startingPrice, discount: discount, discountType: discountType)}'
-                '${endingPrice!= null ? ' - ${PriceConverter.convertPrice(endingPrice, discount: discount, discountType: discountType)}' : ''}',
+                '${endingPrice!= null ? ' - ${PriceConverter.convertPrice(endingPrice, discount: discount, discountType: discountType)}' : ''}'
+                '${ModuleHelper.isUnitVisible(widget.item) ? ' / ${widget.item!.unitType}' : ''}',
             style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge), textDirection: TextDirection.ltr,
           ),
         ]),
@@ -361,7 +390,7 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.item?.name ?? '',
+                          widget.item != null ? '${widget.item!.name ?? ''}${ModuleHelper.isUnitVisible(widget.item) ? ' (${widget.item!.unitType})' : ''}' : '',
                           style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
                           maxLines: 2, overflow: TextOverflow.ellipsis,
                         ),
@@ -373,12 +402,28 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
                         Row(children: [
-                          if(widget.item?.unitType != null)
-                            Text(
-                              widget.item?.unitType ?? '',
-                              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                          if(ModuleHelper.isUnitVisible(widget.item)) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                                border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.2)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.scale_outlined, size: 12, color: Theme.of(context).primaryColor),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${'unit'.tr}: ${widget.item!.unitType}',
+                                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor),
+                                  ),
+                                ],
+                              ),
                             ),
-                          if(widget.item?.unitType != null) const SizedBox(width: 10),
+                            const SizedBox(width: 8),
+                          ],
                           Text(
                              widget.inStock ? 'out_of_stock'.tr : 'in_stock'.tr,
                              style: robotoRegular.copyWith(color: widget.inStock ? Theme.of(context).colorScheme.error : Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
@@ -395,10 +440,11 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        widget.price != null 
+                        (widget.price != null 
                             ? PriceConverter.convertPrice(widget.price)
                             : '${PriceConverter.convertPrice(startingPrice, discount: discount, discountType: discountType)}'
-                                '${endingPrice!= null ? ' - ${PriceConverter.convertPrice(endingPrice, discount: discount, discountType: discountType)}' : ''}',
+                                '${endingPrice!= null ? ' - ${PriceConverter.convertPrice(endingPrice, discount: discount, discountType: discountType)}' : ''}')
+                            + (ModuleHelper.isUnitVisible(widget.item) ? ' / ${widget.item!.unitType}' : ''),
                         style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
                         textDirection: TextDirection.rtl,
                       ),
@@ -444,6 +490,9 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                               }
                                if (widget.item!.wishlistCount != null && widget.item!.wishlistCount! > 0) {
                                 statusList.add({'text': '${widget.item!.wishlistCount} ${'favorites'.tr}', 'icon': Icons.favorite});
+                              }
+                              if (ModuleHelper.isUnitVisible(widget.item)) {
+                                statusList.add({'text': '${'unit'.tr}: ${widget.item!.unitType}', 'icon': Icons.scale_outlined});
                               }
                             }
                           } catch (e) {

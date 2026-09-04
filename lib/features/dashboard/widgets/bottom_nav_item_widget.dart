@@ -42,8 +42,8 @@ class BottomNavItemWidget extends StatelessWidget {
             }
             onTap?.call();
           },
-          splashColor: selectedColor.withOpacity(0.10),
-          highlightColor: selectedColor.withOpacity(0.05),
+          splashColor: selectedColor.withValues(alpha: 0.10),
+          highlightColor: selectedColor.withValues(alpha: 0.05),
           child: Stack(
             clipBehavior: Clip.none,
             alignment: Alignment.center,
@@ -64,7 +64,7 @@ class BottomNavItemWidget extends StatelessWidget {
                     boxShadow: isSelected
                         ? [
                             BoxShadow(
-                              color: selectedColor.withOpacity(0.30),
+                              color: selectedColor.withValues(alpha: 0.30),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
                             ),

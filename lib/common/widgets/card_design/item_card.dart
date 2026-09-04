@@ -30,6 +30,7 @@ import 'package:sixam_mart/helper/color_converter.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'package:sixam_mart/helper/item_helper.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 class ItemCard extends StatefulWidget {
   final Item? item;
@@ -443,7 +444,7 @@ class _ItemCardState extends State<ItemCard> {
                                             const SizedBox(width: 4),
                                             Flexible(
                                               child: Text(
-                                                widget.item != null ? widget.item!.name ?? '' : widget.store!.name ?? '',
+                                                widget.item != null ? '${widget.item!.name ?? ''}${ModuleHelper.isUnitVisible(widget.item) ? ' (${widget.item!.unitType})' : ''}' : widget.store!.name ?? '',
                                                 style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall),
                                                 maxLines: 1, overflow: TextOverflow.ellipsis,
                                                 textAlign: TextAlign.right,
@@ -507,7 +508,7 @@ class _ItemCardState extends State<ItemCard> {
                                       ],
                                       const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                       Text(
-                                        PriceConverter.convertPrice(finalPrice),
+                                        PriceConverter.convertPrice(finalPrice) + (ModuleHelper.isUnitVisible(widget.item) ? ' / ${widget.item!.unitType}' : ''),
                                         style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
                                       ),
                                     ],
@@ -538,7 +539,28 @@ class _ItemCardState extends State<ItemCard> {
                                 const SizedBox(), // Optional spacing between rows
                                 Padding(
                                   padding: const EdgeInsets.only(right: Dimensions.paddingSizeExtraSmall),
-                                  child: Directionality(textDirection: TextDirection.rtl, child: Text(widget.item != null ? widget.item!.name ?? '' : widget.store!.name ?? '', style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                                  child: Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: Text(
+                                            widget.item != null ? widget.item!.name ?? '' : widget.store!.name ?? '',
+                                            style: robotoBold,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        if (ModuleHelper.isUnitVisible(widget.item)) ...[
+                                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                          Text(
+                                            '(${widget.item!.unitType})',
+                                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
                                 ),
 
                                 // (widget.isFood || widget.isShop) ? Flexible(
@@ -675,11 +697,19 @@ class _ItemCardState extends State<ItemCard> {
                                     // Wishlist Count
                                   if(widget.item != null && widget.item!.wishlistCount != null && widget.item!.wishlistCount! > 0) {
                                     statusList.add({
-                                      'text': '${widget.item!.wishlistCount} ${'favorites'.tr}', 
-                                      'icon': Icons.favorite_border, 
-                                      'color': Colors.redAccent, // Classic Love Red
-                                    });
-                                  }
+                                        'text': '${widget.item!.wishlistCount} ${'favorites'.tr}', 
+                                        'icon': Icons.favorite_border, 
+                                        'color': Colors.redAccent, // Classic Love Red
+                                      });
+                                    }
+
+                                    if (widget.item != null && ModuleHelper.isUnitVisible(widget.item)) {
+                                      statusList.add({
+                                        'text': '${'unit'.tr}: ${widget.item!.unitType}',
+                                        'icon': Icons.scale_outlined,
+                                        'color': Colors.indigo,
+                                      });
+                                    }
 
                                       if (widget.item != null) {
                                         if (widget.item!.orderCount != null && widget.item!.orderCount! > 10) {
@@ -887,6 +917,15 @@ class _ItemCardState extends State<ItemCard> {
                                               style: robotoMedium.copyWith(
                                                 fontSize: Dimensions.fontSizeExtraSmall, 
                                                 color: Theme.of(context).primaryColor,
+                                              ),
+                                            ),
+
+                                          if (ModuleHelper.isUnitVisible(widget.item))
+                                            TextSpan(
+                                              text: ' / ${widget.item!.unitType}',
+                                              style: robotoRegular.copyWith(
+                                                fontSize: Dimensions.fontSizeExtraSmall,
+                                                color: Theme.of(context).hintColor,
                                               ),
                                             ),
                                         ],

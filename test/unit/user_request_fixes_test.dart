@@ -1,8 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sixam_mart/common/models/config_model.dart';
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
+import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 
 PlaceOrderBodyModel _buildTestBody({bool? monthlySubscribe}) {
   return PlaceOrderBodyModel(
@@ -193,6 +196,106 @@ void main() {
 
       expect(resolveKeyboardType(isPassword, true), equals('text'));
       expect(resolveKeyboardType(isPassword, false), equals('visiblePassword'));
+    });
+  });
+
+  group('USER REQUEST FIX 6: Zad Module Product Unit Display', () {
+    test('isUnitVisibleForType returns true for Zad module ID 1', () {
+      expect(ModuleHelper.isUnitVisibleForType(unitType: 'kg', moduleId: 1), isTrue);
+      expect(ModuleHelper.isUnitVisibleForType(unitType: 'قطعة', moduleId: 1), isTrue);
+      expect(ModuleHelper.isUnitVisibleForType(unitType: 'حبة', moduleId: 1), isTrue);
+    });
+
+    test('isUnitVisibleForType returns true for grocery module type', () {
+      expect(ModuleHelper.isUnitVisibleForType(unitType: 'kg', moduleType: 'grocery'), isTrue);
+      expect(ModuleHelper.isUnitVisibleForType(unitType: 'ltr', moduleType: 'grocery'), isTrue);
+    });
+
+    test('isUnitVisibleForType returns false for empty or null unitType', () {
+      expect(ModuleHelper.isUnitVisibleForType(unitType: null, moduleId: 1), isFalse);
+      expect(ModuleHelper.isUnitVisibleForType(unitType: '', moduleId: 1), isFalse);
+      expect(ModuleHelper.isUnitVisibleForType(unitType: '   ', moduleId: 1), isFalse);
+    });
+
+    test('isUnitVisible returns true for Item in Zad module with unit', () {
+      final zadItem = Item(id: 10, name: 'Tomato', moduleId: 1, unitType: 'kg');
+      expect(ModuleHelper.isUnitVisible(zadItem), isTrue);
+
+      final groceryItem = Item(id: 11, name: 'Apple', moduleType: 'grocery', unitType: 'box');
+      expect(ModuleHelper.isUnitVisible(groceryItem), isTrue);
+    });
+
+    test('isUnitVisible returns false for Item with null or empty unitType or null item', () {
+      expect(ModuleHelper.isUnitVisible(null), isFalse);
+
+      final itemNoUnit = Item(id: 12, name: 'Milk', moduleId: 1, unitType: null);
+      expect(ModuleHelper.isUnitVisible(itemNoUnit), isFalse);
+
+      final itemEmptyUnit = Item(id: 13, name: 'Bread', moduleId: 1, unitType: '');
+      expect(ModuleHelper.isUnitVisible(itemEmptyUnit), isFalse);
+    });
+  });
+
+  group('USER REQUEST FIX 7: Monthly Enable Module & Config Resolution', () {
+    test('ModuleHelper.isGroceryOrPharmacy correctly detects grocery module ID 1 and pharmacy ID 2', () {
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleId: 1), isTrue);
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleId: 2), isTrue);
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleId: 3), isFalse);
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleId: 4), isFalse);
+    });
+
+    test('ModuleHelper.isGroceryOrPharmacy detects grocery and pharmacy moduleType strings', () {
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleType: 'grocery'), isTrue);
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleType: 'pharmacy'), isTrue);
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleType: 'food'), isFalse);
+      expect(ModuleHelper.isGroceryOrPharmacy(moduleType: 'parcel'), isFalse);
+    });
+
+    test('ModuleHelper.isGroceryOrPharmacy handles Items with null moduleType but valid moduleId', () {
+      final itemFromApi = Item(id: 101, name: 'Cucumber', moduleId: 1, moduleType: null);
+      expect(ModuleHelper.isGroceryOrPharmacy(item: itemFromApi), isTrue);
+
+      final pharmacyItem = Item(id: 102, name: 'Aspirin', moduleId: 2, moduleType: null);
+      expect(ModuleHelper.isGroceryOrPharmacy(item: pharmacyItem), isTrue);
+
+      final foodItem = Item(id: 103, name: 'Burger', moduleId: 3, moduleType: null);
+      expect(ModuleHelper.isGroceryOrPharmacy(item: foodItem), isFalse);
+    });
+
+    test('ConfigModel parses monthlyOrderRemainder safely from string, int, and boolean forms', () {
+      final configInt = ConfigModel.fromJson({'monthly_order_reminder': 1});
+      expect(configInt.monthlyOrderRemainder, equals(1));
+
+      final configStr = ConfigModel.fromJson({'monthly_order_reminder': '1'});
+      expect(configStr.monthlyOrderRemainder, equals(1));
+
+      final configBool = ConfigModel.fromJson({'monthly_order_reminder': true});
+      expect(configBool.monthlyOrderRemainder, equals(1));
+
+      final configRemainderKey = ConfigModel.fromJson({'monthly_order_remainder': '1'});
+      expect(configRemainderKey.monthlyOrderRemainder, equals(1));
+
+      final configStatusKey = ConfigModel.fromJson({'monthly_order_status': 1});
+      expect(configStatusKey.monthlyOrderRemainder, equals(1));
+
+      final configDisabled = ConfigModel.fromJson({'monthly_order_reminder': 0});
+      expect(configDisabled.monthlyOrderRemainder, equals(0));
+
+      final configDisabledStr = ConfigModel.fromJson({'monthly_order_reminder': '0'});
+      expect(configDisabledStr.monthlyOrderRemainder, equals(0));
+    });
+
+    test('PlaceOrderBodyModel sends monthly order payload aliases for backend compatibility', () {
+      final body = _buildTestBody(monthlySubscribe: true);
+      final json = body.toJson();
+      expect(json['monthly_subscribe'], equals('1'));
+      expect(json['is_monthly_subscribe'], equals('1'));
+      expect(json['monthly_order'], equals('1'));
+      expect(json['is_monthly_order'], equals('1'));
+      expect(json['monthly_purchase'], equals('1'));
+      expect(json['is_monthly_purchase'], equals('1'));
+      expect(json['add_to_monthly'], equals('1'));
+      expect(json['add_to_monthly_order'], equals('1'));
     });
   });
 }

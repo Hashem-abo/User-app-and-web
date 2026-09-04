@@ -61,6 +61,10 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
         GuestOrderHelper.addGuestOrder(parsedId, widget.contactPersonNumber);
       }
     }
+
+    if(AuthHelper.isLoggedIn()) {
+      Get.find<OrderController>().getMonthlyOrderList(notify: false);
+    }
   }
 
   @override

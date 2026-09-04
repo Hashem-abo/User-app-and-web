@@ -22,6 +22,7 @@ import 'package:sixam_mart/common/widgets/organic_tag.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/features/store/screens/store_screen.dart';
 import 'package:sixam_mart/helper/item_helper.dart';
+import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -174,7 +175,7 @@ class WebItemWidget extends StatelessWidget {
 
                               Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
                                 Text(
-                                  isStore ? store!.name! : item!.name!,
+                                  isStore ? store!.name! : '${item!.name!}${(!isStore && ModuleHelper.isUnitVisible(item)) ? ' (${item!.unitType})' : ''}',
                                   style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall),
                                   maxLines: desktop ? 1 : 1, overflow: TextOverflow.ellipsis,
                                 ),
@@ -217,7 +218,7 @@ class WebItemWidget extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text(
-                                      PriceConverter.convertPrice(item!.price, discount: discount, discountType: discountType),
+                                      PriceConverter.convertPrice(item!.price, discount: discount, discountType: discountType) + ((!isStore && ModuleHelper.isUnitVisible(item)) ? ' / ${item!.unitType}' : ''),
                                       style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.ltr,
                                     ),
                                     SizedBox(width: discount! > 0 ? Dimensions.paddingSizeExtraSmall : 0),

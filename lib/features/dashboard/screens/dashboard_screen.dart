@@ -239,7 +239,7 @@ class DashboardScreenState extends State<DashboardScreen> {
       isParcel = isParcel && !isTaxiWithCache;
 
       // Only rebuild _screens when the module type actually changes (performance)
-      final String newModuleKey = '${splashController.module?.moduleType}_${isParcel}_${isTaxi}_${isGlobal}';
+      final String newModuleKey = '${splashController.module?.moduleType}_${isParcel}_${isTaxi}_$isGlobal';
       if (newModuleKey != _lastModuleType) {
         _lastModuleType = newModuleKey;
         _buildScreens(isParcel: isParcel, isTaxi: isTaxi, isGlobal: isGlobal);
