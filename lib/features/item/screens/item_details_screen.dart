@@ -1382,7 +1382,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
                         InkWell(
                           onTap: () {
-                             if(!Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > _localQuantity) {
+                             if(item.quantityLimit != null && item.quantityLimit == 0) {
+                                showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+                             } else if(!Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > _localQuantity) {
                                 setState(() => _localQuantity++);
                              } else {
                                 showCustomSnackBar('out_of_stock'.tr);
@@ -1412,6 +1414,10 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                         const SizedBox(width: Dimensions.paddingSizeSmall),
                         InkWell(
                           onTap: () async {
+                              if (item.quantityLimit != null && item.quantityLimit == 0) {
+                                showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+                                return;
+                              }
                               List<OrderVariation> variations = _getSelectedVariations(
                                 isFoodVariation: Get.find<SplashController>().getModuleConfig(item.moduleType).newVariation!,
                                 foodVariations: item.foodVariations!, selectedVariations: itemController.selectedVariations,
@@ -1524,9 +1530,11 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       Expanded(
                         child: CustomButton(
                           isLoading: cartController.isLoading,
-                          buttonText: (item.moduleType != 'food' && Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && stock! <= 0) ? 'out_of_stock'.tr
+                          buttonText: (item.quantityLimit != null && item.quantityLimit == 0)
+                              ? 'item_is_not_available_in_the_store'.tr
+                              : (item.moduleType != 'food' && Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && stock! <= 0) ? 'out_of_stock'.tr
                               : item.availableDateStarts != null ? 'order_now'.tr : cartIndex != -1 ? 'update_in_cart'.tr : 'add_to_cart'.tr,
-                          onPressed: (cart == null || cartModel == null) ? null : (item.moduleType == 'food' || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > 0) ?  () async {
+                          onPressed: (cart == null || cartModel == null || (item.quantityLimit != null && item.quantityLimit == 0)) ? null : (item.moduleType == 'food' || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > 0) ?  () async {
                             if(item.moduleType == 'food' || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > 0) {
                               if (cartIndex != -1) {
                                    setState(() {
@@ -1698,7 +1706,9 @@ class QuantityButton extends StatelessWidget {
             if (!isIncrement && quantity! > 1) {
               cartController.setQuantity(false, resolvedIndex, stock, quantityLimit, cartId: cartItem.id, cartModel: cartItem);
             } else if (isIncrement && quantity! > 0) {
-              if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
+              if (quantityLimit != null && quantityLimit == 0) {
+                showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+              } else if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
                 cartController.setQuantity(true, resolvedIndex, stock, quantityLimit, cartId: cartItem.id, cartModel: cartItem);
               }else {
                 showCustomSnackBar('out_of_stock'.tr);
@@ -1709,7 +1719,9 @@ class QuantityButton extends StatelessWidget {
           if (!isIncrement && quantity! > 1) {
             Get.find<ItemController>().setQuantity(false, stock, quantityLimit);
           } else if (isIncrement && quantity! > 0) {
-            if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
+            if (quantityLimit != null && quantityLimit == 0) {
+              showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+            } else if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
               Get.find<ItemController>().setQuantity(true, stock, quantityLimit);
             }else {
               showCustomSnackBar('out_of_stock'.tr);

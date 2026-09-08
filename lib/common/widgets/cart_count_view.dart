@@ -91,7 +91,9 @@ class CartCountView extends StatelessWidget {
                 var targetCartItem = cartController.cartList[liveIndex];
                 int currentQty = targetCartItem.quantity ?? 1;
                 int? limit = item.quantityLimit ?? targetCartItem.quantityLimit ?? targetCartItem.item?.quantityLimit;
-                if (limit != null && limit != 0 && currentQty >= limit) {
+                if (limit != null && limit <= 0) {
+                  showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+                } else if (limit != null && limit > 0 && currentQty >= limit) {
                   showCustomSnackBar('${'maximum_quantity_limit'.tr} $limit');
                 } else {
                   cartController.setDirectlyAddToCartIndex(index);
@@ -123,6 +125,10 @@ class CartCountView extends StatelessWidget {
         bool isAdding = cartController.isItemAdding(item.id) || itemController.isDirectAdding(item.id);
         return InkWell(
           onTap: isAdding ? null : () {
+            if (item.quantityLimit != null && item.quantityLimit == 0) {
+              showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+              return;
+            }
             itemController.itemDirectlyAddToCart(item, context, isCampaign: isCampaign);
           },
           child: child ?? Container(

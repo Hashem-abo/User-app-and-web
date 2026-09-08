@@ -1765,6 +1765,10 @@ class ItemController extends GetxController implements GetxService {
 
   void itemDirectlyAddToCart(Item? item, BuildContext context, {bool inStore = false, bool isCampaign = false}) {
     if (item == null || item.id == null) return;
+    if (item.quantityLimit != null && item.quantityLimit == 0) {
+      showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+      return;
+    }
     if (_directAddingItemIds.contains(item.id) || Get.find<CartController>().isItemAdding(item.id)) {
       return;
     }
@@ -1772,6 +1776,12 @@ class ItemController extends GetxController implements GetxService {
     update();
 
     getItemDetails(itemId: item.id!, item: item, isCampaign: isCampaign, fetchSimilarItems: false).then((value) {
+      if (_item?.quantityLimit != null && _item!.quantityLimit == 0) {
+        _directAddingItemIds.remove(item.id);
+        update();
+        showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+        return;
+      }
       bool hasVariations = (_item?.choiceOptions != null && _item!.choiceOptions!.isNotEmpty)
           || (_item?.variations != null && _item!.variations!.isNotEmpty)
           || (_item?.foodVariations != null && _item!.foodVariations!.isNotEmpty);
@@ -1807,7 +1817,12 @@ class ItemController extends GetxController implements GetxService {
           variations: ModuleHelper.getModuleConfig(_item?.moduleType).newVariation! ? orderVariations : null,
           quantity: 1, addOnIds: [], addOns: [], addOnQtys: [], model: isCampaign ? 'ItemCampaign' : 'Item',
         );
-        if(Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && _item!.stock! <= 0){
+        if (_item?.quantityLimit != null && _item!.quantityLimit == 0) {
+          _directAddingItemIds.remove(item.id);
+          update();
+          showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+        }
+        else if(Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && _item!.stock! <= 0){
           showCustomSnackBar('out_of_stock'.tr);
         }
         else if (Get.find<CartController>().existAnotherStoreItem(cartModel.item!.storeId, ModuleHelper.getModule() != null

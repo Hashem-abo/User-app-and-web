@@ -1,5 +1,6 @@
 import 'package:sixam_mart/common/widgets/cart_count_view.dart';
 import 'package:sixam_mart/common/widgets/custom_favourite_widget.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/hover/on_hover.dart';
 import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
@@ -67,7 +68,7 @@ class WebItemWidget extends StatelessWidget {
     return TextHover(
       builder: (hovered) {
         return InkWell(
-          onTap: isEntirelyOutOfStock ? null : () {
+          onTap: isEntirelyOutOfStock ? () => showCustomSnackBar('item_is_not_available_in_the_store'.tr) : () {
             if(isStore) {
               if(store != null) {
                 if(isFeatured && Get.find<SplashController>().moduleList != null) {

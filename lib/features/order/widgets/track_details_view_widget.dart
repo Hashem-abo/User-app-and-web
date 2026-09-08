@@ -1,15 +1,12 @@
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
+import 'package:sixam_mart/helper/call_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
 
 class TrackDetailsViewWidget extends StatelessWidget {
   final String? status;
@@ -39,7 +36,7 @@ class TrackDetailsViewWidget extends StatelessWidget {
 
         Align(alignment: Alignment.centerLeft, child: Text(
           takeAway ? Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-              ? 'store'.tr : 'store'.tr : (track.store != null && ModuleHelper.isGrocery(moduleId: track.store!.moduleId)) ? 'grocery_track'.tr : 'delivery_man'.tr,
+              ? 'store'.tr : 'store'.tr : (track.deliveryMan != null) ? 'delivery_man'.tr : 'store'.tr,
           style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
         )),
         const SizedBox(height: Dimensions.paddingSizeExtraSmall),
@@ -62,11 +59,9 @@ class TrackDetailsViewWidget extends StatelessWidget {
             ),
           ])),
           !takeAway ? InkWell(
-            onTap: () async {
-              if(await canLaunchUrlString('tel:${track.deliveryMan?.phone ?? ''}')) {
-                launchUrlString('tel:${track.deliveryMan?.phone ?? ''}', mode: LaunchMode.externalApplication);
-              }else {
-                showCustomSnackBar('${'can_not_launch'.tr} ${track.deliveryMan?.phone ?? ''}');
+            onTap: () {
+              if (track.deliveryMan != null) {
+                CallHelper.callDeliveryMan(context, track.deliveryMan!);
               }
             },
             child: Container(

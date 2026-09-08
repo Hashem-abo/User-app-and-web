@@ -1312,6 +1312,27 @@ class CheckoutButton extends StatelessWidget {
                     radius: 15,
                     height: 55,
                     onPressed: allUnavailable ? null : () async {
+                      int? targetStoreId = (isFoodOrGrocery && selectedStoreId != null)
+                          ? selectedStoreId
+                          : (cartController.cartList.isNotEmpty ? cartController.cartList[0].item?.storeId : null);
+
+                      if (targetStoreId != null) {
+                        Store? store = Get.find<StoreController>().store;
+                        if (store == null || store.id != targetStoreId) {
+                          store = await Get.find<StoreController>().getStoreDetails(Store(id: targetStoreId), false, fromCart: true);
+                        }
+                        double currentSubTotal = (isFoodOrGrocery && selectedStoreId != null)
+                            ? (cartController.getSubTotalForStore(selectedStoreId)['total'] ?? 0)
+                            : cartController.subTotal;
+
+                        if (store != null && store.minimumOrder != null && store.minimumOrder! > 0) {
+                          if (currentSubTotal < store.minimumOrder!) {
+                            showCustomSnackBar('${'minimum_order_amount_is'.tr} ${PriceConverter.convertPrice(store.minimumOrder)}');
+                            return;
+                          }
+                        }
+                      }
+
                       Get.find<CheckoutController>().updateFirstTime();
                       Get.find<CheckoutController>().updateFirstTimeCodActive();
 

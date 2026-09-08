@@ -13,6 +13,7 @@ import 'package:sixam_mart/features/order/controllers/order_controller.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/review/domain/models/review_model.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/helper/call_helper.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -599,65 +600,7 @@ class OrderInfoWidget extends StatelessWidget {
                 SizedBox(width: showChatPermission ? Dimensions.paddingSizeSmall : 0),
 
                 InkWell(
-                  onTap: () async {
-                    if(isGuestLoggedIn) {
-                      if(await canLaunchUrlString('tel:${order.deliveryMan!.phone}')) {
-                        launchUrlString('tel:${order.deliveryMan!.phone}', mode: LaunchMode.externalApplication);
-                      }else {
-                        showCustomSnackBar('${'can_not_launch'.tr} ${order.deliveryMan!.phone}');
-                      }
-                    } else {
-                      Get.bottomSheet(
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).cardColor,
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-                          child: Column(mainAxisSize: MainAxisSize.min, children: [
-                            Container(
-                              height: 4, width: 40,
-                              decoration: BoxDecoration(color: Theme.of(context).disabledColor.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
-                            ),
-                            const SizedBox(height: Dimensions.paddingSizeLarge),
-                            Text('choose_call_option'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                            const SizedBox(height: Dimensions.paddingSizeLarge),
-                            ListTile(
-                              leading: Icon(Icons.ring_volume, color: Theme.of(context).primaryColor),
-                              title: Text('online_call'.tr, style: robotoMedium),
-                              subtitle: Text('call_via_internet'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
-                              onTap: () {
-                                Get.back();
-                                ZegoUIKitPrebuiltCallInvitationService().send(
-                                  invitees: [
-                                    ZegoCallUser(
-                                      'delivery_${order.deliveryMan!.id}',
-                                      '${order.deliveryMan!.fName} ${order.deliveryMan!.lName}',
-                                    )
-                                  ],
-                                  isVideoCall: false,
-                                );
-                              },
-                            ),
-                            const Divider(),
-                            ListTile(
-                              leading: Icon(Icons.phone, color: Theme.of(context).primaryColor),
-                              title: Text('cellular_call'.tr, style: robotoMedium),
-                              subtitle: Text('call_via_sim_card'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
-                              onTap: () async {
-                                Get.back();
-                                if (await canLaunchUrlString('tel:${order.deliveryMan!.phone}')) {
-                                  launchUrlString('tel:${order.deliveryMan!.phone}', mode: LaunchMode.externalApplication);
-                                } else {
-                                  showCustomSnackBar('${'can_not_launch'.tr} ${order.deliveryMan!.phone}');
-                                }
-                              },
-                            ),
-                          ]),
-                        ),
-                      );
-                    }
-                  },
+                  onTap: () => CallHelper.callDeliveryMan(context, order.deliveryMan!),
                   child: Image.asset(Images.phoneOrderDetails, height: 30, width: 30),
                 ),
 

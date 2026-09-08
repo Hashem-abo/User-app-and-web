@@ -63,9 +63,7 @@ class TrackingStepperWidget extends StatelessWidget {
       state = 1;
     }else if(status == 'processing') {
       state = 2;
-    }else if(status == 'handover') {
-      state = takeAway ? 3 : 2;
-    }else if(status == 'picked_up') {
+    }else if(status == 'handover' || status == 'picked_up') {
       state = 3;
     }else if(status == 'delivered') {
       state = 4;

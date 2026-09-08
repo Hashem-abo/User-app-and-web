@@ -161,6 +161,7 @@ class _ItemReviewWidgetState extends State<ItemReviewWidget> {
                   isEnabled: !reviewController.submitList[index],
                   hintText: 'write_your_review_here'.tr,
                   fillColor: Theme.of(context).disabledColor.withOpacity(0.05),
+                  textColor: Theme.of(context).textTheme.bodyLarge?.color,
                   onChanged: (text) => reviewController.setReview(index, text),
                   borderRadius: Dimensions.radiusDefault,
                 ),
@@ -272,6 +273,9 @@ class _ItemReviewWidgetState extends State<ItemReviewWidget> {
                               showCustomSnackBar(value.message, isError: false);
                               reviewController.setReview(index, '');
                               reviewController.pickImage(index, true);
+                              Future.delayed(const Duration(milliseconds: 600), () {
+                                Get.back();
+                              });
                             } else {
                               showCustomSnackBar(value.message);
                             }

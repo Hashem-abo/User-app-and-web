@@ -96,6 +96,7 @@ class _DeliveryManReviewWidgetState extends State<DeliveryManReviewWidget> {
                 controller: _controller,
                 hintText: 'write_your_review_here'.tr,
                 fillColor: Theme.of(context).disabledColor.withOpacity(0.05),
+                textColor: Theme.of(context).textTheme.bodyLarge?.color,
                 borderRadius: Dimensions.radiusDefault,
               ),
               const SizedBox(height: 40),
@@ -128,6 +129,9 @@ class _DeliveryManReviewWidgetState extends State<DeliveryManReviewWidget> {
                             if (value.isSuccess) {
                               showCustomSnackBar(value.message, isError: false);
                               _controller.text = '';
+                              Future.delayed(const Duration(milliseconds: 600), () {
+                                Get.back();
+                              });
                             } else {
                               showCustomSnackBar(value.message);
                             }

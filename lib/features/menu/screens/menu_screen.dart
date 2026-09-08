@@ -265,6 +265,18 @@ class _MenuScreenState extends State<MenuScreen> {
                         }
                       }),
                       const Divider(height: 1, indent: 20, endIndent: 20),
+                      MenuButton(icon: 'assets/svg/icons/linear/document-text.svg', title: 'my_suggestions'.tr, onTap: () {
+                        if(AuthHelper.isLoggedIn()) {
+                          Get.toNamed(RouteHelper.getMySuggestionsRoute());
+                        } else {
+                          Get.bottomSheet(const LoginSuggestionBottomSheet(), isScrollControlled: true);
+                        }
+                      }),
+                      const Divider(height: 1, indent: 20, endIndent: 20),
+                      MenuButton(icon: 'assets/svg/icons/linear/messages.svg', title: 'forum'.tr, onTap: () {
+                        Get.toNamed(RouteHelper.getForumRoute());
+                      }),
+                      const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/messages.svg', title: 'live_chat'.tr, route: RouteHelper.getConversationRoute()),
                       const Divider(height: 1, indent: 20, endIndent: 20),
                       MenuButton(icon: 'assets/svg/icons/linear/user-tick.svg', title: 'my_reviews'.tr, onTap: () {

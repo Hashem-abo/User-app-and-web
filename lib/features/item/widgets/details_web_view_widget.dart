@@ -299,9 +299,11 @@ class DetailsWebViewWidget extends StatelessWidget {
                               return CustomButton(
                                 width: 300,
                                 isLoading: cartController.isLoading,
-                                buttonText: (stock != null && stock! <= 0) ? 'out_of_stock'.tr
+                                buttonText: (itemController.item?.quantityLimit != null && itemController.item!.quantityLimit == 0)
+                                    ? 'item_is_not_available_in_the_store'.tr
+                                    : (stock != null && stock! <= 0) ? 'out_of_stock'.tr
                                     : itemController.item!.availableDateStarts != null ? 'order_now'.tr : itemController.cartIndex != -1 ? 'update_in_cart'.tr : 'add_to_cart'.tr,
-                                onPressed: (stock != null && stock! <= 0) ? null : () async {
+                                onPressed: ((stock != null && stock! <= 0) || (itemController.item?.quantityLimit != null && itemController.item!.quantityLimit == 0)) ? null : () async {
                                   if(itemController.item!.availableDateStarts != null) {
                                     Get.toNamed(RouteHelper.getCheckoutRoute('campaign'), arguments: CheckoutScreen(
                                       storeId: null, fromCart: false, cartList: [cartModel],

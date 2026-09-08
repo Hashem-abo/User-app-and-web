@@ -19,6 +19,7 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/profile/domain/services/profile_service_interface.dart';
+import 'package:sixam_mart/helper/call_helper.dart';
 import 'package:sixam_mart/api/api_client.dart';
 
 class ProfileController extends GetxController implements GetxService {
@@ -126,9 +127,12 @@ class ProfileController extends GetxController implements GetxService {
         ),
         invitationEvents: ZegoUIKitPrebuiltCallInvitationEvents(
           onError: (error) {
-            if (error.code == 6000281 || error.message.contains('107026')) {
-              showCustomSnackBar('delivery_man_offline_message'.tr);
-            }
+            CallHelper.showCallProblemDialog(
+              title: 'call_failed'.tr,
+              message: (error.code == 6000281 || error.message.contains('107026'))
+                  ? 'delivery_man_unreachable_contact_support'.tr
+                  : 'call_failed_error_msg'.tr,
+            );
           },
         ),
         requireConfig: (ZegoCallInvitationData data) {

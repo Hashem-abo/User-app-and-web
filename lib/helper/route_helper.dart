@@ -3,6 +3,9 @@ import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/auth/screens/new_user_setup_screen.dart';
 import 'package:sixam_mart/features/brands/screens/brands_product_screen.dart';
 import 'package:sixam_mart/features/brands/screens/brands_screen.dart';
+import 'package:sixam_mart/features/forum/screens/forum_screen.dart';
+import 'package:sixam_mart/features/forum/screens/forum_details_screen.dart';
+import 'package:sixam_mart/features/forum/domain/models/forum_post_model.dart';
 import 'package:sixam_mart/features/business/screens/subscription_payment_screen.dart';
 import 'package:sixam_mart/features/business/screens/subscription_success_or_failed_screen.dart';
 import 'package:sixam_mart/features/chat/domain/models/order_chat_model.dart';
@@ -97,6 +100,8 @@ import 'package:sixam_mart/features/cart/screens/shared_cart_handler.dart';
 import 'package:sixam_mart/features/pro/screens/subscription_plan_screen.dart';
 
 import 'package:sixam_mart/features/product_question/screens/my_questions_screen.dart';
+import 'package:sixam_mart/features/suggestion/screens/my_suggestions_screen.dart';
+import 'package:sixam_mart/features/suggestion/screens/add_suggestion_screen.dart';
 import 'package:sixam_mart/features/cart/screens/my_carts_screen.dart';
 import 'package:sixam_mart/features/product_question/screens/add_question_screen.dart';
 import 'package:sixam_mart/features/shelf/screens/dynamic_shelf_view_all_screen.dart';
@@ -125,6 +130,8 @@ import 'package:sixam_mart/features/global_shopping/domain/models/global_order_m
 class RouteHelper {
   static const String initial = '/';
   static const String myQuestions = '/my-questions';
+  static const String mySuggestions = '/my-suggestions';
+  static const String addSuggestion = '/add-suggestion';
   static const String splash = '/splash';
   static const String language = '/language';
   static const String onBoarding = '/on-boarding';
@@ -223,10 +230,16 @@ class RouteHelper {
   static const String globalProductDetail = '/global-product-detail';
   static const String myItems = '/my-items';
   static const String myItemsDetails = '/my-items-details';
+  static const String forum = '/forum';
+  static const String forumDetails = '/forum-details';
 
   static String getMyItemsRoute() => myItems;
   static String getMyItemsDetailRoute(int id) => '$myItemsDetails?id=$id';
+  static String getForumRoute() => forum;
+  static String getForumDetailsRoute(int id) => '$forumDetails?id=$id';
   static String getMyQuestionsRoute() => myQuestions;
+  static String getMySuggestionsRoute() => mySuggestions;
+  static String getAddSuggestionRoute() => addSuggestion;
   static String getAddQuestionRoute(Item item) {
     String data = base64Url.encode(utf8.encode(jsonEncode(item.toJson())));
     return '$addQuestion?item=$data';
@@ -738,6 +751,8 @@ class RouteHelper {
     GetPage(name: settingScreen, page: () => SettingPage()),
     GetPage(name: shareCart, page: () => const SharedCartHandler()),
     GetPage(name: myQuestions, page: () => getRoute(const MyQuestionsScreen())),
+    GetPage(name: mySuggestions, page: () => getRoute(const MySuggestionsScreen())),
+    GetPage(name: addSuggestion, page: () => getRoute(const AddSuggestionScreen())),
     GetPage(name: addQuestion, page: () {
       Item item = Item.fromJson(jsonDecode(utf8.decode(base64Url.decode(Get.parameters['item']!.replaceAll(' ', '+')))));
       return getRoute(AddQuestionScreen(item: item));
@@ -794,6 +809,20 @@ class RouteHelper {
         return getRoute(MyItemsDetailScreen(order: order));
       }
       return getRoute(const MyItemsScreen());
+    }),
+    GetPage(name: myQuestions, page: () => getRoute(const MyQuestionsScreen())),
+    GetPage(name: mySuggestions, page: () => getRoute(const MySuggestionsScreen())),
+    GetPage(name: addSuggestion, page: () => getRoute(const AddSuggestionScreen())),
+    GetPage(name: addQuestion, page: () {
+      List<int> decode = base64Decode(Get.parameters['item']!.replaceAll(' ', '+'));
+      Item data = Item.fromJson(jsonDecode(utf8.decode(decode)));
+      return getRoute(AddQuestionScreen(item: data));
+    }),
+    GetPage(name: forum, page: () => getRoute(const ForumScreen())),
+    GetPage(name: forumDetails, page: () {
+      ForumPost? post = Get.arguments is ForumPost ? Get.arguments : null;
+      int? id = Get.parameters['id'] != null ? int.parse(Get.parameters['id']!) : post?.id;
+      return getRoute(ForumDetailsScreen(postId: id, post: post));
     }),
   ];
 

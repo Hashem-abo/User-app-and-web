@@ -70,7 +70,9 @@ class _ContactShareSheetState extends State<ContactShareSheet> {
 
               // Title
               Text(
-                widget.shareableType == 'item' ? 'share_product'.tr : 'share_store'.tr,
+                widget.shareableType == 'item'
+                    ? 'share_product'.tr
+                    : (widget.shareableType == 'forum' ? 'share'.tr : 'share_store'.tr),
                 style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
               ),
               const SizedBox(height: Dimensions.paddingSizeExtraSmall),

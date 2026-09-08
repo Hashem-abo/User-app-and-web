@@ -4,6 +4,7 @@ import 'package:sixam_mart/common/widgets/corner_banner/corner_discount_tag.dart
 import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
 import 'package:sixam_mart/common/widgets/custom_favourite_widget.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
@@ -84,7 +85,7 @@ class ItemWidget extends StatelessWidget {
             boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withValues(alpha: 0.06), blurRadius: 6, spreadRadius: 0, offset: const Offset(0, 2))],
           ),
           child: CustomInkWell(
-            onTap: isEntirelyOutOfStock ? null : () {
+            onTap: isEntirelyOutOfStock ? () => showCustomSnackBar('item_is_not_available_in_the_store'.tr) : () {
               if(isStore) {
                 if(store != null) {
                   if(isFeatured && Get.find<SplashController>().moduleList != null) {

@@ -269,7 +269,9 @@ class ItemService implements ItemServiceInterface {
       if(moduleStock && (stock != null && (totalCartQtyOtherVariations + quantity + 1) > stock)) {
         showCustomSnackBar('out_of_stock'.tr);
       }else {
-        if(quantityLimit != null && quantityLimit != 0){
+        if(quantityLimit != null && quantityLimit <= 0){
+          showCustomSnackBar('item_is_not_available_in_the_store'.tr, getXSnackBar: getxSnackBar);
+        }else if(quantityLimit != null && quantityLimit > 0){
           if((totalCartQtyOtherVariations + quantity + 1) > quantityLimit) {
             showCustomSnackBar('${'maximum_quantity_limit'.tr} $quantityLimit', getXSnackBar: getxSnackBar);
           } else {

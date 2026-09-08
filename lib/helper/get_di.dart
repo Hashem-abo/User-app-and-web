@@ -98,6 +98,11 @@ import 'package:sixam_mart/features/address/domain/repositories/address_reposito
 import 'package:sixam_mart/features/address/domain/repositories/address_repository_interface.dart';
 import 'package:sixam_mart/features/address/domain/services/address_service.dart';
 import 'package:sixam_mart/features/address/domain/services/address_service_interface.dart';
+import 'package:sixam_mart/features/suggestion/controllers/suggestion_controller.dart';
+import 'package:sixam_mart/features/suggestion/domain/repositories/suggestion_repository.dart';
+import 'package:sixam_mart/features/suggestion/domain/repositories/suggestion_repository_interface.dart';
+import 'package:sixam_mart/features/suggestion/domain/services/suggestion_service.dart';
+import 'package:sixam_mart/features/suggestion/domain/services/suggestion_service_interface.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/auth/controllers/deliveryman_registration_controller.dart';
 import 'package:sixam_mart/features/auth/controllers/store_registration_controller.dart';
@@ -253,6 +258,11 @@ import 'package:sixam_mart/features/reels/domain/repositories/reels_repository.d
 import 'package:sixam_mart/features/reels/domain/repositories/reels_repository_interface.dart';
 import 'package:sixam_mart/features/reels/domain/services/reels_service.dart';
 import 'package:sixam_mart/features/reels/domain/services/reels_service_interface.dart';
+import 'package:sixam_mart/features/forum/controllers/forum_controller.dart';
+import 'package:sixam_mart/features/forum/domain/repositories/forum_repository.dart';
+import 'package:sixam_mart/features/forum/domain/repositories/forum_repository_interface.dart';
+import 'package:sixam_mart/features/forum/domain/services/forum_service.dart';
+import 'package:sixam_mart/features/forum/domain/services/forum_service_interface.dart';
 import 'package:get/get.dart';
 
 Future<Map<String, Map<String, String>>> init() async {
@@ -293,6 +303,8 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut<CategoryRepositoryInterface>(() => CategoryRepository(apiClient: Get.find()));
   Get.lazyPut<LoyaltyRepositoryInterface>(() => LoyaltyRepository(apiClient: Get.find()));
   Get.lazyPut<ProductQuestionRepositoryInterface>(() => ProductQuestionRepository(apiClient: Get.find()));
+  Get.lazyPut<SuggestionRepositoryInterface>(() => SuggestionRepository(apiClient: Get.find()));
+  Get.lazyPut<ForumRepositoryInterface>(() => ForumRepository(apiClient: Get.find()));
   Get.lazyPut<ReportRepositoryInterface>(() => ReportRepository(apiClient: Get.find()));
   Get.lazyPut<ShelfRepositoryInterface>(() => ShelfRepository(apiClient: Get.find()));
   Get.lazyPut<StoreCornerRepositoryInterface>(() => StoreCornerRepository(apiClient: Get.find()));
@@ -346,6 +358,8 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut<CategoryServiceInterface>(() => CategoryService(categoryRepositoryInterface: Get.find()));
   Get.lazyPut<LoyaltyServiceInterface>(() => LoyaltyService(loyaltyRepositoryInterface: Get.find()));
   Get.lazyPut<ProductQuestionServiceInterface>(() => ProductQuestionService(productQuestionRepositoryInterface: Get.find()));
+  Get.lazyPut<SuggestionServiceInterface>(() => SuggestionService(suggestionRepositoryInterface: Get.find()));
+  Get.lazyPut<ForumServiceInterface>(() => ForumService(forumRepository: Get.find()));
   Get.lazyPut<ReportServiceInterface>(() => ReportService(reportRepositoryInterface: Get.find()));
   Get.lazyPut<ShelfServiceInterface>(() => ShelfService(shelfRepositoryInterface: Get.find()));
   Get.lazyPut<ServiceServiceInterface>(() => ServiceService(serviceRepositoryInterface: Get.find()));
@@ -403,6 +417,8 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => ReviewController(reviewServiceInterface: Get.find()));
   Get.lazyPut(() => CategoryController(categoryServiceInterface: Get.find()));
   Get.lazyPut(() => ProductQuestionController(productQuestionServiceInterface: Get.find()));
+  Get.lazyPut(() => SuggestionController(suggestionServiceInterface: Get.find()));
+  Get.lazyPut(() => ForumController(forumServiceInterface: Get.find()));
   Get.lazyPut(() => ReportController(reportServiceInterface: Get.find()));
   Get.lazyPut(() => LoyaltyController(loyaltyServiceInterface: Get.find()));
   Get.lazyPut(() => VerificationController(verificationServiceInterface: Get.find()));

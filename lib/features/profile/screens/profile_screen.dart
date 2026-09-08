@@ -117,6 +117,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }) : const SizedBox(),
                     SizedBox(height: isLoggedIn ? Dimensions.paddingSizeSmall : 0),
 
+                    isLoggedIn ? ProfileButtonWidget(icon: Icons.lightbulb_outline, title: 'my_suggestions'.tr, onTap: () {
+                      Get.toNamed(RouteHelper.getMySuggestionsRoute());
+                    }) : const SizedBox(),
+                    SizedBox(height: isLoggedIn ? Dimensions.paddingSizeSmall : 0),
+
+                    ProfileButtonWidget(icon: Icons.forum_outlined, title: 'forum'.tr, onTap: () {
+                      Get.toNamed(RouteHelper.getForumRoute());
+                    }),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
+
                     (isLoggedIn && Get.find<SplashController>().configModel?.monthlyOrderRemainder == 1) ? ProfileButtonWidget(
                       icon: Icons.calendar_month_outlined, title: 'monthly_cart_list'.tr,
                       onTap: () => Get.toNamed(RouteHelper.getMyItemsRoute()),

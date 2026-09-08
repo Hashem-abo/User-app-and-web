@@ -5,6 +5,7 @@ import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 class ItemHelper {
   static bool isItemEntirelyOutOfStock(Item? item) {
     if (item == null) return false;
+    if (item.quantityLimit != null && item.quantityLimit == 0) return true;
     bool isFood = item.moduleType == 'food';
     bool moduleStock = Get.find<SplashController>().configModel?.moduleConfig?.module?.stock ?? false;
     if (isFood || !moduleStock) return false;

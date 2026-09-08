@@ -20,6 +20,7 @@ import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
+import 'package:sixam_mart/helper/call_helper.dart';
 import 'package:sixam_mart/helper/marker_helper.dart';
 import 'package:sixam_mart/helper/pusher_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -63,11 +64,19 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
   bool showChatPermission = true;
   bool isHovered = false;
 
+  Future<void> _refreshData() async {
+    _timer?.cancel();
+    Get.find<OrderController>().clearPrevOrderData(notify: true);
+    _loadData();
+  }
+
   void _loadData() async {
-    await Get.find<LocationController>().getCurrentLocation(true, notify: false, defaultLatLng: LatLng(
-      double.parse(AddressHelper.getUserAddressFromSharedPref()!.latitude!),
-      double.parse(AddressHelper.getUserAddressFromSharedPref()!.longitude!),
-    ));
+    if(AddressHelper.getUserAddressFromSharedPref() != null) {
+      await Get.find<LocationController>().getCurrentLocation(true, notify: false, defaultLatLng: LatLng(
+        double.parse(AddressHelper.getUserAddressFromSharedPref()!.latitude!),
+        double.parse(AddressHelper.getUserAddressFromSharedPref()!.longitude!),
+      ));
+    }
     await Get.find<OrderController>().trackOrder(widget.orderID, null, true, contactNumber: widget.contactNumber);
     await Get.find<OrderController>().getOrderDetails(widget.orderID.toString());
 
@@ -166,11 +175,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
         title: 'order_tracking'.tr, 
         menuWidget: IconButton(
           icon: Icon(Icons.refresh, color: Theme.of(context).primaryColor),
-          onPressed: () {
-            if(Get.find<OrderController>().trackModel != null){
-              Get.find<OrderController>().timerTrackOrder(widget.orderID.toString(), contactNumber: widget.contactNumber);
-            }
-          },
+          onPressed: () => _refreshData(),
         ),
       ),
       endDrawer: const MenuDrawer(),endDrawerEnableOpenDragGesture: false,
@@ -281,8 +286,14 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
         */
 
         return track != null ? (track.orderType == 'parcel'
-            ? _buildParcelTracking(orderController, track)
-            : SingleChildScrollView(
+            ? RefreshIndicator(
+                onRefresh: _refreshData,
+                child: _buildParcelTracking(orderController, track),
+              )
+            : RefreshIndicator(
+                onRefresh: _refreshData,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
@@ -374,63 +385,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                     child: Row(children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () async {
-                            if(AuthHelper.isGuestLoggedIn()) {
-                              if(await canLaunchUrlString('tel:${track!.deliveryMan!.phone}')) {
-                                launchUrlString('tel:${track.deliveryMan!.phone}', mode: LaunchMode.externalApplication);
-                              }
-                            } else {
-                              Get.bottomSheet(
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor,
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                                  ),
-                                  padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-                                  child: Column(mainAxisSize: MainAxisSize.min, children: [
-                                    Container(
-                                      height: 4, width: 40,
-                                      decoration: BoxDecoration(color: Theme.of(context).disabledColor.withOpacity(0.3), borderRadius: BorderRadius.circular(2)),
-                                    ),
-                                    const SizedBox(height: Dimensions.paddingSizeLarge),
-                                    Text('choose_call_option'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                                    const SizedBox(height: Dimensions.paddingSizeLarge),
-                                    ListTile(
-                                      leading: Icon(Icons.ring_volume, color: Theme.of(context).primaryColor),
-                                      title: Text('online_call'.tr, style: robotoMedium),
-                                      subtitle: Text('call_via_internet'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
-                                      onTap: () {
-                                        Get.back();
-                                        ZegoUIKitPrebuiltCallInvitationService().send(
-                                          invitees: [
-                                            ZegoCallUser(
-                                              'delivery_${track!.deliveryMan!.id}',
-                                              '${track.deliveryMan!.fName} ${track.deliveryMan!.lName}',
-                                            )
-                                          ],
-                                          isVideoCall: false,
-                                        );
-                                      },
-                                    ),
-                                    const Divider(),
-                                    ListTile(
-                                      leading: Icon(Icons.phone, color: Theme.of(context).primaryColor),
-                                      title: Text('cellular_call'.tr, style: robotoMedium),
-                                      subtitle: Text('call_via_sim_card'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor)),
-                                      onTap: () async {
-                                        Get.back();
-                                        if (await canLaunchUrlString('tel:${track!.deliveryMan!.phone}')) {
-                                          launchUrlString('tel:${track.deliveryMan!.phone}', mode: LaunchMode.externalApplication);
-                                        } else {
-                                          showCustomSnackBar('${'can_not_launch'.tr} ${track.deliveryMan!.phone}');
-                                        }
-                                      },
-                                    ),
-                                  ]),
-                                ),
-                              );
-                            }
-                          },
+                          onPressed: () => CallHelper.callDeliveryMan(context, track!.deliveryMan!),
                           icon: Icon(Icons.call, size: 18, color: Theme.of(context).primaryColor),
                           label: Text('call'.tr, style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
                           style: OutlinedButton.styleFrom(
@@ -695,7 +650,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
             ),
 
           ]),
-        )) : const CustomLoaderWidget();
+        ))) : const CustomLoaderWidget();
       }),
     );
   }
@@ -774,7 +729,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
           const SizedBox(height: Dimensions.paddingSizeDefault),
           Row(children: [
             Expanded(child: OutlinedButton.icon(
-              onPressed: () => launchUrlString('tel:${track.deliveryMan!.phone}', mode: LaunchMode.externalApplication),
+              onPressed: () => CallHelper.callDeliveryMan(context, track.deliveryMan!),
               icon: const Icon(Icons.call_outlined), label: Text('call_delivery_man'.tr),
             )),
             const SizedBox(width: Dimensions.paddingSizeSmall),

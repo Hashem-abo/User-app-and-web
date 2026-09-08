@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 
 import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
@@ -133,7 +134,7 @@ class _ItemCardState extends State<ItemCard> {
             color: Theme.of(context).cardColor,
           ),
           child: CustomInkWell(
-            onTap: isEntirelyOutOfStock ? null : () {
+            onTap: isEntirelyOutOfStock ? () => showCustomSnackBar('item_is_not_available_in_the_store'.tr) : () {
                if(widget.item != null) {
                  Get.find<ItemController>().navigateToItemPage(widget.item, context, isCampaign: widget.isCampaign);
                } else if(widget.store != null) {

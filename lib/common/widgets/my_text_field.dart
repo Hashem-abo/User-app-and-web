@@ -17,6 +17,7 @@ class MyTextField extends StatefulWidget {
   final bool isEnabled;
   final TextCapitalization capitalization;
   final Color? fillColor;
+  final Color? textColor;
   final bool autoFocus;
   final double borderRadius;
 
@@ -35,6 +36,7 @@ class MyTextField extends StatefulWidget {
     this.capitalization = TextCapitalization.none,
     this.onTap,
     this.fillColor,
+    this.textColor,
     this.isPassword = false,
     this.autoFocus = false,
     this.borderRadius = 5,
@@ -49,8 +51,10 @@ class MyTextFieldState extends State<MyTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final Color effectiveFillColor = widget.fillColor ?? Theme.of(context).cardColor;
-    final bool isCardLight = effectiveFillColor.computeLuminance() > 0.5;
+    final Color cardBg = Theme.of(context).cardColor;
+    final Color effectiveFillColor = widget.fillColor ?? cardBg;
+    final Color perceivedBg = Color.alphaBlend(effectiveFillColor, cardBg);
+    final bool isCardLight = perceivedBg.computeLuminance() > 0.5;
 
     return Directionality(
       textDirection: (widget.inputType == TextInputType.phone || widget.isPassword) ? TextDirection.ltr : Directionality.of(context),
@@ -64,7 +68,7 @@ class MyTextFieldState extends State<MyTextField> {
           fontFamily: widget.isPassword ? 'Roboto' : null,
           fontFamilyFallback: const ['Roboto', 'sans-serif'],
           letterSpacing: widget.isPassword && _obscureText ? 3.0 : null,
-          color: isCardLight ? const Color(0xFF2E2E2E) : Colors.white,
+          color: widget.textColor ?? (isCardLight ? (Theme.of(context).textTheme.bodyLarge?.color ?? const Color(0xFF2E2E2E)) : Colors.white),
         ),
         textInputAction: widget.inputAction,
         keyboardType: widget.isPassword

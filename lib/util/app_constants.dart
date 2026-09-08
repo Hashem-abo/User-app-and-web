@@ -178,6 +178,10 @@ class AppConstants {
   static const String recordItemViewUri = '/api/v1/items/view';
   static const String productQuestionUri = '/api/v1/questions';
   static const String customerQuestionUri = '/api/v1/customer/questions';
+  static const String customerSuggestionUri = '/api/v1/customer/suggestions';
+  static const String customerSuggestionListUri = '/api/v1/customer/suggestions/list';
+  static const String customerSuggestionSubmitUri = '/api/v1/customer/suggestions/submit';
+  static const String customerSuggestionDeleteUri = '/api/v1/customer/suggestions/delete/';
   static const String customerReviewUri = '/api/v1/customer/reviews';
   static const String reportSubmitUri = '/api/v1/customer/report/submit';
   static const String followStoreUri = '/api/v1/customer/follow/store';
@@ -268,6 +272,8 @@ class AppConstants {
   static const String reelVisitUri = '/api/v1/customer/reels/visit';
 
   /// Shared Key
+  static const String forumPostsUri = '/api/v1/forum/list';
+  static const String forumPostDetailsUri = '/api/v1/forum/details/';
   static const String savedRoute = 'savedRoute';
   static const String renewBottomSheetShown = 'sixam_mart_renew_bottomsheet_shown';
   static const String theme = '6ammart_theme';

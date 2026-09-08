@@ -477,7 +477,10 @@ class CartController extends GetxController implements GetxService {
       if (!isFood && moduleStock && effectiveStock != null && (totalCartQtyOtherVariations + currentQuantity + 1) > effectiveStock) {
         showCustomSnackBar('out_of_stock'.tr);
         return;
-      } else if (effectiveLimit != null && effectiveLimit != 0 && (totalCartQtyOtherVariations + currentQuantity + 1) > effectiveLimit) {
+      } else if (effectiveLimit != null && effectiveLimit <= 0) {
+        showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+        return;
+      } else if (effectiveLimit != null && effectiveLimit > 0 && (totalCartQtyOtherVariations + currentQuantity + 1) > effectiveLimit) {
         showCustomSnackBar('${'maximum_quantity_limit'.tr} $effectiveLimit');
         return;
       } else {
@@ -718,6 +721,12 @@ class CartController extends GetxController implements GetxService {
   }
 
   Future<bool> addToCartOnline(OnlineCart onlineCart, CartModel cartModel) async {
+    int? initialLimit = cartModel.item?.quantityLimit ?? cartModel.quantityLimit;
+    if (initialLimit != null && initialLimit <= 0) {
+      showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+      return false;
+    }
+
     int? itemId = cartModel.item?.id;
     if (itemId != null && _addingCartItemIds.contains(itemId)) {
       return false; // DEBOUNCE: Prevent duplicate request while item is being added!
@@ -771,7 +780,10 @@ class CartController extends GetxController implements GetxService {
           return false;
         }
         int? limit = cartModel.item!.quantityLimit ?? cartModel.quantityLimit;
-        if (limit != null && limit != 0 && (totalCartQty + (cartModel.quantity ?? 1)) > limit) {
+        if (limit != null && limit <= 0) {
+          showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+          return false;
+        } else if (limit != null && limit > 0 && (totalCartQty + (cartModel.quantity ?? 1)) > limit) {
           showCustomSnackBar('${'maximum_quantity_limit'.tr} $limit');
           return false;
         }
@@ -844,7 +856,10 @@ class CartController extends GetxController implements GetxService {
         return false;
       }
       int? limit = cartModel.item!.quantityLimit ?? cartModel.quantityLimit;
-      if (limit != null && limit != 0 && (totalCartQtyOtherVariations + (cartModel.quantity ?? 1)) > limit) {
+      if (limit != null && limit <= 0) {
+        showCustomSnackBar('item_is_not_available_in_the_store'.tr);
+        return false;
+      } else if (limit != null && limit > 0 && (totalCartQtyOtherVariations + (cartModel.quantity ?? 1)) > limit) {
         showCustomSnackBar('${'maximum_quantity_limit'.tr} $limit');
         return false;
       }
