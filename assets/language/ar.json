@@ -1901,7 +1901,7 @@
   "type_here_your_refund_reason": "اكتب هنا سبب الاسترداد...",
   "add_image": "أضف صورة",
   "no_payment_method_found": "لم يتم العثور على طريقة دفع",
-  "thank_you_for_your_order": "شكرًا على طلبك! يتم تجهيز أغراضك وسيكون من الممكن استلامها قريبًا.",
+  "thank_you_for_your_order": "شكرًا على طلبك!",
   "select_your_address": "اختر عنوانك",
   "saved_addresses": "العناوين المحفوظة",
   "parcel_returned_successfully": "تم إرجاع الطرد بنجاح",

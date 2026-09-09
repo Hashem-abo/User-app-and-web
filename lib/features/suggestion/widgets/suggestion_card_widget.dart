@@ -11,7 +11,7 @@ import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
 
 class SuggestionCardWidget extends StatelessWidget {
-  final Suggestion suggestion;
+  final CustomerSuggestion suggestion;
   const SuggestionCardWidget({super.key, required this.suggestion});
 
   Color _getStatusColor(BuildContext context, int? status) {
