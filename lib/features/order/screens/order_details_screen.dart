@@ -178,6 +178,8 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
             double additionalCharge = 0;
             double extraPackagingCharge = 0;
             double referrerBonusAmount = 0;
+            double proDiscount = 0;
+            double deliveryTypeCharge = 0;
             OrderModel? order = orderController.trackModel;
             bool parcel = false;
             bool prescriptionOrder = false;
@@ -196,9 +198,13 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
               additionalCharge = order.additionalCharge ?? 0;
               extraPackagingCharge = order.extraPackagingAmount ?? 0;
               referrerBonusAmount = order.referrerBonusAmount ?? 0;
+              proDiscount = (order.proDiscount != null && order.proDiscount! > 0) ? order.proDiscount! : 0;
+              if((order.deliveryType == 'slightly_delay' || order.deliveryType == 'express') && order.deliveryTypeCharge != null && order.deliveryTypeCharge! > 0) {
+                deliveryTypeCharge = order.deliveryType == 'slightly_delay' ? -order.deliveryTypeCharge! : order.deliveryTypeCharge!;
+              }
               if(prescriptionOrder) {
                 double orderAmount = order.orderAmount ?? 0;
-                itemsPrice = (orderAmount + discount + couponDiscount + referrerBonusAmount) - ((taxIncluded ? 0 : tax) + deliveryCharge + dmTips + additionalCharge + extraPackagingCharge);
+                itemsPrice = (orderAmount + discount + couponDiscount + referrerBonusAmount + proDiscount) - ((taxIncluded ? 0 : tax) + deliveryCharge + deliveryTypeCharge + dmTips + additionalCharge + extraPackagingCharge);
               } else{
                 for(OrderDetailsModel orderDetails in orderController.orderDetails!) {
                   if(orderDetails.addOns != null) {
@@ -246,7 +252,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
             }
             double subTotal = itemsPrice + addOns;
-            double total = itemsPrice + addOns - discount + (taxIncluded ? 0 : tax) + deliveryCharge - couponDiscount + dmTips + additionalCharge + extraPackagingCharge - referrerBonusAmount;
+            double total = order?.orderAmount ?? (itemsPrice + addOns - discount + (taxIncluded ? 0 : tax) + deliveryCharge + deliveryTypeCharge - couponDiscount + dmTips + additionalCharge + extraPackagingCharge - referrerBonusAmount - proDiscount);
 
             bool isCurrentOrderData = orderController.orderDetails != null && order != null && orderController.trackModel != null && orderController.trackModel!.id == widget.orderId;
 

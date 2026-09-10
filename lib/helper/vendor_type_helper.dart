@@ -13,15 +13,22 @@ class VendorTypeHelper {
   /// Checks if the type represents a retailer (which MUST be hidden).
   static bool isRetailer(String? type) {
     if (isEmpty(type)) return false;
-    final clean = type!.trim().toLowerCase();
+    final clean = type!.trim().toLowerCase().replaceAll('-', '_');
     return clean == 'retail' ||
         clean == 'retailer' ||
         clean == 'retails' ||
         clean == 'retailers' ||
-        clean == 'تجزئة' ||
+        clean == 'retail_store' ||
+        clean == 'retail store' ||
+        clean == 'retail_stores' ||
+        clean == 'retail_store_restaurant' ||
+        clean.contains('retail') ||
+        clean.contains('تجزئة') ||
         clean == 'قطاعي' ||
         clean == 'مفرق' ||
-        clean == 'تاجر تجزئة';
+        clean == 'تاجر تجزئة' ||
+        clean == 'متجر تجزئة' ||
+        clean == 'متجر_تجزئة';
   }
 
   /// Checks if the type represents a wholesaler (which MUST be kept).
@@ -65,15 +72,12 @@ class VendorTypeHelper {
   /// - Empty / null: returns empty string (hidden)
   /// - Wholesaler: returns "جملة" in Arabic, "Wholesale" in English/other
   /// - Factory: returns "مصنع" in Arabic, "Factory" in English/other
+  /// - Any other type: returns empty string (hidden)
   static String resolveVendorType(String? type) {
     if (isEmpty(type)) return '';
     if (isRetailer(type)) return '';
 
     final arabic = isArabic();
-
-    if (isRetailer(type)) {
-      return '';
-    }
 
     if (isWholesaler(type)) {
       if (arabic) return 'جملة';
@@ -87,9 +91,7 @@ class VendorTypeHelper {
       return (trVal.isNotEmpty && trVal != 'factory') ? trVal : 'Factory';
     }
 
-    // Custom non-empty vendor types (e.g. 'مخبز')
-    final trimmed = type!.trim();
-    final trVal = trimmed.tr;
-    return trVal.isNotEmpty ? trVal : trimmed;
+    // Only show vendor types that are NOT retail (wholesaler or factory).
+    return '';
   }
 }

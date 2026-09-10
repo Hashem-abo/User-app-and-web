@@ -1,48 +1,47 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
-import 'package:sixam_mart/common/widgets/custom_card.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/order/domain/models/order_details_model.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class OrderItemWidget extends StatelessWidget {
   final OrderModel order;
   final OrderDetailsModel orderDetails;
   const OrderItemWidget({super.key, required this.order, required this.orderDetails});
-  
+
   @override
   Widget build(BuildContext context) {
     String addOnText = '';
-    for (var addOn in orderDetails.addOns!) {
-      addOnText = '$addOnText${(addOnText.isEmpty) ? '' : ',  '}${addOn.name} (${addOn.quantity})';
+    if (orderDetails.addOns != null) {
+      for (var addOn in orderDetails.addOns!) {
+        addOnText = '$addOnText${(addOnText.isEmpty) ? '' : ',  '}${addOn.name} (${addOn.quantity})';
+      }
     }
 
     String? variationText = '';
-    if(orderDetails.variation!.isNotEmpty) {
-      if(orderDetails.variation!.isNotEmpty) {
-        List<String> variationTypes = orderDetails.variation![0].type!.split('-');
-        if(variationTypes.length == orderDetails.itemDetails!.choiceOptions!.length) {
-          int index = 0;
-          for (var choice in orderDetails.itemDetails!.choiceOptions!) {
-            variationText = '${variationText!}${(index == 0) ? '' : ',  '}${choice.title} - ${variationTypes[index]}';
-            index = index + 1;
-          }
-        }else {
-          variationText = orderDetails.itemDetails!.variations![0].type;
+    if (orderDetails.variation != null && orderDetails.variation!.isNotEmpty) {
+      List<String> variationTypes = orderDetails.variation![0].type?.split('-') ?? [];
+      if (orderDetails.itemDetails?.choiceOptions != null && variationTypes.length == orderDetails.itemDetails!.choiceOptions!.length) {
+        int index = 0;
+        for (var choice in orderDetails.itemDetails!.choiceOptions!) {
+          variationText = '${variationText!}${(index == 0) ? '' : ',  '}${choice.title} - ${variationTypes[index]}';
+          index = index + 1;
         }
+      } else if (orderDetails.itemDetails?.variations != null && orderDetails.itemDetails!.variations!.isNotEmpty) {
+        variationText = orderDetails.itemDetails!.variations![0].type;
       }
-    }else if(orderDetails.foodVariation!.isNotEmpty) {
-      for(FoodVariation variation in orderDetails.foodVariation!) {
+    } else if (orderDetails.foodVariation != null && orderDetails.foodVariation!.isNotEmpty) {
+      for (FoodVariation variation in orderDetails.foodVariation!) {
         variationText = '${variationText!}${variationText.isNotEmpty ? ', ' : ''}${variation.name} (';
-        if(variation.variationValues != null){
-          for(VariationValue value in variation.variationValues!) {
+        if (variation.variationValues != null) {
+          for (VariationValue value in variation.variationValues!) {
             variationText = '${variationText!}${variationText.endsWith('(') ? '' : ', '}${value.level}';
           }
         }
@@ -50,104 +49,180 @@ class OrderItemWidget extends StatelessWidget {
       }
     }
 
-    return CustomCard(
-      padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-            child: CustomImage(
-              height: 50, width: 50, fit: BoxFit.cover,
-              image: '${orderDetails.imageFullUrl}',
+    final double effectivePrice = (orderDetails.price ?? 0) - (orderDetails.discountOnItem ?? 0);
+    final double totalPrice = effectivePrice * (orderDetails.quantity ?? 1);
+
+    // Determine unit name
+    String unitName = '-';
+    final moduleConfig = Get.find<SplashController>().getModuleConfig(order.moduleType);
+    if ((moduleConfig.unit ?? false) && orderDetails.itemDetails?.unitType != null && orderDetails.itemDetails!.unitType!.isNotEmpty) {
+      unitName = orderDetails.itemDetails!.unitType!;
+    } else if ((Get.find<SplashController>().configModel?.toggleVegNonVeg ?? false) && (moduleConfig.vegNonVeg ?? false)) {
+      unitName = orderDetails.itemDetails?.veg == 0 ? 'non_veg'.tr : 'veg'.tr;
+    }
+
+    final String? imageUrl = (orderDetails.imageFullUrl != null && orderDetails.imageFullUrl!.isNotEmpty)
+        ? orderDetails.imageFullUrl
+        : orderDetails.itemDetails?.imageFullUrl;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: Dimensions.paddingSizeSmall,
+        vertical: Dimensions.paddingSizeSmall,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Item Column (Image + Name + Variations + Addons + Note) (flex: 4) ──
+          Expanded(
+            flex: 4,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (imageUrl != null && imageUrl.isNotEmpty) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                    child: CustomImage(
+                      height: 40,
+                      width: 40,
+                      fit: BoxFit.cover,
+                      image: imageUrl,
+                    ),
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeExtraSmall + 2),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              orderDetails.itemDetails?.name ?? '',
+                              style: robotoMedium.copyWith(
+                                fontSize: Dimensions.fontSizeSmall,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (orderDetails.itemDetails?.isStoreHalalActive == true && orderDetails.itemDetails?.isHalalItem == true) ...[
+                            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                            const CustomAssetImageWidget(Images.halalTag, height: 13, width: 13),
+                          ],
+                        ],
+                      ),
+
+                      // Variation under item name
+                      if (variationText != null && variationText.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            variationText,
+                            style: robotoRegular.copyWith(
+                              fontSize: Dimensions.fontSizeExtraSmall,
+                              color: Theme.of(context).disabledColor,
+                            ),
+                          ),
+                        ),
+
+                      // Addons under item
+                      if ((moduleConfig.addOn ?? false) && addOnText.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            '${'addons'.tr}: $addOnText',
+                            style: robotoRegular.copyWith(
+                              fontSize: Dimensions.fontSizeExtraSmall,
+                              color: Theme.of(context).disabledColor,
+                            ),
+                          ),
+                        ),
+
+                      // Note under item
+                      if (orderDetails.note != null && orderDetails.note!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            '${'note'.tr}: ${orderDetails.note}',
+                            style: robotoRegular.copyWith(
+                              fontSize: Dimensions.fontSizeExtraSmall,
+                              color: Colors.orange.shade800,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: Dimensions.paddingSizeSmall),
+
+          // ── Unit Column (flex: 2) ──
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Expanded(child: Text(
-                  orderDetails.itemDetails!.name!,
-                  style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall),
-                  maxLines: 2, overflow: TextOverflow.ellipsis,
-                )),
-                Text('${'quantity'.tr}: ', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                Text(
-                  orderDetails.quantity.toString(),
-                  style: robotoMedium.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                unitName,
+                textAlign: TextAlign.center,
+                style: robotoRegular.copyWith(
+                  fontSize: Dimensions.fontSizeSmall,
+                  color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                 ),
-              ]),
-              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-              Row(children: [
-                Expanded(child: Text(
-                  PriceConverter.convertPrice(orderDetails.price),
-                  style: robotoMedium, textDirection: TextDirection.ltr,
-                )),
-
-                ((Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && orderDetails.itemDetails!.unitType != null)
-                    || (Get.find<SplashController>().configModel!.moduleConfig!.module!.vegNonVeg! && Get.find<SplashController>().configModel!.toggleVegNonVeg!))
-                    ? Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation! ? CustomAssetImageWidget(
-                  orderDetails.itemDetails!.veg == 0 ? Images.nonVegImage : Images.vegImage,
-                  height: 11, width: 11,
-                ) : Container(
-                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: Dimensions.paddingSizeSmall),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                  ),
-                  child: Text(
-                    orderDetails.itemDetails!.unitType ?? '',
-                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor),
-                  ),
-                ) : const SizedBox(),
-
-                SizedBox(width: orderDetails.itemDetails!.isStoreHalalActive! && orderDetails.itemDetails!.isHalalItem! ? Dimensions.paddingSizeExtraSmall : 0),
-
-                orderDetails.itemDetails!.isStoreHalalActive! && orderDetails.itemDetails!.isHalalItem! ? const CustomAssetImageWidget(
-                 Images.halalTag, height: 13, width: 13) : const SizedBox(),
-
-              ]),
-
-            ]),
+              ),
+            ),
           ),
-        ]),
 
-        (Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! && addOnText.isNotEmpty) ? Padding(
-          padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
-          child: Row(children: [
-            const SizedBox(width: 60),
-            Text('${'addons'.tr}: ', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
-            Flexible(child: Text(
-                addOnText,
-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor,
-            ))),
-          ]),
-        ) : const SizedBox(),
+          // ── Quantity Column (flex: 2) ──
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                '${orderDetails.quantity ?? 1}',
+                textAlign: TextAlign.center,
+                style: robotoBold.copyWith(
+                  fontSize: Dimensions.fontSizeSmall,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
+          ),
 
-        variationText!.isNotEmpty ? Padding(
-          padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
-          child: Row(children: [
-            const SizedBox(width: 60),
-            Text('${'variations'.tr}: ', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
-            Flexible(child: Text(
-                variationText,
-                style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor,
-            ))),
-          ]),
-        ) : const SizedBox(),
-
-        orderDetails.note != null && orderDetails.note!.isNotEmpty ? Padding(
-          padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
-          child: Row(children: [
-            const SizedBox(width: 60),
-            Text('${'note'.tr}: ', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall)),
-            Flexible(child: Text(
-              orderDetails.note!,
-              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-            )),
-          ]),
-        ) : const SizedBox(),
-
-      ]),
+          // ── Price Column (flex: 2) ──
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    PriceConverter.convertPrice(totalPrice),
+                    textAlign: TextAlign.end,
+                    style: robotoBold.copyWith(
+                      fontSize: Dimensions.fontSizeSmall,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    ),
+                  ),
+                  if ((orderDetails.discountOnItem ?? 0) > 0)
+                    Text(
+                      PriceConverter.convertPrice((orderDetails.price ?? 0) * (orderDetails.quantity ?? 1)),
+                      textAlign: TextAlign.end,
+                      style: robotoRegular.copyWith(
+                        decoration: TextDecoration.lineThrough,
+                        fontSize: Dimensions.fontSizeExtraSmall,
+                        color: Theme.of(context).disabledColor,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

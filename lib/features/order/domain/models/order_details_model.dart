@@ -23,6 +23,13 @@ class OrderDetailsModel {
   int? isGuest;
   ParcelCancellation? parcelCancellation;
   String? note;
+  String? deliveryType;
+  double? deliveryTypeCharge;
+  String? saverDeliveryTime;
+  double? proDiscount;
+  String? benefitType;
+  double? deliveryFeeReductionAmount;
+  String? deliveryOfferType;
 
   OrderDetailsModel({
     this.id,
@@ -46,6 +53,13 @@ class OrderDetailsModel {
     this.isGuest,
     this.parcelCancellation,
     this.note,
+    this.deliveryType,
+    this.deliveryTypeCharge,
+    this.saverDeliveryTime,
+    this.proDiscount,
+    this.benefitType,
+    this.deliveryFeeReductionAmount,
+    this.deliveryOfferType,
   });
 
   OrderDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -86,6 +100,13 @@ class OrderDetailsModel {
     isGuest = json['is_guest'];
     parcelCancellation = json['parcel_cancellation'] != null ? ParcelCancellation.fromJson(json['parcel_cancellation']) : null;
     note = json['note'];
+    deliveryType = json['delivery_type']?.toString();
+    deliveryTypeCharge = json['delivery_type_charge'] != null ? double.tryParse(json['delivery_type_charge'].toString()) : null;
+    saverDeliveryTime = json['saver_delivery_time']?.toString();
+    proDiscount = json['pro_discount'] != null ? double.tryParse(json['pro_discount'].toString()) : null;
+    benefitType = json['benefit_type']?.toString();
+    deliveryFeeReductionAmount = json['delivery_fee_reduction_amount'] != null ? double.tryParse(json['delivery_fee_reduction_amount'].toString()) : null;
+    deliveryOfferType = json['delivery_offer_type']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -120,6 +141,13 @@ class OrderDetailsModel {
       data['parcel_cancellation'] = parcelCancellation!.toJson();
     }
     data['note'] = note;
+    data['delivery_type'] = deliveryType;
+    data['delivery_type_charge'] = deliveryTypeCharge;
+    data['saver_delivery_time'] = saverDeliveryTime;
+    data['pro_discount'] = proDiscount;
+    data['benefit_type'] = benefitType;
+    data['delivery_fee_reduction_amount'] = deliveryFeeReductionAmount;
+    data['delivery_offer_type'] = deliveryOfferType;
     return data;
   }
 }

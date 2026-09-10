@@ -81,7 +81,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
     await Get.find<OrderController>().getOrderDetails(widget.orderID.toString());
 
     if(Get.find<SplashController>().configModel!.websocketEnabled!) {
-      print('====pusher entered-------------');
+     // print('====pusher entered-------------');
       _trackWithPusher();
     }
     
@@ -425,125 +425,125 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
             const SizedBox(height: Dimensions.paddingSizeDefault),
 
             // Address Section
-            Container(
-              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('address'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                const SizedBox(height: Dimensions.paddingSizeSmall),
-                Row(children: [
-                  Icon(Icons.location_on, color: Theme.of(context).primaryColor),
-                  const SizedBox(width: Dimensions.paddingSizeSmall),
-                  Expanded(child: Text(track.deliveryAddress?.address ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall))),
-                ]),
-              ]),
-            ),
-            const SizedBox(height: Dimensions.paddingSizeDefault),
+            // Container(
+            //   padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+            //   decoration: BoxDecoration(
+            //     color: Theme.of(context).cardColor,
+            //     borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            //     border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
+            //   ),
+            //   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            //     Text('address'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+            //     const SizedBox(height: Dimensions.paddingSizeSmall),
+            //     Row(children: [
+            //       Icon(Icons.location_on, color: Theme.of(context).primaryColor),
+            //       const SizedBox(width: Dimensions.paddingSizeSmall),
+            //       Expanded(child: Text(track.deliveryAddress?.address ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall))),
+            //     ]),
+            //   ]),
+            // ),
+            // const SizedBox(height: Dimensions.paddingSizeDefault),
 
             // Products Summary
-            if(orderController.orderDetails != null)
-              Builder(
-                builder: (context) {
-                  bool hasUnit = orderController.orderDetails!.any((detail) => detail.itemDetails?.unitType != null && detail.itemDetails?.unitType?.isNotEmpty == true);
-                  
-                  return Container(
-                    padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                      border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
-                    ),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meals_summary'.tr : 'products_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                      const SizedBox(height: Dimensions.paddingSizeDefault),
-                      Table(
-                        columnWidths: hasUnit ? const {
-                          0: FlexColumnWidth(3),
-                          1: FlexColumnWidth(1.5),
-                          2: FlexColumnWidth(2),
-                          3: FlexColumnWidth(1),
-                          4: FlexColumnWidth(2),
-                        } : const {
-                          0: FlexColumnWidth(3),
-                          1: FlexColumnWidth(2),
-                          2: FlexColumnWidth(1),
-                          3: FlexColumnWidth(2),
-                        },
-                        children: [
-                          TableRow(children: [
-                            _buildTableHeader(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meal'.tr : 'product'.tr),
-                            if (hasUnit) _buildTableHeader('unit'.tr),
-                            _buildTableHeader('price'.tr),
-                            _buildTableHeader('quantity'.tr),
-                            _buildTableHeader('total'.tr),
-                          ]),
-                          ...orderController.orderDetails!.map((detail) => TableRow(children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(detail.itemDetails?.name ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
-                                  if (detail.variant != null && detail.variant!.isNotEmpty && detail.variant != 'null') ...[
-                                    const SizedBox(height: 2),
-                                    Text(detail.variant!, style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor)),
-                                  ],
-                                ],
-                              ),
-                            ),
-                            if (hasUnit) Padding(
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Text(detail.itemDetails?.unitType ?? '-', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textAlign: TextAlign.center),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Text(PriceConverter.convertPrice(detail.price), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Text(detail.quantity.toString(), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Text(PriceConverter.convertPrice(detail.price! * detail.quantity!), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
-                            ),
-                          ])),
-                        ],
-                      ),
-                    ]),
-                  );
-                }
-              ),
-            const SizedBox(height: Dimensions.paddingSizeDefault),
-
-            // Order Summary
-            Container(
-              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('order_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                const SizedBox(height: Dimensions.paddingSizeDefault),
-                _buildSummaryRow('item_price'.tr, PriceConverter.convertPrice(track.orderAmount! - track.deliveryCharge! - track.totalTaxAmount! + track.couponDiscountAmount! + track.storeDiscountAmount!)),
-                if (track.dmTips != null && track.dmTips! > 0)
-                  _buildSummaryRow('delivery_man_tips'.tr, PriceConverter.convertPrice(track.dmTips)),
-                _buildSummaryRow('delivery_fee'.tr, PriceConverter.convertPrice(track.deliveryCharge)),
-                if (track.totalTaxAmount != null && track.totalTaxAmount! > 0)
-                  _buildSummaryRow('tax'.tr, PriceConverter.convertPrice(track.totalTaxAmount)),
-                if ((track.couponDiscountAmount! + track.storeDiscountAmount!) > 0)
-                  _buildSummaryRow('discount'.tr, '-${PriceConverter.convertPrice(track.couponDiscountAmount! + track.storeDiscountAmount!)}'),
-                const Divider(),
-                _buildSummaryRow('total_amount'.tr, PriceConverter.convertPrice(track.orderAmount), isBold: true),
-              ]),
-            ),
-            const SizedBox(height: Dimensions.paddingSizeExtraLarge),
+            // if(orderController.orderDetails != null)
+            //   Builder(
+            //     builder: (context) {
+            //       bool hasUnit = orderController.orderDetails!.any((detail) => detail.itemDetails?.unitType != null && detail.itemDetails?.unitType?.isNotEmpty == true);
+            //
+            //       return Container(
+            //         padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+            //         decoration: BoxDecoration(
+            //           color: Theme.of(context).cardColor,
+            //           borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            //           border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
+            //         ),
+            //         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            //           Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meals_summary'.tr : 'products_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+            //           const SizedBox(height: Dimensions.paddingSizeDefault),
+            //           Table(
+            //             columnWidths: hasUnit ? const {
+            //               0: FlexColumnWidth(3),
+            //               1: FlexColumnWidth(1.5),
+            //               2: FlexColumnWidth(2),
+            //               3: FlexColumnWidth(1),
+            //               4: FlexColumnWidth(2),
+            //             } : const {
+            //               0: FlexColumnWidth(3),
+            //               1: FlexColumnWidth(2),
+            //               2: FlexColumnWidth(1),
+            //               3: FlexColumnWidth(2),
+            //             },
+            //             children: [
+            //               TableRow(children: [
+            //                 _buildTableHeader(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'meal'.tr : 'product'.tr),
+            //                 if (hasUnit) _buildTableHeader('unit'.tr),
+            //                 _buildTableHeader('price'.tr),
+            //                 _buildTableHeader('quantity'.tr),
+            //                 _buildTableHeader('total'.tr),
+            //               ]),
+            //               ...orderController.orderDetails!.map((detail) => TableRow(children: [
+            //                 Padding(
+            //                   padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
+            //                   child: Column(
+            //                     crossAxisAlignment: CrossAxisAlignment.start,
+            //                     children: [
+            //                       Text(detail.itemDetails?.name ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+            //                       if (detail.variant != null && detail.variant!.isNotEmpty && detail.variant != 'null') ...[
+            //                         const SizedBox(height: 2),
+            //                         Text(detail.variant!, style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor)),
+            //                       ],
+            //                     ],
+            //                   ),
+            //                 ),
+            //                 if (hasUnit) Padding(
+            //                   padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
+            //                   child: Text(detail.itemDetails?.unitType ?? '-', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textAlign: TextAlign.center),
+            //                 ),
+            //                 Padding(
+            //                   padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
+            //                   child: Text(PriceConverter.convertPrice(detail.price), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+            //                 ),
+            //                 Padding(
+            //                   padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
+            //                   child: Text(detail.quantity.toString(), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+            //                 ),
+            //                 Padding(
+            //                   padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
+            //                   child: Text(PriceConverter.convertPrice(detail.price! * detail.quantity!), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+            //                 ),
+            //               ])),
+            //             ],
+            //           ),
+            //         ]),
+            //       );
+            //     }
+            //   ),
+            // const SizedBox(height: Dimensions.paddingSizeDefault),
+            //
+            // // Order Summary
+            // Container(
+            //   padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+            //   decoration: BoxDecoration(
+            //     color: Theme.of(context).cardColor,
+            //     borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            //     border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
+            //   ),
+            //   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            //     Text('order_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+            //     const SizedBox(height: Dimensions.paddingSizeDefault),
+            //     _buildSummaryRow('item_price'.tr, PriceConverter.convertPrice(track.orderAmount! - track.deliveryCharge! - track.totalTaxAmount! + track.couponDiscountAmount! + track.storeDiscountAmount!)),
+            //     if (track.dmTips != null && track.dmTips! > 0)
+            //       _buildSummaryRow('delivery_man_tips'.tr, PriceConverter.convertPrice(track.dmTips)),
+            //     _buildSummaryRow('delivery_fee'.tr, PriceConverter.convertPrice(track.deliveryCharge)),
+            //     if (track.totalTaxAmount != null && track.totalTaxAmount! > 0)
+            //       _buildSummaryRow('tax'.tr, PriceConverter.convertPrice(track.totalTaxAmount)),
+            //     if ((track.couponDiscountAmount! + track.storeDiscountAmount!) > 0)
+            //       _buildSummaryRow('discount'.tr, '-${PriceConverter.convertPrice(track.couponDiscountAmount! + track.storeDiscountAmount!)}'),
+            //     const Divider(),
+            //     _buildSummaryRow('total_amount'.tr, PriceConverter.convertPrice(track.orderAmount), isBold: true),
+            //   ]),
+            // ),
+            // const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
             // Footer Buttons
             /*ElevatedButton(

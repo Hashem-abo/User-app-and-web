@@ -434,20 +434,173 @@ class OrderInfoWidget extends StatelessWidget {
             Text('item_info'.tr, style: robotoSemiBold),
             const SizedBox(height: Dimensions.paddingSizeSmall),
 
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: orderController.orderDetails!.length,
-              padding: EdgeInsets.zero,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.only(bottom: index == orderController.orderDetails!.length - 1 ? 0 : Dimensions.paddingSizeSmall),
-                  child: OrderItemWidget(order: order, orderDetails: orderController.orderDetails![index]),
-                );
-              },
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                border: Border.all(
+                  color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Table Header Row: item | unit | quantity | price
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Dimensions.paddingSizeSmall,
+                      vertical: Dimensions.paddingSizeSmall,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(Dimensions.radiusDefault),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 4,
+                          child: Text(
+                            'item'.tr.isNotEmpty && 'item'.tr != 'item' ? 'item'.tr : 'العنصر',
+                            style: robotoBold.copyWith(
+                              fontSize: Dimensions.fontSizeSmall,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'unit'.tr.isNotEmpty && 'unit'.tr != 'unit' ? 'unit'.tr : 'الوحدة',
+                            textAlign: TextAlign.center,
+                            style: robotoBold.copyWith(
+                              fontSize: Dimensions.fontSizeSmall,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'quantity'.tr.isNotEmpty && 'quantity'.tr != 'quantity' ? 'quantity'.tr : 'الكمية',
+                            textAlign: TextAlign.center,
+                            style: robotoBold.copyWith(
+                              fontSize: Dimensions.fontSizeSmall,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'price'.tr.isNotEmpty && 'price'.tr != 'price' ? 'price'.tr : 'السعر',
+                            textAlign: TextAlign.end,
+                            style: robotoBold.copyWith(
+                              fontSize: Dimensions.fontSizeSmall,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Table Rows
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: orderController.orderDetails!.length,
+                    padding: EdgeInsets.zero,
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: Theme.of(context).disabledColor.withValues(alpha: 0.15),
+                    ),
+                    itemBuilder: (context, index) {
+                      return OrderItemWidget(
+                        order: order,
+                        orderDetails: orderController.orderDetails![index],
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ]),
         ) : const SizedBox() : const SizedBox(),
+
+        (isDesktop && order.store?.id != 15) ? Text(parcel ? 'parcel_category'.tr : Get.find<SplashController>().getModuleConfig(order.moduleType).showRestaurantText! ? 'restaurant_details'.tr : 'store_details'.tr, style: robotoMedium)  : const SizedBox(),
+        SizedBox(height: isDesktop ? Dimensions.paddingSizeSmall : 0),
+
+        order.store?.id != 15 ? CustomCard(
+          borderRadius: isDesktop ? Dimensions.radiusDefault : 0, isBorder: false,
+          padding: EdgeInsets.all(Dimensions.paddingSizeDefault),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            !isDesktop ? Text(parcel ? 'parcel_category'.tr : Get.find<SplashController>().getModuleConfig(order.moduleType).showRestaurantText! ? 'restaurant_details'.tr : 'store_details'.tr, style: robotoSemiBold) : const SizedBox(),
+            !isDesktop ? const SizedBox(height: Dimensions.paddingSizeSmall) : const SizedBox(),
+
+            (parcel && order.parcelCategory == null) ? Text(
+              'no_parcel_category_data_found'.tr, style: robotoMedium,
+            ) : (!parcel && order.store == null) ? Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+              child: Text('no_restaurant_data_found'.tr, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+            )) : Row(children: [
+              ClipOval(child: CustomImage(
+                image: parcel ? '${order.parcelCategory!.imageFullUrl}' : '${order.store!.logoFullUrl}',
+                height: 35, width: 35, fit: BoxFit.cover,
+              )),
+              const SizedBox(width: Dimensions.paddingSizeSmall),
+
+              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                  parcel ? order.parcelCategory!.name! : order.store!.name!, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                ),
+                Text(
+                  parcel ? order.parcelCategory!.description! : order.store?.address ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
+                ),
+              ])),
+
+              (!parcel && order.orderType == 'take_away' && (order.orderStatus == 'pending' || order.orderStatus == 'accepted'
+              || order.orderStatus == 'confirmed' || order.orderStatus == 'processing' || order.orderStatus == 'handover'
+              || order.orderStatus == 'picked_up')) ? TextButton.icon(onPressed: () async {
+                if(!parcel) {
+                  String url ='https://www.google.com/maps/dir/?api=1&destination=${order.store!.latitude}'
+                      ',${order.store!.longitude}&mode=d';
+                  if (await canLaunchUrlString(url)) {
+                    await launchUrlString(url);
+                  }else {
+                    showCustomSnackBar('unable_to_launch_google_map'.tr);
+                  }
+                }
+              }, icon: const Icon(Icons.directions), label: Text('direction'.tr),
+
+              ) : const SizedBox(),
+
+              // Vendor contact button hidden per user request
+              const SizedBox(),
+
+              !isGuestLoggedIn && (Get.find<SplashController>().configModel!.refundActiveStatus! && order.orderStatus == 'delivered' && !parcel
+              && (parcel || (orderController.orderDetails!.isNotEmpty && orderController.orderDetails![0].itemCampaignId == null))) ? InkWell(
+                onTap: () => Get.toNamed(RouteHelper.getRefundRequestRoute(order.id.toString())),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).primaryColor, width: 1),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: Dimensions.paddingSizeSmall),
+                  child: Text('refund_this_order'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
+                ),
+              ) : const SizedBox(),
+
+            ]),
+          ]),
+        ) : const SizedBox(),
+        SizedBox(height: (!parcel && order.store != null) ? Dimensions.paddingSizeSmall : 0),
+
         SizedBox(height: !isDesktop ? (parcel || orderController.orderDetails!.isNotEmpty) ? Dimensions.paddingSizeSmall : 0 : 0),
 
         (isDesktop && Get.find<SplashController>().getModuleConfig(order.moduleType).orderAttachment! && order.orderAttachmentFullUrl != null
@@ -684,76 +837,6 @@ class OrderInfoWidget extends StatelessWidget {
                   ])),
                 ]),
               ),
-            ]),
-          ]),
-        ) : const SizedBox(),
-        SizedBox(height: (!parcel && order.store != null) ? Dimensions.paddingSizeSmall : 0),
-
-        (isDesktop && order.store?.id != 15) ? Text(parcel ? 'parcel_category'.tr : Get.find<SplashController>().getModuleConfig(order.moduleType).showRestaurantText! ? 'restaurant_details'.tr : 'store_details'.tr, style: robotoMedium)  : const SizedBox(),
-        SizedBox(height: isDesktop ? Dimensions.paddingSizeSmall : 0),
-
-        order.store?.id != 15 ? CustomCard(
-          borderRadius: isDesktop ? Dimensions.radiusDefault : 0, isBorder: false,
-          padding: EdgeInsets.all(Dimensions.paddingSizeDefault),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            !isDesktop ? Text(parcel ? 'parcel_category'.tr : Get.find<SplashController>().getModuleConfig(order.moduleType).showRestaurantText! ? 'restaurant_details'.tr : 'store_details'.tr, style: robotoSemiBold) : const SizedBox(),
-            !isDesktop ? const SizedBox(height: Dimensions.paddingSizeSmall) : const SizedBox(),
-
-            (parcel && order.parcelCategory == null) ? Text(
-              'no_parcel_category_data_found'.tr, style: robotoMedium,
-            ) : (!parcel && order.store == null) ? Center(child: Padding(padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-              child: Text('no_restaurant_data_found'.tr, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
-            )) : Row(children: [
-              ClipOval(child: CustomImage(
-                image: parcel ? '${order.parcelCategory!.imageFullUrl}' : '${order.store!.logoFullUrl}',
-                height: 35, width: 35, fit: BoxFit.cover,
-              )),
-              const SizedBox(width: Dimensions.paddingSizeSmall),
-
-              Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
-                  parcel ? order.parcelCategory!.name! : order.store!.name!, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
-                ),
-                Text(
-                  parcel ? order.parcelCategory!.description! : order.store?.address ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                ),
-              ])),
-
-              (!parcel && order.orderType == 'take_away' && (order.orderStatus == 'pending' || order.orderStatus == 'accepted'
-              || order.orderStatus == 'confirmed' || order.orderStatus == 'processing' || order.orderStatus == 'handover'
-              || order.orderStatus == 'picked_up')) ? TextButton.icon(onPressed: () async {
-                if(!parcel) {
-                  String url ='https://www.google.com/maps/dir/?api=1&destination=${order.store!.latitude}'
-                      ',${order.store!.longitude}&mode=d';
-                  if (await canLaunchUrlString(url)) {
-                    await launchUrlString(url);
-                  }else {
-                    showCustomSnackBar('unable_to_launch_google_map'.tr);
-                  }
-                }
-              }, icon: const Icon(Icons.directions), label: Text('direction'.tr),
-
-              ) : const SizedBox(),
-
-              // Vendor contact button hidden per user request
-              const SizedBox(),
-
-              !isGuestLoggedIn && (Get.find<SplashController>().configModel!.refundActiveStatus! && order.orderStatus == 'delivered' && !parcel
-              && (parcel || (orderController.orderDetails!.isNotEmpty && orderController.orderDetails![0].itemCampaignId == null))) ? InkWell(
-                onTap: () => Get.toNamed(RouteHelper.getRefundRequestRoute(order.id.toString())),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Theme.of(context).primaryColor, width: 1),
-                    borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: Dimensions.paddingSizeSmall),
-                  child: Text('refund_this_order'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
-                ),
-              ) : const SizedBox(),
-
             ]),
           ]),
         ) : const SizedBox(),
