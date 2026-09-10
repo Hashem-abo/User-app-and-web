@@ -103,13 +103,14 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
       final bool isLoggedIn = AuthHelper.isLoggedIn();
       final String guestId = AuthHelper.getGuestId();
       final profile = Get.find<ProfileController>().userInfoModel;
+      final String contactNumber = _selectedAddress!.contactPersonNumber ?? (profile?.phone ?? '');
 
       final PlaceOrderBodyModel placeOrderBody = PlaceOrderBodyModel(
         cart: [],
         couponDiscountAmount: 0.0,
         couponCode: '',
         orderAmount: 0.0,
-        orderType: 'delivery',
+        orderType: 'parcel',
         paymentMethod: 'cash_on_delivery',
         storeId: null,
         distance: 1.0,
@@ -121,10 +122,10 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
         latitude: _selectedAddress!.latitude,
         longitude: _selectedAddress!.longitude,
         contactPersonName: _selectedAddress!.contactPersonName ?? (profile != null ? '${profile.fName} ${profile.lName}' : 'Customer'),
-        contactPersonNumber: _selectedAddress!.contactPersonNumber ?? (profile?.phone ?? ''),
+        contactPersonNumber: contactNumber,
         addressType: _selectedAddress!.addressType ?? 'home',
         parcelCategoryId: null,
-        chargePayer: null,
+        chargePayer: 'sender',
         dmTips: '0',
         unavailableItemNote: '',
         cutlery: 0,
@@ -156,7 +157,7 @@ class _GlobalOrderFormScreenState extends State<GlobalOrderFormScreen> {
 
       showCustomSnackBar('global_order_submitted_success'.tr, isError: false);
       if (orderId.isNotEmpty && orderId != '-1') {
-        Get.offNamed(RouteHelper.getOrderDetailsRoute(int.tryParse(orderId)));
+        Get.offNamed(RouteHelper.getOrderDetailsRoute(int.tryParse(orderId), contactNumber: contactNumber));
       } else if (mounted) {
         Navigator.of(context).pop();
       }

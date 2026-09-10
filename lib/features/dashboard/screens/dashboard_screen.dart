@@ -143,7 +143,7 @@ class DashboardScreenState extends State<DashboardScreen> {
               : isGlobal
                   ? const GlobalHomeScreen()
                   : const CategoryTreeScreen(),
-      isGlobal ? const GlobalOrderListScreen() : const OrderScreen(),
+      const OrderScreen(),
       isGlobal ? const GlobalCartScreen() : const CartScreen(fromNav: true),
       isTaxi ? const OrderScreen(index: 1) : const FavouriteScreen(),
       const MenuScreen(),

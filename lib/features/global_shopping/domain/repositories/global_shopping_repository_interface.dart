@@ -6,10 +6,10 @@ abstract class GlobalShoppingRepositoryInterface {
   Future<Response> getProductDetails(String source, String id);
   Future<Response> getCart(String guestId);
   Future<Response> addToCart(String guestId, String source, String productId, int quantity, String variant);
-  Future<Response> removeFromCart(int cartItemId);
+  Future<Response> removeFromCart(int cartItemId, String guestId);
   Future<Response> clearCart(String guestId);
   Future<Response> placeOrder(String guestId, Map<String, dynamic> data);
   Future<Response> getOrderHistory();
-  Future<Response> trackOrder(int orderId);
-  Future<Response> cancelOrder(int orderId);
+  Future<Response> trackOrder(int orderId, String guestId);
+  Future<Response> cancelOrder(int orderId, String guestId);
 }

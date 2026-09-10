@@ -199,14 +199,14 @@ class OrderController extends GetxController implements GetxService {
     _isLoading = true;
     _showCancelled = false;
 
-    if(_trackModel == null || (_trackModel!.orderType != 'parcel' && !_trackModel!.prescriptionOrder!)) {
+    if(_trackModel == null || (_trackModel!.orderType != 'parcel' && !_trackModel!.prescriptionOrder! && _trackModel!.moduleType != 'global_shopping')) {
       List<OrderDetailsModel>? detailsList = await orderServiceInterface.getOrderDetails(orderID, AuthHelper.isLoggedIn() ? null : AuthHelper.getGuestId());
       _isLoading = false;
+      _orderDetails = [];
       if (detailsList != null) {
-        _orderDetails = [];
         _orderDetails!.addAll(detailsList);
       }
-    }else {
+    } else {
       _isLoading = false;
       _orderDetails = [];
     }

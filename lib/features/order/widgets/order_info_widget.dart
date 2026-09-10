@@ -64,14 +64,14 @@ class OrderInfoWidget extends StatelessWidget {
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-        !isDesktop ? SizedBox(height: DateConverter.isBeforeTime(order.scheduleAt) && Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation!
+        !isDesktop ? SizedBox(height: DateConverter.isBeforeTime(order.scheduleAt) && (Get.find<SplashController>().getModuleConfig(order.moduleType)?.newVariation ?? false)
           ? (order.orderStatus != 'delivered' && order.orderStatus != 'failed'
           && order.orderStatus != 'canceled' && order.orderStatus != 'refund_requested' && order.orderStatus != 'refunded'
           && order.orderStatus != 'refund_request_canceled' ) ? 280 : 140 :
-          parcel || prescriptionOrder || (orderController.orderDetails!.isNotEmpty && orderController.orderDetails![0].itemDetails!.moduleType == 'grocery')
-          || (orderController.orderDetails!.isNotEmpty && orderController.orderDetails![0].itemDetails!.moduleType == 'ecommerce')
-          || (orderController.orderDetails!.isNotEmpty && orderController.orderDetails![0].itemDetails!.moduleType == 'pharmacy')
-          || (orderController.orderDetails!.isNotEmpty && orderController.orderDetails![0].itemDetails!.moduleType == 'food')
+          parcel || prescriptionOrder || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'grocery')
+          || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'ecommerce')
+          || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'pharmacy')
+          || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'food')
           ? 140 : 0) : const SizedBox(),
 
         CustomCard(
@@ -107,18 +107,18 @@ class OrderInfoWidget extends StatelessWidget {
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('order_date'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
-              Text(DateConverter.dateTimeStringToDateTime(order.createdAt!), style: robotoRegular),
+              Text(order.createdAt != null ? DateConverter.dateTimeStringToDateTime(order.createdAt!) : '', style: robotoRegular),
             ]),
             Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
 
             order.scheduled == 1 ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('scheduled_at'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
-              Text(DateConverter.dateTimeStringToDateTime(order.scheduleAt!), style: robotoRegular),
+              Text(order.scheduleAt != null ? DateConverter.dateTimeStringToDateTime(order.scheduleAt!) : '', style: robotoRegular),
             ]) : const SizedBox(),
             order.scheduled == 1 ? Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)) : const SizedBox(),
 
-            order.orderStatus != 'canceled' && Get.find<SplashController>().configModel!.orderDeliveryVerification! ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            order.orderStatus != 'canceled' && (Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false) ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('delivery_verification_code'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
               InkWell(
@@ -137,7 +137,7 @@ class OrderInfoWidget extends StatelessWidget {
                 ),
               ),
             ]) : const SizedBox(),
-            order.orderStatus != 'canceled' && Get.find<SplashController>().configModel!.orderDeliveryVerification! ? Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)) : const SizedBox(),
+            order.orderStatus != 'canceled' && (Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false) ? Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)) : const SizedBox(),
 
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text('payment_method'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
@@ -182,7 +182,7 @@ class OrderInfoWidget extends StatelessWidget {
                 ),
                 child: Text(
                   (order.orderType == 'take_away' && (order.orderStatus == 'handover' || order.orderStatus == 'picked_up') ? 'ready_for_handover'
-                  : (order.orderType != 'pickup_center' && order.orderStatus == 'arrived_at_pickup_center' ? 'delivery_on_the_way' : order.orderStatus!)).tr,
+                  : (order.orderType != 'pickup_center' && order.orderStatus == 'arrived_at_pickup_center' ? 'delivery_on_the_way' : (order.orderStatus ?? ''))).tr,
                   style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
                 ),
               ),
@@ -196,7 +196,7 @@ class OrderInfoWidget extends StatelessWidget {
                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                 Text(
-                  parcel ? order.chargePayer!.tr : orderController.orderDetails!.length.toString(),
+                  parcel ? (order.chargePayer?.tr ?? '') : (orderController.orderDetails?.length.toString() ?? '0'),
                   style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
                 ),
               ]),
@@ -210,20 +210,20 @@ class OrderInfoWidget extends StatelessWidget {
                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                 Text(
-                  DateConverter.dateTimeStringToDateTime(order.delivered!),
+                  order.delivered != null ? DateConverter.dateTimeStringToDateTime(order.delivered!) : '',
                   style: robotoMedium.copyWith(color: Theme.of(context).primaryColor),
                 ),
               ]),
             ) : const SizedBox(),
 
-            Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation! ? Column(children: [
+            (Get.find<SplashController>().getModuleConfig(order.moduleType)?.newVariation ?? false) ? Column(children: [
               Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
 
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text('cutlery'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
                 Text(
-                  order.cutlery! ? 'yes'.tr : 'no'.tr,
+                  (order.cutlery ?? false) ? 'yes'.tr : 'no'.tr,
                   style: robotoRegular,
                 ),
               ]),

@@ -56,8 +56,9 @@ class GlobalOrderController extends GetxController implements GetxService {
     _isLoading = true;
     update();
 
+    String guestId = AuthHelper.getGuestId();
     try {
-      _trackingData = await service.trackOrder(orderId);
+      _trackingData = await service.trackOrder(orderId, guestId);
     } catch (e) {
       _trackingData = null;
     }
@@ -70,8 +71,9 @@ class GlobalOrderController extends GetxController implements GetxService {
     _isLoading = true;
     update();
 
+    String guestId = AuthHelper.getGuestId();
     try {
-      var cancelled = await service.cancelOrder(orderId);
+      var cancelled = await service.cancelOrder(orderId, guestId);
       if (cancelled != null) {
         await getOrders();
         _isLoading = false;

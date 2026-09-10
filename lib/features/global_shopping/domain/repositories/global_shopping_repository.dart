@@ -51,8 +51,8 @@ class GlobalShoppingRepository implements GlobalShoppingRepositoryInterface {
   }
 
   @override
-  Future<Response> removeFromCart(int cartItemId) async {
-    return await apiClient.postData('/api/v1/global-shopping/cart/remove/$cartItemId', {});
+  Future<Response> removeFromCart(int cartItemId, String guestId) async {
+    return await apiClient.postData('/api/v1/global-shopping/cart/remove/$cartItemId', {}, headers: _withGuestHeader(guestId));
   }
 
   @override
@@ -71,12 +71,12 @@ class GlobalShoppingRepository implements GlobalShoppingRepositoryInterface {
   }
 
   @override
-  Future<Response> trackOrder(int orderId) async {
-    return await apiClient.getData('/api/v1/global-shopping/order/$orderId/track');
+  Future<Response> trackOrder(int orderId, String guestId) async {
+    return await apiClient.getData('/api/v1/global-shopping/order/$orderId/track', headers: _withGuestHeader(guestId));
   }
 
   @override
-  Future<Response> cancelOrder(int orderId) async {
-    return await apiClient.postData('/api/v1/global-shopping/order/$orderId/cancel', {});
+  Future<Response> cancelOrder(int orderId, String guestId) async {
+    return await apiClient.postData('/api/v1/global-shopping/order/$orderId/cancel', {}, headers: _withGuestHeader(guestId));
   }
 }

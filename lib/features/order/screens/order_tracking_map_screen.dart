@@ -167,7 +167,7 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
         if(orderController.trackModel != null) {
           track = orderController.trackModel;
 
-          if(track!.orderType != 'parcel') {
+          if(track!.orderType != 'parcel' && track.moduleType != 'global_shopping' && track.store != null) {
             if (track.store!.storeBusinessModel == 'commission') {
               showChatPermission = true;
             } else if (track.store!.storeSubscription != null && track.store!.storeBusinessModel == 'subscription') {
@@ -190,7 +190,7 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
                 onExit: (event) => onEntered(false),
                 child: GoogleMap(
                   initialCameraPosition: CameraPosition(target: LatLng(
-                    double.parse(track.deliveryAddress!.latitude!), double.parse(track.deliveryAddress!.longitude!),
+                    double.parse(track.deliveryAddress?.latitude ?? '0'), double.parse(track.deliveryAddress?.longitude ?? '0'),
                   ), zoom: 16),
                   minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
                   zoomControlsEnabled: false,
@@ -199,8 +199,8 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
                     _controller = controller;
                     _isLoading = false;
                     setMarker(
-                      track!.orderType == 'parcel' ? Store(latitude: track.receiverDetails!.latitude, longitude: track.receiverDetails!.longitude,
-                          address: track.receiverDetails!.address, name: track.receiverDetails!.contactPersonName) : track.store, track.deliveryMan,
+                      track!.orderType == 'parcel' ? (track.receiverDetails != null ? Store(latitude: track.receiverDetails!.latitude, longitude: track.receiverDetails!.longitude,
+                          address: track.receiverDetails!.address, name: track.receiverDetails!.contactPersonName) : null) : track.store, track.deliveryMan,
                       track.orderType == 'take_away' ? Get.find<LocationController>().position.latitude == 0 ? track.deliveryAddress : AddressModel(
                         latitude: Get.find<LocationController>().position.latitude.toString(),
                         longitude: Get.find<LocationController>().position.longitude.toString(),
@@ -225,8 +225,8 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
                   onTap: () => _checkPermission(() async {
                     AddressModel address = await Get.find<LocationController>().getCurrentLocation(false, mapController: _controller);
                     setMarker(
-                      track!.orderType == 'parcel' ? Store(latitude: track.receiverDetails!.latitude, longitude: track.receiverDetails!.longitude,
-                          address: track.receiverDetails!.address, name: track.receiverDetails!.contactPersonName) : track.store, track.deliveryMan,
+                      track!.orderType == 'parcel' ? (track.receiverDetails != null ? Store(latitude: track.receiverDetails!.latitude, longitude: track.receiverDetails!.longitude,
+                          address: track.receiverDetails!.address, name: track.receiverDetails!.contactPersonName) : null) : track.store, track.deliveryMan,
                       track.orderType == 'take_away' ? Get.find<LocationController>().position.latitude == 0 ? track.deliveryAddress : AddressModel(
                         latitude: Get.find<LocationController>().position.latitude.toString(),
                         longitude: Get.find<LocationController>().position.longitude.toString(),

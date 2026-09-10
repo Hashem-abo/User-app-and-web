@@ -73,7 +73,7 @@ class OrderBannerViewWidget extends StatelessWidget {
       const SizedBox(height: Dimensions.paddingSizeDefault),
 
       DateConverter.isBeforeTime(order.scheduleAt) &&
-              Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation! &&
+              (Get.find<SplashController>().getModuleConfig(order.moduleType)?.newVariation ?? false) &&
               ongoing
           ? Column(children: [
               Text('your_food_will_delivered_within'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).disabledColor)),

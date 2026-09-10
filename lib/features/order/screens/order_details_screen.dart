@@ -185,7 +185,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
             bool ongoing = false;
             bool showChatPermission = true;
             if(orderController.orderDetails != null  && order != null) {
-              parcel = order.orderType == 'parcel';
+              parcel = order.orderType == 'parcel' || order.moduleType == 'global_shopping';
               prescriptionOrder = order.prescriptionOrder ?? false;
               deliveryCharge = order.deliveryCharge ?? 0;
               couponDiscount = order.couponDiscountAmount ?? 0;

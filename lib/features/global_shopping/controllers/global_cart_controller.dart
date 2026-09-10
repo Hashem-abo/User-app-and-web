@@ -75,8 +75,9 @@ class GlobalCartController extends GetxController implements GetxService {
     _isLoading = true;
     update();
 
+    String guestId = AuthHelper.getGuestId();
     try {
-      bool success = await service.removeFromCart(id);
+      bool success = await service.removeFromCart(id, guestId);
       if (success) {
         await getCartList();
       }

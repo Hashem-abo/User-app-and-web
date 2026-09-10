@@ -8,10 +8,10 @@ abstract class GlobalShoppingServiceInterface {
   Future<GlobalProductModel?> getProductDetails(String source, String id);
   Future<List<GlobalCartItemModel>?> getCart(String guestId);
   Future<GlobalCartItemModel?> addToCart(String guestId, String source, String productId, int quantity, String variant);
-  Future<bool> removeFromCart(int cartItemId);
+  Future<bool> removeFromCart(int cartItemId, String guestId);
   Future<bool> clearCart(String guestId);
   Future<GlobalOrderModel?> placeOrder(String guestId, Map<String, dynamic> data);
   Future<List<GlobalOrderModel>?> getOrderHistory();
-  Future<Map<String, dynamic>?> trackOrder(int orderId);
-  Future<GlobalOrderModel?> cancelOrder(int orderId);
+  Future<Map<String, dynamic>?> trackOrder(int orderId, String guestId);
+  Future<GlobalOrderModel?> cancelOrder(int orderId, String guestId);
 }

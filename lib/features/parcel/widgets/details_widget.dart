@@ -11,6 +11,8 @@ class DetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (address == null) return const SizedBox();
+
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
       Text(title, style: robotoSemiBold),
@@ -36,14 +38,14 @@ class DetailsWidget extends StatelessWidget {
           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
           Expanded(
             child: Text(
-              address!.contactPersonNumber ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
+              address?.contactPersonNumber ?? '', maxLines: 1, overflow: TextOverflow.ellipsis,
               style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
             ),
           ),
         ],
       ),
 
-      AuthHelper.isGuestLoggedIn() && address!.email != null && address!.email!.isNotEmpty ? Padding(
+      AuthHelper.isGuestLoggedIn() && address?.email != null && address!.email!.isNotEmpty ? Padding(
         padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall),
         child: Row(
           children: [

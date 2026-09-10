@@ -56,8 +56,8 @@ class GlobalShoppingService implements GlobalShoppingServiceInterface {
   }
 
   @override
-  Future<bool> removeFromCart(int cartItemId) async {
-    Response response = await repo.removeFromCart(cartItemId);
+  Future<bool> removeFromCart(int cartItemId, String guestId) async {
+    Response response = await repo.removeFromCart(cartItemId, guestId);
     return response.statusCode == 200;
   }
 
@@ -86,8 +86,8 @@ class GlobalShoppingService implements GlobalShoppingServiceInterface {
   }
 
   @override
-  Future<Map<String, dynamic>?> trackOrder(int orderId) async {
-    Response response = await repo.trackOrder(orderId);
+  Future<Map<String, dynamic>?> trackOrder(int orderId, String guestId) async {
+    Response response = await repo.trackOrder(orderId, guestId);
     if (response.statusCode == 200 && response.body != null) {
       return Map<String, dynamic>.from(response.body);
     }
@@ -95,8 +95,8 @@ class GlobalShoppingService implements GlobalShoppingServiceInterface {
   }
 
   @override
-  Future<GlobalOrderModel?> cancelOrder(int orderId) async {
-    Response response = await repo.cancelOrder(orderId);
+  Future<GlobalOrderModel?> cancelOrder(int orderId, String guestId) async {
+    Response response = await repo.cancelOrder(orderId, guestId);
     if (response.statusCode == 200 && response.body != null) {
       return GlobalOrderModel.fromJson(response.body);
     }

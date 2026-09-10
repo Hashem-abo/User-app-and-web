@@ -184,7 +184,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
         if(orderController.trackModel != null) {
           track = orderController.trackModel;
 
-          if(track!.orderType != 'parcel') {
+          if(track!.orderType != 'parcel' && track.moduleType != 'global_shopping' && track.store != null) {
             if (track.store!.storeBusinessModel == 'commission') {
               showChatPermission = true;
             } else if (track.store!.storeSubscription != null && track.store!.storeBusinessModel == 'subscription') {
@@ -322,7 +322,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                 ]),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  track.orderStatus != 'canceled' && Get.find<SplashController>().configModel!.orderDeliveryVerification! ? Row(children: [
+                  track.orderStatus != 'canceled' && (Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false) ? Row(children: [
                     Text('${'delivery_verification_code'.tr}: ', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
                     InkWell(
                       onTap: () {
@@ -340,7 +340,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                   ]) : const SizedBox(),
 
                   Text(
-                    DateConverter.dateTimeStringToDateTime(track.createdAt!),
+                    track.createdAt != null ? DateConverter.dateTimeStringToDateTime(track.createdAt!) : '',
                     style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall),
                   ),
                 ]),
@@ -509,7 +509,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Text(PriceConverter.convertPrice(detail.price! * detail.quantity!), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+                              child: Text(PriceConverter.convertPrice((detail.price ?? 0) * (detail.quantity ?? 1)), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
                             ),
                           ])),
                         ],
@@ -531,16 +531,16 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('order_summary'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                 const SizedBox(height: Dimensions.paddingSizeDefault),
-                _buildSummaryRow('item_price'.tr, PriceConverter.convertPrice(track.orderAmount! - track.deliveryCharge! - track.totalTaxAmount! + track.couponDiscountAmount! + track.storeDiscountAmount!)),
+                _buildSummaryRow('item_price'.tr, PriceConverter.convertPrice((track.orderAmount ?? 0) - (track.deliveryCharge ?? 0) - (track.totalTaxAmount ?? 0) + (track.couponDiscountAmount ?? 0) + (track.storeDiscountAmount ?? 0))),
                 if (track.dmTips != null && track.dmTips! > 0)
                   _buildSummaryRow('delivery_man_tips'.tr, PriceConverter.convertPrice(track.dmTips)),
-                _buildSummaryRow('delivery_fee'.tr, PriceConverter.convertPrice(track.deliveryCharge)),
+                _buildSummaryRow('delivery_fee'.tr, PriceConverter.convertPrice(track.deliveryCharge ?? 0)),
                 if (track.totalTaxAmount != null && track.totalTaxAmount! > 0)
                   _buildSummaryRow('tax'.tr, PriceConverter.convertPrice(track.totalTaxAmount)),
-                if ((track.couponDiscountAmount! + track.storeDiscountAmount!) > 0)
-                  _buildSummaryRow('discount'.tr, '-${PriceConverter.convertPrice(track.couponDiscountAmount! + track.storeDiscountAmount!)}'),
+                if (((track.couponDiscountAmount ?? 0) + (track.storeDiscountAmount ?? 0)) > 0)
+                  _buildSummaryRow('discount'.tr, '-${PriceConverter.convertPrice((track.couponDiscountAmount ?? 0) + (track.storeDiscountAmount ?? 0))}'),
                 const Divider(),
-                _buildSummaryRow('total_amount'.tr, PriceConverter.convertPrice(track.orderAmount), isBold: true),
+                _buildSummaryRow('total_amount'.tr, PriceConverter.convertPrice(track.orderAmount ?? 0), isBold: true),
               ]),
             ),
             const SizedBox(height: Dimensions.paddingSizeExtraLarge),

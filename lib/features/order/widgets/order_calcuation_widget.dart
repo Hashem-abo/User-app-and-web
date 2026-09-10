@@ -115,7 +115,7 @@ class OrderCalculationWidget extends StatelessWidget {
                 SizedBox(height: (tax == 0) || taxIncluded ? 0 : 10),
 
                 (order.additionalCharge != null && order.additionalCharge! > 0) ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Expanded(child: Text(Get.find<SplashController>().configModel!.additionalChargeName!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                  Expanded(child: Text(Get.find<SplashController>().configModel?.additionalChargeName ?? 'additional_charge'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
                   maxLines: 1, overflow: TextOverflow.ellipsis,
                   )),
                   SizedBox(width: 10),
@@ -130,7 +130,7 @@ class OrderCalculationWidget extends StatelessWidget {
                 ]),
                 const SizedBox(height: 10),
 
-                Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Row(
+                (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('addons'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
@@ -138,16 +138,16 @@ class OrderCalculationWidget extends StatelessWidget {
                   ],
                 ) : const SizedBox(),
 
-                Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Divider(thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5),) : const SizedBox(),
+                (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? Divider(thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5),) : const SizedBox(),
 
-                Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? Row(
+                (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('subtotal'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
                     Text(PriceConverter.convertPrice(subTotal), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr),
                   ],
                 ) : const SizedBox(),
-                SizedBox(height: Get.find<SplashController>().getModuleConfig(order.moduleType).addOn! ? 10 : 0),
+                SizedBox(height: (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? 10 : 0),
 
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text('discount'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
@@ -175,7 +175,7 @@ class OrderCalculationWidget extends StatelessWidget {
 
                 (order.additionalCharge != null && order.additionalCharge! > 0) ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Expanded(
-                    child: Text(Get.find<SplashController>().configModel!.additionalChargeName!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    child: Text(Get.find<SplashController>().configModel?.additionalChargeName ?? 'additional_charge'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ),
                   SizedBox(width: 10),
 
@@ -340,7 +340,7 @@ class OrderCalculationWidget extends StatelessWidget {
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text('total'.tr, style: robotoBold),
 
-                Text(PriceConverter.convertPrice(total + order.parcelCancellation!.returnFee!), style: robotoBold, textDirection: TextDirection.ltr),
+                Text(PriceConverter.convertPrice(total + (order.parcelCancellation?.returnFee ?? 0)), style: robotoBold, textDirection: TextDirection.ltr),
               ]),
             ]) : const SizedBox(),
             order.parcelCancellation?.returnFee != null && order.parcelCancellation!.returnFee! > 0 ? SizedBox(height: isDesktop ? Dimensions.paddingSizeDefault : Dimensions.paddingSizeSmall) : SizedBox(),
