@@ -105,6 +105,11 @@ class OrderModel {
   double? proDiscount;
   double? proDeliveryDiscount;
   bool? proCustomer;
+  String? deliveryType;
+  double? deliveryTypeCharge;
+  String? benefitType;
+  double? deliveryFeeReductionAmount;
+  String? deliveryOfferType;
 
   OrderModel({
     this.id,
@@ -175,6 +180,11 @@ class OrderModel {
     this.proDiscount,
     this.proDeliveryDiscount,
     this.proCustomer,
+    this.deliveryType,
+    this.deliveryTypeCharge,
+    this.benefitType,
+    this.deliveryFeeReductionAmount,
+    this.deliveryOfferType,
   });
 
   OrderModel.fromJson(Map<String, dynamic> json) {
@@ -268,6 +278,11 @@ class OrderModel {
     proDeliveryDiscount = _asDouble(json['pro_delivery_discount'] ?? json['delivery_fee_discount_pro'] ?? json['delivery_fee_discount']);
     final dynamic proCustomerValue = json['pro_customer'] ?? json['is_pro_customer'];
     proCustomer = proCustomerValue == true || proCustomerValue == 1 || proCustomerValue == '1' || proCustomerValue == 'true';
+    deliveryType = json['delivery_type']?.toString();
+    deliveryTypeCharge = _asDouble(json['delivery_type_charge']);
+    benefitType = json['benefit_type']?.toString();
+    deliveryFeeReductionAmount = _asDouble(json['delivery_fee_reduction_amount']);
+    deliveryOfferType = json['delivery_offer_type']?.toString();
     if (json['reviews'] != null) {
       reviews = <Reviews>[];
       json['reviews'].forEach((v) {
@@ -354,6 +369,11 @@ class OrderModel {
     data['pro_discount'] = proDiscount;
     data['pro_delivery_discount'] = proDeliveryDiscount;
     data['pro_customer'] = proCustomer;
+    data['delivery_type'] = deliveryType;
+    data['delivery_type_charge'] = deliveryTypeCharge;
+    data['benefit_type'] = benefitType;
+    data['delivery_fee_reduction_amount'] = deliveryFeeReductionAmount;
+    data['delivery_offer_type'] = deliveryOfferType;
     data['extra_packaging_amount'] = extraPackagingAmount;
     data['ref_bonus_amount'] = referrerBonusAmount;
     if (parcelCancellation != null) {

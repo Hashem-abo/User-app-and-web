@@ -50,6 +50,13 @@ class OrderCalculationWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     bool isDesktop = ResponsiveHelper.isDesktop(context);
+    final double proDiscount = (order.proDiscount != null && order.proDiscount! > 0) ? order.proDiscount! : 0;
+    final double proDeliveryDiscount = (order.deliveryFeeReductionAmount != null && order.deliveryFeeReductionAmount! > 0)
+        ? order.deliveryFeeReductionAmount!
+        : ((order.proDeliveryDiscount != null && order.proDeliveryDiscount! > 0) ? order.proDeliveryDiscount! : 0);
+    final double rawDeliveryTypeCharge = order.deliveryTypeCharge ?? 0;
+    final bool showDeliveryTypeCharge = (order.deliveryType == 'slightly_delay' || order.deliveryType == 'express') && rawDeliveryTypeCharge > 0;
+    final double deliveryTypeCharge = order.deliveryType == 'slightly_delay' ? -rawDeliveryTypeCharge : rawDeliveryTypeCharge;
     
     return Column(children: [
       Padding(
@@ -72,14 +79,102 @@ class OrderCalculationWidget extends StatelessWidget {
 
                 DetailsWidget(title: 'receiver_details'.tr, address: order.receiverDetails),
               ]) : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: orderController.orderDetails!.length,
-                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                  itemBuilder: (context, index) {
-                    return OrderItemWidget(order: order, orderDetails: orderController.orderDetails![index]);
-                  },
+                Text('item_info'.tr, style: robotoSemiBold),
+                const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    border: Border.all(
+                      color: Theme.of(context).disabledColor.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Table Header Row: item | unit | quantity | price
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: Dimensions.paddingSizeSmall,
+                          vertical: Dimensions.paddingSizeSmall,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(Dimensions.radiusDefault),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                'item'.tr.isNotEmpty && 'item'.tr != 'item' ? 'item'.tr : 'العنصر',
+                                style: robotoBold.copyWith(
+                                  fontSize: Dimensions.fontSizeSmall,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'unit'.tr.isNotEmpty && 'unit'.tr != 'unit' ? 'unit'.tr : 'الوحدة',
+                                textAlign: TextAlign.center,
+                                style: robotoBold.copyWith(
+                                  fontSize: Dimensions.fontSizeSmall,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'quantity'.tr.isNotEmpty && 'quantity'.tr != 'quantity' ? 'quantity'.tr : 'الكمية',
+                                textAlign: TextAlign.center,
+                                style: robotoBold.copyWith(
+                                  fontSize: Dimensions.fontSizeSmall,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                'price'.tr.isNotEmpty && 'price'.tr != 'price' ? 'price'.tr : 'السعر',
+                                textAlign: TextAlign.end,
+                                style: robotoBold.copyWith(
+                                  fontSize: Dimensions.fontSizeSmall,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Table Rows
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: orderController.orderDetails!.length,
+                        padding: EdgeInsets.zero,
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Theme.of(context).disabledColor.withValues(alpha: 0.15),
+                        ),
+                        itemBuilder: (context, index) {
+                          return OrderItemWidget(
+                            order: order,
+                            orderDetails: orderController.orderDetails![index],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ]),
             ) : const SizedBox(),
@@ -96,10 +191,35 @@ class OrderCalculationWidget extends StatelessWidget {
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text('delivery_fee'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
                   Text(
-                    '(+) ${PriceConverter.convertPrice(order.deliveryCharge)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
+                    '(+) ${PriceConverter.convertPrice(proDeliveryDiscount > 0 ? (order.deliveryCharge ?? 0) + proDeliveryDiscount : (order.deliveryCharge ?? 0))}',
+                    style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                    textDirection: TextDirection.ltr,
                   ),
                 ]),
                 const SizedBox(height: 10),
+
+                if (proDeliveryDiscount > 0) ...[
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Text('delivery_fee_discount_pro'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                    Text('(-) ${PriceConverter.convertPrice(proDeliveryDiscount)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr),
+                  ]),
+                  const SizedBox(height: 10),
+                ],
+
+                if (showDeliveryTypeCharge) ...[
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Text(
+                      order.deliveryType == 'express' ? '${'express'.tr} ${'delivery'.tr}' : '${'slightly_delay'.tr} ${'delivery'.tr}',
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                    ),
+                    Text(
+                      '${deliveryTypeCharge < 0 ? '(-)' : '(+)'} ${PriceConverter.convertPrice(deliveryTypeCharge.abs())}',
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                      textDirection: TextDirection.ltr,
+                    ),
+                  ]),
+                  const SizedBox(height: 10),
+                ],
 
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text('delivery_man_tips'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
@@ -155,8 +275,19 @@ class OrderCalculationWidget extends StatelessWidget {
                 ]),
                 const SizedBox(height: 10),
 
+                if (proDiscount > 0) ...[
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Text('discount_pro'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                    Text('(-) ${PriceConverter.convertPrice(proDiscount)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr),
+                  ]),
+                  const SizedBox(height: 10),
+                ],
+
                 couponDiscount > 0 ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  Text('coupon_discount'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                  Text(
+                    (order.benefitType == 'coupon') ? 'coupon_discount_pro'.tr : 'coupon_discount'.tr,
+                    style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                  ),
                   Text(
                     '(-) ${PriceConverter.convertPrice(couponDiscount)}',
                     style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
@@ -168,7 +299,7 @@ class OrderCalculationWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('referral_discount'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                    Text('(+) ${PriceConverter.convertPrice(referrerBonusAmount)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr),
+                    Text('(-) ${PriceConverter.convertPrice(referrerBonusAmount)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr),
                   ],
                 ) : const SizedBox(),
                 SizedBox(height: referrerBonusAmount > 0 ? 10 : 0),
@@ -209,10 +340,33 @@ class OrderCalculationWidget extends StatelessWidget {
 
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text('delivery_fee'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                  deliveryCharge > 0 ? Text(
-                    '(+) ${PriceConverter.convertPrice(deliveryCharge)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
+                  (deliveryCharge + proDeliveryDiscount) > 0 ? Text(
+                    '(+) ${PriceConverter.convertPrice(deliveryCharge + proDeliveryDiscount)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr,
                   ) : Text('free'.tr, style: robotoRegular.copyWith( fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor)),
                 ]),
+
+                if (proDeliveryDiscount > 0) ...[
+                  const SizedBox(height: 10),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Text('delivery_fee_discount_pro'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                    Text('(-) ${PriceConverter.convertPrice(proDeliveryDiscount)}', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr),
+                  ]),
+                ],
+
+                if (showDeliveryTypeCharge) ...[
+                  const SizedBox(height: 10),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    Text(
+                      order.deliveryType == 'express' ? '${'express'.tr} ${'delivery'.tr}' : '${'slightly_delay'.tr} ${'delivery'.tr}',
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                    ),
+                    Text(
+                      '${deliveryTypeCharge < 0 ? '(-)' : '(+)'} ${PriceConverter.convertPrice(deliveryTypeCharge.abs())}',
+                      style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall),
+                      textDirection: TextDirection.ltr,
+                    ),
+                  ]),
+                ],
               ]),
             ]),
             Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),

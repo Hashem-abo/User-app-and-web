@@ -16,6 +16,9 @@ void main() {
       expect(VendorTypeHelper.isRetailer('تجزئة'), isTrue);
       expect(VendorTypeHelper.isRetailer('قطاعي'), isTrue);
       expect(VendorTypeHelper.isRetailer('مفرق'), isTrue);
+      expect(VendorTypeHelper.isRetailer('retail_store'), isTrue);
+      expect(VendorTypeHelper.isRetailer('retail store'), isTrue);
+      expect(VendorTypeHelper.isRetailer('متجر تجزئة'), isTrue);
       expect(VendorTypeHelper.isRetailer('تاجر تجزئة'), isTrue);
 
       // Non-retail
@@ -67,6 +70,8 @@ void main() {
     test('resolveVendorType hides retailer and empty, returns empty string', () {
       expect(VendorTypeHelper.resolveVendorType('retail'), equals(''));
       expect(VendorTypeHelper.resolveVendorType('retailer'), equals(''));
+      expect(VendorTypeHelper.resolveVendorType('retail_store'), equals(''));
+      expect(VendorTypeHelper.resolveVendorType('retail store'), equals(''));
       expect(VendorTypeHelper.resolveVendorType('تجزئة'), equals(''));
       expect(VendorTypeHelper.resolveVendorType(null), equals(''));
       expect(VendorTypeHelper.resolveVendorType(''), equals(''));
@@ -127,6 +132,14 @@ void main() {
         'vendor_type': 'تجزئة',
       });
       expect(arabicRetailStore.vendorType, equals(''));
+
+      final storeTypeRetailStore = Store.fromJson({
+        'id': 5,
+        'name': 'Default Retail Store',
+        'module_id': 1,
+        'store_type': 'retail_store',
+      });
+      expect(storeTypeRetailStore.vendorType, equals(''));
     });
 
     test('Store model vendorType keeps wholesale and factory stores', () {

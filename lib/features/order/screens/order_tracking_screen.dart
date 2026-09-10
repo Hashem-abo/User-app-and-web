@@ -81,7 +81,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
     await Get.find<OrderController>().getOrderDetails(widget.orderID.toString());
 
     if(Get.find<SplashController>().configModel!.websocketEnabled!) {
-      print('====pusher entered-------------');
+     // print('====pusher entered-------------');
       _trackWithPusher();
     }
     
@@ -425,26 +425,27 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
             const SizedBox(height: Dimensions.paddingSizeDefault),
 
             // Address Section
-            Container(
-              padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('address'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                const SizedBox(height: Dimensions.paddingSizeSmall),
-                Row(children: [
-                  Icon(Icons.location_on, color: Theme.of(context).primaryColor),
-                  const SizedBox(width: Dimensions.paddingSizeSmall),
-                  Expanded(child: Text(track.deliveryAddress?.address ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall))),
-                ]),
-              ]),
-            ),
-            const SizedBox(height: Dimensions.paddingSizeDefault),
+            // Container(
+            //   padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+            //   decoration: BoxDecoration(
+            //     color: Theme.of(context).cardColor,
+            //     borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            //     border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
+            //   ),
+            //   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            //     Text('address'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+            //     const SizedBox(height: Dimensions.paddingSizeSmall),
+            //     Row(children: [
+            //       Icon(Icons.location_on, color: Theme.of(context).primaryColor),
+            //       const SizedBox(width: Dimensions.paddingSizeSmall),
+            //       Expanded(child: Text(track.deliveryAddress?.address ?? '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall))),
+            //     ]),
+            //   ]),
+            // ),
+            // const SizedBox(height: Dimensions.paddingSizeDefault),
 
             // Products Summary
+<<<<<<< HEAD
             if(orderController.orderDetails != null)
               Builder(
                 builder: (context) {
