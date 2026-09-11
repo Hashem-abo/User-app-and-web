@@ -172,6 +172,7 @@ import 'package:sixam_mart/features/search/domain/repositories/search_repository
 import 'package:sixam_mart/features/search/domain/repositories/search_repository_interface.dart';
 import 'package:sixam_mart/features/search/domain/services/search_service.dart';
 import 'package:sixam_mart/features/search/domain/services/search_service_interface.dart';
+import 'package:sixam_mart/features/smart_shopping_list/controllers/smart_shopping_list_controller.dart';
 import 'package:sixam_mart/features/service/controllers/service_controller.dart';
 import 'package:sixam_mart/features/service/domain/repositories/service_repository.dart';
 import 'package:sixam_mart/features/service/domain/repositories/service_repository_interface.dart';
@@ -403,6 +404,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => HomeController(homeServiceInterface: Get.find()));
   Get.lazyPut(() => ReelsController(reelsServiceInterface: Get.find()), fenix: true);
   Get.lazyPut(() => SearchController(searchServiceInterface: Get.find()));
+  Get.lazyPut(() => SmartShoppingListController(searchServiceInterface: Get.find()));
   Get.lazyPut(() => CouponController(couponServiceInterface: Get.find()));
   Get.lazyPut(() => OrderController(orderServiceInterface: Get.find()));
   Get.lazyPut(() => NotificationController(notificationServiceInterface: Get.find()));

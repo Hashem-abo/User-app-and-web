@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -143,7 +144,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
         }
       },
       child: Scaffold(
-        appBar: CustomAppBar(title: Get.find<StoreRegistrationController>().registrationType == RegistrationType.serviceProvider ? 'provider_registration'.tr : 'vendor_registration'.tr, onBackPressed: () async {
+        appBar: CustomAppBar(title: 'store_registration'.tr, onBackPressed: () async {
           if(Get.find<StoreRegistrationController>().storeStatus != 0.1 && firstTime){
             Get.find<StoreRegistrationController>().storeStatusChange(0.1);
             firstTime = false;
@@ -160,7 +161,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
 
           return Column(children: [
 
-            WebScreenTitleWidget(title: storeRegController.registrationType == RegistrationType.serviceProvider ? 'join_as_provider'.tr : 'join_as_vendor'.tr),
+            WebScreenTitleWidget(title: 'store_registration'.tr),
 
             ResponsiveHelper.isDesktop(context) ? Center(child: SizedBox(
               width: Dimensions.webMaxWidth,
@@ -172,15 +173,16 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge, vertical:  Dimensions.paddingSizeSmall),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
-                  storeRegController.storeStatus == 0.1 ? 'provide_vendor_information_to_proceed_next'.tr : storeRegController.storeStatus == 0.6 ? 'provide_owner_information_to_confirm'.tr : 'you_are_one_step_away_choose_your_business_plan'.tr,
+                  storeRegController.storeStatus == 0.1 ? 'provide_store_information_to_proceed_next'.tr : storeRegController.storeStatus == 0.6 ? 'provide_owner_information_to_confirm'.tr : 'you_are_one_step_away_choose_your_business_plan'.tr,
                   style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
                 ),
 
                 const SizedBox(height: Dimensions.paddingSizeSmall),
 
                 LinearProgressIndicator(
-                  backgroundColor: Theme.of(context).disabledColor, minHeight: 2,
+                  backgroundColor: Theme.of(context).disabledColor.withValues(alpha: 0.3), minHeight: 2,
                   value: storeRegController.storeStatus,
+                  valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor),
                 ),
               ]),
             ),
@@ -198,40 +200,56 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                         key: _formKeyFirst,
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                          Row(children: [
-                            Expanded(child: InkWell(
-                              onTap: () => storeRegController.setRegistrationType(RegistrationType.store),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: storeRegController.registrationType == RegistrationType.store ? Theme.of(context).primaryColor : Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                  border: Border.all(color: storeRegController.registrationType == RegistrationType.store ? Theme.of(context).primaryColor : Theme.of(context).disabledColor, width: 0.5),
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                                alignment: Alignment.center,
-                                child: Text('store'.tr, style: robotoMedium.copyWith(color: storeRegController.registrationType == RegistrationType.store ? Theme.of(context).cardColor : Theme.of(context).textTheme.bodyLarge?.color)),
-                              ),
-                            )),
-                            const SizedBox(width: Dimensions.paddingSizeDefault),
-                            Expanded(child: InkWell(
-                              onTap: () => storeRegController.setRegistrationType(RegistrationType.serviceProvider),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: storeRegController.registrationType == RegistrationType.serviceProvider ? Theme.of(context).primaryColor : Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                  border: Border.all(color: storeRegController.registrationType == RegistrationType.serviceProvider ? Theme.of(context).primaryColor : Theme.of(context).disabledColor, width: 0.5),
-                                ),
-                                padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
-                                alignment: Alignment.center,
-                                child: Text('service_provider'.tr, style: robotoMedium.copyWith(color: storeRegController.registrationType == RegistrationType.serviceProvider ? Theme.of(context).cardColor : Theme.of(context).textTheme.bodyLarge?.color)),
-                              ),
-                            )),
-                          ]),
-                          const SizedBox(height: Dimensions.paddingSizeLarge),
-
-                          Text(storeRegController.registrationType == RegistrationType.serviceProvider ? 'provider_info'.tr : 'vendor_info'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                          Text('store_information'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                           const SizedBox(height: Dimensions.paddingSizeDefault),
 
+                          // 1. Store / Vendor Type Card (3 horizontal selectable cards)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
+                            ),
+                            padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text('store_type'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault)),
+                              const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                              Row(children: [
+                                // 1. Retailer (بائع تجزئة)
+                                Expanded(child: _buildStoreTypeCard(
+                                  context: context,
+                                  title: 'retail_store'.tr,
+                                  icon: Icons.storefront_outlined,
+                                  isSelected: storeRegController.selectedStoreTypeIndex == 0,
+                                  onTap: () => storeRegController.selectStoreTypeIndex(0),
+                                )),
+                                const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                                // 2. Wholesaler (بائع جملة)
+                                Expanded(child: _buildStoreTypeCard(
+                                  context: context,
+                                  title: 'wholesale_store'.tr,
+                                  icon: Icons.warehouse_outlined,
+                                  isSelected: storeRegController.selectedStoreTypeIndex == 1,
+                                  onTap: () => storeRegController.selectStoreTypeIndex(1),
+                                )),
+                                const SizedBox(width: Dimensions.paddingSizeSmall),
+
+                                // 3. Factory (مصنع)
+                                Expanded(child: _buildStoreTypeCard(
+                                  context: context,
+                                  title: 'factory_store'.tr,
+                                  icon: Icons.factory_outlined,
+                                  isSelected: storeRegController.selectedStoreTypeIndex == 2,
+                                  onTap: () => storeRegController.selectStoreTypeIndex(2),
+                                )),
+                              ]),
+                            ]),
+                          ),
+                          const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                          // 2. Store Info & Media Upload Card
                           Container(
                             decoration: BoxDecoration(
                               color: Theme.of(context).cardColor,
@@ -258,7 +276,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                     isScrollable: true,
                                     indicatorSize: TabBarIndicatorSize.tab,
                                     tabs: _tabs,
-                                    onTap: (int ? value) {
+                                    onTap: (int? value) {
                                       setState(() {});
                                     },
                                   ),
@@ -271,8 +289,8 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
 
                               CustomTextField(
                                 key: _storeInfoScrollKey,
-                                titleText: storeRegController.registrationType == RegistrationType.serviceProvider ? 'write_provider_name'.tr : 'write_vendor_name'.tr,
-                                labelText: storeRegController.registrationType == RegistrationType.serviceProvider ? 'provider_name'.tr : 'vendor_name'.tr,
+                                titleText: 'store_name'.tr,
+                                labelText: 'store_name'.tr,
                                 controller: _nameController[_tabController!.index],
                                 focusNode: _nameFocus[_tabController!.index],
                                 nextFocus: _tabController!.index != _languageList!.length-1 ? _addressFocus[_tabController!.index] : _addressFocus[0],
@@ -280,164 +298,42 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                 prefixImage: Images.shopIcon,
                                 capitalization: TextCapitalization.words,
                                 required: true,
-                                validator: (value) => ValidateCheck.validateEmptyText(value, storeRegController.registrationType == RegistrationType.serviceProvider ? "provider_name_field_is_required".tr : "vendor_name_field_is_required".tr),
+                                validator: (value) => ValidateCheck.validateEmptyText(value, "store_name_field_is_required".tr),
                               ),
-                              const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
+                              const SizedBox(height: Dimensions.paddingSizeLarge),
 
+                              // Side by side Logo & Cover Upload Boxes
                               Row(children: [
+                                // Cover (3:1)
+                                Expanded(flex: 1, child: _buildMediaUploadBox(
+                                  context: context,
+                                  title: 'store_cover'.tr,
+                                  aspectRatioText: '3:1',
+                                  uploadText: 'upload_store_cover'.tr,
+                                  subText: 'upload_jpg_png_gif_maximum_2_mb'.tr,
+                                  file: storeRegController.pickedCover,
+                                  onTap: () => storeRegController.pickImage(false, false),
+                                  isLogo: false,
+                                )),
+                                const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                                Expanded(flex: 4,
-                                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                                    Row(children: [
-                                      Text(storeRegController.registrationType == RegistrationType.serviceProvider ? 'provider_logo'.tr : 'vendor_logo'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
-                                      Text(' (${'1:1'})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
-                                    ]),
-                                    const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                                    Align(alignment: Alignment.center, child: Stack(children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                                          child: storeRegController.pickedLogo != null ? GetPlatform.isWeb ? Image.network(
-                                            storeRegController.pickedLogo!.path, width: 150, height: 120, fit: BoxFit.cover,
-                                          ) : Image.file(
-                                            File(storeRegController.pickedLogo!.path), width: 150, height: 120, fit: BoxFit.cover,
-                                          ) : SizedBox(
-                                            width: 150, height: 120,
-                                            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-
-                                              Icon(CupertinoIcons.photo_camera_solid, size: 30, color: Theme.of(context).disabledColor.withValues(alpha: 0.6)),
-                                              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-                                                child: Text(
-                                                  storeRegController.registrationType == RegistrationType.serviceProvider ? 'upload_provider_logo'.tr : 'upload_vendor_logo'.tr,
-                                                  style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7)), textAlign: TextAlign.center,
-                                                ),
-                                              ),
-
-                                            ]),
-                                          ),
-                                        ),
-                                      ),
-                                      Positioned(
-                                        bottom: 0, right: 0, top: 0, left: 0,
-                                        child: InkWell(
-                                          onTap: () => storeRegController.pickImage(true, false),
-                                          child: DottedBorder(
-                                            options: RoundedRectDottedBorderOptions(
-                                              color: Theme.of(context).primaryColor,
-                                              strokeWidth: 1,
-                                              strokeCap: StrokeCap.butt,
-                                              dashPattern: const [5, 5],
-                                              padding: const EdgeInsets.all(0),
-                                              radius: const Radius.circular(Dimensions.radiusDefault),
-                                            ),
-                                            child: Center(
-                                              child: Visibility(
-                                                visible: storeRegController.pickedLogo != null,
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(25),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(width: 2, color: Colors.white),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ])),
-                                  ]),
-                                ),
-                                const SizedBox(width: Dimensions.paddingSizeDefault),
-
-                                Expanded(flex: 6,
-                                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                                    Row(children: [
-                                      Text(storeRegController.registrationType == RegistrationType.serviceProvider ? 'provider_cover'.tr : 'vendor_cover'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7))),
-                                      Text(' (${'3:1'})', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
-                                    ]),
-                                    const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                                    Stack(children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                                          child: storeRegController.pickedCover != null ? GetPlatform.isWeb ? Image.network(
-                                            storeRegController.pickedCover!.path, width: context.width, height: 120, fit: BoxFit.cover,
-                                          ) : Image.file(
-                                            File(storeRegController.pickedCover!.path), width: context.width, height: 120, fit: BoxFit.cover,
-                                          ) : SizedBox(
-                                            width: context.width, height: 120,
-                                            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-
-                                              Icon(CupertinoIcons.photo_camera_solid, size: 30, color: Theme.of(context).disabledColor.withValues(alpha: 0.6)),
-
-                                              Text(
-                                                  storeRegController.registrationType == RegistrationType.serviceProvider ? 'upload_provider_cover'.tr : 'upload_vendor_cover'.tr,
-                                                style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7)), textAlign: TextAlign.center,
-                                              ),
-
-                                              Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-                                                child: Text(
-                                                  'upload_jpg_png_gif_maximum_2_mb'.tr,
-                                                  style: robotoRegular.copyWith(color: Theme.of(context).disabledColor.withValues(alpha: 0.6), fontSize: Dimensions.fontSizeSmall),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-
-                                            ]),
-                                          ),
-                                        ),
-                                      ),
-
-                                      Positioned(
-                                        bottom: 0, right: 0, top: 0, left: 0,
-                                        child: InkWell(
-                                          onTap: () => storeRegController.pickImage(false, false),
-                                          child: DottedBorder(
-                                            options: RoundedRectDottedBorderOptions(
-                                              color: Theme.of(context).primaryColor,
-                                              strokeWidth: 1,
-                                              strokeCap: StrokeCap.butt,
-                                              dashPattern: const [5, 5],
-                                              padding: const EdgeInsets.all(0),
-                                              radius: const Radius.circular(Dimensions.radiusDefault),
-                                            ),
-                                            child: Center(
-                                              child: Visibility(
-                                                visible: storeRegController.pickedCover != null,
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(25),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(width: 3, color: Colors.white),
-                                                    shape: BoxShape.circle,
-                                                  ),
-                                                  child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white, size: 50),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ]),
-
-                                  ]),
-                                ),
+                                // Logo (1:1)
+                                Expanded(flex: 1, child: _buildMediaUploadBox(
+                                  context: context,
+                                  title: 'store_logo'.tr,
+                                  aspectRatioText: '1:1',
+                                  uploadText: 'upload_store_logo'.tr,
+                                  subText: 'JPG, JPEG, PNG (1:1)',
+                                  file: storeRegController.pickedLogo,
+                                  onTap: () => storeRegController.pickImage(true, false),
+                                  isLogo: true,
+                                )),
                               ]),
                             ]),
                           ),
                           const SizedBox(height: Dimensions.paddingSizeDefault),
 
+                          // 3. Location Information Header & Card
                           Text('location_info'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                           const SizedBox(height: Dimensions.paddingSizeDefault),
 
@@ -449,10 +345,9 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                             decoration: BoxDecoration(
                               color: Theme.of(context).cardColor,
                               borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                              boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.1), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 1))],
+                              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
                             ),
                             child: Column(children: [
-
                               Shimmer(
                                 child: Container(
                                   height: 45, width: context.width,
@@ -463,7 +358,6 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                 ),
                               ),
                               const SizedBox(height: Dimensions.paddingSizeLarge),
-
                               Shimmer(
                                 child: Container(
                                   height: 220, width: context.width,
@@ -473,305 +367,9 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: Dimensions.paddingSizeLarge),
-
-                              Shimmer(
-                                child: Container(
-                                  height: 100, width: context.width,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).shadowColor,
-                                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                  ),
-                                ),
-                              ),
-
                             ]),
                           ),
-                          const SizedBox(height: Dimensions.paddingSizeLarge),
-
-                          Text(storeRegController.registrationType == RegistrationType.serviceProvider ? 'provider_preference'.tr : 'vendor_preference'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                           const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                              boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.1), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 1))],
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeDefault),
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                              InkWell(
-                                onTap: () {
-                                  Get.dialog(const CustomTimePickerWidget());
-                                },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).cardColor,
-                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                        border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
-                                      child: Row(children: [
-                                        Expanded(child: Text(
-                                          '${storeRegController.storeMinTime} : ${storeRegController.storeMaxTime} ${storeRegController.storeTimeUnit}',
-                                          style: robotoMedium,
-                                        )),
-                                        Icon(Icons.access_time_filled, color: Theme.of(context).primaryColor,)
-                                      ]),
-                                    ),
-
-                                    Positioned(
-                                      left: 10, top: -15,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                        ),
-                                        padding: const EdgeInsets.all(5),
-                                        child: Text('select_estimated_delivery_time'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ]),
-                          ),
-                          const SizedBox(height: Dimensions.paddingSizeLarge),
-
-                          /* Text('business_tin'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                          const SizedBox(height: Dimensions.paddingSizeDefault),
-
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                              boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.1), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 1))],
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeDefault),
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                              CustomTextField(
-                                hintText: 'taxpayer_identification_number_tin'.tr,
-                                labelText: 'tin_number'.tr,
-                                controller: _tinNumberController,
-                                inputAction: TextInputAction.done,
-                                inputType: TextInputType.number,
-                                onChanged: (value) {},
-                              ),
-                              const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
-
-                              InkWell(
-                                onTap: () async {
-                                  final DateTime? pickedDate = await showDatePicker(
-                                    context: context,
-                                    firstDate: DateTime.now(),
-                                    initialDate: DateTime.now(),
-                                    lastDate: DateTime(2100),
-                                  );
-
-                                  if (pickedDate != null) {
-                                    storeRegController.setTinExpireDate(pickedDate);
-                                  }
-                                },
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).cardColor,
-                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                        border: Border.all(color: Theme.of(context).disabledColor, width: 0.5),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
-                                      child: Row(children: [
-                                        Expanded(child: Text(
-                                          storeRegController.tinExpireDate ?? 'select_date'.tr,
-                                          style: robotoMedium,
-                                        )),
-                                        Icon(Icons.calendar_month, color: Theme.of(context).primaryColor),
-                                      ]),
-                                    ),
-
-                                    Positioned(
-                                      left: 10, top: -15,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                        ),
-                                        padding: const EdgeInsets.all(5),
-                                        child: Text('expire_date'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: Dimensions.paddingSizeLarge),
-
-                              Text('tin_certificate'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeLarge)),
-
-                              Text('vehicle_doc_format'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                              const SizedBox(height: Dimensions.paddingSizeLarge),
-
-                              storeRegController.tinFiles!.isEmpty ? InkWell(
-                                onTap: () {
-                                  storeRegController.pickFiles();
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraLarge),
-                                  child: DottedBorder(
-                                    options: RoundedRectDottedBorderOptions(
-                                      radius: const Radius.circular(Dimensions.radiusDefault),
-                                      dashPattern: const [8, 4],
-                                      strokeWidth: 1,
-                                      color: Get.isDarkMode ? Colors.white.withValues(alpha: 0.2) : const Color(0xFFE5E5E5),
-                                    ),
-                                    child: Container(
-                                      height: 120,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Get.isDarkMode ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFFAFAFA),
-                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          const SizedBox(width: Dimensions.paddingSizeSmall),
-                                          CustomAssetImageWidget(Images.uploadIcon, height: 40, width: 40, color: Get.isDarkMode ? Colors.grey : null),
-                                          const SizedBox(width: Dimensions.paddingSizeSmall),
-                                          RichText(
-                                            textAlign: TextAlign.center,
-                                            text: TextSpan(
-                                              children: [
-                                                TextSpan(
-                                                  text: 'click_to_upload'.tr,
-                                                  style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Colors.blue),
-                                                ),
-                                                // const TextSpan(text: '\n'),
-                                                // TextSpan(
-                                                //   text: 'or_drag_and_drop'.tr,
-                                                //   style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.7)),
-                                                // ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ) : Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraLarge),
-                                child: DottedBorder(
-                                  options: RoundedRectDottedBorderOptions(
-                                    radius: const Radius.circular(Dimensions.radiusDefault),
-                                    dashPattern: const [8, 4],
-                                    strokeWidth: 1,
-                                    color: const Color(0xFFE5E5E5),
-                                  ),
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    child: Stack(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.only(left: Dimensions.paddingSizeDefault),
-                                          height: 120,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFAFAFA),
-                                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Flexible(
-                                                child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Builder(
-                                                      builder: (context) {
-                                                        final filePath = storeRegController.tinFiles![0].paths[0];
-                                                        final fileName = filePath!.split('/').last.toLowerCase();
-
-                                                        if (fileName.endsWith('.pdf')) {
-                                                          // Show PDF preview
-                                                          return Row(
-                                                            children: [
-                                                              const Icon(Icons.picture_as_pdf, size: 40, color: Colors.red),
-                                                              const SizedBox(width: 10),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  fileName,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 35),
-                                                            ],
-                                                          );
-                                                        } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-                                                          // Show Word document preview
-                                                          return Row(
-                                                            children: [
-                                                              const Icon(Icons.description, size: 40, color: Colors.blue),
-                                                              const SizedBox(width: 10),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  fileName,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 35),
-                                                            ],
-                                                          );
-                                                        } else {
-                                                          // Show generic file preview
-                                                          return Row(
-                                                            children: [
-                                                              const Icon(Icons.insert_drive_file, size: 40, color: Colors.grey),
-                                                              const SizedBox(width: 10),
-                                                              Expanded(
-                                                                child: Text(
-                                                                  fileName,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 35),
-                                                            ],
-                                                          );
-                                                        }
-                                                      },
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: 0,
-                                          top: 0,
-                                          child: InkWell(
-                                            onTap: () {
-                                              storeRegController.removeFile(0);
-                                            },
-                                            child: const Padding(
-                                              padding: EdgeInsets.all(Dimensions.paddingSizeSmall),
-                                              child: Icon(Icons.delete_forever, color: Colors.red),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                            ]),
-                          ), */
 
                         ]),
                       ),
@@ -1821,17 +1419,17 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
           radius: ResponsiveHelper.isDesktop(context) ? Dimensions.radiusSmall : Dimensions.radiusDefault,
           isLoading: storeRegController.isLoading,
           margin: EdgeInsets.all(ResponsiveHelper.isDesktop(context) ? 0 : Dimensions.paddingSizeSmall),
-          buttonText: storeRegController.storeStatus == 0.1 && !ResponsiveHelper.isDesktop(context) ? 'next'.tr : 'submit'.tr,
+          buttonText: storeRegController.storeStatus == 0.1 && !ResponsiveHelper.isDesktop(context) ? 'execute_btn'.tr : 'submit'.tr,
           color: Theme.of(context).primaryColor,
           onPressed: (storeRegController.storeStatus == 0.1 && !ResponsiveHelper.isDesktop(context) && !storeRegController.inZone)
               || (ResponsiveHelper.isDesktop(context) && !storeRegController.inZone) ? null :() {
-            bool defaultDataNull = false;
-            for(int index=0; index<_languageList!.length; index++) {
-              if(_languageList[index].key == 'en') {
-                if (_nameController[index].text.trim().isEmpty || _addressController[index].text.trim().isEmpty) {
-                  defaultDataNull = true;
+            bool hasName = _nameController.any((c) => c.text.trim().isNotEmpty);
+            if(hasName) {
+              String enteredName = _nameController.firstWhere((c) => c.text.trim().isNotEmpty).text.trim();
+              for (var controller in _nameController) {
+                if (controller.text.trim().isEmpty) {
+                  controller.text = enteredName;
                 }
-                break;
               }
             }
             String tin = _tinNumberController.text.trim();
@@ -1854,18 +1452,18 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
 
             if(storeRegController.storeStatus == 0.1 || storeRegController.storeStatus == 0.6) {
               if(storeRegController.storeStatus == 0.1 && !ResponsiveHelper.isDesktop(context)){
-                if(defaultDataNull) {
+                if(!hasName) {
                   _scrollToKey(_storeInfoScrollKey);
                 }
                 if(_formKeyFirst!.currentState!.validate()){
-                  if(defaultDataNull) {
-                  showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'enter_provider_name'.tr : 'enter_vendor_name'.tr);
+                  if(!hasName) {
+                  showCustomSnackBar('enter_store_name'.tr);
                 }else if(storeRegController.pickedLogo == null) {
                   _scrollToKey(_storeInfoScrollKey);
-                  showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'select_provider_logo'.tr : 'select_vendor_logo'.tr);
+                  showCustomSnackBar('select_store_logo'.tr);
                 }else if(storeRegController.pickedCover == null) {
                   _scrollToKey(_storeInfoScrollKey);
-                  showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'select_provider_cover_photo'.tr : 'select_vendor_cover_photo'.tr);
+                  showCustomSnackBar('select_store_cover_photo'.tr);
                 }else if(storeRegController.selectedZoneIndex == -1) {
                   _scrollToKey(_locationInfoScrollKey);
                   showCustomSnackBar('please_select_zone'.tr);
@@ -1873,7 +1471,7 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                   _scrollToKey(_locationInfoScrollKey);
                   showCustomSnackBar('please_select_module_first'.tr);
                 }else if(storeRegController.restaurantLocation == null) {
-                  showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'set_provider_location'.tr : 'set_vendor_location'.tr);
+                  showCustomSnackBar('set_store_location'.tr);
                   _scrollToKey(_locationInfoScrollKey);
                   }else if(minTime.isEmpty) {
                     showCustomSnackBar('enter_minimum_delivery_time'.tr);
@@ -1892,10 +1490,10 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                 }
               }else{
                 if(ResponsiveHelper.isDesktop(context)){
-                  if(defaultDataNull) {
-                    showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'enter_provider_name'.tr : 'enter_vendor_name'.tr);
+                  if(!hasName) {
+                    showCustomSnackBar('enter_store_name'.tr);
                   }else if(storeRegController.restaurantLocation == null) {
-                    showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'set_provider_location'.tr : 'set_vendor_location'.tr);
+                    showCustomSnackBar('set_store_location'.tr);
                   }else if(storeRegController.selectedZoneIndex == -1) {
                     showCustomSnackBar('please_select_zone'.tr);
                   }else if(storeRegController.selectedModuleIndex == -1) {
@@ -1909,9 +1507,9 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
                   }else if(valid && double.parse(minTime) > double.parse(maxTime)) {
                     showCustomSnackBar('maximum_delivery_time_can_not_be_smaller_then_minimum_delivery_time'.tr);
                   }else if(storeRegController.pickedLogo == null) {
-                    showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'select_provider_logo'.tr : 'select_vendor_logo'.tr);
+                    showCustomSnackBar('select_store_logo'.tr);
                   }else if(storeRegController.pickedCover == null) {
-                    showCustomSnackBar(storeRegController.registrationType == RegistrationType.serviceProvider ? 'select_provider_cover_photo'.tr : 'select_vendor_cover_photo'.tr);
+                    showCustomSnackBar('select_store_cover_photo'.tr);
                   }
                 }
                 if((storeRegController.storeStatus == 0.6 && _formKeySecond!.currentState!.validate()) || ResponsiveHelper.isDesktop(context)){
@@ -1941,17 +1539,19 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
             } else {
 
               List<Translation> translation = [];
-              for(int index=0; index<_languageList.length; index++) {
-                translation.add(Translation(
-                  locale: _languageList[index].key, key: 'name',
-                  value: _nameController[index].text.trim().isNotEmpty ? _nameController[index].text.trim()
-                      : _nameController[0].text.trim(),
-                ));
-                translation.add(Translation(
-                  locale: _languageList[index].key, key: 'address',
-                  value: _addressController[index].text.trim().isNotEmpty ? _addressController[index].text.trim()
-                      : _addressController[0].text.trim(),
-                ));
+              if (_languageList != null) {
+                for(int index=0; index<_languageList.length; index++) {
+                  translation.add(Translation(
+                    locale: _languageList[index].key, key: 'name',
+                    value: _nameController[index].text.trim().isNotEmpty ? _nameController[index].text.trim()
+                        : _nameController[0].text.trim(),
+                  ));
+                  translation.add(Translation(
+                    locale: _languageList[index].key, key: 'address',
+                    value: _addressController[index].text.trim().isNotEmpty ? _addressController[index].text.trim()
+                        : _addressController[0].text.trim(),
+                  ));
+                }
               }
 
               storeRegController.registerStore(StoreBodyModel(
@@ -1983,6 +1583,114 @@ class _StoreRegistrationScreenState extends State<StoreRegistrationScreen> with 
         curve: Curves.easeInOut,
       );
     }
+  }
+
+  Widget _buildStoreTypeCard({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    Color primaryColor = Theme.of(context).primaryColor;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault, horizontal: Dimensions.paddingSizeExtraSmall),
+        decoration: BoxDecoration(
+          color: isSelected ? primaryColor.withValues(alpha: 0.06) : Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+          border: Border.all(
+            color: isSelected ? primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.3),
+            width: isSelected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 28, color: isSelected ? primaryColor : Theme.of(context).hintColor),
+          const SizedBox(height: Dimensions.paddingSizeSmall),
+          Text(
+            title,
+            style: robotoMedium.copyWith(
+              fontSize: Dimensions.fontSizeSmall,
+              color: isSelected ? primaryColor : Theme.of(context).textTheme.bodyLarge?.color,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _buildMediaUploadBox({
+    required BuildContext context,
+    required String title,
+    required String aspectRatioText,
+    required String uploadText,
+    required String subText,
+    required XFile? file,
+    required VoidCallback onTap,
+    required bool isLogo,
+  }) {
+    Color primaryColor = Theme.of(context).primaryColor;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        Text(title, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.8), fontSize: Dimensions.fontSizeSmall)),
+        Text(' ($aspectRatioText) *', style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall)),
+      ]),
+      const SizedBox(height: Dimensions.paddingSizeSmall),
+
+      InkWell(
+        onTap: onTap,
+        child: DottedBorder(
+          options: RoundedRectDottedBorderOptions(
+            color: primaryColor.withValues(alpha: 0.7),
+            strokeWidth: 1.2,
+            dashPattern: const [5, 4],
+            padding: const EdgeInsets.all(0),
+            radius: const Radius.circular(Dimensions.radiusDefault),
+          ),
+          child: Container(
+            height: 125,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+            ),
+            child: file != null ? ClipRRect(
+              borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+              child: Stack(fit: StackFit.expand, children: [
+                GetPlatform.isWeb
+                    ? Image.network(file.path, fit: BoxFit.cover)
+                    : Image.file(File(file.path), fit: BoxFit.cover),
+                Positioned(
+                  bottom: 4, right: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                    child: const Icon(CupertinoIcons.photo_camera_solid, color: Colors.white, size: 16),
+                  ),
+                ),
+              ]),
+            ) : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(CupertinoIcons.photo_camera_solid, size: 30, color: Theme.of(context).disabledColor.withValues(alpha: 0.6)),
+              const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(uploadText, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.8), fontSize: Dimensions.fontSizeSmall), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+              const SizedBox(height: 2),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(subText, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor.withValues(alpha: 0.6), fontSize: Dimensions.fontSizeExtraSmall), textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    ]);
   }
 
 }

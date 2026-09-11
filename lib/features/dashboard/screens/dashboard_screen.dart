@@ -51,8 +51,8 @@ import 'package:sixam_mart/common/widgets/floating_ad_widget.dart';
 import 'package:sixam_mart/features/trends/screens/trends_screen.dart';
 import 'package:sixam_mart/features/global_shopping/screens/global_home_screen.dart';
 import 'package:sixam_mart/features/global_shopping/screens/global_cart_screen.dart';
-import 'package:sixam_mart/features/global_shopping/screens/global_order_list_screen.dart';
 import 'package:sixam_mart/features/global_shopping/controllers/global_cart_controller.dart';
+import 'package:sixam_mart/features/smart_shopping_list/widgets/smart_shopping_list_input_sheet.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -79,6 +79,7 @@ class DashboardScreenState extends State<DashboardScreen> {
 
   // FAB position — ValueNotifier so only the FAB widget rebuilds on drag
   final ValueNotifier<Offset> _fabPosition = ValueNotifier(const Offset(16, 100));
+  final ValueNotifier<Offset> _listFabPosition = ValueNotifier(const Offset(16, 100));
 
   // ── Floating-ad scroll visibility ──────────────────────────────────────────
   bool _isScrollingContent = false;
@@ -128,6 +129,7 @@ class DashboardScreenState extends State<DashboardScreen> {
   @override
   void dispose() {
     _fabPosition.dispose();
+    _listFabPosition.dispose();
     _scrollHideTimer?.cancel();
     super.dispose();
   }
@@ -236,6 +238,8 @@ class DashboardScreenState extends State<DashboardScreen> {
       bool isGlobal = (splashController.module != null &&
           splashController.module!.moduleType.toString() ==
               AppConstants.globalShopping);
+      bool isGrocery = (splashController.module != null &&
+          splashController.module!.moduleType.toString() == 'grocery');
       isParcel = isParcel && !isTaxiWithCache;
 
       // Only rebuild _screens when the module type actually changes (performance)
@@ -389,6 +393,86 @@ class DashboardScreenState extends State<DashboardScreen> {
                                         begin: const Offset(1, 1),
                                         end: const Offset(1.1, 1.1),
                                         duration: 1500.ms,
+                                        curve: Curves.easeInOut),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    // Smart Shopping List FAB (Opposite Side - Left) — Grocery Module Only
+                    ValueListenableBuilder<Offset>(
+                      valueListenable: _listFabPosition,
+                      builder: (context, listFabPos, _) {
+                        if (!isGrocery) {
+                          return const SizedBox();
+                        }
+                        return Positioned(
+                          bottom: listFabPos.dy,
+                          left: listFabPos.dx,
+                          child: AnimatedScale(
+                            scale: _isScrollingContent ? 0.0 : 1.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: IgnorePointer(
+                              ignoring: _isScrollingContent,
+                              child: GestureDetector(
+                                onPanUpdate: (details) {
+                                  _listFabPosition.value = Offset(
+                                    (listFabPos.dx + details.delta.dx).clamp(0.0, double.infinity),
+                                    (listFabPos.dy - details.delta.dy).clamp(80.0, double.infinity),
+                                  );
+                                },
+                                onPanEnd: (_) {
+                                  _listFabPosition.value = Offset(16, _listFabPosition.value.dy);
+                                },
+                                onTap: () {
+                                  ResponsiveHelper.isDesktop(context)
+                                      ? Get.dialog(const Dialog(child: SmartShoppingListInputSheet()))
+                                      : showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (con) => const SmartShoppingListInputSheet(),
+                                        );
+                                },
+                                child: Container(
+                                  height: 60,
+                                  width: 60,
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Theme.of(context).primaryColor,
+                                        Theme.of(context).primaryColor.withValues(alpha: 0.8),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Theme.of(context).primaryColor.withValues(alpha: 0.35),
+                                        blurRadius: 14,
+                                        spreadRadius: 2,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.bolt_rounded,
+                                      color: Colors.white,
+                                      size: 34,
+                                    ),
+                                  ),
+                                )
+                                    .animate(
+                                        onPlay: (controller) =>
+                                            controller.repeat(reverse: true))
+                                    .scale(
+                                        begin: const Offset(1, 1),
+                                        end: const Offset(1.08, 1.08),
+                                        duration: 1600.ms,
                                         curve: Curves.easeInOut),
                               ),
                             ),

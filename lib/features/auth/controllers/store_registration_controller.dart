@@ -29,6 +29,16 @@ class StoreRegistrationController extends GetxController implements GetxService 
   RegistrationType _registrationType = RegistrationType.store;
   RegistrationType get registrationType => _registrationType;
 
+  int _selectedStoreTypeIndex = 0;
+  int get selectedStoreTypeIndex => _selectedStoreTypeIndex;
+
+  void selectStoreTypeIndex(int index, {bool canUpdate = true}) {
+    _selectedStoreTypeIndex = index;
+    if(canUpdate) {
+      update();
+    }
+  }
+
   void setRegistrationType(RegistrationType type, {bool canUpdate = true}) {
     _registrationType = type;
     _selectedModuleIndex = -1;
@@ -84,10 +94,10 @@ class StoreRegistrationController extends GetxController implements GetxService 
   String? _storeAddress;
   String? get storeAddress => _storeAddress;
 
-  String _storeMinTime = '--';
+  String _storeMinTime = '20';
   String get storeMinTime => _storeMinTime;
 
-  String _storeMaxTime = '--';
+  String _storeMaxTime = '40';
   String get storeMaxTime => _storeMaxTime;
 
   String _storeTimeUnit = 'minute';
@@ -446,10 +456,11 @@ class StoreRegistrationController extends GetxController implements GetxService 
   }
 
   void resetData(){
+    _selectedStoreTypeIndex = 0;
     _tinExpireDate = null;
     _tinFiles.clear();
-    _storeMinTime = '--';
-    _storeMaxTime = '--';
+    _storeMinTime = '20';
+    _storeMaxTime = '40';
     _storeTimeUnit = 'minute';
   }
 

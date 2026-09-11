@@ -70,7 +70,13 @@ class ModuleViewWidget extends StatelessWidget {
               color: Theme.of(context).cardColor,
             ),
             padding: const EdgeInsets.all(5),
-            child: Text('select_module'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: isDesktop ? Dimensions.fontSizeExtraSmall : Dimensions.fontSizeDefault)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('select_module'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: isDesktop ? Dimensions.fontSizeExtraSmall : Dimensions.fontSizeDefault)),
+                Text(' *', style: robotoRegular.copyWith(color: Colors.red, fontSize: isDesktop ? Dimensions.fontSizeExtraSmall : Dimensions.fontSizeDefault)),
+              ],
+            ),
           ),
         ),
 

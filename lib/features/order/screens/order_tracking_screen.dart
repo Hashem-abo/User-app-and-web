@@ -445,7 +445,6 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
             // const SizedBox(height: Dimensions.paddingSizeDefault),
 
             // Products Summary
-<<<<<<< HEAD
             if(orderController.orderDetails != null)
               Builder(
                 builder: (context) {
