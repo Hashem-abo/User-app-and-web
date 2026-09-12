@@ -61,4 +61,11 @@ android/build.gradle.kts
 # Android memory dumps
 *.hprof
 
+# Keystores & Certificates
+*.jks
+*.keystore
+*.key
+*.pem
+*.p12
+
 PROJECT_DOCUMENTATION_AR.md

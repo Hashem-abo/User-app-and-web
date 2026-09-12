@@ -7,8 +7,8 @@ class AppConstants {
   static const String appName = 'Suliman';
   static const double appVersion = 3.5; ///Flutter sdk 3.38.1
 
-  static const int zegoAppId = 418985050;
-  static const String zegoAppSign = 'da31d64ee0b505ffbf01145ae76ccead20cefa0ee716b8081d01f5b66b0051e8';
+  static const int zegoAppId = 0;
+  static const String zegoAppSign = '';
 
   static const String fontFamily = 'font_family';
   static const List<String> fontFamilies = ['Roboto', 'Cairo', 'Tajawal', 'Rubik', 'DINNextLTArabic', 'NeoSansArabic', 'SomarSans','KOSans'];
@@ -18,7 +18,7 @@ class AppConstants {
   static const String webHostedUrl = 'https://t.directplace.store';
 
   static const bool useReactWebsite = false;
-  static const String googleServerClientId = '72955669368-ak9ou1maimkatvlngk39s815qc2vql19.apps.googleusercontent.com';
+  static const String googleServerClientId = '';
 
   // static const String baseUrl = 'http://192.168.100.125/adminold';
   static const String baseUrl = 'https://ta.directplace.store';

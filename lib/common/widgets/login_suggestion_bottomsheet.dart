@@ -224,7 +224,8 @@ class LoginSuggestionBottomSheet extends StatelessWidget {
     }else{
       try{
         if(googleSignIn.supportsAuthenticate()) {
-          await googleSignIn.initialize(serverClientId: AppConstants.googleServerClientId).then((_) async {
+          String? googleClientId = Get.find<SplashController>().configModel?.googleClientId ?? AppConstants.googleServerClientId;
+          await googleSignIn.initialize(serverClientId: (googleClientId != null && googleClientId.isNotEmpty) ? googleClientId : null).then((_) async {
 
             googleSignIn.signOut();
             GoogleSignInAccount googleAccount = await googleSignIn.authenticate();

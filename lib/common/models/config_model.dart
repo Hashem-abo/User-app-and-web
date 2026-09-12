@@ -111,6 +111,9 @@ class ConfigModel {
   int? virtualTryOnLoyaltyPointCost;
   int? homepageCacheVersion;
   bool? proMemberStatus;
+  int? zegoAppId;
+  String? zegoAppSign;
+  String? googleClientId;
 
   ConfigModel({
     this.businessName,
@@ -217,6 +220,9 @@ class ConfigModel {
     this.virtualTryOnLoyaltyPointCost,
     this.homepageCacheVersion,
     this.proMemberStatus,
+    this.zegoAppId,
+    this.zegoAppSign,
+    this.googleClientId,
   });
 
   ConfigModel.fromJson(Map<String, dynamic> json) {
@@ -357,6 +363,9 @@ class ConfigModel {
     virtualTryOnLoyaltyPointCost = json['virtual_try_on_loyalty_point_cost'] != null ? int.tryParse(json['virtual_try_on_loyalty_point_cost'].toString()) : null;
     homepageCacheVersion = json['homepage_cache_version'] != null ? int.tryParse(json['homepage_cache_version'].toString()) : 1;
     proMemberStatus = TypeConverterHelper.getBool(json['pro_member_status']);
+    zegoAppId = json['zego_app_id'] != null ? int.tryParse(json['zego_app_id'].toString()) : null;
+    zegoAppSign = json['zego_app_sign'];
+    googleClientId = json['google_client_id'];
     if (json['onboarding_screens'] != null) {
       onboardingScreens = <OnboardingScreen>[];
       json['onboarding_screens'].forEach((v) {
@@ -498,6 +507,9 @@ class ConfigModel {
     if (onboardingScreens != null) {
       data['onboarding_screens'] = onboardingScreens!.map((v) => v.toJson()).toList();
     }
+    data['zego_app_id'] = zegoAppId;
+    data['zego_app_sign'] = zegoAppSign;
+    data['google_client_id'] = googleClientId;
     return data;
   }
 }

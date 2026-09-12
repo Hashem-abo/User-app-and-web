@@ -17,6 +17,7 @@ import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/verification/screens/verification_screen.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/profile/domain/services/profile_service_interface.dart';
 import 'package:sixam_mart/api/api_client.dart';
@@ -98,12 +99,17 @@ class ProfileController extends GetxController implements GetxService {
     if (userInfoModel != null) {
       _userInfoModel = userInfoModel;
       
-      ZegoUIKitPrebuiltCallInvitationService().init(
-        appID: AppConstants.zegoAppId,
-        appSign: AppConstants.zegoAppSign,
-        userID: 'user_${userInfoModel.id}',
-        userName: '${userInfoModel.fName} ${userInfoModel.lName}',
-        plugins: [ZegoUIKitSignalingPlugin()],
+      final config = Get.isRegistered<SplashController>() ? Get.find<SplashController>().configModel : null;
+      final int zegoAppId = config?.zegoAppId ?? AppConstants.zegoAppId;
+      final String zegoAppSign = config?.zegoAppSign ?? AppConstants.zegoAppSign;
+
+      if (zegoAppId > 0 && zegoAppSign.isNotEmpty) {
+        ZegoUIKitPrebuiltCallInvitationService().init(
+          appID: zegoAppId,
+          appSign: zegoAppSign,
+          userID: 'user_${userInfoModel.id}',
+          userName: '${userInfoModel.fName} ${userInfoModel.lName}',
+          plugins: [ZegoUIKitSignalingPlugin()],
         config: ZegoCallInvitationConfig(
           permissions: [],
         ),
@@ -138,6 +144,7 @@ class ProfileController extends GetxController implements GetxService {
           return config;
         },
       );
+      }
     }
     update();
   }

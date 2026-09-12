@@ -2578,5 +2578,8 @@
   "search_in_forum": "البحث في المنتدى...",
   "no_forum_posts_found": "لا توجد منشورات في المنتدى حالياً",
   "updates": "تحديثات",
-  "general": "عام"
+  "general": "عام",
+  "order_not_found_or_unauthorized": "الطلب غير متاح أو غير مصرح بعرضه",
+  "you_dont_have_permission_to_view_this_order": "ليس لديك صلاحية للوصول إلى هذا الطلب أو تم إلغاؤه",
+  "back_to_orders": "العودة للطلبات"
 }

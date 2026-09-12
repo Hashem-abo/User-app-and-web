@@ -2420,5 +2420,8 @@
   "search_in_forum": "Search in forum...",
   "no_forum_posts_found": "No forum posts found",
   "updates": "Updates",
-  "general": "General"
+  "general": "General",
+  "order_not_found_or_unauthorized": "Order not available or unauthorized",
+  "you_dont_have_permission_to_view_this_order": "You do not have permission to view this order or it has been removed",
+  "back_to_orders": "Back to Orders"
 }

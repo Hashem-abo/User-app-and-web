@@ -314,7 +314,33 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
               isDesktop ? const SizedBox() : buildBottomView(orderController, order, parcel, total),
 
-            ]) : const CustomLoaderWidget();
+            ]) : (orderController.isLoading ? const CustomLoaderWidget() : Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.lock_outline_rounded, size: 70, color: Theme.of(context).disabledColor),
+                      const SizedBox(height: Dimensions.paddingSizeDefault),
+                      Text('order_not_found_or_unauthorized'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge), textAlign: TextAlign.center),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                      Text('you_dont_have_permission_to_view_this_order'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor), textAlign: TextAlign.center),
+                      const SizedBox(height: Dimensions.paddingSizeLarge),
+                      CustomButton(
+                        buttonText: 'back_to_orders'.tr,
+                        width: 200,
+                        onPressed: () {
+                          if (Navigator.canPop(context)) {
+                            Get.back();
+                          } else {
+                            Get.offAllNamed(RouteHelper.getInitialRoute());
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ));
           })),
         );
       }),

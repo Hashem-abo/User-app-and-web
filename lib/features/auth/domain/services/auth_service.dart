@@ -40,8 +40,8 @@ class AuthService implements AuthServiceInterface{
   }
 
   Future<void> _updateHeaderFunctionality(AuthResponseModel authResponse, {bool alreadyInApp = false}) async {
-    if(authResponse.isEmailVerified! && authResponse.isPhoneVerified! && authResponse.isPersonalInfo! && authResponse.token != null && authResponse.isExistUser == null) {
-      authRepositoryInterface.saveUserToken(authResponse.token??'', alreadyInApp: alreadyInApp);
+    if((authResponse.isEmailVerified ?? false) && (authResponse.isPhoneVerified ?? false) && (authResponse.isPersonalInfo ?? false) && authResponse.token != null && authResponse.token!.isNotEmpty && authResponse.isExistUser == null) {
+      authRepositoryInterface.saveUserToken(authResponse.token!, alreadyInApp: alreadyInApp);
       await authRepositoryInterface.updateToken();
       await authRepositoryInterface.clearSharedPrefGuestId();
     }

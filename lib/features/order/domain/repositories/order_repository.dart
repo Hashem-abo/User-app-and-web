@@ -23,7 +23,7 @@ class OrderRepository implements OrderRepositoryInterface {
   @override
   Future<Response> trackOrder(String? orderID, String? guestId, {String? contactNumber}) async {
     return await apiClient.getData(
-     '${AppConstants.trackUri}$orderID${guestId != null ? '&guest_id=$guestId' : ''}'
+     '${AppConstants.trackUri}$orderID${(guestId != null && !AuthHelper.isLoggedIn()) ? '&guest_id=$guestId' : ''}'
           '${contactNumber != null ? '&contact_number=$contactNumber' : ''}',
     );
   }
@@ -31,7 +31,7 @@ class OrderRepository implements OrderRepositoryInterface {
   @override
   Future<Response> switchToCOD(String? orderID, {String? guestId}) async {
     Map<String, String> data = {'_method': 'put', 'order_id': orderID!};
-    if(AuthHelper.isGuestLoggedIn() || guestId != null) {
+    if(AuthHelper.isGuestLoggedIn() || (!AuthHelper.isLoggedIn() && guestId != null)) {
       data.addAll({'guest_id': guestId ?? AuthHelper.getGuestId()});
     }
     return await apiClient.postData(AppConstants.codSwitchUri, data);
@@ -49,7 +49,7 @@ class OrderRepository implements OrderRepositoryInterface {
       data = {'_method': 'put', 'order_id': orderID, 'reason': reason ?? '', 'note': comment ?? ''};
     }
 
-    if(AuthHelper.isGuestLoggedIn() || guestId != null){
+    if(AuthHelper.isGuestLoggedIn() || (!AuthHelper.isLoggedIn() && guestId != null)){
       data.addAll({'guest_id': guestId ?? AuthHelper.getGuestId()});
     }
     Response response = await apiClient.postData(AppConstants.orderCancelUri, data, );
@@ -66,7 +66,7 @@ class OrderRepository implements OrderRepositoryInterface {
 
   Future<List<OrderDetailsModel>?> _getOrderDetails(String orderID, String? guestId) async {
     List<OrderDetailsModel>? orderDetails;
-    Response response = await apiClient.getData('${AppConstants.orderDetailsUri}$orderID${guestId != null ? '&guest_id=$guestId' : ''}');
+    Response response = await apiClient.getData('${AppConstants.orderDetailsUri}$orderID${(guestId != null && !AuthHelper.isLoggedIn()) ? '&guest_id=$guestId' : ''}');
     if (response.statusCode == 200) {
       orderDetails = [];
       if (response.body is List) {
