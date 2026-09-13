@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/order/domain/models/order_model.dart';
 import 'package:suliman/helper/price_converter.dart';
@@ -14,7 +14,7 @@ class ProOrderSavingsBannerWidget extends StatelessWidget {
   final OrderModel order;
   const ProOrderSavingsBannerWidget({super.key, required this.order});
 
-  // TEMPORARY FIX: Returning 0 because Sixam Mart's OrderModel does not yet
+  // TEMPORARY FIX: Returning 0 because Suliman's OrderModel does not yet
   // support StackFood's Pro/Premium membership benefit properties.
   // This bypasses the compiler error and allows the app to compile successfully.
   double get _savedAmount => 0;

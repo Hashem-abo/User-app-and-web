@@ -1,4 +1,4 @@
-﻿import 'package:suliman/features/pro/domain/models/pro_plan_model.dart';
+import 'package:suliman/features/pro/domain/models/pro_plan_model.dart';
 import 'package:suliman/features/pro/widgets/pro_benefit_items.dart';
 import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/util/images.dart';
@@ -40,7 +40,7 @@ class ProPlanCardWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: Dimensions.paddingSizeSmall),
                     Text(
-                      model?.proBrand ?? 'sixammart_pro'.tr,
+                      model?.proBrand ?? 'suliman_pro'.tr,
                       style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).primaryColor),
                     ),
                     const SizedBox(height: Dimensions.paddingSizeExtraSmall),

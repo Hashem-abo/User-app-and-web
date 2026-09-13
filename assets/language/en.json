@@ -2243,8 +2243,8 @@
   "please_enter_address_label": "Enter an address label.",
   "benefit_unlocked": "benefit unlocked",
   "pro": "Pro",
-  "and_special_saving_for_mart_pro_members": "and special saving for mart pro members",
-  "special_saving_for_mart_pro_members": "Special saving for mart pro members",
+  "and_special_saving_for_mart_pro_members": "and special saving for Suliman Pro members",
+  "special_saving_for_mart_pro_members": "Special saving for Suliman Pro members",
   "please_enter_registered_phone": "Please enter your registered phone number",
   "please_enter_registered_email": "Please enter your registered email",
   "use_mail_mail_for_recovery": "Use Mail/Phone for Recovery",
@@ -2372,5 +2372,6 @@
   "updates": "Updates",
   "order_not_found_or_unauthorized": "Order not available or unauthorized",
   "you_dont_have_permission_to_view_this_order": "You do not have permission to view this order or it has been removed",
-  "back_to_orders": "Back to Orders"
+  "back_to_orders": "Back to Orders",
+  "suliman_pro": "Suliman Pro"
 }

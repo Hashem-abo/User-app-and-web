@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
@@ -143,7 +143,7 @@ class _DropdownLocationBottomSheetState extends State<DropdownLocationBottomShee
     for (String q in queries) {
       try {
         final uri = Uri.parse("https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(q)}&format=json&limit=1");
-        final response = await http.get(uri, headers: {'User-Agent': 'SixamMartAIApp/1.0'}).timeout(const Duration(seconds: 3));
+        final response = await http.get(uri, headers: {'User-Agent': 'SulimanAIApp/1.0'}).timeout(const Duration(seconds: 3));
         if (response.statusCode == 200) {
           final List data = jsonDecode(response.body);
           if (data.isNotEmpty) {
