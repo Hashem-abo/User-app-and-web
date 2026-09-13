@@ -1,14 +1,14 @@
-import 'package:carousel_slider/carousel_slider.dart';
+﻿import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:sixam_mart/common/widgets/card_design/visit_again_card.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/features/home/widgets/web/widgets/arrow_icon_button.dart';
+import 'package:suliman/common/widgets/card_design/visit_again_card.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/features/store/controllers/store_controller.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/features/home/widgets/web/widgets/arrow_icon_button.dart';
 
 class WebVisitAgainView extends StatefulWidget {
   final bool fromFood;

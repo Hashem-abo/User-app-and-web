@@ -1,23 +1,23 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sixam_mart/common/widgets/address_widget.dart';
-import 'package:sixam_mart/features/address/controllers/address_controller.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
-import 'package:sixam_mart/features/location/controllers/location_controller.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_dropdown.dart';
-import 'package:sixam_mart/features/checkout/widgets/guest_delivery_address.dart';
-import 'package:sixam_mart/features/checkout/widgets/add_address_options_bottom_sheet.dart';
+import 'package:suliman/common/widgets/address_widget.dart';
+import 'package:suliman/features/address/controllers/address_controller.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/checkout/controllers/checkout_controller.dart';
+import 'package:suliman/features/location/controllers/location_controller.dart';
+import 'package:suliman/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_dropdown.dart';
+import 'package:suliman/features/checkout/widgets/guest_delivery_address.dart';
+import 'package:suliman/features/checkout/widgets/add_address_options_bottom_sheet.dart';
 
-import 'package:sixam_mart/features/checkout/widgets/pickup_center_selection_widget.dart';
+import 'package:suliman/features/checkout/widgets/pickup_center_selection_widget.dart';
 
 class DeliverySection extends StatelessWidget {
   final CheckoutController checkoutController;

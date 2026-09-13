@@ -1,26 +1,26 @@
-import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
-import 'package:sixam_mart/features/auth/widgets/auth_dialog_widget.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/common/controllers/theme_controller.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
-import 'package:sixam_mart/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/common/widgets/menu_drawer.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/web_menu_bar.dart';
-import 'package:sixam_mart/features/checkout/widgets/payment_failed_dialog.dart';
+﻿import 'package:suliman/features/notification/domain/models/notification_body_model.dart';
+import 'package:suliman/features/auth/widgets/auth_dialog_widget.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/common/controllers/theme_controller.dart';
+import 'package:suliman/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/features/order/controllers/order_controller.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/footer_view.dart';
+import 'package:suliman/common/widgets/menu_drawer.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/common/widgets/web_menu_bar.dart';
+import 'package:suliman/features/checkout/widgets/payment_failed_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:sixam_mart/helper/guest_order_helper.dart';
+import 'package:suliman/helper/guest_order_helper.dart';
 
 class OrderSuccessfulScreen extends StatefulWidget {
   final String? orderID;

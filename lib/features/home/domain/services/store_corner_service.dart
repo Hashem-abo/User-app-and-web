@@ -1,5 +1,5 @@
-import 'package:sixam_mart/features/home/domain/repositories/store_corner_repository.dart';
-import 'package:sixam_mart/features/home/domain/models/store_corner_model.dart';
+﻿import 'package:suliman/features/home/domain/repositories/store_corner_repository.dart';
+import 'package:suliman/features/home/domain/models/store_corner_model.dart';
 
 abstract class StoreCornerServiceInterface {
   Future<StoreCornerDataModel?> getStoreCorners({int? offset});

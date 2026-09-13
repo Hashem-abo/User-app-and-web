@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/pro/domain/models/pro_active_offer_model.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/pro/domain/models/pro_active_offer_model.dart';
+import 'package:suliman/helper/module_helper.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
 
 class ProBenefitBannerWidget extends StatelessWidget {
   final ProActiveBenefit benefit;

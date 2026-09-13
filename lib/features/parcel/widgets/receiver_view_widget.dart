@@ -1,20 +1,20 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/address/controllers/address_controller.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/location/screens/pick_map_screen.dart';
-import 'package:sixam_mart/features/location/widgets/serach_location_widget.dart';
-import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/my_text_field.dart';
-import 'package:sixam_mart/common/widgets/text_field_shadow.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/address/controllers/address_controller.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/location/screens/pick_map_screen.dart';
+import 'package:suliman/features/location/widgets/serach_location_widget.dart';
+import 'package:suliman/features/parcel/controllers/parcel_controller.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/my_text_field.dart';
+import 'package:suliman/common/widgets/text_field_shadow.dart';
 
 class ReceiverViewWidget extends StatefulWidget {
   const ReceiverViewWidget({super.key});

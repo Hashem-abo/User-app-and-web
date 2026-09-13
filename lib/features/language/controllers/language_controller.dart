@@ -1,14 +1,14 @@
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/language/domain/models/language_model.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/features/home/screens/home_screen.dart';
+﻿import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/language/domain/models/language_model.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/features/home/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/language/domain/service/language_service_interface.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
+import 'package:suliman/features/language/domain/service/language_service_interface.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/features/notification/controllers/notification_controller.dart';
 
 class LocalizationController extends GetxController implements GetxService {
   final LanguageServiceInterface languageServiceInterface;

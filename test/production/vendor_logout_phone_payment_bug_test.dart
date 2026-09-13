@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // PRODUCTION TDD REGRESSION & FEATURE VERIFICATION SUITE
 //
 // These tests assert the DESIRED CORRECT BEHAVIOR.
@@ -7,7 +7,7 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
 
 void main() {
   group('FEATURE & BUG TEST 1: Store Model Robustness & Vendor Type Exposure', () {

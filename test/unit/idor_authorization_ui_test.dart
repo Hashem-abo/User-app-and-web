@@ -1,11 +1,11 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

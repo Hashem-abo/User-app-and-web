@@ -1,9 +1,9 @@
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/html/controllers/html_controller.dart';
-import 'package:sixam_mart/util/html_type.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+﻿import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/html/controllers/html_controller.dart';
+import 'package:suliman/util/html_type.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';

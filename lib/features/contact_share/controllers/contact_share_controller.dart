@@ -1,12 +1,12 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
 
 class ContactShareController extends GetxController implements GetxService {
   final ApiClient apiClient;

@@ -1,7 +1,7 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:sixam_mart/features/service/domain/models/service_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_provider_model.dart';
+import 'package:suliman/features/service/domain/models/service_model.dart';
+import 'package:suliman/features/service/domain/models/service_provider_model.dart';
 
 class ServiceQuotationModel {
   int? totalSize;

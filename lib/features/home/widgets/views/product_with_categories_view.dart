@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/features/item/domain/models/basic_medicine_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/home/widgets/web/web_basic_medicine_nearby_view_widget.dart';
-import 'package:sixam_mart/features/home/widgets/web/widgets/medicine_item_card.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/features/item/domain/models/basic_medicine_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/home/widgets/web/web_basic_medicine_nearby_view_widget.dart';
+import 'package:suliman/features/home/widgets/web/widgets/medicine_item_card.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class ProductWithCategoriesView extends StatefulWidget {
   final bool fromShop;

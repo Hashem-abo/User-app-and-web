@@ -1,12 +1,12 @@
-import 'package:card_swiper/card_swiper.dart';
+﻿import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:sixam_mart/features/item/controllers/campaign_controller.dart';
-import 'package:sixam_mart/features/home/widgets/components/circle_list_view_widget.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/title_widget.dart';
+import 'package:suliman/features/item/controllers/campaign_controller.dart';
+import 'package:suliman/features/home/widgets/components/circle_list_view_widget.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/title_widget.dart';
 
 class JustForYouView extends StatefulWidget {
   final String? title;

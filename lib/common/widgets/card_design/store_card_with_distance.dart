@@ -1,21 +1,21 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
-import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/new_tag.dart';
-import 'package:sixam_mart/features/store/screens/store_screen.dart';
-import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
+import 'package:suliman/common/widgets/custom_ink_well.dart';
+import 'package:suliman/common/widgets/hover/text_hover.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/new_tag.dart';
+import 'package:suliman/features/store/screens/store_screen.dart';
+import 'package:suliman/features/favourite/controllers/favourite_controller.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/widgets/vendor_type_badge_widget.dart';
 
 
 class StoreCardWithDistance extends StatelessWidget {

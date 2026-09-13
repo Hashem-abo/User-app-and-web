@@ -1,7 +1,7 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/date_converter.dart';
+import 'package:suliman/helper/responsive_helper.dart';
 
 void main() {
   group('PRODUCTION HELPER SUITE: PriceConverter Edge Cases', () {

@@ -1,10 +1,10 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/category/domain/models/category_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/category/domain/models/category_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/category/domain/services/category_service_interface.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/category/domain/services/category_service_interface.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
 class CategoryController extends GetxController implements GetxService {
   final CategoryServiceInterface categoryServiceInterface;

@@ -1,5 +1,5 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
 
 class VendorTypeHelper {
   /// Checks if the vendor type string is empty, null, or a null-like placeholder.

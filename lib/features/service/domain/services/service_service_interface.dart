@@ -1,5 +1,5 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/api/api_client.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/api/api_client.dart';
 
 abstract class ServiceServiceInterface {
   Future<dynamic> getServices(int offset, int? categoryId, int? providerId, DataSourceEnum source);

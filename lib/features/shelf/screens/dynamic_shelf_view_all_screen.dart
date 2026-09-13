@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
-import 'package:sixam_mart/common/widgets/menu_drawer.dart';
-import 'package:sixam_mart/common/widgets/card_design/store_card_with_distance.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/shelf/controllers/shelf_controller.dart';
-import 'package:sixam_mart/features/shelf/domain/models/shelf_model.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/service/widgets/service_widget.dart';
-import 'package:sixam_mart/features/service/widgets/service_provider_widget.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/common/widgets/card_design/item_card.dart';
+import 'package:suliman/common/widgets/menu_drawer.dart';
+import 'package:suliman/common/widgets/card_design/store_card_with_distance.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/shelf/controllers/shelf_controller.dart';
+import 'package:suliman/features/shelf/domain/models/shelf_model.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/service/widgets/service_widget.dart';
+import 'package:suliman/features/service/widgets/service_provider_widget.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class DynamicShelfViewAllScreen extends StatefulWidget {
   final int shelfId;

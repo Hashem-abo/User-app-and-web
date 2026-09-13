@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
+﻿import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/global_shopping/domain/repositories/global_shopping_repository_interface.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/global_shopping/domain/repositories/global_shopping_repository_interface.dart';
 
 class GlobalShoppingRepository implements GlobalShoppingRepositoryInterface {
   final ApiClient apiClient;

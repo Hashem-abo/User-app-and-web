@@ -1,21 +1,21 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/global_shopping/controllers/global_browse_controller.dart';
-import 'package:sixam_mart/features/global_shopping/controllers/global_cart_controller.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_product_model.dart';
-import 'package:sixam_mart/features/global_shopping/screens/global_cart_screen.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
+import 'package:suliman/features/global_shopping/controllers/global_browse_controller.dart';
+import 'package:suliman/features/global_shopping/controllers/global_cart_controller.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_product_model.dart';
+import 'package:suliman/features/global_shopping/screens/global_cart_screen.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/features/contact_share/screens/contact_share_sheet.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
 
 class GlobalProductDetailScreen extends StatefulWidget {
   final GlobalProductModel product;

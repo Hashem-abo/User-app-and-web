@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/pro/controllers/pro_controller.dart';
-import 'package:sixam_mart/features/pro/domain/models/pro_active_offer_model.dart';
-import 'package:sixam_mart/features/pro/screens/subscription_plan_screen.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/pro/controllers/pro_controller.dart';
+import 'package:suliman/features/pro/domain/models/pro_active_offer_model.dart';
+import 'package:suliman/features/pro/screens/subscription_plan_screen.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
 
 class ProPlanBannerWidget extends StatelessWidget {
   final VoidCallback? onSubscribe;

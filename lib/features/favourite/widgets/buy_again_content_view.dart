@@ -1,14 +1,14 @@
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
+﻿import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/footer_view.dart';
+import 'package:suliman/common/widgets/card_design/item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/util/styles.dart';
 
 class BuyAgainContentView extends StatefulWidget {
   const BuyAgainContentView({super.key});

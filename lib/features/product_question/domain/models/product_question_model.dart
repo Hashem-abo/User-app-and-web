@@ -1,5 +1,5 @@
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/profile/domain/models/userinfo_model.dart';
+﻿import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/profile/domain/models/userinfo_model.dart';
 
 class ProductQuestionModel {
   int? totalSize;

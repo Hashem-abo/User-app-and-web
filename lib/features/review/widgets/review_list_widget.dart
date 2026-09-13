@@ -1,9 +1,9 @@
-import 'package:flutter/cupertino.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
-import 'package:sixam_mart/features/review/controllers/review_controller.dart';
-import 'package:sixam_mart/features/review/widgets/review_widget.dart';
+﻿import 'package:flutter/cupertino.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
+import 'package:suliman/features/review/controllers/review_controller.dart';
+import 'package:suliman/features/review/widgets/review_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
 
 class ReviewListWidget extends StatelessWidget {
   final ReviewController reviewController;

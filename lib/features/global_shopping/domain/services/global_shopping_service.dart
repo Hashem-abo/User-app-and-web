@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_product_model.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_cart_item_model.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_order_model.dart';
-import 'package:sixam_mart/features/global_shopping/domain/repositories/global_shopping_repository_interface.dart';
-import 'package:sixam_mart/features/global_shopping/domain/services/global_shopping_service_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_product_model.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_cart_item_model.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_order_model.dart';
+import 'package:suliman/features/global_shopping/domain/repositories/global_shopping_repository_interface.dart';
+import 'package:suliman/features/global_shopping/domain/services/global_shopping_service_interface.dart';
 
 class GlobalShoppingService implements GlobalShoppingServiceInterface {
   final GlobalShoppingRepositoryInterface repo;

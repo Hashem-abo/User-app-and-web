@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/util/images.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/util/images.dart';
 
 // Overlays a gold pro crown badge on the bottom-right of an avatar.
 // Shown only when the user is a pro member and the config flag is enabled.

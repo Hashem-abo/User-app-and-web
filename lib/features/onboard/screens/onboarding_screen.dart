@@ -1,20 +1,20 @@
-import 'dart:math' as math;
+﻿import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/web_menu_bar.dart';
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/location/controllers/location_controller.dart';
-import 'package:sixam_mart/features/onboard/controllers/onboard_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/web_menu_bar.dart';
+import 'package:suliman/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/features/location/controllers/location_controller.dart';
+import 'package:suliman/features/onboard/controllers/onboard_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   const OnBoardingScreen({super.key});

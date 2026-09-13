@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/location/controllers/location_controller.dart';
-import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
-import 'package:sixam_mart/features/redesign_feature/global_widgets/bottom_sheet_header_widget.dart';
-import 'package:sixam_mart/features/redesign_feature/parcel/widget/parcel_category_card_widget.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/features/location/controllers/location_controller.dart';
+import 'package:suliman/features/parcel/controllers/parcel_controller.dart';
+import 'package:suliman/features/redesign_feature/global_widgets/bottom_sheet_header_widget.dart';
+import 'package:suliman/features/redesign_feature/parcel/widget/parcel_category_card_widget.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
 
 class AllParcelTypeBottomSheet extends StatelessWidget {
   const AllParcelTypeBottomSheet({super.key});

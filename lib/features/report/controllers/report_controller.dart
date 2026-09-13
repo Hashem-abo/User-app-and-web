@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/api/api_checker.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/report/domain/models/report_model.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/api/api_checker.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/report/domain/models/report_model.dart';
 // Added for navigation if needed, though Get.back is used.
-import 'package:sixam_mart/features/report/domain/services/report_service_interface.dart';
+import 'package:suliman/features/report/domain/services/report_service_interface.dart';
 
 class ReportController extends GetxController implements GetxService {
   final ReportServiceInterface reportServiceInterface;

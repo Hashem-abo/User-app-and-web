@@ -1,16 +1,16 @@
-import 'package:get/get.dart';
+﻿import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/features/auth/screens/delivery_man_registration_screen.dart';
-import 'package:sixam_mart/features/location/controllers/location_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_data_model.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
-import 'package:sixam_mart/features/auth/domain/models/delivery_man_body.dart';
-import 'package:sixam_mart/features/auth/domain/models/delivery_man_vehicles_model.dart';
-import 'package:sixam_mart/features/auth/domain/services/deliveryman_registration_service_interface.dart';
+import 'package:suliman/features/auth/screens/delivery_man_registration_screen.dart';
+import 'package:suliman/features/location/controllers/location_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/location/domain/models/zone_data_model.dart';
+import 'package:suliman/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/features/auth/domain/models/delivery_man_body.dart';
+import 'package:suliman/features/auth/domain/models/delivery_man_vehicles_model.dart';
+import 'package:suliman/features/auth/domain/services/deliveryman_registration_service_interface.dart';
 
 class DeliverymanRegistrationController extends GetxController implements GetxService {
   final DeliverymanRegistrationServiceInterface deliverymanRegistrationServiceInterface;

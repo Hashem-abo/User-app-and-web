@@ -1,6 +1,6 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/home/domain/models/cashback_model.dart';
-import 'package:sixam_mart/features/home/domain/models/homepage_model.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/home/domain/models/cashback_model.dart';
+import 'package:suliman/features/home/domain/models/homepage_model.dart';
 
 abstract class HomeServiceInterface {
   Future<List<CashBackModel>> getCashBackOfferList();

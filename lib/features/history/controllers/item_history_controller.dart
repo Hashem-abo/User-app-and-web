@@ -1,9 +1,9 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class ItemHistoryController extends GetxController implements GetxService {
   final SharedPreferences sharedPreferences;

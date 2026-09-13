@@ -1,11 +1,11 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/coupon/domain/models/coupon_model.dart';
-import 'package:sixam_mart/features/category/domain/models/category_model.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
-import 'package:sixam_mart/features/notification/domain/models/notification_model.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:suliman/features/order/domain/models/order_model.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/coupon/domain/models/coupon_model.dart';
+import 'package:suliman/features/category/domain/models/category_model.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
+import 'package:suliman/features/notification/domain/models/notification_model.dart';
 
 void main() {
   group('PRODUCTION MODEL SUITE: OrderModel & PaginatedOrderModel', () {

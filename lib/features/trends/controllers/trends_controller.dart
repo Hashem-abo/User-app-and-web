@@ -1,6 +1,6 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/trends/domain/models/trend_model.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/trends/domain/models/trend_model.dart';
 
 class TrendsController extends GetxController implements GetxService {
   final ApiClient apiClient;

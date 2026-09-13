@@ -1,12 +1,12 @@
-import 'package:sixam_mart/features/search/controllers/search_controller.dart' as search;
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/service/controllers/service_controller.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/features/search/widgets/filter_widget.dart';
-import 'package:sixam_mart/features/search/widgets/sort_widget.dart';
-import 'package:sixam_mart/features/search/widgets/item_view_widget.dart';
+﻿import 'package:suliman/features/search/controllers/search_controller.dart' as search;
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/service/controllers/service_controller.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/features/search/widgets/filter_widget.dart';
+import 'package:suliman/features/search/widgets/sort_widget.dart';
+import 'package:suliman/features/search/widgets/item_view_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

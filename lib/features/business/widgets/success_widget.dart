@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/business/controllers/business_controller.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/business/controllers/business_controller.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
 
 class SuccessWidget extends StatelessWidget {
   const SuccessWidget({super.key});

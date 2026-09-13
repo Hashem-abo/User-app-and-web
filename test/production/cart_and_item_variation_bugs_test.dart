@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // PRODUCTION TESTS: CART & ITEM VARIATION CRASH REPRODUCTIONS & INVARIANTS
 // =============================================================================
 //
@@ -26,9 +26,9 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart' hide Variation;
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/cart/domain/models/online_cart_model.dart' hide Variation;
+import 'package:suliman/features/item/domain/models/item_model.dart';
 
 void main() {
   group('[CART & VARIATION BUG] ItemService null dereference crashes', () {

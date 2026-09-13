@@ -1,6 +1,6 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/item/domain/models/basic_medicine_model.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/item/domain/models/basic_medicine_model.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class ItemRepositoryInterface implements RepositoryInterface {
   @override

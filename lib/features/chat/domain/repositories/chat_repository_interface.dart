@@ -1,5 +1,5 @@
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:suliman/api/api_client.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class ChatRepositoryInterface extends RepositoryInterface {
   @override

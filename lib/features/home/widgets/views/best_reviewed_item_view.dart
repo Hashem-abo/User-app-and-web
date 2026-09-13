@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/title_widget.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/title_widget.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/common/widgets/card_design/item_card.dart';
 
 class BestReviewItemView extends StatefulWidget {
   final String? title;

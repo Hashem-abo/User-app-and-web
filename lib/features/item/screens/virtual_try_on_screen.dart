@@ -1,23 +1,23 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/item/domain/services/fashn_service.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/item/domain/services/fashn_service.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 import 'dart:io';
 import 'dart:convert';
 
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/item/widgets/virtual_try_on_points_dialog.dart';
+import 'package:suliman/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/item/widgets/virtual_try_on_points_dialog.dart';
 
 class VirtualTryOnScreen extends StatefulWidget {
   final String imageUrl;

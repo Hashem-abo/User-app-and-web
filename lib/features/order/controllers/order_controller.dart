@@ -1,21 +1,21 @@
-import 'package:get/get.dart';
+﻿import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_cancellation_body.dart';
-import 'package:sixam_mart/features/order/domain/models/order_details_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-import 'package:sixam_mart/features/order/domain/services/order_service_interface.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
-import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/features/order/domain/models/order_cancellation_body.dart';
+import 'package:suliman/features/order/domain/models/order_details_model.dart';
+import 'package:suliman/features/order/domain/models/order_model.dart';
+import 'package:suliman/features/order/domain/services/order_service_interface.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/features/cart/controllers/cart_controller.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/cart/domain/models/online_cart_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/module_helper.dart';
+import 'package:suliman/features/checkout/domain/models/place_order_body_model.dart';
 
-import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/order/domain/models/monthly_order_model.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
 
 class OrderController extends GetxController implements GetxService {
   final OrderServiceInterface orderServiceInterface;

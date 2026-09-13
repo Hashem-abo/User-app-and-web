@@ -1,15 +1,15 @@
-import 'package:flutter/widgets.dart';
+﻿import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/service/domain/models/service_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_category_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_provider_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_booking_model.dart';
-import 'package:sixam_mart/features/service/domain/services/service_service_interface.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_quotation_model.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/service/domain/models/service_model.dart';
+import 'package:suliman/features/service/domain/models/service_category_model.dart';
+import 'package:suliman/features/service/domain/models/service_provider_model.dart';
+import 'package:suliman/features/service/domain/models/service_booking_model.dart';
+import 'package:suliman/features/service/domain/services/service_service_interface.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/features/service/domain/models/service_quotation_model.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ServiceController extends GetxController implements GetxService {

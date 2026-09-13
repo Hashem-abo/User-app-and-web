@@ -1,6 +1,6 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:sixam_mart/features/checkout/domain/models/pickup_center_model.dart';
+import 'package:suliman/features/checkout/domain/models/pickup_center_model.dart';
 
 class ZoneResponseModel {
   final bool _isSuccess;

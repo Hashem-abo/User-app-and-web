@@ -2,25 +2,25 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:sixam_mart/common/widgets/demo_reset_dialog_widget.dart';
-import 'package:sixam_mart/common/widgets/taxi_make_payment_bottomsheet.dart';
-import 'package:sixam_mart/features/chat/controllers/chat_controller.dart';
-import 'package:sixam_mart/features/chat/enums/user_type_enum.dart';
-import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
-import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
-import 'package:sixam_mart/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart/features/rental_module/rental_order/controllers/taxi_order_controller.dart';
-import 'package:sixam_mart/features/rental_module/rental_order/screens/taxi_order_details_screen.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:suliman/common/widgets/demo_reset_dialog_widget.dart';
+import 'package:suliman/common/widgets/taxi_make_payment_bottomsheet.dart';
+import 'package:suliman/features/chat/controllers/chat_controller.dart';
+import 'package:suliman/features/chat/enums/user_type_enum.dart';
+import 'package:suliman/features/notification/controllers/notification_controller.dart';
+import 'package:suliman/features/notification/domain/models/notification_body_model.dart';
+import 'package:suliman/features/order/controllers/order_controller.dart';
+import 'package:suliman/features/rental_module/rental_order/controllers/taxi_order_controller.dart';
+import 'package:suliman/features/rental_module/rental_order/screens/taxi_order_details_screen.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:sixam_mart/features/dashboard/screens/dashboard_screen.dart';
-import 'package:sixam_mart/features/notification/widgets/notifiation_popup_dialog_widget.dart';
+import 'package:suliman/features/dashboard/screens/dashboard_screen.dart';
+import 'package:suliman/features/notification/widgets/notifiation_popup_dialog_widget.dart';
 
 class NotificationHelper {
 
@@ -205,7 +205,7 @@ class NotificationHelper {
 
   static Future<void> showTextNotification(String title, String body, String orderID, NotificationBodyModel? notificationBody, FlutterLocalNotificationsPlugin fln) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      '6ammart', AppConstants.appName, playSound: true,
+      'suliman', AppConstants.appName, playSound: true,
       importance: Importance.max, priority: Priority.max, sound: RawResourceAndroidNotificationSound('notification'),
     );
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
@@ -218,7 +218,7 @@ class NotificationHelper {
       contentTitle: title, htmlFormatContentTitle: true,
     );
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      '6ammart', AppConstants.appName, importance: Importance.max,
+      'suliman', AppConstants.appName, importance: Importance.max,
       styleInformation: bigTextStyleInformation, priority: Priority.max, playSound: true,
       sound: const RawResourceAndroidNotificationSound('notification'),
     );
@@ -235,7 +235,7 @@ class NotificationHelper {
       summaryText: body, htmlFormatSummaryText: true,
     );
     final AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      '6ammart', AppConstants.appName,
+      'suliman', AppConstants.appName,
       largeIcon: FilePathAndroidBitmap(largeIconPath), priority: Priority.max, playSound: true,
       styleInformation: bigPictureStyleInformation, importance: Importance.max,
       sound: const RawResourceAndroidNotificationSound('notification'),

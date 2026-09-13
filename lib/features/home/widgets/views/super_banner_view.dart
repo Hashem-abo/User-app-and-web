@@ -1,19 +1,19 @@
-import 'package:carousel_slider/carousel_slider.dart';
+﻿import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/home/controllers/super_banner_controller.dart';
-import 'package:sixam_mart/features/home/domain/models/super_banner_model.dart';
-import 'package:sixam_mart/features/store/screens/store_screen.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/home/controllers/super_banner_controller.dart';
+import 'package:suliman/features/home/domain/models/super_banner_model.dart';
+import 'package:suliman/features/store/screens/store_screen.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:sixam_mart/common/widgets/item_bottom_sheet.dart';
-import 'package:sixam_mart/features/item/screens/item_details_screen.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
+import 'package:suliman/common/widgets/item_bottom_sheet.dart';
+import 'package:suliman/features/item/screens/item_details_screen.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/responsive_helper.dart';
 
 class SuperBannerView extends StatefulWidget {
   final int superBannerId;

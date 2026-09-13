@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
 class ExtraDiscountViewWidget extends StatelessWidget {
   final double extraDiscount;
   const ExtraDiscountViewWidget({super.key, required this.extraDiscount});

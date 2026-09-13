@@ -1,7 +1,7 @@
-import 'package:get/get_connect/http/src/response/response.dart';
+﻿import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+import 'package:suliman/features/order/domain/models/monthly_order_model.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class OrderRepositoryInterface extends RepositoryInterface {
   @override

@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/choose_us_model.dart';
-import 'package:sixam_mart/features/language/domain/models/language_model.dart';
-import 'package:sixam_mart/util/images.dart';
+import 'package:suliman/common/models/choose_us_model.dart';
+import 'package:suliman/features/language/domain/models/language_model.dart';
+import 'package:suliman/util/images.dart';
 
 class AppConstants {
   static const String appName = 'Suliman';
@@ -276,51 +276,51 @@ class AppConstants {
   static const String forumPostsUri = '/api/v1/forum/list';
   static const String forumPostDetailsUri = '/api/v1/forum/details/';
   static const String savedRoute = 'savedRoute';
-  static const String renewBottomSheetShown = 'sixam_mart_renew_bottomsheet_shown';
-  static const String theme = '6ammart_theme';
-  static const String themeColor = '6ammart_theme_color';
-  static const String themeTextColor = '6ammart_theme_text_color';
-  static const String themeDisabledColor = '6ammart_theme_disabled_color';
-  static const String themeHintColor = '6ammart_theme_hint_color';
-  static const String themeCardColor = '6ammart_theme_card_color';
-  static const String fontSize = '6ammart_font_size';
-  static const String token = '6ammart_token';
-  static const String countryCode = '6ammart_country_code';
-  static const String languageCode = '6ammart_language_code';
+  static const String renewBottomSheetShown = 'suliman_renew_bottomsheet_shown';
+  static const String theme = 'suliman_theme';
+  static const String themeColor = 'suliman_theme_color';
+  static const String themeTextColor = 'suliman_theme_text_color';
+  static const String themeDisabledColor = 'suliman_theme_disabled_color';
+  static const String themeHintColor = 'suliman_theme_hint_color';
+  static const String themeCardColor = 'suliman_theme_card_color';
+  static const String fontSize = 'suliman_font_size';
+  static const String token = 'suliman_token';
+  static const String countryCode = 'suliman_country_code';
+  static const String languageCode = 'suliman_language_code';
   static const String cacheCountryCode = 'cache_country_code';
   static const String cacheLanguageCode = 'cache_language_code';
 
-  static const String cartList = '6ammart_cart_list';
-  static const String userPassword = '6ammart_user_password';
-  static const String userAddress = '6ammart_user_address';
-  static const String userNumber = '6ammart_user_number';
-  static const String userCountryCode = '6ammart_user_country_code';
-  static const String notification = '6ammart_notification';
+  static const String cartList = 'suliman_cart_list';
+  static const String userPassword = 'suliman_user_password';
+  static const String userAddress = 'suliman_user_address';
+  static const String userNumber = 'suliman_user_number';
+  static const String userCountryCode = 'suliman_user_country_code';
+  static const String notification = 'suliman_notification';
   static const String notificationIdList = 'notification_id_list';
-  static const String searchHistory = '6ammart_search_history';
-  static const String intro = '6ammart_intro';
-  static const String notificationCount = '6ammart_notification_count';
-  static const String dmTipIndex = '6ammart_dm_tip_index';
-  static const String earnPoint = '6ammart_earn_point';
-  static const String acceptCookies = '6ammart_accept_cookies';
-  static const String suggestedLocation = '6ammart_suggested_location';
-  static const String walletAccessToken = '6ammart_wallet_access_token';
-  static const String guestId = '6ammart_guest_id';
-  static const String guestNumber = '6ammart_guest_number';
-  static const String referBottomSheet = '6ammart_reffer_bottomsheet_show';
-  static const String dmRegisterSuccess = '6ammart_dm_registration_success';
-  static const String isRestaurantRegister = '6ammart_store_registration';
-  static const String suggestLogin = '6ammart_login_suggestion';
+  static const String searchHistory = 'suliman_search_history';
+  static const String intro = 'suliman_intro';
+  static const String notificationCount = 'suliman_notification_count';
+  static const String dmTipIndex = 'suliman_dm_tip_index';
+  static const String earnPoint = 'suliman_earn_point';
+  static const String acceptCookies = 'suliman_accept_cookies';
+  static const String suggestedLocation = 'suliman_suggested_location';
+  static const String walletAccessToken = 'suliman_wallet_access_token';
+  static const String guestId = 'suliman_guest_id';
+  static const String guestNumber = 'suliman_guest_number';
+  static const String referBottomSheet = 'suliman_reffer_bottomsheet_show';
+  static const String dmRegisterSuccess = 'suliman_dm_registration_success';
+  static const String isRestaurantRegister = 'suliman_store_registration';
+  static const String suggestLogin = 'suliman_login_suggestion';
   static const String aiChatHistory = 'ai_chat_history';
-  static const String cartWishList = '6ammart_cart_wish_list';
-  static const String productReferralCode = '6ammart_product_referral_code';
+  static const String cartWishList = 'suliman_cart_wish_list';
+  static const String productReferralCode = 'suliman_product_referral_code';
 
   ///taxi
-  static const String taxiSearchHistory = '6ammart_taxi_search_history';
-  static const String taxiSearchAddressHistory = '6ammart_taxi_search_address_history';
-  static const String itemHistory = 'sixam_mart_item_history';
-  static const String storeHistory = 'sixam_mart_store_history';
-  static const String isHistoryEnabled = 'sixam_mart_is_history_enabled';
+  static const String taxiSearchHistory = 'suliman_taxi_search_history';
+  static const String taxiSearchAddressHistory = 'suliman_taxi_search_address_history';
+  static const String itemHistory = 'suliman_item_history';
+  static const String storeHistory = 'suliman_store_history';
+  static const String isHistoryEnabled = 'suliman_is_history_enabled';
 
   static const String topic = 'all_zone_customer';
   static const String zoneId = 'zoneId';
@@ -383,7 +383,7 @@ class AppConstants {
   static const String ride = 'ride_sharing';
   static const String services = 'services';
   static const String globalShopping = 'global_shopping';
-  static const String parcelRecentAddresses = '6ammart_parcel_recent_addresses';
+  static const String parcelRecentAddresses = 'suliman_parcel_recent_addresses';
   static const int parcelRecentAddressesMax = 10;
   
 ///ride share map zoom

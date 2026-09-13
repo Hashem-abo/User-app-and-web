@@ -1,5 +1,5 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/controllers/theme_controller.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/controllers/theme_controller.dart';
 
 class Dimensions {
   static double get _offset => Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontSizeOffset : 0.0;

@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // REAL PRODUCTION AUTH & LIFECYCLE CRASH/BUG EXPOSURE TESTS
 // =============================================================================
 //
@@ -25,7 +25,7 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
 
 void main() {
   group('[AUTH CRASH BUG] AuthRepository null userAddress dereference in clearSharedData & updateToken', () {

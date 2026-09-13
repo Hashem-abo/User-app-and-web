@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/report/domain/models/report_model.dart';
-import 'package:sixam_mart/features/report/domain/repositories/report_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/report/domain/models/report_model.dart';
+import 'package:suliman/features/report/domain/repositories/report_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class ReportRepository implements ReportRepositoryInterface {
   final ApiClient apiClient;

@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/helper/vendor_type_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/helper/vendor_type_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
-export 'package:sixam_mart/helper/vendor_type_helper.dart';
+export 'package:suliman/helper/vendor_type_helper.dart';
 
 class VendorTypeBadgeWidget extends StatelessWidget {
   final Store? store;

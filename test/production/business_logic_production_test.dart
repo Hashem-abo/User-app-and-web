@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // COMPREHENSIVE PRODUCTION BUSINESS LOGIC & CALCULATION TESTS
 // =============================================================================
 //
@@ -35,9 +35,9 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
 
 void main() {
   group('[BUSINESS LOGIC BUG] Prescription itemsPrice Back-Calculation Inflation', () {

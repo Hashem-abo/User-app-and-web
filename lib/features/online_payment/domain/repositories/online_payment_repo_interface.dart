@@ -1,3 +1,3 @@
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class OnlinePaymentRepoInterface<T> implements RepositoryInterface {}

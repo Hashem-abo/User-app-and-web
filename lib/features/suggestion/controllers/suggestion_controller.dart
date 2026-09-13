@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/suggestion/domain/models/suggestion_model.dart';
-import 'package:sixam_mart/features/suggestion/domain/services/suggestion_service_interface.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/suggestion/domain/models/suggestion_model.dart';
+import 'package:suliman/features/suggestion/domain/services/suggestion_service_interface.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/models/response_model.dart';
 
 class SuggestionController extends GetxController implements GetxService {
   final SuggestionServiceInterface suggestionServiceInterface;

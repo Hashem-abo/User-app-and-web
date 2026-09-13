@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // PRODUCTION TESTS: SEARCH, SUGGESTIONS & FILTERING CRASHES & INVARIANTS
 // =============================================================================
 //
@@ -17,8 +17,8 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
 
 void main() {
   group('[SEARCH CONTROLLER BUG] Search suggestions and response null safety crashes', () {

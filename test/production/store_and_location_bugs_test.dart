@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // PRODUCTION TESTS: STORE, LOCATION & ZONE CRASH REPRODUCTIONS & INVARIANTS
 // =============================================================================
 //
@@ -22,8 +22,8 @@
 
 import 'dart:math';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/location/domain/models/zone_response_model.dart';
 
 void main() {
   group('[FIXED] Store.fromJson safely handles MySQL decimal strings and string category IDs', () {

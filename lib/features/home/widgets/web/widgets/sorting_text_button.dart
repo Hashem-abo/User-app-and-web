@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class SortingTextButton extends StatelessWidget {
   final String title;

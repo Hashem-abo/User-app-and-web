@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/common/models/config_model.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/common/models/config_model.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
 
 class ModuleHelper {
 

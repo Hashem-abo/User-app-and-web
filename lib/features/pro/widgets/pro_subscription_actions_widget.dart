@@ -1,12 +1,12 @@
-import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/pro/controllers/pro_controller.dart';
-import 'package:sixam_mart/features/pro/domain/models/pro_plan_model.dart';
-import 'package:sixam_mart/features/pro/widgets/pro_payment_bottom_sheet_widget.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
+﻿import 'package:suliman/common/widgets/confirmation_dialog.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/pro/controllers/pro_controller.dart';
+import 'package:suliman/features/pro/domain/models/pro_plan_model.dart';
+import 'package:suliman/features/pro/widgets/pro_payment_bottom_sheet_widget.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

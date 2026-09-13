@@ -1,5 +1,5 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/rental_module/rental_order/domain/services/taxi_order_service_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/rental_module/rental_order/domain/services/taxi_order_service_interface.dart';
 
 class TaxiOrderController extends GetxController implements GetxService {
   final TaxiOrderServiceInterface taxiOrderServiceInterface;

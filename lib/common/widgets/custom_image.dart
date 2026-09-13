@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
+﻿import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/util/images.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/util/images.dart';
 import 'package:flutter_avif/flutter_avif.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

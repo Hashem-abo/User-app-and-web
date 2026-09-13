@@ -1,9 +1,9 @@
-import 'package:sixam_mart/features/category/domain/models/category_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_category_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_provider_model.dart';
+﻿import 'package:suliman/features/category/domain/models/category_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/service/domain/models/service_model.dart';
+import 'package:suliman/features/service/domain/models/service_category_model.dart';
+import 'package:suliman/features/service/domain/models/service_provider_model.dart';
 
 class ShelfModel {
   int? id;

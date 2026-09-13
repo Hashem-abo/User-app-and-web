@@ -1,16 +1,16 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/item/widgets/virtual_try_on_points_dialog.dart';
-import 'package:sixam_mart/features/item/widgets/ai_limit_points_dialog.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/item/widgets/virtual_try_on_points_dialog.dart';
+import 'package:suliman/features/item/widgets/ai_limit_points_dialog.dart';
 
 enum AiLimitStatus {
   allowed,

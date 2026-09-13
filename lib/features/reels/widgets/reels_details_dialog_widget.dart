@@ -1,31 +1,31 @@
-import 'dart:io';
+﻿import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/item_bottom_sheet.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/reels/controllers/reels_controller.dart';
-import 'package:sixam_mart/features/reels/domain/models/reel_model.dart';
-import 'package:sixam_mart/features/reels/widgets/reel_transient_toast_widget.dart';
-import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/item_bottom_sheet.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/reels/controllers/reels_controller.dart';
+import 'package:suliman/features/reels/domain/models/reel_model.dart';
+import 'package:suliman/features/reels/widgets/reel_transient_toast_widget.dart';
+import 'package:suliman/features/contact_share/screens/contact_share_sheet.dart';
 
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/features/reels/helpers/web_video_helper.dart' as web_video;
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/date_converter.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/features/reels/helpers/web_video_helper.dart' as web_video;
 import 'package:video_player/video_player.dart';
 
 // Shared cache manager for reel video files.

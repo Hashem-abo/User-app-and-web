@@ -1,5 +1,5 @@
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/rental_module/rental_cart_screen/domain/repository/taxi_cart_repository_interface.dart';
+﻿import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/rental_module/rental_cart_screen/domain/repository/taxi_cart_repository_interface.dart';
 
 class TaxiCartRepository implements TaxiCartRepositoryInterface{
   final ApiClient apiClient;

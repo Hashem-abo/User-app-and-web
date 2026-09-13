@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:suliman/helper/price_converter.dart';
 
 void main() {
   group('PriceConverter - Standard Logic', () {

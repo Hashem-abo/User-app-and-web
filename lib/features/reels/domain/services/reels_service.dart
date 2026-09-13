@@ -1,7 +1,7 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/reels/domain/models/reel_model.dart';
-import 'package:sixam_mart/features/reels/domain/repositories/reels_repository_interface.dart';
-import 'package:sixam_mart/features/reels/domain/services/reels_service_interface.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/reels/domain/models/reel_model.dart';
+import 'package:suliman/features/reels/domain/repositories/reels_repository_interface.dart';
+import 'package:suliman/features/reels/domain/services/reels_service_interface.dart';
 
 
 class ReelsService implements ReelsServiceInterface {

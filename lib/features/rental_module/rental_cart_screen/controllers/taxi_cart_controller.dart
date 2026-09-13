@@ -1,7 +1,7 @@
-
+﻿
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/rental_module/rental_cart_screen/domain/models/car_cart_model.dart';
-import 'package:sixam_mart/features/rental_module/rental_cart_screen/domain/services/taxi_cart_service_interface.dart';
+import 'package:suliman/features/rental_module/rental_cart_screen/domain/models/car_cart_model.dart';
+import 'package:suliman/features/rental_module/rental_cart_screen/domain/services/taxi_cart_service_interface.dart';
 
 class TaxiCartController extends GetxController implements GetxService {
   final TaxiCartServiceInterface taxiCartServiceInterface;

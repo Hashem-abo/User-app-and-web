@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/product_question/domain/models/product_question_model.dart';
-import 'package:sixam_mart/features/product_question/domain/services/product_question_service_interface.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/product_question/domain/models/product_question_model.dart';
+import 'package:suliman/features/product_question/domain/services/product_question_service_interface.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/models/response_model.dart';
 
 class ProductQuestionController extends GetxController implements GetxService {
   final ProductQuestionServiceInterface productQuestionServiceInterface;

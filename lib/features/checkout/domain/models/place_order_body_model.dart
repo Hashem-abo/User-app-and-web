@@ -1,6 +1,6 @@
-import 'dart:convert';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+﻿import 'dart:convert';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
 
 class PlaceOrderBodyModel {
   List<OnlineCart>? _cart;

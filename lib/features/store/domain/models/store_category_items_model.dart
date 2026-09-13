@@ -1,4 +1,4 @@
-import 'package:sixam_mart/features/item/domain/models/item_model.dart' show Item;
+﻿import 'package:suliman/features/item/domain/models/item_model.dart' show Item;
 
 class StoreCategoryItemsModel {
   final int? totalSize;

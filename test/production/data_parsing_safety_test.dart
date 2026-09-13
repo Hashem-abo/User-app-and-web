@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // COMPREHENSIVE PRODUCTION DATA PARSING & CRASH EXPOSURE TEST SUITE
 // =============================================================================
 //
@@ -50,21 +50,21 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/parcel/domain/models/parcel_cancellation_reasons_model.dart';
-import 'package:sixam_mart/features/coupon/domain/models/coupon_model.dart';
-import 'package:sixam_mart/common/models/transaction_model.dart';
-import 'package:sixam_mart/features/flash_sale/domain/models/product_flash_sale.dart';
-import 'package:sixam_mart/features/flash_sale/domain/models/flash_sale_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart';
-import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
-import 'package:sixam_mart/features/checkout/domain/models/distance_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/business/domain/models/package_model.dart';
-import 'package:sixam_mart/features/home/domain/models/cashback_model.dart';
-import 'package:sixam_mart/features/notification/domain/models/notification_model.dart';
+import 'package:suliman/features/parcel/domain/models/parcel_cancellation_reasons_model.dart';
+import 'package:suliman/features/coupon/domain/models/coupon_model.dart';
+import 'package:suliman/common/models/transaction_model.dart';
+import 'package:suliman/features/flash_sale/domain/models/product_flash_sale.dart';
+import 'package:suliman/features/flash_sale/domain/models/flash_sale_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/cart/domain/models/online_cart_model.dart';
+import 'package:suliman/features/checkout/domain/models/place_order_body_model.dart';
+import 'package:suliman/features/checkout/domain/models/distance_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/order/domain/models/order_model.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/business/domain/models/package_model.dart';
+import 'package:suliman/features/home/domain/models/cashback_model.dart';
+import 'package:suliman/features/notification/domain/models/notification_model.dart';
 
 void main() {
   group('[DATA PARSING BUG] ParcelCancellationReasonsModel.fromJson crashes', () {

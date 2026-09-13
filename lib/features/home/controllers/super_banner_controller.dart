@@ -1,6 +1,6 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/home/domain/models/super_banner_model.dart';
-import 'package:sixam_mart/features/home/domain/repositories/super_banner_repository_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/home/domain/models/super_banner_model.dart';
+import 'package:suliman/features/home/domain/repositories/super_banner_repository_interface.dart';
 
 class SuperBannerController extends GetxController implements GetxService {
   final SuperBannerRepositoryInterface superBannerRepositoryInterface;

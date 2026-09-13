@@ -1,18 +1,18 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/home/domain/models/cashback_model.dart';
-import 'package:sixam_mart/features/home/domain/models/homepage_model.dart';
-import 'package:sixam_mart/features/home/domain/services/home_service_interface.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/banner/controllers/banner_controller.dart';
-import 'package:sixam_mart/features/category/controllers/category_controller.dart';
-import 'package:sixam_mart/features/shelf/controllers/shelf_controller.dart';
-import 'package:sixam_mart/features/home/controllers/store_corner_controller.dart';
-import 'package:sixam_mart/features/item/controllers/campaign_controller.dart';
-import 'package:sixam_mart/features/home/controllers/super_banner_controller.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/home/domain/models/cashback_model.dart';
+import 'package:suliman/features/home/domain/models/homepage_model.dart';
+import 'package:suliman/features/home/domain/services/home_service_interface.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/banner/controllers/banner_controller.dart';
+import 'package:suliman/features/category/controllers/category_controller.dart';
+import 'package:suliman/features/shelf/controllers/shelf_controller.dart';
+import 'package:suliman/features/home/controllers/store_corner_controller.dart';
+import 'package:suliman/features/item/controllers/campaign_controller.dart';
+import 'package:suliman/features/home/controllers/super_banner_controller.dart';
 
-import 'package:sixam_mart/api/data_module_manager.dart';
+import 'package:suliman/api/data_module_manager.dart';
 
 class HomeController extends GetxController implements GetxService {
   final HomeServiceInterface homeServiceInterface;

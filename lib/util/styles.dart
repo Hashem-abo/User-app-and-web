@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:flutter/material.dart';
 
-import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:suliman/common/controllers/theme_controller.dart';
 
 TextStyle get robotoRegular => TextStyle(
   fontFamily: Get.isRegistered<ThemeController>() ? Get.find<ThemeController>().fontFamily : 'Roboto',

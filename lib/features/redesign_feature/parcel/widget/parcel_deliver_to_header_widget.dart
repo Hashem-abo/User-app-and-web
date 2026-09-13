@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
-import 'package:sixam_mart/common/widgets/title_widget.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/common/widgets/title_widget.dart';
+import 'package:suliman/util/dimensions.dart';
 
 class ParcelDeliverToHeaderWidget extends StatelessWidget {
   const ParcelDeliverToHeaderWidget({super.key});

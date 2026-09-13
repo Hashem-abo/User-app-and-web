@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/pro/controllers/pro_controller.dart';
-import 'package:sixam_mart/features/pro/domain/models/pro_active_offer_model.dart';
-import 'package:sixam_mart/features/pro/screens/subscription_plan_screen.dart';
-import 'package:sixam_mart/features/pro/widgets/pro_benefit_banner_widget.dart';
-import 'package:sixam_mart/features/pro/widgets/pro_plan_banner_widget.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/pro/controllers/pro_controller.dart';
+import 'package:suliman/features/pro/domain/models/pro_active_offer_model.dart';
+import 'package:suliman/features/pro/screens/subscription_plan_screen.dart';
+import 'package:suliman/features/pro/widgets/pro_benefit_banner_widget.dart';
+import 'package:suliman/features/pro/widgets/pro_plan_banner_widget.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
 class ProCartBannerWidget extends StatelessWidget {
   final double subtotal;

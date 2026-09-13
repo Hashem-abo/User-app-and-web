@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/checkout/domain/models/place_order_body_model.dart';
+import 'package:suliman/features/order/domain/models/order_model.dart';
 
 void main() {
   group('Customer End-to-End User Journey Simulation Tests', () {

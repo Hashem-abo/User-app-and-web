@@ -1,8 +1,8 @@
-import 'package:get/get_connect.dart';
-import 'package:sixam_mart/common/models/transaction_model.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/loyalty/domain/repositories/loyalty_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:get/get_connect.dart';
+import 'package:suliman/common/models/transaction_model.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/loyalty/domain/repositories/loyalty_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class LoyaltyRepository implements LoyaltyRepositoryInterface {
   final ApiClient apiClient;

@@ -1,6 +1,6 @@
-import 'package:sixam_mart/features/pro/domain/models/pro_faq_model.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+﻿import 'package:suliman/features/pro/domain/models/pro_faq_model.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,15 +1,15 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/item/domain/models/basic_medicine_model.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/features/item/domain/models/common_condition_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/item/domain/repositories/item_repository_interface.dart';
-import 'package:sixam_mart/features/item/domain/services/item_service_interface.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/item/domain/models/basic_medicine_model.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/features/item/domain/models/common_condition_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/cart/controllers/cart_controller.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/item/domain/repositories/item_repository_interface.dart';
+import 'package:suliman/features/item/domain/services/item_service_interface.dart';
+import 'package:suliman/helper/module_helper.dart';
 
 class ItemService implements ItemServiceInterface {
   final ItemRepositoryInterface itemRepositoryInterface;

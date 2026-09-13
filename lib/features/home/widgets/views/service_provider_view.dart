@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/service/controllers/service_controller.dart';
-import 'package:sixam_mart/features/service/widgets/service_provider_widget.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
+import 'package:suliman/features/service/controllers/service_controller.dart';
+import 'package:suliman/features/service/widgets/service_provider_widget.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/helper/responsive_helper.dart';
 
 class ServiceProviderView extends StatelessWidget {
   const ServiceProviderView({super.key});

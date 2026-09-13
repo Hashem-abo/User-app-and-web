@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/onboard/domain/repository/onboard_repository_interface.dart';
-import 'package:sixam_mart/features/onboard/domain/models/onboarding_model.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/common/models/config_model.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/onboard/domain/repository/onboard_repository_interface.dart';
+import 'package:suliman/features/onboard/domain/models/onboarding_model.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/common/models/config_model.dart';
 
 class OnboardRepository implements OnboardRepositoryInterface {
 

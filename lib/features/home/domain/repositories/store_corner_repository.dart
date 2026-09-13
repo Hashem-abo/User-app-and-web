@@ -1,8 +1,8 @@
-import 'package:get/get_connect/http/src/response/response.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/features/home/domain/models/store_corner_model.dart';
+﻿import 'package:get/get_connect/http/src/response/response.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/features/home/domain/models/store_corner_model.dart';
 
 abstract class StoreCornerRepositoryInterface extends RepositoryInterface {
   Future<StoreCornerDataModel?> getStoreCorners({int? offset});

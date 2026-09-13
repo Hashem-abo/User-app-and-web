@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
 import 'package:get/get.dart';
 
 class ArFurnitureScreen extends StatelessWidget {

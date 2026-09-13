@@ -1,8 +1,8 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/features/auth/controllers/auth_controller.dart';
 
 class GuestOrderModel {
   final int id;

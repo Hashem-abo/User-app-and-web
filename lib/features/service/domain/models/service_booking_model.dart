@@ -1,6 +1,6 @@
-import 'dart:convert';
-import 'package:sixam_mart/features/service/domain/models/service_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_provider_model.dart';
+﻿import 'dart:convert';
+import 'package:suliman/features/service/domain/models/service_model.dart';
+import 'package:suliman/features/service/domain/models/service_provider_model.dart';
 
 class ServiceBookingModel {
   int? totalSize;

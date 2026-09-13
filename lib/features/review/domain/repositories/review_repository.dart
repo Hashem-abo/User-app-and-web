@@ -1,10 +1,10 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/review/domain/models/review_body_model.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
-import 'package:sixam_mart/features/review/domain/repositories/review_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/review/domain/models/review_body_model.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
+import 'package:suliman/features/review/domain/repositories/review_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class ReviewRepository implements ReviewRepositoryInterface {
   final ApiClient apiClient;

@@ -1,11 +1,11 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:suliman/features/cart/controllers/cart_controller.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/helper/route_helper.dart';
 
 class SharedCartHandler extends StatefulWidget {
   const SharedCartHandler({super.key});

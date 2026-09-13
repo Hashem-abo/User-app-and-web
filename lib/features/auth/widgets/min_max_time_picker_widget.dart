@@ -1,8 +1,8 @@
-import 'package:carousel_slider/carousel_slider.dart';
+﻿import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class MinMaxTimePickerWidget extends StatefulWidget {
   final List<String> times;

@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/favourite/controllers/wish_list_controller.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/favourite/controllers/wish_list_controller.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 import 'package:intl/intl.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/features/favourite/domain/models/wish_list_model.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
+import 'package:suliman/features/cart/controllers/cart_controller.dart';
+import 'package:suliman/features/checkout/domain/models/place_order_body_model.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/features/favourite/domain/models/wish_list_model.dart';
 
 class WishListContentView extends StatefulWidget {
   const WishListContentView({super.key});

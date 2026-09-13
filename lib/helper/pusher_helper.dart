@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class PusherHelper {
   static PusherChannelsClient? pusherClient;
@@ -33,7 +33,7 @@ class PusherHelper {
     int port = config?.websocketPort ?? (isHttps ? 443 : 6001);
     String key = (config?.websocketKey != null && config!.websocketKey!.trim().isNotEmpty)
         ? config.websocketKey!.trim()
-        : '6ammart';
+        : 'suliman';
 
     try {
       if (pusherClient != null) {

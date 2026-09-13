@@ -1,6 +1,6 @@
-import 'package:sixam_mart/util/dimensions.dart';
+﻿import 'package:suliman/util/dimensions.dart';
 import 'package:flutter/material.dart';
-import 'package:sixam_mart/util/images.dart';
+import 'package:suliman/util/images.dart';
 
 class QuantityButton extends StatefulWidget {
   final bool isIncrement;

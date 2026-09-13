@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/checkout/screens/checkout_screen.dart';
-import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/store/controllers/store_controller.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/checkout/screens/checkout_screen.dart';
+import 'package:suliman/features/checkout/controllers/checkout_controller.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class PrescriptionStoreBottomSheetWidget extends StatefulWidget {
   const PrescriptionStoreBottomSheetWidget({super.key});

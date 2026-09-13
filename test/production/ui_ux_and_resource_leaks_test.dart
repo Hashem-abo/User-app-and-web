@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // COMPREHENSIVE PRODUCTION UI/UX, LAYOUT & RESOURCE LEAK TEST SUITE
 // =============================================================================
 //
@@ -24,9 +24,9 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
 
 void main() {
   group('[UI/UX CRASH BUG] ItemWidget crashes on unrated store cards', () {

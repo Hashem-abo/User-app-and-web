@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/features/parcel/domain/models/parcel_category_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/features/parcel/widgets/deliver_item_card_widget.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/features/parcel/domain/models/parcel_category_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/features/parcel/widgets/deliver_item_card_widget.dart';
 
 class ParcelBottomSheetWidget extends StatelessWidget {
   final List<ParcelCategoryModel>? parcelCategoryList;

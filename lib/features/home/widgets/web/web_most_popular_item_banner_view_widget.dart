@@ -1,10 +1,10 @@
-import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
-import 'package:sixam_mart/features/item/controllers/campaign_controller.dart';
-import 'package:sixam_mart/features/item/domain/models/basic_campaign_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/home/widgets/web/widgets/arrow_icon_button.dart';
+﻿import 'package:suliman/common/widgets/hover/text_hover.dart';
+import 'package:suliman/features/item/controllers/campaign_controller.dart';
+import 'package:suliman/features/item/domain/models/basic_campaign_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/home/widgets/web/widgets/arrow_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';

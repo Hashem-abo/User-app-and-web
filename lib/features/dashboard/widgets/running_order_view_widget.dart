@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/features/order/screens/order_details_screen.dart';
+import 'package:suliman/features/order/controllers/order_controller.dart';
+import 'package:suliman/features/order/domain/models/order_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/features/order/screens/order_details_screen.dart';
 
 class RunningOrderViewWidget extends StatelessWidget {
   final List<OrderModel> reversOrder;

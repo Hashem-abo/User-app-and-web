@@ -1,4 +1,4 @@
-// PRODUCTION TESTS: AddressModel (Fixes Verified)
+﻿// PRODUCTION TESTS: AddressModel (Fixes Verified)
 //
 // Verifies that AddressModel.fromJson preserves true null values instead of
 // corrupting them into the string "null", ensuring UI and GPS map rendering work properly.
@@ -6,7 +6,7 @@
 // Run with:  flutter test test/unit/real_crash_tests/address_model_null_string_test.dart
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
 
 void main() {
   group('[FIXED] AddressModel.fromJson – null fields stay null instead of string "null"', () {

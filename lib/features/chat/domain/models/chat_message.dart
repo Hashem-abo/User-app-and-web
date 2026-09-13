@@ -1,9 +1,9 @@
-import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/features/chat/domain/enum/chat_role_enum.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/coupon/domain/models/coupon_model.dart' hide Store;
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
+﻿import 'package:image_picker/image_picker.dart';
+import 'package:suliman/features/chat/domain/enum/chat_role_enum.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/coupon/domain/models/coupon_model.dart' hide Store;
+import 'package:suliman/features/order/domain/models/order_model.dart';
 
 class ChatMessage {
   final String text;

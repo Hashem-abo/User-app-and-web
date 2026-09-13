@@ -1,10 +1,10 @@
-import 'package:sixam_mart/common/widgets/rating_bar.dart';
-import 'package:sixam_mart/features/review/widgets/rating_progress_widget.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+﻿import 'package:suliman/common/widgets/rating_bar.dart';
+import 'package:suliman/features/review/widgets/rating_progress_widget.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/util/styles.dart';
 
 class RatingWidget extends StatelessWidget {
   final double? averageRating;

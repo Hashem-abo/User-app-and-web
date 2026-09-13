@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/home/widgets/components/popular_store_card_widget.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/title_widget.dart';
-import 'package:sixam_mart/features/home/widgets/web/widgets/arrow_icon_button.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/features/store/controllers/store_controller.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/home/widgets/components/popular_store_card_widget.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/title_widget.dart';
+import 'package:suliman/features/home/widgets/web/widgets/arrow_icon_button.dart';
 
 class WebPopularStoresView extends StatefulWidget {
   const WebPopularStoresView({super.key});

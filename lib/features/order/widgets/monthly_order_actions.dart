@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/images.dart';
+import 'package:suliman/common/widgets/confirmation_dialog.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/order/controllers/order_controller.dart';
+import 'package:suliman/features/order/domain/models/monthly_order_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/images.dart';
 
 class MonthlyOrderActions {
   MonthlyOrderActions._();

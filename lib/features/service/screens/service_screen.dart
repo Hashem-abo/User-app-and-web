@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/features/home/widgets/module_home_layout_builder.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/features/home/widgets/module_home_layout_builder.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/auth_helper.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/service/controllers/service_controller.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/features/service/controllers/service_controller.dart';
+import 'package:suliman/util/dimensions.dart';
 // removed unused imports
-import 'package:sixam_mart/features/service/widgets/service_widget.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
+import 'package:suliman/features/service/widgets/service_widget.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
 
 class ServiceScreen extends StatefulWidget {
   final bool fromHomeScreen;

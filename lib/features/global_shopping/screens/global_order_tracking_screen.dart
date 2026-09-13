@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/global_shopping/controllers/global_order_controller.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_order_model.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
+import 'package:suliman/features/global_shopping/controllers/global_order_controller.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_order_model.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
 
 class GlobalOrderTrackingScreen extends StatefulWidget {
   final GlobalOrderModel order;

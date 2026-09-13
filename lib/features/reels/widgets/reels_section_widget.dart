@@ -1,20 +1,20 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/store_verified_avatar.dart';
-import 'package:sixam_mart/features/home/widgets/web/widgets/arrow_icon_button.dart';
-import 'package:sixam_mart/features/reels/controllers/reels_controller.dart';
-import 'package:sixam_mart/features/reels/domain/models/reel_model.dart';
-import 'package:sixam_mart/features/reels/domain/services/reels_service_interface.dart';
-import 'package:sixam_mart/features/reels/widgets/reels_details_dialog_widget.dart';
-import 'package:sixam_mart/features/reels/widgets/reels_shimmer_widget.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/store_verified_avatar.dart';
+import 'package:suliman/features/home/widgets/web/widgets/arrow_icon_button.dart';
+import 'package:suliman/features/reels/controllers/reels_controller.dart';
+import 'package:suliman/features/reels/domain/models/reel_model.dart';
+import 'package:suliman/features/reels/domain/services/reels_service_interface.dart';
+import 'package:suliman/features/reels/widgets/reels_details_dialog_widget.dart';
+import 'package:suliman/features/reels/widgets/reels_shimmer_widget.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
 
 class ReelsSectionWidget extends StatefulWidget {
   final String? title;

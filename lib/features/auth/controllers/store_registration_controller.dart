@@ -1,22 +1,22 @@
-import 'package:file_picker/file_picker.dart';
+﻿import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/business/controllers/business_controller.dart';
-import 'package:sixam_mart/features/business/domain/models/package_model.dart';
-import 'package:sixam_mart/features/home/controllers/home_controller.dart';
-import 'package:sixam_mart/features/location/controllers/location_controller.dart';
-import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_data_model.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
-import 'package:sixam_mart/features/auth/domain/models/store_body_model.dart';
-import 'package:sixam_mart/features/auth/domain/services/store_registration_service_interface.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/business/controllers/business_controller.dart';
+import 'package:suliman/features/business/domain/models/package_model.dart';
+import 'package:suliman/features/home/controllers/home_controller.dart';
+import 'package:suliman/features/location/controllers/location_controller.dart';
+import 'package:suliman/features/location/domain/services/location_service_interface.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/location/domain/models/zone_data_model.dart';
+import 'package:suliman/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/features/auth/domain/models/store_body_model.dart';
+import 'package:suliman/features/auth/domain/services/store_registration_service_interface.dart';
+import 'package:suliman/helper/date_converter.dart';
+import 'package:suliman/helper/route_helper.dart';
 
 enum RegistrationType { store, serviceProvider }
 

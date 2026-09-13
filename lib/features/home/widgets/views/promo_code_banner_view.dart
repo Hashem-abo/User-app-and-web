@@ -1,16 +1,16 @@
-import 'package:carousel_slider/carousel_slider.dart';
+﻿import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
-import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/widgets/custom_ink_well.dart';
+import 'package:suliman/features/coupon/controllers/coupon_controller.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
 
 class PromoCodeBannerView extends StatefulWidget {
   const PromoCodeBannerView({super.key});

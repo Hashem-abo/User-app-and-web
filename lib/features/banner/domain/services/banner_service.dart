@@ -1,11 +1,11 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/banner/domain/models/banner_model.dart';
-import 'package:sixam_mart/features/banner/domain/models/others_banner_model.dart';
-import 'package:sixam_mart/features/banner/domain/models/promotional_banner_model.dart';
-import 'package:sixam_mart/features/banner/domain/repositories/banner_repository_interface.dart';
-import 'package:sixam_mart/features/banner/domain/services/banner_service_interface.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/banner/domain/models/banner_model.dart';
+import 'package:suliman/features/banner/domain/models/others_banner_model.dart';
+import 'package:suliman/features/banner/domain/models/promotional_banner_model.dart';
+import 'package:suliman/features/banner/domain/repositories/banner_repository_interface.dart';
+import 'package:suliman/features/banner/domain/services/banner_service_interface.dart';
+import 'package:suliman/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/helper/address_helper.dart';
 
 class BannerService implements BannerServiceInterface {
   final BannerRepositoryInterface bannerRepositoryInterface;

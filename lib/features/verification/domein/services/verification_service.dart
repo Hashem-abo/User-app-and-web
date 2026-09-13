@@ -1,10 +1,10 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/features/auth/domain/models/auth_response_model.dart';
-import 'package:sixam_mart/features/auth/domain/reposotories/auth_repository_interface.dart';
-import 'package:sixam_mart/features/verification/domein/models/verification_data_model.dart';
-import 'package:sixam_mart/features/verification/domein/reposotories/verification_repository_interface.dart';
-import 'package:sixam_mart/features/verification/domein/services/verification_service_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/features/auth/domain/models/auth_response_model.dart';
+import 'package:suliman/features/auth/domain/reposotories/auth_repository_interface.dart';
+import 'package:suliman/features/verification/domein/models/verification_data_model.dart';
+import 'package:suliman/features/verification/domein/reposotories/verification_repository_interface.dart';
+import 'package:suliman/features/verification/domein/services/verification_service_interface.dart';
 
 class VerificationService implements VerificationServiceInterface {
   final VerificationRepositoryInterface verificationRepoInterface;

@@ -1,15 +1,15 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/features/review/domain/models/review_body_model.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_details_model.dart';
-import 'package:sixam_mart/features/review/domain/services/review_service_interface.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/features/review/domain/models/review_body_model.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
+import 'package:suliman/features/order/domain/models/order_details_model.dart';
+import 'package:suliman/features/review/domain/services/review_service_interface.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
 
 class ReviewController extends GetxController implements GetxService {
   final ReviewServiceInterface reviewServiceInterface;

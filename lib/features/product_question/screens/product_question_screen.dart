@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/product_question/controllers/product_question_controller.dart';
-import 'package:sixam_mart/features/product_question/widgets/product_question_widget.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/product_question/controllers/product_question_controller.dart';
+import 'package:suliman/features/product_question/widgets/product_question_widget.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
+import 'package:suliman/features/auth/controllers/auth_controller.dart';
 
 class ProductQuestionScreen extends StatefulWidget {
   final Item item;

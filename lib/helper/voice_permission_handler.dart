@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sixam_mart/common/widgets/custom_bottom_sheet_widget.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/search/widgets/voice_search_bottom_sheet.dart';
+import 'package:suliman/common/widgets/custom_bottom_sheet_widget.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/search/widgets/voice_search_bottom_sheet.dart';
 
 class VoicePermissionHandler {
 

@@ -1,6 +1,6 @@
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/forum/domain/repositories/forum_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/forum/domain/repositories/forum_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class ForumRepository implements ForumRepositoryInterface {
   final ApiClient apiClient;

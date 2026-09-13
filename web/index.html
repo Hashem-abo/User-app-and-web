@@ -25,7 +25,6 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" type="text/css" href="style.css">
   <script type="application/javascript" src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js" defer></script>
-  <!--<link rel="canonical" href="https://6ammart-web.6amtech.com/" />-->
 
   <script>
     // The value below is injected by flutter build, do not touch.
@@ -82,7 +81,7 @@
     // Check if localStorage is supported in the browser
       if (typeof(Storage) !== "undefined") {
         // Get the item from localStorage
-        var itemValue = localStorage.getItem("flutter.6ammart_theme");
+        var itemValue = localStorage.getItem("flutter.suliman_theme") || localStorage.getItem("flutter.6ammart_theme");
         // Check if the item exists
         if (itemValue !== null) {
           // Check the value of the item

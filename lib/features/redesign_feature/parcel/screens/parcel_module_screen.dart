@@ -1,16 +1,16 @@
-import 'package:flutter/cupertino.dart';
+﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/location/controllers/location_controller.dart';
-import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
-import 'package:sixam_mart/features/redesign_feature/dashboard/widgets/sliver_gap.dart';
-import 'package:sixam_mart/features/redesign_feature/parcel/screens/parcel_category_screen.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/location/controllers/location_controller.dart';
+import 'package:suliman/features/parcel/controllers/parcel_controller.dart';
+import 'package:suliman/features/redesign_feature/dashboard/widgets/sliver_gap.dart';
+import 'package:suliman/features/redesign_feature/parcel/screens/parcel_category_screen.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
 class ParcelModuleScreen extends StatefulWidget {

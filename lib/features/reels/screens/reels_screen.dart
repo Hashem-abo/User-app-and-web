@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/features/reels/widgets/reels_section_widget.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/features/reels/widgets/reels_section_widget.dart';
 
 class ReelsScreen extends StatelessWidget {
   const ReelsScreen({super.key});

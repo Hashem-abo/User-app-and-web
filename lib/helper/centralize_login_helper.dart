@@ -1,5 +1,5 @@
-import 'package:sixam_mart/common/models/config_model.dart';
-import 'package:sixam_mart/features/auth/domain/enum/centralize_login_enum.dart';
+﻿import 'package:suliman/common/models/config_model.dart';
+import 'package:suliman/features/auth/domain/enum/centralize_login_enum.dart';
 
 class CentralizeLoginHelper {
   static ({CentralizeLoginType type, double size}) getPreferredLoginMethod(CentralizeLoginSetup data, bool isOtpViewEnable, {bool calculateWidth = false}) {

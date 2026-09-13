@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
-import 'package:sixam_mart/features/parcel/widgets/get_service_video_widget.dart';
-import 'package:sixam_mart/features/redesign_feature/global_widgets/bottom_sheet_header_widget.dart';
-import 'package:sixam_mart/features/redesign_feature/parcel/screens/parcel_category_screen.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/features/parcel/controllers/parcel_controller.dart';
+import 'package:suliman/features/parcel/widgets/get_service_video_widget.dart';
+import 'package:suliman/features/redesign_feature/global_widgets/bottom_sheet_header_widget.dart';
+import 'package:suliman/features/redesign_feature/parcel/screens/parcel_category_screen.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class EasiestWayToGetServicesBottomSheet extends StatelessWidget {
   const EasiestWayToGetServicesBottomSheet({super.key});

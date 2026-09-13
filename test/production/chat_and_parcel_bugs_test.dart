@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // PRODUCTION TESTS: CHAT, PARCEL & ORDER DETAILS CRASHES & INVARIANTS
 // =============================================================================
 //
@@ -19,9 +19,9 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/chat/domain/models/chat_model.dart';
-import 'package:sixam_mart/features/parcel/domain/models/parcel_category_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_details_model.dart';
+import 'package:suliman/features/chat/domain/models/chat_model.dart';
+import 'package:suliman/features/parcel/domain/models/parcel_category_model.dart';
+import 'package:suliman/features/order/domain/models/order_details_model.dart';
 
 void main() {
   group('[FIXED] Chat, Parcel & OrderDetails decimal string safe parsing', () {

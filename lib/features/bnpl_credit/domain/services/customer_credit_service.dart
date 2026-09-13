@@ -1,6 +1,6 @@
-import 'package:get/get_connect/http/src/response/response.dart';
-import 'package:sixam_mart/features/bnpl_credit/domain/repositories/customer_credit_repository_interface.dart';
-import 'package:sixam_mart/features/bnpl_credit/domain/services/customer_credit_service_interface.dart';
+﻿import 'package:get/get_connect/http/src/response/response.dart';
+import 'package:suliman/features/bnpl_credit/domain/repositories/customer_credit_repository_interface.dart';
+import 'package:suliman/features/bnpl_credit/domain/services/customer_credit_service_interface.dart';
 
 class CustomerCreditService implements CustomerCreditServiceInterface {
   final CustomerCreditRepositoryInterface customerCreditRepositoryInterface;

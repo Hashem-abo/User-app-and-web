@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
 class ZegoCallScreen extends StatelessWidget {
   final String orderId;

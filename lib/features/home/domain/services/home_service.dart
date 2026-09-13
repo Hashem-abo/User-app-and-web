@@ -1,8 +1,8 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/home/domain/models/cashback_model.dart';
-import 'package:sixam_mart/features/home/domain/models/homepage_model.dart';
-import 'package:sixam_mart/features/home/domain/repositories/home_repository_interface.dart';
-import 'package:sixam_mart/features/home/domain/services/home_service_interface.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/home/domain/models/cashback_model.dart';
+import 'package:suliman/features/home/domain/models/homepage_model.dart';
+import 'package:suliman/features/home/domain/repositories/home_repository_interface.dart';
+import 'package:suliman/features/home/domain/services/home_service_interface.dart';
 
 class HomeService implements HomeServiceInterface{
   final HomeRepositoryInterface homeRepositoryInterface;

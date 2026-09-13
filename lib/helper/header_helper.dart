@@ -1,11 +1,11 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class HeaderHelper {
   static Map<String, String> featuredHeader() {

@@ -1,5 +1,5 @@
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:suliman/api/api_client.dart';
+import 'package:suliman/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 

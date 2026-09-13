@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/features/shelf/screens/dynamic_shelf_view_all_screen.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/features/shelf/screens/dynamic_shelf_view_all_screen.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:sixam_mart/features/service/screens/service_provider_screen.dart';
+import 'package:suliman/features/service/screens/service_provider_screen.dart';
 
 class FloatingAdWidget extends StatefulWidget {
   /// When true the ad fades out; when false it fades back in.

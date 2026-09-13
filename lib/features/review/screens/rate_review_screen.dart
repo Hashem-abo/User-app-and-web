@@ -1,17 +1,17 @@
-import 'dart:ui' as ui;
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/features/order/domain/models/order_details_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-import 'package:sixam_mart/features/review/controllers/review_controller.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/menu_drawer.dart';
-import 'package:sixam_mart/features/review/widgets/deliver_man_review_widget.dart';
-import 'package:sixam_mart/features/review/widgets/item_review_widget.dart';
+﻿import 'dart:ui' as ui;
+import 'package:suliman/util/images.dart';
+import 'package:suliman/features/order/domain/models/order_details_model.dart';
+import 'package:suliman/features/order/domain/models/order_model.dart';
+import 'package:suliman/features/review/controllers/review_controller.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/menu_drawer.dart';
+import 'package:suliman/features/review/widgets/deliver_man_review_widget.dart';
+import 'package:suliman/features/review/widgets/item_review_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
+import 'package:suliman/helper/module_helper.dart';
 
 class RateReviewScreen extends StatefulWidget {
   final List<OrderDetailsModel> orderDetailsList;

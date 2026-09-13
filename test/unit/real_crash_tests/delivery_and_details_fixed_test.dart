@@ -1,4 +1,4 @@
-// FIXED BEHAVIOR TESTS: DeliveryMan, OrderDetailsModel, AddOn
+﻿// FIXED BEHAVIOR TESTS: DeliveryMan, OrderDetailsModel, AddOn
 //
 // These were previously CRASH tests that expected NoSuchMethodError.
 // After the fix (null-safe .toDouble()), they now verify correct behavior.
@@ -6,8 +6,8 @@
 // Run with:  flutter test test/unit/real_crash_tests/order_model_null_crash_test.dart
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_details_model.dart' as od;
+import 'package:suliman/features/order/domain/models/order_model.dart';
+import 'package:suliman/features/order/domain/models/order_details_model.dart' as od;
 
 void main() {
   // ---------------------------------------------------------------------------

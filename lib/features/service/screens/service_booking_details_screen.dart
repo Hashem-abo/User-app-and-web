@@ -1,17 +1,17 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/service/controllers/service_controller.dart';
-import 'package:sixam_mart/features/service/domain/models/service_booking_model.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/features/review/widgets/service_review_dialog_widget.dart';
+import 'package:suliman/features/service/controllers/service_controller.dart';
+import 'package:suliman/features/service/domain/models/service_booking_model.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/date_converter.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/features/review/widgets/service_review_dialog_widget.dart';
 
 class ServiceBookingDetailsScreen extends StatefulWidget {
   final int bookingId;

@@ -1,20 +1,20 @@
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/rating_bar.dart';
-import 'package:sixam_mart/common/widgets/readmore_widget.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+﻿import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/rating_bar.dart';
+import 'package:suliman/common/widgets/readmore_widget.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
+import 'package:suliman/helper/date_converter.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
-import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/report/widgets/report_bottom_sheet.dart';
-import 'package:sixam_mart/features/review/controllers/review_controller.dart';
+import 'package:suliman/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/report/widgets/report_bottom_sheet.dart';
+import 'package:suliman/features/review/controllers/review_controller.dart';
 
 class ReviewWidget extends StatelessWidget {
   final ReviewModel review;

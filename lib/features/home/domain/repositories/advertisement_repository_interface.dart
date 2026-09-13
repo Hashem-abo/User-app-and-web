@@ -1,6 +1,6 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/home/domain/models/advertisement_model.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/home/domain/models/advertisement_model.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class AdvertisementRepositoryInterface extends RepositoryInterface{
   @override

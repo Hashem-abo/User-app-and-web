@@ -1,19 +1,19 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
+﻿import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get_connect/connect.dart';
 import 'package:get/get_utils/src/platform/platform.dart';
-import 'package:sixam_mart/api/api_client.dart';
+import 'package:suliman/api/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/auth/domain/models/signup_body_model.dart';
-import 'package:sixam_mart/features/auth/domain/models/social_log_in_body.dart';
-import 'package:sixam_mart/features/auth/domain/reposotories/auth_repository_interface.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/auth/domain/models/signup_body_model.dart';
+import 'package:suliman/features/auth/domain/models/social_log_in_body.dart';
+import 'package:suliman/features/auth/domain/reposotories/auth_repository_interface.dart';
+import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/module_helper.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class AuthRepository implements AuthRepositoryInterface{
   final ApiClient apiClient;

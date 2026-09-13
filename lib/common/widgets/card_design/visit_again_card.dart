@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/add_favourite_view.dart';
-import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
-import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/store/screens/store_screen.dart';
-import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
+import 'package:suliman/common/widgets/add_favourite_view.dart';
+import 'package:suliman/common/widgets/custom_ink_well.dart';
+import 'package:suliman/common/widgets/hover/text_hover.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/store/screens/store_screen.dart';
+import 'package:suliman/common/widgets/vendor_type_badge_widget.dart';
 
 class VisitAgainCard extends StatelessWidget {
   final Store store;

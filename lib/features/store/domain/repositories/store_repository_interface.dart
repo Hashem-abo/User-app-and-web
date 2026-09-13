@@ -1,7 +1,7 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
-import 'package:sixam_mart/features/store/domain/models/store_category_items_model.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
+import 'package:suliman/features/store/domain/models/store_category_items_model.dart';
 
 abstract class StoreRepositoryInterface extends RepositoryInterface {
   @override

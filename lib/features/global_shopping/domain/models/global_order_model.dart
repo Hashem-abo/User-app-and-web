@@ -1,4 +1,4 @@
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
+﻿import 'package:suliman/features/address/domain/models/address_model.dart';
 
 class GlobalOrderModel {
   int? id;

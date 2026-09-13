@@ -1,4 +1,4 @@
-// PRODUCTION TESTS: ResponsiveHelper & Item.fromJson (All Fixes Verified)
+﻿// PRODUCTION TESTS: ResponsiveHelper & Item.fromJson (All Fixes Verified)
 //
 // Verifies:
 // 1. ResponsiveHelper.isMobile/isTab/isDesktop safely handle null context without throwing.
@@ -8,8 +8,8 @@
 // Run with:  flutter test test/unit/real_crash_tests/responsive_helper_and_item_crash_test.dart
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
 
 void main() {
   // ---------------------------------------------------------------------------

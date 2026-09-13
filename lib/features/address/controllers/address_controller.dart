@@ -1,10 +1,10 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/address/domain/services/address_service_interface.dart';
-import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/models/response_model.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/address/domain/services/address_service_interface.dart';
+import 'package:suliman/features/checkout/controllers/checkout_controller.dart';
+import 'package:suliman/helper/address_helper.dart';
 
 class AddressController extends GetxController implements GetxService {
   final AddressServiceInterface addressServiceInterface;

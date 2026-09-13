@@ -1,12 +1,12 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/store/domain/models/cart_suggested_item_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/store/domain/models/recommended_product_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_banner_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_category_items_model.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/store/domain/models/cart_suggested_item_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/store/domain/models/recommended_product_model.dart';
+import 'package:suliman/features/store/domain/models/store_banner_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/features/store/domain/models/store_category_items_model.dart';
 
 abstract class StoreServiceInterface {
   Future<StoreModel?> getStoreList(int offset, String filterBy, String storeType, {required DataSourceEnum source});

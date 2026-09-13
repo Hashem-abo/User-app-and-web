@@ -1,10 +1,10 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/business/domain/models/business_plan_body.dart';
-import 'package:sixam_mart/features/business/domain/models/package_model.dart';
-import 'package:sixam_mart/features/business/domain/repositories/business_repo_interface.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/business/domain/models/business_plan_body.dart';
+import 'package:suliman/features/business/domain/models/package_model.dart';
+import 'package:suliman/features/business/domain/repositories/business_repo_interface.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/app_constants.dart';
 import 'package:universal_html/html.dart' as html;
 
 class BusinessRepo implements BusinessRepoInterface<dynamic> {

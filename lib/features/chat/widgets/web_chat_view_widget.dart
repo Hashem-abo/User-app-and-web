@@ -1,26 +1,26 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/chat/controllers/chat_controller.dart';
-import 'package:sixam_mart/features/chat/enums/user_type_enum.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
-import 'package:sixam_mart/features/chat/domain/models/conversation_model.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/common/widgets/not_logged_in_screen.dart';
-import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
-import 'package:sixam_mart/common/widgets/web_search_field.dart';
-import 'package:sixam_mart/features/chat/widgets/chatting_shimmer.dart';
-import 'package:sixam_mart/features/chat/widgets/message_bubble_widget.dart';
-import 'package:sixam_mart/features/chat/widgets/web_conversation_list_view_widget.dart';
+import 'package:suliman/features/chat/controllers/chat_controller.dart';
+import 'package:suliman/features/chat/enums/user_type_enum.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/notification/domain/models/notification_body_model.dart';
+import 'package:suliman/features/chat/domain/models/conversation_model.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/widgets/footer_view.dart';
+import 'package:suliman/common/widgets/not_logged_in_screen.dart';
+import 'package:suliman/common/widgets/paginated_list_view.dart';
+import 'package:suliman/common/widgets/web_search_field.dart';
+import 'package:suliman/features/chat/widgets/chatting_shimmer.dart';
+import 'package:suliman/features/chat/widgets/message_bubble_widget.dart';
+import 'package:suliman/features/chat/widgets/web_conversation_list_view_widget.dart';
 
 
 class WebChatViewWidget extends StatefulWidget {

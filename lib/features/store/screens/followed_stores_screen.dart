@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
-import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/common/widgets/card_design/store_card.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
+import 'package:suliman/features/store/controllers/store_controller.dart';
+import 'package:suliman/common/widgets/card_design/store_card.dart';
+import 'package:suliman/util/dimensions.dart';
 
 class FollowedStoresScreen extends StatefulWidget {
   const FollowedStoresScreen({super.key});

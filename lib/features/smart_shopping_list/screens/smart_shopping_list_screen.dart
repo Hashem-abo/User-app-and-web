@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/features/cart/screens/cart_screen.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/smart_shopping_list/controllers/smart_shopping_list_controller.dart';
-import 'package:sixam_mart/features/smart_shopping_list/widgets/smart_product_card.dart';
-import 'package:sixam_mart/features/smart_shopping_list/widgets/smart_shopping_list_input_sheet.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
+import 'package:suliman/features/cart/controllers/cart_controller.dart';
+import 'package:suliman/features/cart/screens/cart_screen.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/smart_shopping_list/controllers/smart_shopping_list_controller.dart';
+import 'package:suliman/features/smart_shopping_list/widgets/smart_product_card.dart';
+import 'package:suliman/features/smart_shopping_list/widgets/smart_shopping_list_input_sheet.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class SmartShoppingListScreen extends StatelessWidget {
   const SmartShoppingListScreen({super.key});

@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
-import 'package:sixam_mart/common/widgets/not_logged_in_screen.dart';
-import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
-import 'package:sixam_mart/features/suggestion/controllers/suggestion_controller.dart';
-import 'package:sixam_mart/features/suggestion/domain/models/suggestion_model.dart';
-import 'package:sixam_mart/features/suggestion/widgets/suggestion_widget.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/footer_view.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
+import 'package:suliman/common/widgets/not_logged_in_screen.dart';
+import 'package:suliman/common/widgets/paginated_list_view.dart';
+import 'package:suliman/features/suggestion/controllers/suggestion_controller.dart';
+import 'package:suliman/features/suggestion/domain/models/suggestion_model.dart';
+import 'package:suliman/features/suggestion/widgets/suggestion_widget.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class MySuggestionsScreen extends StatefulWidget {
   const MySuggestionsScreen({super.key});

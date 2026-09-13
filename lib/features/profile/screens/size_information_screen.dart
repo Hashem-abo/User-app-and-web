@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/profile/screens/edit_size_screen.dart';
-import 'package:sixam_mart/features/profile/screens/preference_screen.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/profile/screens/edit_size_screen.dart';
+import 'package:suliman/features/profile/screens/preference_screen.dart';
+import 'package:suliman/util/styles.dart';
 
 class SizeInformationScreen extends StatefulWidget {
   const SizeInformationScreen({super.key});

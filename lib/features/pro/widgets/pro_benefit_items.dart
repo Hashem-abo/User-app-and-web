@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/pro/domain/models/pro_active_offer_model.dart';
-import 'package:sixam_mart/features/pro/domain/models/pro_plan_model.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/pro/domain/models/pro_active_offer_model.dart';
+import 'package:suliman/features/pro/domain/models/pro_plan_model.dart';
+import 'package:suliman/helper/module_helper.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class ProBenefitItems {
   ProBenefitItems._();

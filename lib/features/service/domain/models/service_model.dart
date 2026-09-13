@@ -1,5 +1,5 @@
-import 'package:sixam_mart/features/service/domain/models/service_provider_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_category_model.dart';
+﻿import 'package:suliman/features/service/domain/models/service_provider_model.dart';
+import 'package:suliman/features/service/domain/models/service_category_model.dart';
 
 class ServiceModel {
   int? totalSize;

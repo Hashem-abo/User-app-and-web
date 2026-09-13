@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/notification/domain/models/notification_model.dart';
-import 'package:sixam_mart/features/notification/domain/repository/notification_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/notification/domain/models/notification_model.dart';
+import 'package:suliman/features/notification/domain/repository/notification_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class NotificationRepository implements NotificationRepositoryInterface {
   final ApiClient apiClient;

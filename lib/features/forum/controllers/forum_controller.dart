@@ -1,6 +1,6 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/forum/domain/models/forum_post_model.dart';
-import 'package:sixam_mart/features/forum/domain/services/forum_service_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/forum/domain/models/forum_post_model.dart';
+import 'package:suliman/features/forum/domain/services/forum_service_interface.dart';
 
 class ForumController extends GetxController implements GetxService {
   final ForumServiceInterface forumServiceInterface;

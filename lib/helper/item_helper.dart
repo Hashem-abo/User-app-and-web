@@ -1,6 +1,6 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
 class ItemHelper {
   static bool isItemEntirelyOutOfStock(Item? item) {

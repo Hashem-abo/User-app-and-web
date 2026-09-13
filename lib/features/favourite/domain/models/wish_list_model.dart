@@ -1,4 +1,4 @@
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
+﻿import 'package:suliman/features/cart/domain/models/cart_model.dart';
 
 class WishListModel {
   String? id;

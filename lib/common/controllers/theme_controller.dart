@@ -1,12 +1,12 @@
-import 'package:flutter/services.dart';
+﻿import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/util/app_constants.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:sixam_mart/theme/light_theme.dart';
-import 'package:sixam_mart/theme/dark_theme.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/theme/light_theme.dart';
+import 'package:suliman/theme/dark_theme.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
 class ThemeController extends GetxController implements GetxService {
   final SharedPreferences sharedPreferences;

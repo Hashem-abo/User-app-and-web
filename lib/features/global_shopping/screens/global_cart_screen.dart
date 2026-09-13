@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/global_shopping/controllers/global_cart_controller.dart';
-import 'package:sixam_mart/features/global_shopping/screens/global_checkout_screen.dart';
-import 'package:sixam_mart/features/global_shopping/widgets/global_cart_item_widget.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
+import 'package:suliman/features/global_shopping/controllers/global_cart_controller.dart';
+import 'package:suliman/features/global_shopping/screens/global_checkout_screen.dart';
+import 'package:suliman/features/global_shopping/widgets/global_cart_item_widget.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
 
 class GlobalCartScreen extends StatefulWidget {
   const GlobalCartScreen({super.key});

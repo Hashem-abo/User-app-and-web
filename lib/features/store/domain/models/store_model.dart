@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/vendor_type_helper.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/vendor_type_helper.dart';
+import 'package:suliman/helper/module_helper.dart';
 
 class StoreModel {
   int? totalSize;

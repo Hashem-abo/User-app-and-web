@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/rating_bar.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/rating_bar.dart';
 
 class ReviewDialogWidget extends StatelessWidget {
   final ReviewModel review;

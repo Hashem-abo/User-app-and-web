@@ -1,11 +1,11 @@
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/service/domain/models/service_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_category_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_provider_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_booking_model.dart';
-import 'package:sixam_mart/features/service/domain/repositories/service_repository_interface.dart';
-import 'package:sixam_mart/features/service/domain/services/service_service_interface.dart';
+﻿import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/service/domain/models/service_model.dart';
+import 'package:suliman/features/service/domain/models/service_category_model.dart';
+import 'package:suliman/features/service/domain/models/service_provider_model.dart';
+import 'package:suliman/features/service/domain/models/service_booking_model.dart';
+import 'package:suliman/features/service/domain/repositories/service_repository_interface.dart';
+import 'package:suliman/features/service/domain/services/service_service_interface.dart';
 
 class ServiceService implements ServiceServiceInterface {
   final ServiceRepositoryInterface serviceRepositoryInterface;

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:sixam_mart/util/images.dart';
+import 'package:suliman/util/images.dart';
 
 class CustomLoaderWidget extends StatelessWidget {
   final double size;

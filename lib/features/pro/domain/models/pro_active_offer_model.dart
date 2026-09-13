@@ -1,4 +1,4 @@
-import 'package:sixam_mart/helper/type_converter_helper.dart';
+﻿import 'package:suliman/helper/type_converter_helper.dart';
 
 class ProActiveOfferModel {
   bool? status;

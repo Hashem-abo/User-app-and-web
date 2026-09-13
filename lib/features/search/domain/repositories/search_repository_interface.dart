@@ -1,6 +1,6 @@
-import 'package:sixam_mart/features/search/domain/models/popular_categories_model.dart';
-import 'package:sixam_mart/features/search/domain/models/search_suggestion_model.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:suliman/features/search/domain/models/popular_categories_model.dart';
+import 'package:suliman/features/search/domain/models/search_suggestion_model.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class SearchRepositoryInterface extends RepositoryInterface {
   Future<bool> saveSearchHistory(List<String> searchHistories);

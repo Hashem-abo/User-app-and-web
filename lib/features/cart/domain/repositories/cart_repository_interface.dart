@@ -1,5 +1,5 @@
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class CartRepositoryInterface<OnlineCart> extends RepositoryInterface<OnlineCart> {
   Future<void> addSharedPrefCartList(List<CartModel> cartProductList);

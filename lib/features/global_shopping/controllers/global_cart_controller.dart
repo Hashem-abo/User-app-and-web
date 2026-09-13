@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_cart_item_model.dart';
-import 'package:sixam_mart/features/global_shopping/domain/services/global_shopping_service_interface.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_cart_item_model.dart';
+import 'package:suliman/features/global_shopping/domain/services/global_shopping_service_interface.dart';
+import 'package:suliman/helper/auth_helper.dart';
 
 class GlobalCartController extends GetxController implements GetxService {
   final GlobalShoppingServiceInterface service;

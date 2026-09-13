@@ -1,4 +1,4 @@
-import 'package:sixam_mart/features/profile/domain/models/userinfo_model.dart';
+﻿import 'package:suliman/features/profile/domain/models/userinfo_model.dart';
 
 class CustomerSuggestionModel {
   int? totalSize;

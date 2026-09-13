@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
-import 'package:sixam_mart/features/order/widgets/monthly_item_tile.dart';
-import 'package:sixam_mart/features/order/widgets/monthly_order_actions.dart';
-import 'package:sixam_mart/features/order/widgets/monthly_order_menu_button.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/order/domain/models/monthly_order_model.dart';
+import 'package:suliman/features/order/widgets/monthly_item_tile.dart';
+import 'package:suliman/features/order/widgets/monthly_order_actions.dart';
+import 'package:suliman/features/order/widgets/monthly_order_menu_button.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class MonthlyStoreCard extends StatelessWidget {
   final MonthlyOrder order;

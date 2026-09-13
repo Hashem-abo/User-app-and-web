@@ -1,4 +1,4 @@
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class FavouriteRepositoryInterface<ResponseModel> implements RepositoryInterface<ResponseModel> {
   @override

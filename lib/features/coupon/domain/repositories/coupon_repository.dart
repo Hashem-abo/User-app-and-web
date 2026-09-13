@@ -1,9 +1,9 @@
-import 'package:get/get.dart';
+﻿import 'package:get/get.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/coupon/domain/models/coupon_model.dart';
-import 'package:sixam_mart/features/coupon/domain/repositories/coupon_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/coupon/domain/models/coupon_model.dart';
+import 'package:suliman/features/coupon/domain/repositories/coupon_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class CouponRepository implements CouponRepositoryInterface {
   final ApiClient apiClient;

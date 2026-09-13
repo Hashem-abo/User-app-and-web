@@ -1,4 +1,4 @@
-// PRODUCTION TESTS: PriceConverter & CustomValidator (All Fixes Verified)
+﻿// PRODUCTION TESTS: PriceConverter & CustomValidator (All Fixes Verified)
 //
 // Verifies:
 // 1. PriceConverter.convertWithDiscount and calculation handle null arguments safely.
@@ -8,8 +8,8 @@
 // Run with:  flutter test test/unit/real_crash_tests/price_converter_crash_test.dart
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/custom_validator.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/custom_validator.dart';
 
 void main() {
   // ---------------------------------------------------------------------------

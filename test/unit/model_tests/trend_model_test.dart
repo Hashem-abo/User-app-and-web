@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/trends/domain/models/trend_model.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:suliman/features/trends/domain/models/trend_model.dart';
 
 void main() {
   group('TrendHashtagModel Deserialization & Serialization', () {

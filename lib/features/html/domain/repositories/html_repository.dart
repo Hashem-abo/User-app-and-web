@@ -1,9 +1,9 @@
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/util/app_constants.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/util/html_type.dart';
-import 'package:sixam_mart/features/html/domain/repositories/html_repository_interface.dart';
+import 'package:suliman/util/html_type.dart';
+import 'package:suliman/features/html/domain/repositories/html_repository_interface.dart';
 
 class HtmlRepository implements HtmlRepositoryInterface {
   final ApiClient apiClient;

@@ -1,18 +1,18 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/features/cart/controllers/cart_controller.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/features/favourite/controllers/favourite_controller.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
 
-import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
+import 'package:suliman/features/contact_share/screens/contact_share_sheet.dart';
 
 class DetailsAppBarWidget extends StatefulWidget implements PreferredSizeWidget {
   final String? title;

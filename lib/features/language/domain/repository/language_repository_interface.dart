@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/interfaces/repository_interface.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/interfaces/repository_interface.dart';
 
 abstract class LanguageRepositoryInterface extends RepositoryInterface {
   AddressModel? getAddressFormSharedPref();

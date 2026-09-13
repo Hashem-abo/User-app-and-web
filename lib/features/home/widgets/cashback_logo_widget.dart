@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
+import 'package:suliman/util/images.dart';
+import 'package:suliman/util/styles.dart';
 class CashBackLogoWidget extends StatelessWidget {
   const CashBackLogoWidget({super.key});
 

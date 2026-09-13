@@ -1,12 +1,12 @@
-import 'package:sixam_mart/features/home/domain/models/store_corner_model.dart';
+﻿import 'package:suliman/features/home/domain/models/store_corner_model.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:get/get.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/common/widgets/card_design/item_card.dart';
 
 class StoreCornerView extends StatefulWidget {
   final StoreCornerModel? storeCorner;

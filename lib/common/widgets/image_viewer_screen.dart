@@ -1,12 +1,12 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/util/app_constants.dart';
-import 'package:sixam_mart/helper/color_converter.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/util/app_constants.dart';
+import 'package:suliman/helper/color_converter.dart';
 
 class ImageViewerScreen extends StatefulWidget {
   final Item item;

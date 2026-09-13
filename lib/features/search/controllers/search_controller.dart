@@ -1,22 +1,22 @@
-import 'dart:async';
+﻿import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/search/domain/models/popular_categories_model.dart';
-import 'package:sixam_mart/features/search/domain/models/search_suggestion_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/search/domain/models/popular_categories_model.dart';
+import 'package:suliman/features/search/domain/models/search_suggestion_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/search/domain/services/search_service_interface.dart';
-import 'package:sixam_mart/features/search/domain/services/openai_service.dart';
-import 'package:sixam_mart/features/search/widgets/image_source_bottom_sheet.dart';
-import 'package:sixam_mart/features/search/screens/noon_vision_screen.dart';
+import 'package:suliman/features/search/domain/services/search_service_interface.dart';
+import 'package:suliman/features/search/domain/services/openai_service.dart';
+import 'package:suliman/features/search/widgets/image_source_bottom_sheet.dart';
+import 'package:suliman/features/search/screens/noon_vision_screen.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:image_picker/image_picker.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/service/controllers/service_controller.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/service/controllers/service_controller.dart';
 
 class SearchController extends GetxController implements GetxService {
   final SearchServiceInterface searchServiceInterface;

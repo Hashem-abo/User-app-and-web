@@ -1,11 +1,11 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/search/domain/models/popular_categories_model.dart';
-import 'package:sixam_mart/features/search/domain/models/search_suggestion_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/features/search/domain/repositories/search_repository_interface.dart';
-import 'package:sixam_mart/features/search/domain/services/search_service_interface.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/search/domain/models/popular_categories_model.dart';
+import 'package:suliman/features/search/domain/models/search_suggestion_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/features/search/domain/repositories/search_repository_interface.dart';
+import 'package:suliman/features/search/domain/services/search_service_interface.dart';
+import 'package:suliman/helper/date_converter.dart';
 
 class SearchService implements SearchServiceInterface {
   final SearchRepositoryInterface searchRepositoryInterface;

@@ -1,8 +1,8 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/api/cancellation_token.dart';
-import 'package:sixam_mart/api/lru_memory_cache.dart';
-import 'package:sixam_mart/api/data_module_manager.dart';
-import 'package:sixam_mart/common/models/tab_pagination_state.dart';
+﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:suliman/api/cancellation_token.dart';
+import 'package:suliman/api/lru_memory_cache.dart';
+import 'package:suliman/api/data_module_manager.dart';
+import 'package:suliman/common/models/tab_pagination_state.dart';
 
 void main() {
   group('CancellationToken Tests', () {

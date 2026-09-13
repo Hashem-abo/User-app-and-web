@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:suliman/common/widgets/vendor_type_badge_widget.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
 
 void main() {
   group('VendorTypeHelper & VendorTypeBadgeWidget Comprehensive Tests', () {

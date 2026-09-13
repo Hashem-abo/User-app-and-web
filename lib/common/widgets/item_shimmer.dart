@@ -1,6 +1,6 @@
-import 'package:shimmer_animation/shimmer_animation.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+﻿import 'package:shimmer_animation/shimmer_animation.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:flutter/material.dart';
 
 class ItemShimmer extends StatelessWidget {

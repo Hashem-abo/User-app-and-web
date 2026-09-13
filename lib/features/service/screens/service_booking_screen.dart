@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/address/controllers/address_controller.dart';
-import 'package:sixam_mart/features/service/controllers/service_controller.dart';
-import 'package:sixam_mart/features/service/domain/models/service_model.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
+import 'package:suliman/features/address/controllers/address_controller.dart';
+import 'package:suliman/features/service/controllers/service_controller.dart';
+import 'package:suliman/features/service/domain/models/service_model.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/date_converter.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
 
 class ServiceBookingScreen extends StatefulWidget {
   final int serviceId;

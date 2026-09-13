@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
+import 'package:suliman/util/dimensions.dart';
 
 class CustomIconLayout extends StatelessWidget {
   final double height;

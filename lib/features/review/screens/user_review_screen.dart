@@ -1,17 +1,17 @@
-
+﻿
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/common/widgets/menu_drawer.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
-import 'package:sixam_mart/features/review/controllers/review_controller.dart';
-import 'package:sixam_mart/features/review/widgets/user_review_widget.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/not_logged_in_screen.dart';
-import 'package:sixam_mart/features/review/domain/models/review_model.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/footer_view.dart';
+import 'package:suliman/common/widgets/menu_drawer.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
+import 'package:suliman/features/review/controllers/review_controller.dart';
+import 'package:suliman/features/review/widgets/user_review_widget.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/common/widgets/not_logged_in_screen.dart';
+import 'package:suliman/features/review/domain/models/review_model.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/util/styles.dart';
 
 class UserReviewScreen extends StatefulWidget {
   const UserReviewScreen({super.key});

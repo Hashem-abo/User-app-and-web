@@ -1,6 +1,6 @@
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/features/product_question/domain/repositories/product_question_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+﻿import 'package:suliman/api/api_client.dart';
+import 'package:suliman/features/product_question/domain/repositories/product_question_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class ProductQuestionRepository implements ProductQuestionRepositoryInterface {
   final ApiClient apiClient;

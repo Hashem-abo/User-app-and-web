@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/models/transaction_model.dart';
-import 'package:sixam_mart/features/wallet/domain/models/fund_bonus_model.dart';
-import 'package:sixam_mart/features/wallet/domain/repositories/wallet_repository_interface.dart';
-import 'package:sixam_mart/features/wallet/domain/services/wallet_service_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/models/transaction_model.dart';
+import 'package:suliman/features/wallet/domain/models/fund_bonus_model.dart';
+import 'package:suliman/features/wallet/domain/repositories/wallet_repository_interface.dart';
+import 'package:suliman/features/wallet/domain/services/wallet_service_interface.dart';
 
 class WalletService implements WalletServiceInterface {
   final WalletRepositoryInterface walletRepositoryInterface;

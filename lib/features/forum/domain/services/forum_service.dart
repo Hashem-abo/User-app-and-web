@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/forum/domain/models/forum_post_model.dart';
-import 'package:sixam_mart/features/forum/domain/repositories/forum_repository_interface.dart';
-import 'package:sixam_mart/features/forum/domain/services/forum_service_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/forum/domain/models/forum_post_model.dart';
+import 'package:suliman/features/forum/domain/repositories/forum_repository_interface.dart';
+import 'package:suliman/features/forum/domain/services/forum_service_interface.dart';
 
 class ForumService implements ForumServiceInterface {
   final ForumRepositoryInterface forumRepository;

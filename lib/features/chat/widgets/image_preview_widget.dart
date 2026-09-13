@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
-import 'package:sixam_mart/features/chat/domain/models/chat_model.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
+import 'package:suliman/features/chat/domain/models/chat_model.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
 
 class ImagePreviewWidget extends StatefulWidget {
   final Message currentMessage;

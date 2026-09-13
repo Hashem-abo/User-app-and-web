@@ -1,11 +1,11 @@
-import 'package:sixam_mart/features/notification/controllers/notification_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/menu_drawer.dart';
-import 'package:sixam_mart/common/widgets/not_logged_in_screen.dart';
-import 'package:sixam_mart/features/notification/widgets/notification_content_view.dart';
+﻿import 'package:suliman/features/notification/controllers/notification_controller.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/menu_drawer.dart';
+import 'package:suliman/common/widgets/not_logged_in_screen.dart';
+import 'package:suliman/features/notification/widgets/notification_content_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

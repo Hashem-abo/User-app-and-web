@@ -1,4 +1,4 @@
-import 'package:sixam_mart/api/cancellation_token.dart';
+﻿import 'package:suliman/api/cancellation_token.dart';
 
 /// Encapsulates isolated pagination and lifecycle state for a specific tab or filter category.
 /// Guarantees that offsets, items, and in-flight cancellation tokens remain isolated per tab.

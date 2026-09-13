@@ -1,4 +1,4 @@
-// PRODUCTION TESTS: CartModel (All Fixes Verified)
+﻿// PRODUCTION TESTS: CartModel (All Fixes Verified)
 //
 // Verifies:
 // 1. price null in CartModel.fromJson defaults safely to 0.0.
@@ -8,8 +8,8 @@
 // Run with:  flutter test test/unit/real_crash_tests/cart_model_crash_test.dart
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
 
 void main() {
   group('[FIXED] CartModel.fromJson – price null safety', () {

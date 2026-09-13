@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/global_shopping/controllers/global_cart_controller.dart';
-import 'package:sixam_mart/features/global_shopping/controllers/global_order_controller.dart';
-import 'package:sixam_mart/features/global_shopping/screens/global_order_list_screen.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:suliman/features/global_shopping/controllers/global_cart_controller.dart';
+import 'package:suliman/features/global_shopping/controllers/global_order_controller.dart';
+import 'package:suliman/features/global_shopping/screens/global_order_list_screen.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
 
 class GlobalCheckoutScreen extends StatefulWidget {
   const GlobalCheckoutScreen({super.key});

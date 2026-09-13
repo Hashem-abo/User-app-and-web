@@ -1,18 +1,18 @@
-import 'package:sixam_mart/common/widgets/cart_count_view.dart';
-import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
+﻿import 'package:suliman/common/widgets/cart_count_view.dart';
+import 'package:suliman/common/widgets/custom_ink_well.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/features/favourite/controllers/favourite_controller.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
+import 'package:suliman/common/widgets/custom_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
 
 class RecommendedStoreItemWidget extends StatelessWidget {
   final Item item;

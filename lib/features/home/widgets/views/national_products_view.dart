@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:sixam_mart/common/widgets/card_design/item_card.dart'; // + ahmed
-import 'package:sixam_mart/helper/responsive_helper.dart'; // + ahmed
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart'; // + ahmed
-import 'package:sixam_mart/util/app_constants.dart'; // + ahmed
+﻿import 'package:flutter/material.dart';
+import 'package:suliman/common/widgets/card_design/item_card.dart'; // + ahmed
+import 'package:suliman/helper/responsive_helper.dart'; // + ahmed
+import 'package:suliman/features/splash/controllers/splash_controller.dart'; // + ahmed
+import 'package:suliman/util/app_constants.dart'; // + ahmed
 import 'package:get/get.dart';
 import 'package:sliver_tools/sliver_tools.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/item/controllers/item_controller.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/item/controllers/item_controller.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 
 class NationalProductsView extends StatefulWidget {

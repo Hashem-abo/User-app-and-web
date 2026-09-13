@@ -1,13 +1,13 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/common/widgets/menu_drawer.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
-import 'package:sixam_mart/features/forum/controllers/forum_controller.dart';
-import 'package:sixam_mart/features/forum/widgets/forum_card_widget.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_app_bar.dart';
+import 'package:suliman/common/widgets/footer_view.dart';
+import 'package:suliman/common/widgets/menu_drawer.dart';
+import 'package:suliman/common/widgets/no_data_screen.dart';
+import 'package:suliman/features/forum/controllers/forum_controller.dart';
+import 'package:suliman/features/forum/widgets/forum_card_widget.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class ForumScreen extends StatefulWidget {
   const ForumScreen({super.key});

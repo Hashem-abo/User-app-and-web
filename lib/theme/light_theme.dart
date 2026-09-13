@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:suliman/common/controllers/theme_controller.dart';
 
 ThemeData light({Color color = const Color(0xFFFF7A21), Color disabledColor = const Color(0xFF9F9F9F), Color hintColor = const Color(0xFF9F9F9F), Color cardColor = Colors.white, Color textColor = const Color(0xFF000000), String? fontFamily}) => ThemeData(
   fontFamily: fontFamily ?? Get.find<ThemeController>().fontFamily,

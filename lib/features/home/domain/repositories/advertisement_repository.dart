@@ -1,13 +1,13 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 
 import 'package:get/get.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/api/local_client.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/home/domain/models/advertisement_model.dart';
-import 'package:sixam_mart/features/home/domain/repositories/advertisement_repository_interface.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/api/local_client.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/home/domain/models/advertisement_model.dart';
+import 'package:suliman/features/home/domain/repositories/advertisement_repository_interface.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class AdvertisementRepository implements AdvertisementRepositoryInterface {
   final ApiClient apiClient;

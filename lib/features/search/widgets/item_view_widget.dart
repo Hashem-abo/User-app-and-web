@@ -1,16 +1,16 @@
-import 'package:sixam_mart/features/service/widgets/service_provider_widget.dart';
-import 'package:sixam_mart/features/service/widgets/service_widget.dart';
-import 'package:sixam_mart/features/search/controllers/search_controller.dart' as search;
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
+﻿import 'package:suliman/features/service/widgets/service_provider_widget.dart';
+import 'package:suliman/features/service/widgets/service_widget.dart';
+import 'package:suliman/features/search/controllers/search_controller.dart' as search;
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/common/widgets/footer_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/service/controllers/service_controller.dart';
-import 'package:sixam_mart/common/widgets/item_view.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/common/widgets/web_item_view.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/service/controllers/service_controller.dart';
+import 'package:suliman/common/widgets/item_view.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/common/widgets/web_item_view.dart';
 
 class ItemViewWidget extends StatelessWidget {
   final bool isItem;

@@ -1,6 +1,6 @@
-import 'package:sixam_mart/features/global_shopping/domain/models/global_product_model.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_cart_item_model.dart';
-import 'package:sixam_mart/features/global_shopping/domain/models/global_order_model.dart';
+﻿import 'package:suliman/features/global_shopping/domain/models/global_product_model.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_cart_item_model.dart';
+import 'package:suliman/features/global_shopping/domain/models/global_order_model.dart';
 
 abstract class GlobalShoppingServiceInterface {
   Future<List<GlobalProductModel>?> searchProducts(String source, String query, int page);

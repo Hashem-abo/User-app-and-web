@@ -1,13 +1,13 @@
-import 'package:geolocator/geolocator.dart';
+﻿import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/search/domain/services/search_service_interface.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/store/controllers/store_controller.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/helper/address_helper.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/search/domain/services/search_service_interface.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
+import 'package:suliman/features/store/controllers/store_controller.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/helper/address_helper.dart';
 
 class CandidateStoreInfo {
   final int storeId;

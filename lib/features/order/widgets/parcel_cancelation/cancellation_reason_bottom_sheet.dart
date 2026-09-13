@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_bottom_sheet_widget.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/custom_text_field.dart';
-import 'package:sixam_mart/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart/features/order/widgets/parcel_cancelation/custom_check_box_widget.dart';
-import 'package:sixam_mart/features/order/widgets/parcel_cancelation/parcel_cancel_confirm_bottom_sheet.dart';
-import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/common/widgets/custom_bottom_sheet_widget.dart';
+import 'package:suliman/common/widgets/custom_button.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
+import 'package:suliman/common/widgets/custom_text_field.dart';
+import 'package:suliman/features/order/controllers/order_controller.dart';
+import 'package:suliman/features/order/widgets/parcel_cancelation/custom_check_box_widget.dart';
+import 'package:suliman/features/order/widgets/parcel_cancelation/parcel_cancel_confirm_bottom_sheet.dart';
+import 'package:suliman/features/parcel/controllers/parcel_controller.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class CancellationReasonBottomSheet extends StatefulWidget {
   final bool isBeforePickup;

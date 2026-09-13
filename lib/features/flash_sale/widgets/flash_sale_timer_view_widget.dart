@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/flash_sale/widgets/timer_widget.dart';
+import 'package:suliman/features/flash_sale/widgets/timer_widget.dart';
 
 class FlashSaleTimerView extends StatelessWidget {
   final Duration? eventDuration;

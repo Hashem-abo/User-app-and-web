@@ -1,14 +1,14 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:sixam_mart/api/api_client.dart';
-import 'package:sixam_mart/api/local_client.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/service/domain/models/service_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_category_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_provider_model.dart';
-import 'package:sixam_mart/features/service/domain/models/service_booking_model.dart';
-import 'package:sixam_mart/features/service/domain/repositories/service_repository_interface.dart';
-import 'package:sixam_mart/util/app_constants.dart';
+import 'package:suliman/api/api_client.dart';
+import 'package:suliman/api/local_client.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/service/domain/models/service_model.dart';
+import 'package:suliman/features/service/domain/models/service_category_model.dart';
+import 'package:suliman/features/service/domain/models/service_provider_model.dart';
+import 'package:suliman/features/service/domain/models/service_booking_model.dart';
+import 'package:suliman/features/service/domain/repositories/service_repository_interface.dart';
+import 'package:suliman/util/app_constants.dart';
 
 class ServiceRepository implements ServiceRepositoryInterface {
   final ApiClient apiClient;

@@ -1,8 +1,8 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/common/enums/data_source_enum.dart';
-import 'package:sixam_mart/features/shelf/domain/models/shelf_model.dart';
-import 'package:sixam_mart/features/shelf/domain/services/shelf_service_interface.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/common/enums/data_source_enum.dart';
+import 'package:suliman/features/shelf/domain/models/shelf_model.dart';
+import 'package:suliman/features/shelf/domain/services/shelf_service_interface.dart';
+import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
 class ShelfController extends GetxController implements GetxService {
   final ShelfServiceInterface shelfServiceInterface;

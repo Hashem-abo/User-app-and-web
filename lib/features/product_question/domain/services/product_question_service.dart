@@ -1,7 +1,7 @@
-import 'package:sixam_mart/features/product_question/domain/models/product_question_model.dart';
-import 'package:sixam_mart/features/product_question/domain/repositories/product_question_repository_interface.dart';
-import 'package:sixam_mart/features/product_question/domain/services/product_question_service_interface.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
+﻿import 'package:suliman/features/product_question/domain/models/product_question_model.dart';
+import 'package:suliman/features/product_question/domain/repositories/product_question_repository_interface.dart';
+import 'package:suliman/features/product_question/domain/services/product_question_service_interface.dart';
+import 'package:suliman/common/models/response_model.dart';
 
 class ProductQuestionService implements ProductQuestionServiceInterface {
   final ProductQuestionRepositoryInterface productQuestionRepositoryInterface;

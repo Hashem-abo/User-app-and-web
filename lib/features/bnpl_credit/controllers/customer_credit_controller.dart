@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/features/bnpl_credit/domain/models/customer_credit_model.dart';
-import 'package:sixam_mart/features/bnpl_credit/domain/services/customer_credit_service_interface.dart';
-import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/features/bnpl_credit/domain/models/customer_credit_model.dart';
+import 'package:suliman/features/bnpl_credit/domain/services/customer_credit_service_interface.dart';
+import 'package:suliman/common/widgets/custom_snackbar.dart';
 
 class CustomerCreditController extends GetxController implements GetxService {
   final CustomerCreditServiceInterface customerCreditServiceInterface;

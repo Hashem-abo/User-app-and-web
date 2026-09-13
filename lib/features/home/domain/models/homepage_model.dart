@@ -1,12 +1,12 @@
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/banner/domain/models/banner_model.dart';
-import 'package:sixam_mart/features/category/domain/models/category_model.dart';
-import 'package:sixam_mart/features/banner/domain/models/promotional_banner_model.dart';
-import 'package:sixam_mart/features/shelf/domain/models/shelf_model.dart';
-import 'package:sixam_mart/features/home/domain/models/store_corner_model.dart';
-import 'package:sixam_mart/features/item/domain/models/basic_campaign_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/home/domain/models/super_banner_model.dart';
+﻿import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/banner/domain/models/banner_model.dart';
+import 'package:suliman/features/category/domain/models/category_model.dart';
+import 'package:suliman/features/banner/domain/models/promotional_banner_model.dart';
+import 'package:suliman/features/shelf/domain/models/shelf_model.dart';
+import 'package:suliman/features/home/domain/models/store_corner_model.dart';
+import 'package:suliman/features/item/domain/models/basic_campaign_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/home/domain/models/super_banner_model.dart';
 
 class HomepageModel {
   List<ModuleModel>? modules;

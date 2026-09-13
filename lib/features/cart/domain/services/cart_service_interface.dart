@@ -1,8 +1,8 @@
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart';
-import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
+﻿import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/common/models/module_model.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/cart/domain/models/online_cart_model.dart';
+import 'package:suliman/features/checkout/domain/models/place_order_body_model.dart';
 
 abstract class CartServiceInterface {
   int availableSelectedIndex(int selectedIndex, int index);

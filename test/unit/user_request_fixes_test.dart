@@ -1,19 +1,19 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sixam_mart/common/models/config_model.dart';
-import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
-import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
-import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
-import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
-import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
-import 'package:sixam_mart/api/data_module_manager.dart';
-import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
-import 'package:sixam_mart/util/images.dart';
+import 'package:suliman/common/models/config_model.dart';
+import 'package:suliman/common/widgets/vendor_type_badge_widget.dart';
+import 'package:suliman/common/widgets/paginated_list_view.dart';
+import 'package:suliman/features/cart/domain/models/cart_model.dart';
+import 'package:suliman/features/checkout/domain/models/place_order_body_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/order/domain/models/monthly_order_model.dart';
+import 'package:suliman/features/order/domain/models/order_model.dart';
+import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/helper/module_helper.dart';
+import 'package:suliman/api/data_module_manager.dart';
+import 'package:suliman/common/widgets/confirmation_dialog.dart';
+import 'package:suliman/util/images.dart';
 import 'package:get/get.dart';
 
 PlaceOrderBodyModel _buildTestBody({bool? monthlySubscribe}) {

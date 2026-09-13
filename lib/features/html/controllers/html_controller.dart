@@ -1,6 +1,6 @@
-import 'package:get/get.dart';
-import 'package:sixam_mart/util/html_type.dart';
-import 'package:sixam_mart/features/html/domain/services/html_service_interface.dart';
+﻿import 'package:get/get.dart';
+import 'package:suliman/util/html_type.dart';
+import 'package:suliman/features/html/domain/services/html_service_interface.dart';
 
 class HtmlController extends GetxController implements GetxService {
   final HtmlServiceInterface htmlServiceInterface;

@@ -1,14 +1,14 @@
-import 'package:flutter/cupertino.dart';
+﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/home/controllers/home_controller.dart';
-import 'package:sixam_mart/features/home/widgets/cashback_logo_widget.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
-import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
-import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
+import 'package:suliman/features/home/controllers/home_controller.dart';
+import 'package:suliman/features/home/widgets/cashback_logo_widget.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
+import 'package:suliman/helper/date_converter.dart';
+import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/styles.dart';
 
 class CashBackDialogWidget extends StatelessWidget {
   const CashBackDialogWidget({super.key});

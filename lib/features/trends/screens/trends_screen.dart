@@ -1,11 +1,11 @@
-import 'dart:io' show Platform;
+﻿import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
-import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/features/trends/controllers/trends_controller.dart';
-import 'package:sixam_mart/features/trends/widgets/trend_widgets.dart';
-import 'package:sixam_mart/util/dimensions.dart';
+import 'package:suliman/common/widgets/card_design/item_card.dart';
+import 'package:suliman/common/widgets/custom_loader.dart';
+import 'package:suliman/features/trends/controllers/trends_controller.dart';
+import 'package:suliman/features/trends/widgets/trend_widgets.dart';
+import 'package:suliman/util/dimensions.dart';
 
 class TrendsScreen extends StatefulWidget {
   const TrendsScreen({super.key});

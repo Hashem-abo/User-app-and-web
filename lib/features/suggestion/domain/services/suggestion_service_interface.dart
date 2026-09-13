@@ -1,5 +1,5 @@
-import 'package:sixam_mart/features/suggestion/domain/models/suggestion_model.dart';
-import 'package:sixam_mart/common/models/response_model.dart';
+﻿import 'package:suliman/features/suggestion/domain/models/suggestion_model.dart';
+import 'package:suliman/common/models/response_model.dart';
 
 abstract class SuggestionServiceInterface {
   Future<CustomerSuggestionModel?> getUserSuggestions(int offset);
