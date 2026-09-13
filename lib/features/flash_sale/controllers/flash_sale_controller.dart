@@ -148,10 +148,18 @@ class FlashSaleController extends GetxController implements GetxService {
         _duration = endTime.difference(DateTime.now());
         _timer?.cancel();
         _timer = null;
-        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-          _duration = _duration! - const Duration(seconds: 1);
-          update();
-        });
+        if (_duration != null && _duration!.inSeconds > 0) {
+          _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (_duration != null && _duration!.inSeconds > 0) {
+              _duration = _duration! - const Duration(seconds: 1);
+            } else {
+              _duration = Duration.zero;
+              _timer?.cancel();
+              _timer = null;
+            }
+            update();
+          });
+        }
       }
     }
     update();
@@ -179,13 +187,28 @@ class FlashSaleController extends GetxController implements GetxService {
         _duration = endTime.difference(DateTime.now());
         _timer?.cancel();
         _timer = null;
-        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-          _duration = _duration! - const Duration(seconds: 1);
-          update();
-        });
+        if (_duration != null && _duration!.inSeconds > 0) {
+          _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (_duration != null && _duration!.inSeconds > 0) {
+              _duration = _duration! - const Duration(seconds: 1);
+            } else {
+              _duration = Duration.zero;
+              _timer?.cancel();
+              _timer = null;
+            }
+            update();
+          });
+        }
       }
       update();
     }
+  }
+
+  @override
+  void onClose() {
+    _timer?.cancel();
+    _timer = null;
+    super.onClose();
   }
   
 }

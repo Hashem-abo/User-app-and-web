@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -24,15 +25,16 @@ class ApiClient extends GetxService {
   final String appBaseUrl;
   final SharedPreferences sharedPreferences;
   static final String noInternetMessage = 'connection_to_api_server_failed'.tr;
-  final int timeoutInSeconds = 20;
+  final int timeoutInSeconds = 30;
+  final int uploadTimeoutInSeconds = 90;
 
   String? token;
   late Map<String, String> _mainHeaders;
 
-  ApiClient({required this.appBaseUrl, required this.sharedPreferences}) {
-    token = sharedPreferences.getString(AppConstants.token);
+  ApiClient({required this.appBaseUrl, required this.sharedPreferences, String? token}) {
+    this.token = token ?? sharedPreferences.getString(AppConstants.token);
     if (kDebugMode) {
-      print('Token: $token');
+      print('Token: ${this.token}');
     }
     AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
     int? moduleID;
@@ -42,7 +44,7 @@ class ApiClient extends GetxService {
       }catch(_) {}
     }
     updateHeader(
-      token, addressModel?.zoneIds, addressModel?.areaIds,
+      this.token, addressModel?.zoneIds, addressModel?.areaIds,
       sharedPreferences.getString(AppConstants.languageCode), moduleID, addressModel?.latitude,
         addressModel?.longitude
     );
@@ -203,6 +205,7 @@ class ApiClient extends GetxService {
     String uri, {
     Map<String, dynamic>? query,
     Map<String, String>? headers,
+    int? timeout,
     bool handleError = true,
     CancellationToken? cancelToken,
     bool useCache = false,
@@ -257,6 +260,7 @@ class ApiClient extends GetxService {
         }
 
         final http.Response httpResponse;
+        int activeTimeout = timeout ?? timeoutInSeconds;
         if (cancelToken != null) {
           client = http.Client();
           cancelToken.onCancel(() {
@@ -264,9 +268,9 @@ class ApiClient extends GetxService {
               client?.close();
             } catch (_) {}
           });
-          httpResponse = await client.get(requestUri, headers: finalHeaders).timeout(Duration(seconds: timeoutInSeconds));
+          httpResponse = await client.get(requestUri, headers: finalHeaders).timeout(Duration(seconds: activeTimeout));
         } else {
-          httpResponse = await http.get(requestUri, headers: finalHeaders).timeout(Duration(seconds: timeoutInSeconds));
+          httpResponse = await http.get(requestUri, headers: finalHeaders).timeout(Duration(seconds: activeTimeout));
         }
 
         final Response response = handleResponse(httpResponse, uri, handleError);
@@ -325,7 +329,7 @@ class ApiClient extends GetxService {
     }
   }
 
-  Future<Response> postMultipartData(String uri, Map<String, String> body, List<MultipartBody> multipartBody, {List<MultipartDocument>? multipartDoc, Map<String, String>? headers, bool handleError = true}) async {
+  Future<Response> postMultipartData(String uri, Map<String, String> body, List<MultipartBody> multipartBody, {List<MultipartDocument>? multipartDoc, Map<String, String>? headers, int? timeout, bool handleError = true}) async {
     try {
       Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       debugPrint('====> API Call: $uri\nHeader: $finalHeaders');
@@ -372,18 +376,23 @@ class ApiClient extends GetxService {
       }
 
       request.fields.addAll(body);
-      http.Response response = await http.Response.fromStream(await request.send());
+      int activeTimeout = timeout ?? uploadTimeoutInSeconds;
+      http.StreamedResponse streamedResponse = await request.send().timeout(Duration(seconds: activeTimeout));
+      http.Response response = await http.Response.fromStream(streamedResponse);
       final Response result = handleResponse(response, uri, handleError);
       if (result.statusCode == 200 || result.statusCode == 201) {
         _invalidateOnMutation(uri);
       }
       return result;
     } catch (e) {
+      if (kDebugMode) {
+        print('====> postMultipartData error: $e');
+      }
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
 
-  Future<Response> putData(String uri, dynamic body, {Map<String, String>? headers, bool handleError = true}) async {
+  Future<Response> putData(String uri, dynamic body, {Map<String, String>? headers, int? timeout, bool handleError = true}) async {
     try {
       Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
@@ -404,7 +413,7 @@ class ApiClient extends GetxService {
         Uri.parse(appBaseUrl+uri),
         body: jsonEncode(newBody),
         headers: finalHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      ).timeout(Duration(seconds: timeout ?? timeoutInSeconds));
       final Response result = handleResponse(response, uri, handleError);
       if (result.statusCode == 200 || result.statusCode == 201) {
         _invalidateOnMutation(uri);
@@ -415,7 +424,7 @@ class ApiClient extends GetxService {
     }
   }
 
-  Future<Response> deleteData(String uri, {Map<String, String>? headers, bool handleError = true}) async {
+  Future<Response> deleteData(String uri, {Map<String, String>? headers, int? timeout, bool handleError = true}) async {
     try {
       Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
@@ -424,7 +433,7 @@ class ApiClient extends GetxService {
       http.Response response = await http.delete(
         Uri.parse(appBaseUrl+uri),
         headers: finalHeaders,
-      ).timeout(Duration(seconds: timeoutInSeconds));
+      ).timeout(Duration(seconds: timeout ?? timeoutInSeconds));
       final Response result = handleResponse(response, uri, handleError);
       if (result.statusCode == 200 || result.statusCode == 201) {
         _invalidateOnMutation(uri);

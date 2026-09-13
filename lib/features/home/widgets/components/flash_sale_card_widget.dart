@@ -12,8 +12,6 @@ import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-
-import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -61,9 +59,9 @@ class _FlashSaleCardState extends State<FlashSaleCard> {
 
   @override
   void dispose() {
-    super.dispose();
-    _pageController.dispose();
     _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override

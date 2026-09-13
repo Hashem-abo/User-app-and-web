@@ -18,7 +18,7 @@ class AppConstants {
   static const String webHostedUrl = 'https://t.directplace.store';
 
   static const bool useReactWebsite = false;
-  static const String googleServerClientId = '';
+  static const String googleServerClientId = '72955669368-ak9ou1maimkatvlngk39s815qc2vql19.apps.googleusercontent.com';
 
   // static const String baseUrl = 'http://192.168.100.125/adminold';
   static const String baseUrl = 'https://ta.directplace.store';
@@ -46,6 +46,7 @@ class AppConstants {
   static const String verifyEmailUri = '/api/v1/auth/verify-email';
   static const String registerUri = '/api/v1/auth/sign-up';
   static const String loginUri = '/api/v1/auth/login';
+  static const String logoutUri = '/api/v1/auth/logout';
   static const String tokenUri = '/api/v1/customer/cm-firebase-token';
   static const String placeOrderUri = '/api/v1/customer/order/place';
   static const String placePrescriptionOrderUri = '/api/v1/customer/order/prescription/place';

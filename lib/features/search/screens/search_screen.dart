@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
@@ -43,6 +44,15 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
 
   List<String> _itemsAndStors = <String>[];
   bool _showSuggestion = false;
+  Timer? _debounceTimer;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _tabController?.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -62,15 +72,20 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
   }
 
   Future<void> _searchSuggestions(String query) async {
-    _itemsAndStors = [];
-    if (query == '') {
-      _showSuggestion = false;
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
       _itemsAndStors = [];
-    } else {
-      _showSuggestion = true;
-      _itemsAndStors = await Get.find<search.SearchController>().getSearchSuggestions(query);
-    }
-    setState(() {});
+      if (query == '') {
+        _showSuggestion = false;
+        _itemsAndStors = [];
+      } else {
+        _showSuggestion = true;
+        _itemsAndStors = await Get.find<search.SearchController>().getSearchSuggestions(query);
+      }
+      if(mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override

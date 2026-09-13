@@ -262,6 +262,7 @@ import 'package:sixam_mart/features/reels/domain/services/reels_service_interfac
 import 'package:sixam_mart/features/forum/controllers/forum_controller.dart';
 import 'package:sixam_mart/features/forum/domain/repositories/forum_repository.dart';
 import 'package:sixam_mart/features/forum/domain/repositories/forum_repository_interface.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sixam_mart/features/forum/domain/services/forum_service.dart';
 import 'package:sixam_mart/features/forum/domain/services/forum_service_interface.dart';
 import 'package:get/get.dart';
@@ -270,10 +271,32 @@ Future<Map<String, Map<String, String>>> init() async {
   /// Core
   final sharedPreferences = await SharedPreferences.getInstance();
   Get.lazyPut(() => sharedPreferences);
-  Get.lazyPut(() => ApiClient(appBaseUrl: AppConstants.baseUrl, sharedPreferences: Get.find()));
+
+  const flutterSecureStorage = FlutterSecureStorage();
+  // Use Get.put (eager) so the instance is immediately available for Get.find().
+  Get.put<FlutterSecureStorage>(flutterSecureStorage);
+
+  // Migrate token from SharedPreferences to FlutterSecureStorage if present
+  String? secureToken = await flutterSecureStorage.read(key: AppConstants.token);
+  if (secureToken == null || secureToken.isEmpty) {
+    String? spToken = sharedPreferences.getString(AppConstants.token);
+    if (spToken != null && spToken.isNotEmpty) {
+      await flutterSecureStorage.write(key: AppConstants.token, value: spToken);
+      await sharedPreferences.remove(AppConstants.token);
+      secureToken = spToken;
+    }
+  }
+
+  // Purge any stored passwords from SharedPreferences
+  if (sharedPreferences.containsKey(AppConstants.userPassword)) {
+    await sharedPreferences.remove(AppConstants.userPassword);
+  }
+
+  Get.lazyPut(() => ApiClient(appBaseUrl: AppConstants.baseUrl, sharedPreferences: Get.find(), token: secureToken));
 
   /// Repository interface
-  Get.put<AuthRepositoryInterface>(AuthRepository(apiClient: Get.find(), sharedPreferences: Get.find()));
+  // Pass flutterSecureStorage directly — avoids nullable/non-nullable type mismatch with Get.find.
+  Get.put<AuthRepositoryInterface>(AuthRepository(apiClient: Get.find(), sharedPreferences: Get.find(), secureStorage: flutterSecureStorage));
 
   Get.lazyPut<CheckoutRepositoryInterface>(() => CheckoutRepository(apiClient: Get.find(), sharedPreferences: Get.find()), fenix: true);
   Get.lazyPut<LocationRepositoryInterface>(() => LocationRepository(apiClient: Get.find()), fenix: true);

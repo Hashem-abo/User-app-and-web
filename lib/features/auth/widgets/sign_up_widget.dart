@@ -414,8 +414,6 @@ class SignUpWidgetState extends State<SignUpWidget> {
       }
 
       if (isPhoneNotVerified) {
-        List<int> encoded = utf8.encode(password);
-        String data = base64Encode(encoded);
         if (Get.find<SplashController>()
             .configModel!
             .firebaseOtpVerification!) {
@@ -429,12 +427,12 @@ class SignUpWidgetState extends State<SignUpWidget> {
             Get.back();
             Get.dialog(VerificationScreen(
               number: numberWithCountryCode,
+              password: password,
               email: null,
               token: status.message,
               fromSignUp: true,
               fromForgetPassword: false,
               loginType: CentralizeLoginType.manual.name,
-              password: password,
             ));
           } else {
             Get.toNamed(RouteHelper.getVerificationRoute(
@@ -442,25 +440,23 @@ class SignUpWidgetState extends State<SignUpWidget> {
               null,
               status.message,
               RouteHelper.signUp,
-              data,
+              null,
               CentralizeLoginType.manual.name,
             ));
           }
         }
       } else if (status.authResponseModel != null &&
           status.authResponseModel!.isEmailVerified == false) {
-        List<int> encoded = utf8.encode(password);
-        String data = base64Encode(encoded);
         if (ResponsiveHelper.isDesktop(context)) {
           Get.back();
           Get.dialog(VerificationScreen(
             number: null,
+            password: password,
             email: email,
             token: status.message,
             fromSignUp: true,
             fromForgetPassword: false,
             loginType: CentralizeLoginType.manual.name,
-            password: password,
           ));
         } else {
           Get.toNamed(RouteHelper.getVerificationRoute(
@@ -468,7 +464,7 @@ class SignUpWidgetState extends State<SignUpWidget> {
             email,
             status.message,
             RouteHelper.signUp,
-            data,
+            null,
             CentralizeLoginType.manual.name,
           ));
         }

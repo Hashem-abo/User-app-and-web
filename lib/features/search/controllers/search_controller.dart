@@ -722,6 +722,11 @@ class SearchController extends GetxController implements GetxService {
   @override
   void onClose() {
     _voiceAutoSubmitTimer?.cancel();
+    try {
+      if (_speech.isListening) {
+        _speech.stop();
+      }
+    } catch (_) {}
     super.onClose();
   }
   

@@ -74,6 +74,8 @@ class Gallery3DState extends State<Gallery3D> with TickerProviderStateMixin, Wid
     _timer?.cancel();
     _timer = null;
     _autoScrollAnimationController?.stop(canceled: true);
+    _autoScrollAnimationController?.dispose();
+    _autoScrollAnimationController = null;
     super.dispose();
   }
 

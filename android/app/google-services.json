@@ -36,6 +36,35 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:72955669368:android:c256e30b41e7322a88368d",
+        "android_client_info": {
+          "package_name": "com.directplace.store_store_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "72955669368-ak9ou1maimkatvlngk39s815qc2vql19.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFeHl94rh3st8ssQ_hCobfpnCHcYJsqYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "72955669368-ak9ou1maimkatvlngk39s815qc2vql19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:72955669368:android:3d793fcaeb29326e88368d",
         "android_client_info": {
           "package_name": "com.directplace.store_user"

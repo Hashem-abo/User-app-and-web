@@ -16,6 +16,7 @@ dependencies:
       url: https://github.com/luis901101/getx_fork.git
       ref: old-4.7.0
   shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.4
   connectivity_plus: ^7.0.0
   firebase_core: ^4.1.1
   firebase_messaging: ^16.0.2

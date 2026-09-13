@@ -66,6 +66,8 @@ class _WebLandingPageState extends State<WebLandingPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _controller.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 

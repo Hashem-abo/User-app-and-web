@@ -132,17 +132,16 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
       _timerTrackOrder();
     }else if(state == AppLifecycleState.paused){
       _timer?.cancel();
-      _controller?.dispose();
     }
   }
 
   @override
   void dispose() {
-    super.dispose();
-    _controller?.dispose();
     _timer?.cancel();
+    _controller?.dispose();
     PusherHelper().pusherDisconnectPusher();
     WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   void onEntered(bool isHovered) {

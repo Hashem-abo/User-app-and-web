@@ -110,30 +110,35 @@ class SplashController extends GetxController implements GetxService {
 
   DateTime? _splashStartTime;
   bool _isRoutingStarted = false;
+  bool get isRoutingStarted => _isRoutingStarted;
+  bool _hasNavigated = false;
+  bool get hasNavigated => _hasNavigated;
   Completer<void>? _videoCompleter;
 
   void initSplashSession() {
     _splashStartTime = DateTime.now();
     _isExiting = false;
     _isRoutingStarted = false;
+    _hasNavigated = false;
     _videoFinished = false;
     _videoCompleter = null;
   }
 
   void markSplashStarted() {
-    _splashStartTime = DateTime.now();
+    _splashStartTime ??= DateTime.now();
   }
 
   void resetSplashExitState() {
     _isExiting = false;
     _isRoutingStarted = false;
+    _hasNavigated = false;
   }
 
   Future<void> _performSmoothExit(FutureOr<void> Function() navigate) async {
-    if (_isExiting) {
-      await navigate();
+    if (_hasNavigated) {
       return;
     }
+    _hasNavigated = true;
     _isExiting = true;
     update();
     await navigate();
@@ -163,6 +168,7 @@ class SplashController extends GetxController implements GetxService {
   @override
   void onClose() {
     _linkSubscription?.cancel();
+    _linkSubscription = null;
     super.onClose();
   }
 
@@ -220,17 +226,38 @@ class SplashController extends GetxController implements GetxService {
   Future<void> getConfigData({NotificationBodyModel? notificationBody, bool loadModuleData = false, bool loadLandingData = false, DataSourceEnum source = DataSourceEnum.local, bool fromMainFunction = false, bool fromDemoReset = false}) async {
     _hasConnection = true;
     _moduleIndex = 0;
-    Response response;
-    if(source == DataSourceEnum.local && !fromDemoReset) {
-      response = await splashServiceInterface.getConfigData(source: DataSourceEnum.local);
-      _handleConfigResponse(response, loadModuleData, loadLandingData, fromMainFunction, fromDemoReset, notificationBody);
-      getConfigData(loadModuleData: loadModuleData, loadLandingData: loadLandingData, source: DataSourceEnum.client);
+    
+    if(source == DataSourceEnum.local && !fromDemoReset && !fromMainFunction) {
+      // 1. Fetch local cache to immediately initialize modules and theme
+      try {
+        Response localResponse = await splashServiceInterface.getConfigData(source: DataSourceEnum.local);
+        if(localResponse.statusCode == 200) {
+          _data = localResponse.body;
+          _configModel = ConfigModel.fromJson(localResponse.body);
+          if(_configModel!.module != null) {
+            setModule(_configModel!.module, notify: false);
+          } else if(GetPlatform.isWeb || _module != null) {
+            setModule(GetPlatform.isWeb ? splashServiceInterface.getModule() : _module, notify: false);
+          }
+          update();
+        }
+      } catch (e) {
+        debugPrint('Local config fetch error: $e');
+      }
 
+      // 2. Fetch authoritative remote data and then route
+      return await getConfigData(
+        notificationBody: notificationBody,
+        loadModuleData: loadModuleData,
+        loadLandingData: loadLandingData,
+        source: DataSourceEnum.client,
+        fromMainFunction: fromMainFunction,
+        fromDemoReset: fromDemoReset,
+      );
     } else {
-      response = await splashServiceInterface.getConfigData(source: DataSourceEnum.client);
-      _handleConfigResponse(response, loadModuleData, loadLandingData, fromMainFunction, fromDemoReset, notificationBody);
+      Response response = await splashServiceInterface.getConfigData(source: DataSourceEnum.client);
+      await _handleConfigResponse(response, loadModuleData, loadLandingData, fromMainFunction, fromDemoReset, notificationBody);
     }
-
   }
 
   Future<void> _handleConfigResponse(Response response, bool loadModuleData, bool loadLandingData, bool fromMainFunction, bool fromDemoReset, NotificationBodyModel? notificationBody) async {
@@ -259,6 +286,10 @@ class SplashController extends GetxController implements GetxService {
       if(response.statusText == ApiClient.noInternetMessage) {
         _hasConnection = false;
       }
+      // If client config fails and we already have cached config, attempt routing with cached config
+      if (!fromMainFunction && !fromDemoReset && _configModel != null) {
+        route(body: notificationBody);
+      }
     }
     update();
   }
@@ -273,9 +304,8 @@ class SplashController extends GetxController implements GetxService {
   }
 
   Future<void> route({NotificationBodyModel? body}) async {
-    if (_isRoutingStarted) return;
+    if (_isRoutingStarted || _hasNavigated) return;
     _isRoutingStarted = true;
-    markSplashStarted();
 
     String? splashImage = _cacheModule?.splashScreenImageFullUrl ?? _module?.splashScreenImageFullUrl;
     bool isVideo = splashImage != null && splashImage.toLowerCase().contains('.mp4');
@@ -288,13 +318,15 @@ class SplashController extends GetxController implements GetxService {
       ]);
     } else {
       final bool hasCustomSplash = splashImage != null && splashImage.trim().isNotEmpty && splashImage.trim() != 'null';
-      final int minMs = hasCustomSplash ? 2500 : 2200;
-      final int elapsed = DateTime.now().difference(_splashStartTime!).inMilliseconds;
+      final int minMs = hasCustomSplash ? 2200 : 1800;
+      final int elapsed = _splashStartTime != null ? DateTime.now().difference(_splashStartTime!).inMilliseconds : 0;
       final int remainingMs = minMs - elapsed;
       if (remainingMs > 0) {
         await Future.delayed(Duration(milliseconds: remainingMs));
       }
     }
+
+    if (_hasNavigated) return;
 
     double? minimumVersion = _getMinimumVersion();
     double? latestVersion = _getLatestVersion();
@@ -839,5 +871,7 @@ class SplashController extends GetxController implements GetxService {
   }
   // Pro feature status — reads from config model
   bool get proStaus => _configModel?.proMemberStatus ?? false;
+
+
 
 }

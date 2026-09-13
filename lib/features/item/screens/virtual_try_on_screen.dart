@@ -127,7 +127,7 @@ class _VirtualTryOnScreenState extends State<VirtualTryOnScreen> {
     });
 
     try {
-      final response = await http.get(Uri.parse(_resultImageUrl!));
+      final response = await http.get(Uri.parse(_resultImageUrl!)).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         final directory = await getTemporaryDirectory();
         final path = '${directory.path}/try_on_result.png';

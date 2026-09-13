@@ -52,7 +52,6 @@ class _SignInViewState extends State<SignInView> {
 
     _countryDialCode = authController.getUserCountryCode().isNotEmpty ? authController.getUserCountryCode() : CountryCode.fromCountryCode(splashController.configModel!.country!).dialCode;
     _phoneController.text =  authController.getUserNumber();
-    _passwordController.text = authController.getUserPassword();
 
     WidgetsBinding.instance.addPostFrameCallback((_){
       bool isOtpActive = CentralizeLoginHelper.getPreferredLoginMethod(splashController.configModel!.centralizeLoginSetup!, authController.isOtpViewEnable).type == CentralizeLoginType.otp
@@ -261,20 +260,16 @@ class _SignInViewState extends State<SignInView> {
 
     if(isPhoneNotVerified) {
       await authController.clearSharedData(removeToken: true);
-      List<int> encoded = utf8.encode(password);
-      String data = base64Encode(encoded);
       String token = status.authResponseModel!.token??'';
       if(Get.find<SplashController>().configModel!.firebaseOtpVerification!) {
         Get.find<AuthController>().firebaseVerifyPhoneNumber(phoneToVerify, token, CentralizeLoginType.manual.name, fromSignUp: true);
       } else {
-        Get.toNamed(RouteHelper.getVerificationRoute(phoneToVerify, null, token, RouteHelper.signUp, data, CentralizeLoginType.manual.name));
+        Get.toNamed(RouteHelper.getVerificationRoute(phoneToVerify, null, token, RouteHelper.signUp, null, CentralizeLoginType.manual.name));
       }
       return;
     } else if(status.authResponseModel != null && status.authResponseModel!.isEmailVerified == false) {
-      List<int> encoded = utf8.encode(password);
-      String data = base64Encode(encoded);
       String token = status.authResponseModel!.token??'';
-      Get.toNamed(RouteHelper.getVerificationRoute(null, email, token, RouteHelper.signUp, data, CentralizeLoginType.manual.name));
+      Get.toNamed(RouteHelper.getVerificationRoute(null, email, token, RouteHelper.signUp, null, CentralizeLoginType.manual.name));
       return;
     } else {
       if(widget.backFromThis) {

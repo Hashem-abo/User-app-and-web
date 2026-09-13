@@ -247,7 +247,7 @@ class NotificationHelper {
   static Future<String> _downloadAndSaveFile(String url, String fileName) async {
     final Directory directory = await getApplicationDocumentsDirectory();
     final String filePath = '${directory.path}/$fileName';
-    final http.Response response = await http.get(Uri.parse(url));
+    final http.Response response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
     final File file = File(filePath);
     await file.writeAsBytes(response.bodyBytes);
     return filePath;

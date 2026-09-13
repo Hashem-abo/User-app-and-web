@@ -1183,8 +1183,18 @@ class AIChatController extends GetxController implements GetxService {
         }
       }
     } catch (e) {
-      print('Error finding module for query: $e');
+     print('Error finding module for query: $e');
     }
     return null;
+  }
+
+  @override
+  void onClose() {
+    try {
+      if (_speech.isListening) {
+        _speech.stop();
+      }
+    } catch (_) {}
+    super.onClose();
   }
 }

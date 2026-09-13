@@ -4,6 +4,8 @@ import 'package:get/get_connect/connect.dart';
 import 'package:get/get_utils/src/platform/platform.dart';
 import 'package:sixam_mart/api/api_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:sixam_mart/common/models/response_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/auth/domain/models/signup_body_model.dart';
@@ -16,7 +18,9 @@ import 'package:sixam_mart/util/app_constants.dart';
 class AuthRepository implements AuthRepositoryInterface{
   final ApiClient apiClient;
   final SharedPreferences sharedPreferences;
-  AuthRepository({ required this.sharedPreferences, required this.apiClient});
+  final FlutterSecureStorage secureStorage;
+  AuthRepository({ required this.sharedPreferences, required this.apiClient, FlutterSecureStorage? secureStorage})
+      : secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   @override
   bool isSharedPrefNotificationActive() {
@@ -117,7 +121,9 @@ class AuthRepository implements AuthRepositoryInterface{
     }else{
       apiClient.updateHeader(token, null, null, sharedPreferences.getString(AppConstants.languageCode), ModuleHelper.getModule()?.id, null, null);
     }
-    return await sharedPreferences.setString(AppConstants.token, token);
+    await secureStorage.write(key: AppConstants.token, value: token);
+    await sharedPreferences.remove(AppConstants.token);
+    return true;
   }
 
   @override
@@ -165,7 +171,7 @@ class AuthRepository implements AuthRepositoryInterface{
 
   @override
   bool isLoggedIn() {
-    return sharedPreferences.containsKey(AppConstants.token);
+    return (apiClient.token != null && apiClient.token!.isNotEmpty) || sharedPreferences.containsKey(AppConstants.token);
   }
 
   @override
@@ -203,13 +209,24 @@ class AuthRepository implements AuthRepositoryInterface{
         FirebaseMessaging.instance.unsubscribeFromTopic('zone_${userAddress!.zoneId}_customer');
       }
       if(removeToken){
-        apiClient.postData(AppConstants.tokenUri, {"_method": "put", "cm_firebase_token": '@'}, handleError: false);
+        try {
+          apiClient.postData(AppConstants.tokenUri, {"_method": "put", "cm_firebase_token": '@'}, handleError: false);
+        } catch(_) {}
       }
+    }
+    if(removeToken) {
+      try {
+        await apiClient.postData(AppConstants.logoutUri, {}, handleError: false);
+      } catch(_) {}
+      await secureStorage.delete(key: AppConstants.token);
     }
     sharedPreferences.remove(AppConstants.token);
     sharedPreferences.remove(AppConstants.guestId);
     sharedPreferences.setStringList(AppConstants.cartList, []);
     apiClient.token = null;
+    try {
+      await DefaultCacheManager().emptyCache();
+    } catch(_) {}
     await guestLogin();
     AddressModel? addressModel = AddressHelper.getUserAddressFromSharedPref();
     apiClient.updateHeader(
@@ -222,7 +239,7 @@ class AuthRepository implements AuthRepositoryInterface{
   @override
   Future<void> saveUserNumberAndPassword(String number, String password, String countryCode) async {
     try {
-      await sharedPreferences.setString(AppConstants.userPassword, password);
+      await sharedPreferences.remove(AppConstants.userPassword);
       await sharedPreferences.setString(AppConstants.userNumber, number);
       await sharedPreferences.setString(AppConstants.userCountryCode, countryCode);
     } catch (e) {
@@ -242,7 +259,7 @@ class AuthRepository implements AuthRepositoryInterface{
 
   @override
   String getUserPassword() {
-    return sharedPreferences.getString(AppConstants.userPassword) ?? "";
+    return "";
   }
 
   @override

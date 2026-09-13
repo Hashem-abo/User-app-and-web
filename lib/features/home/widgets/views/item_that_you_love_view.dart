@@ -68,9 +68,9 @@ class _ItemThatYouLoveViewState extends State<ItemThatYouLoveView> {
 
   @override
   void dispose() {
-    super.dispose();
-    _pageController.dispose();
     _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override

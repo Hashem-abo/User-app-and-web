@@ -46,7 +46,10 @@ class SplashScreenState extends State<SplashScreen> {
           content: Text(isConnected ? 'connected'.tr : 'no_connection'.tr, textAlign: TextAlign.center),
         ));
         if(isConnected) {
-          Get.find<SplashController>().getConfigData(notificationBody: widget.body);
+          final splashController = Get.find<SplashController>();
+          if(!splashController.hasNavigated && !splashController.isRoutingStarted && !splashController.hasConnection) {
+            splashController.getConfigData(notificationBody: widget.body);
+          }
         }
       }
 
@@ -60,7 +63,7 @@ class SplashScreenState extends State<SplashScreen> {
     }
     
     _checkAndInitVideo();
-    Get.find<SplashController>().getConfigData(notificationBody: widget.body).then((value) {
+    Get.find<SplashController>().getConfigData(notificationBody: widget.body).then((_) {
       _checkAndInitVideo(); // Try again after config is fetched
     });
   }

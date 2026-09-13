@@ -373,11 +373,11 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
+    _timer?.cancel();
     _expandedModuleController.dispose();
     _collapsedModuleController.dispose();
-    super.dispose();
     _scrollController.dispose();
-    _timer?.cancel();
+    super.dispose();
   }
 
   void _scrollToSelectedModule(SplashController splashController) {

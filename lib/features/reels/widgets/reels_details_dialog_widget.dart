@@ -610,17 +610,27 @@ class _ReelDetailsPageState extends State<_ReelDetailsPage> {
       }
 
       await controller.initialize();
+      if (!mounted) {
+        await controller.dispose();
+        return;
+      }
       await controller.setLooping(true);
       await controller.setVolume(_isReelMuted.value ? 0.0 : 1.0);
       if(_savedPosition > Duration.zero && _savedPosition < controller.value.duration) {
         await controller.seekTo(_savedPosition);
       }
-      // _shouldPlayWhenReady may have been flipped to true while we were downloading.
-      if(_shouldPlayWhenReady) {
-        await controller.play();
+
+      if (!mounted) {
+        await controller.dispose();
+        return;
       }
+
       _videoController = controller;
       _hasVideoError = false;
+
+      if(_shouldPlayWhenReady && widget.isActive) {
+        controller.play();
+      }
     } catch (e) {
       debugPrint('=======> ReelDetails: Video controller error: $e');
       await controller?.dispose();

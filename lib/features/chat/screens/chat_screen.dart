@@ -81,8 +81,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     _stream?.cancel();
+    _scrollController.dispose();
+    _inputMessageController.dispose();
+    super.dispose();
   }
 
   @override
