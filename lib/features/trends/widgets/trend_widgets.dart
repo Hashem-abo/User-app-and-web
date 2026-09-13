@@ -15,7 +15,6 @@ import 'package:sixam_mart/helper/module_icon_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
-import 'package:sixam_mart/util/images.dart';
 
 class TrendHeaderBanner extends StatelessWidget {
   final TrendHashtagModel hashtag;

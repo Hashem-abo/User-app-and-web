@@ -49,6 +49,7 @@ class PlaceOrderBodyModel {
   bool? _monthlySubscribe;
   String? _pickupCenterName;
   String? _phone;
+  String? _idempotencyKey;
 
   PlaceOrderBodyModel({
     required List<OnlineCart> cart,
@@ -97,7 +98,9 @@ class PlaceOrderBodyModel {
     bool? monthlySubscribe,
     String? pickupCenterName,
     String? phone,
+    String? idempotencyKey,
   }) {
+    _idempotencyKey = idempotencyKey;
     _cart = cart;
     _couponDiscountAmount = couponDiscountAmount;
     _orderAmount = orderAmount;
@@ -242,9 +245,9 @@ class PlaceOrderBodyModel {
     _saverDeliveryType = json['delivery_type'];
     _monthlySubscribe = json['monthly_subscribe'] == '1' || json['monthly_subscribe'] == 1 || json['monthly_subscribe'] == true
         || json['is_monthly_subscribe'] == '1' || json['is_monthly_subscribe'] == 1 || json['is_monthly_subscribe'] == true
-        || json['monthly_order'] == '1' || json['monthly_order'] == 1 || json['monthly_order'] == true
         || json['monthly_purchase'] == '1' || json['monthly_purchase'] == 1 || json['monthly_purchase'] == true
         || json['add_to_monthly'] == '1' || json['add_to_monthly'] == 1 || json['add_to_monthly'] == true;
+    _idempotencyKey = json['idempotency_key'];
   }
 
   Map<String, String> toJson() {
@@ -349,9 +352,14 @@ class PlaceOrderBodyModel {
       data['phone'] = _phone!;
       data['pickup_center_phone'] = _phone!;
     }
+    if (_idempotencyKey != null) {
+      data['idempotency_key'] = _idempotencyKey!;
+    }
     return data;
   }
 
+  String? get idempotencyKey => _idempotencyKey;
+  set idempotencyKey(String? key) => _idempotencyKey = key;
   bool? get monthlySubscribe => _monthlySubscribe;
 }
 

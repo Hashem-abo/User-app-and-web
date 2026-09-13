@@ -57,7 +57,7 @@ class _BestStoreNearbyViewState extends State<BestStoreNearbyView> {
     bool isFood = Get.find<SplashController>().module != null &&
         Get.find<SplashController>().module!.moduleType.toString() ==
             AppConstants.food;
-    final bool ltr = Get.find<LocalizationController>().isLtr;
+    // final bool ltr = Get.find<LocalizationController>().isLtr;
 
     return GetBuilder<StoreController>(builder: (storeController) {
       List<Store>? storeList = isPharmacy

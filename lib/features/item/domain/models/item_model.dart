@@ -29,7 +29,7 @@ class ItemModel {
         bool isNewVariation = false;
         try {
           if (Get.isRegistered<SplashController>() && Get.find<SplashController>().configModel != null) {
-            isNewVariation = Get.find<SplashController>().getModuleConfig(v['module_type'])?.newVariation ?? false;
+            isNewVariation = Get.find<SplashController>().getModuleConfig(v['module_type']).newVariation ?? false;
           }
         } catch (_) {}
 

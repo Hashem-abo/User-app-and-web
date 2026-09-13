@@ -8,7 +8,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/common/models/module_model.dart';
 
 void main() {
   group('FEATURE & BUG TEST 1: Store Model Robustness & Vendor Type Exposure', () {
@@ -191,8 +190,7 @@ void main() {
   group('FEATURE & BUG TEST 4: Payment Section Mobile Clickability & Multi-Step Workflow', () {
     test('PaymentSection container MUST allow mobile users to tap and open payment selection', () {
       // On mobile (!isDesktop), tapping the payment selection container must be allowed.
-      bool isMobile = true;
-      bool canTapOnMobile = true; // Desired behavior: both desktop and mobile can tap!
+      const bool canTapOnMobile = true; // Desired behavior: both desktop and mobile can tap!
 
       expect(canTapOnMobile, isTrue, reason: 'Mobile users must be able to tap select_payment_method container');
     });

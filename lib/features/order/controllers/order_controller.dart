@@ -8,12 +8,14 @@ import 'package:sixam_mart/features/order/domain/services/order_service_interfac
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
+import 'package:sixam_mart/features/cart/domain/models/online_cart_model.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/features/checkout/domain/models/place_order_body_model.dart';
 
 import 'package:sixam_mart/features/order/domain/models/monthly_order_model.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 
 class OrderController extends GetxController implements GetxService {
   final OrderServiceInterface orderServiceInterface;
@@ -228,7 +230,7 @@ class OrderController extends GetxController implements GetxService {
         orderID, AuthHelper.isLoggedIn() ? null : AuthHelper.getGuestId(),
         contactNumber: contactNumber,
       );
-      if (response.statusCode == 200) {
+      if (response.isOk) {
         _trackModel = OrderModel.fromJson(response.body);
         _responseModel = ResponseModel(true, response.body.toString());
       } else {
@@ -250,7 +252,7 @@ class OrderController extends GetxController implements GetxService {
       orderID, AuthHelper.isLoggedIn() ? null : AuthHelper.getGuestId(),
       contactNumber: contactNumber,
     );
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       _trackModel = OrderModel.fromJson(response.body);
       _responseModel = ResponseModel(true, response.body.toString());
     } else {
@@ -385,8 +387,15 @@ class OrderController extends GetxController implements GetxService {
           await cartController.clearStoreCartItems(reorderStoreIds);
         }
 
+        int successCount = 0;
+        int failedCount = 0;
+
         for (var detail in details) {
            if(detail.itemDetails != null) {
+              if (detail.itemDetails!.stock != null && detail.itemDetails!.stock! <= 0) {
+                 failedCount++;
+                 continue;
+              }
               List<List<bool?>> selectedFoodVariations = [];
               if (detail.itemDetails!.foodVariations != null && detail.itemDetails!.foodVariations!.isNotEmpty) {
                 for (int i = 0; i < detail.itemDetails!.foodVariations!.length; i++) {
@@ -421,7 +430,7 @@ class OrderController extends GetxController implements GetxService {
                   quantityLimit: detail.itemDetails!.quantityLimit,
                   note: detail.note,
               );
-              cartController.addToCart(cartModel, null);
+              
               if(AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
                 List<OrderVariation> variations = [];
                 if(Get.find<SplashController>().getModuleConfig(detail.itemDetails!.moduleType).newVariation!) {
@@ -443,7 +452,16 @@ class OrderController extends GetxController implements GetxService {
                     quantity: detail.quantity, addOnIds: [], addOns: [], addOnQtys: [], model: 'Item',
                     note: detail.note,
                 );
-                await cartController.cartServiceInterface.addToCartOnline(onlineCart);
+                List<OnlineCartModel>? res = await cartController.cartServiceInterface.addToCartOnline(onlineCart);
+                if (res != null) {
+                   successCount++;
+                   cartController.addToCart(cartModel, null);
+                } else {
+                   failedCount++;
+                }
+              } else {
+                 cartController.addToCart(cartModel, null);
+                 successCount++;
               }
            }
         }
@@ -452,7 +470,17 @@ class OrderController extends GetxController implements GetxService {
         if(AuthHelper.isLoggedIn() || AuthHelper.isGuestLoggedIn()) {
            await cartController.getCartDataOnline();
         }
-        Get.toNamed(RouteHelper.getCartRoute());
+
+        if (successCount == 0) {
+           showCustomSnackBar('one_or_more_products_are_not_available_for_this_selected_time'.tr);
+        } else {
+           if (failedCount > 0) {
+              showCustomSnackBar('some_items_were_not_available_and_skipped'.tr, isError: false);
+           }
+           Get.toNamed(RouteHelper.getCartRoute());
+        }
+      } else {
+         showCustomSnackBar('failed_to_load_order_details'.tr);
       }
     } finally {
       _isReordering = false;

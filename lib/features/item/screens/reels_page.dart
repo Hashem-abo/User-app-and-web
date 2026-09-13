@@ -5,8 +5,6 @@ import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:video_player/video_player.dart';
 import 'package:sixam_mart/common/widgets/item_bottom_sheet.dart';
-import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/features/item/screens/item_details_screen.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/util/styles.dart';

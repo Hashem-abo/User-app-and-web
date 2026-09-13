@@ -22,7 +22,7 @@ class ServiceScreen extends StatefulWidget {
 }
 
 class _ServiceScreenState extends State<ServiceScreen> {
-  final int _selectedCategory = -1;
+  // final int _selectedCategory = -1;
 
   @override
   void initState() {

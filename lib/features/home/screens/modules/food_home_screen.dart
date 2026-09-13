@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/home/widgets/highlight_widget.dart';
 import 'package:sixam_mart/features/home/widgets/views/category_view.dart';
 import 'package:sixam_mart/features/home/widgets/views/browse_by_category_view.dart';
 import 'package:sixam_mart/features/home/widgets/views/store_corner_view.dart';
-import 'package:sixam_mart/features/home/widgets/views/recommended_store_view.dart';
 import 'package:sixam_mart/features/home/widgets/views/top_offers_near_me.dart';
 import 'package:sixam_mart/features/shelf/controllers/shelf_controller.dart';
 import 'package:sixam_mart/features/shelf/widgets/dynamic_shelf_view.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sixam_mart/features/global_shopping/domain/models/global_product_model.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -8,7 +7,6 @@ import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
 import 'package:sixam_mart/common/widgets/hover/on_hover.dart';
 import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
 
 class GlobalProductCard extends StatelessWidget {
   final GlobalProductModel product;

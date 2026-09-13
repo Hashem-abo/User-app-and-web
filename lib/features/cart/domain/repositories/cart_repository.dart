@@ -47,7 +47,7 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
   Future<List<OnlineCartModel>?> _addToCartOnline(OnlineCart cart) async {
     List<OnlineCartModel>? onlineCartList;
     Response response = await apiClient.postData('${AppConstants.addCartUri}${!AuthHelper.isLoggedIn() ? '?guest_id=${AuthHelper.getGuestId()}' : ''}', cart.toJson());
-    if(response.statusCode == 200) {
+    if(response.isOk) {
       onlineCartList = [];
       response.body.forEach((cart) => onlineCartList!.add(OnlineCartModel.fromJson(cart)));
     }
@@ -65,7 +65,7 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
 
   Future<bool> _removeCartItemOnline(int cartId) async {
     Response response = await apiClient.postData('${AppConstants.removeItemCartUri}?cart_id=$cartId${!AuthHelper.isLoggedIn() ? '&guest_id=${AuthHelper.getGuestId()}' : ''}', {});
-    return (response.statusCode == 200);
+    return response.isOk;
   }
 
   Future<bool> _clearCartOnline({int? moduleId}) async {
@@ -79,7 +79,7 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
       {},
       headers: customHeaders,
     );
-    return (response.statusCode == 200);
+    return response.isOk;
   }
 
   @override
@@ -94,18 +94,19 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
 
   Future<List<OnlineCartModel>?> _getCartDataOnline() async {
     List<OnlineCartModel>? onlineCartList;
-    Map<String, String>? header ={
+    String? token = sharedPreferences.getString(AppConstants.token) ?? apiClient.token;
+    Map<String, String>? header = {
       'Content-Type': 'application/json; charset=UTF-8',
       AppConstants.localizationKey: AppConstants.languages[0].languageCode!,
       AppConstants.moduleId: '${ModuleHelper.getCacheModule()?.id}',
-      'Authorization': 'Bearer ${sharedPreferences.getString(AppConstants.token)}'
+      if (token != null && token.isNotEmpty && token != 'null') 'Authorization': 'Bearer $token',
     };
 
     Response response = await apiClient.getData(
       '${AppConstants.getCartListUri}${!AuthHelper.isLoggedIn() ? '?guest_id=${AuthHelper.getGuestId()}' : ''}',
       headers: ModuleHelper.getModule()?.id == null ? header : null,
     );
-    if(response.statusCode == 200) {
+    if(response.isOk) {
       onlineCartList = [];
       response.body.forEach((cart) => onlineCartList!.add(OnlineCartModel.fromJson(cart)));
     }
@@ -124,7 +125,7 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
   Future<List<OnlineCartModel>?> _updateCartOnline(Map<String, dynamic> body) async {
     List<OnlineCartModel>? onlineCartList;
     Response response = await apiClient.postData('${AppConstants.updateCartUri}${!AuthHelper.isLoggedIn() ? '?guest_id=${AuthHelper.getGuestId()}' : ''}', body);
-    if(response.statusCode == 200) {
+    if(response.isOk) {
       onlineCartList = [];
       response.body.forEach((cart) => onlineCartList!.add(OnlineCartModel.fromJson(cart)));
     }
@@ -138,7 +139,7 @@ class CartRepository implements CartRepositoryInterface<OnlineCart> {
       "quantity": quantity,
     };
     Response response = await apiClient.postData('${AppConstants.updateCartUri}${!AuthHelper.isLoggedIn() ? '?guest_id=${AuthHelper.getGuestId()}' : ''}', data);
-    return (response.statusCode == 200);
+    return response.isOk;
   }
 
   @override

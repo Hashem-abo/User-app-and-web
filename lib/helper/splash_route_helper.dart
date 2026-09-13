@@ -10,12 +10,14 @@ import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 
+import 'package:sixam_mart/helper/version_helper.dart';
+
 // class SplashRouteHelper{
 
   void route({NotificationBodyModel? body}) {
-    double? minimumVersion = _getMinimumVersion();
+    dynamic minimumVersion = _getMinimumVersion();
     bool isMaintenanceMode = Get.find<SplashController>().configModel!.maintenanceMode!;
-    bool needsUpdate = AppConstants.appVersion < minimumVersion!;
+    bool needsUpdate = VersionHelper.isVersionLower(AppConstants.appVersion, minimumVersion);
 
     if(needsUpdate || isMaintenanceMode) {
       Get.offNamed(RouteHelper.getUpdateRoute(needsUpdate));

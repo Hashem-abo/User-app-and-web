@@ -28,9 +28,9 @@ import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-
 import '../domain/models/parcel_instruction_model.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:uuid/uuid.dart';
 
 class ParcelController extends GetxController implements GetxService {
   final ParcelServiceInterface parcelServiceInterface;
@@ -38,6 +38,18 @@ class ParcelController extends GetxController implements GetxService {
 
   List<ParcelCategoryModel>? _parcelCategoryList;
   List<ParcelCategoryModel>? get parcelCategoryList => _parcelCategoryList;
+
+  bool _isSubmittingParcel = false;
+  bool get isSubmittingParcel => _isSubmittingParcel;
+
+  String? _parcelIdempotencyKey;
+  String get parcelIdempotencyKey {
+    _parcelIdempotencyKey ??= const Uuid().v4();
+    return _parcelIdempotencyKey!;
+  }
+  void resetParcelIdempotencyKey() {
+    _parcelIdempotencyKey = const Uuid().v4();
+  }
 
   AddressModel? _pickupAddress;
   AddressModel? get pickupAddress => _pickupAddress;
@@ -541,39 +553,52 @@ class ParcelController extends GetxController implements GetxService {
   }
 
   Future<String> placeOrder(PlaceOrderBodyModel placeOrderBody, int? zoneID, double amount, double? maximumCodOrderAmount, bool fromCart, bool isCashOnDeliveryActive, {bool forParcel = false, bool isOfflinePay = false}) async {
+    if (_isSubmittingParcel) {
+      return '';
+    }
+    _isSubmittingParcel = true;
     _isLoading = true;
     update();
+
+    placeOrderBody.idempotencyKey ??= parcelIdempotencyKey;
+
     String orderID = '';
-    Response response = await parcelServiceInterface.placeOrder(placeOrderBody);
-    _isLoading = false;
-    if (response.statusCode == 200) {
-      String? message = response.body['message'];
-      orderID = response.body['order_id'].toString();
-      int createUserId = response.body['user_id'];
+    try {
+      Response response = await parcelServiceInterface.placeOrder(placeOrderBody);
+      _isLoading = false;
+      if (response.isOk) {
+        resetParcelIdempotencyKey();
+        String? message = response.body['message'];
+        orderID = response.body['order_id'].toString();
+        int createUserId = response.body['user_id'];
 
-      if(forParcel && _destinationAddress != null) {
-        await addParcelRecentAddress(_destinationAddress!);
-      }
+        if(forParcel && _destinationAddress != null) {
+          await addParcelRecentAddress(_destinationAddress!);
+        }
 
-      if(!isOfflinePay) {
-        parcelCallback(true, message, orderID, zoneID, amount, maximumCodOrderAmount, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber, createUserId: createUserId);
+        if(!isOfflinePay) {
+          parcelCallback(true, message, orderID, zoneID, amount, maximumCodOrderAmount, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber, createUserId: createUserId);
+        } else {
+          Get.offNamed(RouteHelper.getOfflinePaymentScreen(
+            placeOrderBody: placeOrderBody, zoneId: zoneID, total: amount,
+            maxCodOrderAmount: maximumCodOrderAmount, fromCart: false, isCodActive: isCashOnDeliveryActive, forParcel: true,
+          ));
+        }
+        if (kDebugMode) {
+          print('-------- Order placed successfully $orderID ----------');
+        }
       } else {
-        Get.offNamed(RouteHelper.getOfflinePaymentScreen(
-          placeOrderBody: placeOrderBody, zoneId: zoneID, total: amount,
-          maxCodOrderAmount: maximumCodOrderAmount, fromCart: false, isCodActive: isCashOnDeliveryActive, forParcel: true,
-        ));
+        if(!isOfflinePay) {
+          parcelCallback(false, response.statusText, '-1', zoneID, amount, maximumCodOrderAmount, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber);
+        } else {
+          showCustomSnackBar(response.statusText);
+        }
       }
-      if (kDebugMode) {
-        print('-------- Order placed successfully $orderID ----------');
-      }
-    } else {
-      if(!isOfflinePay) {
-        parcelCallback(false, response.statusText, '-1', zoneID, amount, maximumCodOrderAmount, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber);
-      } else {
-        showCustomSnackBar(response.statusText);
-      }
+    } finally {
+      _isSubmittingParcel = false;
+      _isLoading = false;
+      update();
     }
-    update();
 
     return orderID;
   }

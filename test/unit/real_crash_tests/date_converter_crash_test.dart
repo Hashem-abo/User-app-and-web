@@ -138,7 +138,7 @@ void main() {
       // This calls Get.find<SplashController> via _timeFormatter() for the time part.
       // In a pure unit-test environment GetX has no registered controller so this
       // will throw. We just verify the date portion is parseable independently.
-      final dt = DateTime(2026, 8, 11, 14, 30, 0);
+      final dt = DateTime.parse(dtStr.replaceFirst(' ', 'T'));
       expect(dt.year, equals(2026));
       expect(dt.month, equals(8));
       expect(dt.day, equals(11));

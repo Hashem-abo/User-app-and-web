@@ -1,8 +1,3 @@
-// import 'package:sixam_mart/features/business/controllers/business_controller.dart';
-// import 'package:flutter/material.dart';
-// import 'package:sixam_mart/helper/responsive_helper.dart';
-// import 'package:sixam_mart/util/dimensions.dart';
-// import 'package:sixam_mart/util/styles.dart';
 //
 // class BaseCardWidget extends StatelessWidget {
 //   final BusinessController businessController;

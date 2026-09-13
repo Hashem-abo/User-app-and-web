@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
-import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/coupon/domain/models/coupon_model.dart';
 import 'package:sixam_mart/features/category/domain/models/category_model.dart';

@@ -8,12 +8,13 @@ class FlashSaleTimerView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int? days, hours, minutes, seconds;
+    int? days, hours, minutes;
+    // int? seconds;
     if (eventDuration != null) {
       days = eventDuration!.inDays;
       hours = eventDuration!.inHours - days * 24;
       minutes = eventDuration!.inMinutes - (24 * days * 60) - (hours * 60);
-      seconds = eventDuration!.inSeconds - (24 * days * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
+      // seconds = eventDuration!.inSeconds - (24 * days * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
     }
     return eventDuration != null ? Row(children: [
 

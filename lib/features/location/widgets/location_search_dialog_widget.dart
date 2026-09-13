@@ -1,7 +1,6 @@
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/location/domain/models/prediction_model.dart';
 import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
-//import 'package:sixam_mart/features/ride_share_module/ride_location/controllers/search_location_controller.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';

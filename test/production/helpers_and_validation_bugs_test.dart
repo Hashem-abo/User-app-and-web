@@ -29,12 +29,8 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:intl/intl.dart';
-import 'package:sixam_mart/helper/validate_check.dart';
 import 'package:sixam_mart/helper/custom_validator.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
 
 void main() {
   group('[VALIDATION BUG] ValidateCheck null safety and format parsing crashes', () {

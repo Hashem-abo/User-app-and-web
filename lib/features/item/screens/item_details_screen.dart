@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:collection/collection.dart';
 import 'package:get/get.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
@@ -19,7 +18,6 @@ import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/cart_snackbar.dart';
 import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
 import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
@@ -35,19 +33,14 @@ import 'package:sixam_mart/features/item/widgets/similar_products_same_type_widg
 import 'package:sixam_mart/features/item/widgets/more_from_store_widget.dart';
 import 'package:sixam_mart/features/item/widgets/explore_more_similar_products_widget.dart';
 import 'package:sixam_mart/features/item/screens/virtual_try_on_screen.dart';
-import 'package:sixam_mart/features/item/screens/ar_furniture_screen.dart';
 import 'package:sixam_mart/features/item/screens/reels_page.dart';
-import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
-import 'package:sixam_mart/common/widgets/item_shimmer.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/features/review/screens/item_review_screen.dart';
-import 'package:sixam_mart/helper/color_converter.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/product_question/controllers/product_question_controller.dart';
 import 'package:sixam_mart/features/product_question/screens/product_question_screen.dart';
-import 'package:sixam_mart/features/product_question/widgets/ask_question_dialog.dart';
 import 'package:sixam_mart/features/product_question/widgets/product_question_widget.dart';
 import 'package:sixam_mart/features/report/widgets/report_bottom_sheet.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
@@ -115,12 +108,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
 
 
-  final bool _showLocal = true;
   bool _isEditing = false;
   int _localQuantity = 1;
   bool _isDescriptionExpanded = false;
-  final int _selectedTabIndex = 0;
-  final bool _isAddedToHistory = false;
 
   @override
   Widget build(BuildContext context) {
@@ -572,7 +562,6 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                 itemBuilder: (context, i) {
                                   String optionName = item.choiceOptions![index].options![i].trim();
                                   bool isSelected = itemController.variationIndex != null && itemController.variationIndex!.length > index && itemController.variationIndex![index] == i;
-                                  Color? color = ColorConverter.getColorFromOption(optionName);
 
                                   Variation? matchingVariation;
                                   if (item.variations != null) {
@@ -1624,27 +1613,6 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
       listOfAddOnQty.add(addOn.quantity);
     }
     return listOfAddOnQty;
-  }
-
-  double _getItemDetailsDiscountPrice({required CartModel cart}) {
-    double discountedPrice = 0;
-
-    double? discount = cart.item!.discount;
-    String? discountType = cart.item!.discountType;
-    String variationType = cart.variation != null && cart.variation!.isNotEmpty ? cart.variation![0].type! : '';
-
-    if(cart.variation != null && cart.variation!.isNotEmpty){
-      for (Variation variation in cart.item!.variations!) {
-        if (variation.type == variationType) {
-          discountedPrice = (PriceConverter.convertWithDiscount(variation.price!, discount, discountType)! * cart.quantity!);
-          break;
-        }
-      }
-    } else {
-      discountedPrice = (PriceConverter.convertWithDiscount(cart.item!.price!, discount, discountType)! * cart.quantity!);
-    }
-
-    return discountedPrice;
   }
 
   String? _getTryOnCategory(Item item) {

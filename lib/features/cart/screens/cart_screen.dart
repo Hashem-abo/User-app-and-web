@@ -773,7 +773,6 @@ class _CartScreenState extends State<CartScreen> {
                                                 return Column(children: groupedCart.entries.map((entry) {
                                                 int storeId = entry.key;
                                                 List<int> indices = entry.value;
-                                                List<CartModel> itemsForThisStore = indices.map((index) => cartController.cartList[index]).toList();
                                                 String storeName = cartController.cartList[indices[0]].item!.storeName ?? '';
 
                                                 return Container(

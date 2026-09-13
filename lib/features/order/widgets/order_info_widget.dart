@@ -3,9 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:sixam_mart/common/widgets/custom_card.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
-import 'package:sixam_mart/features/call/screens/zego_call_screen.dart';
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/chat/domain/models/conversation_model.dart';
@@ -27,7 +24,6 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/features/chat/widgets/image_dialog_widget.dart';
-import 'package:sixam_mart/features/order/widgets/delivery_details_widget.dart';
 import 'package:sixam_mart/features/payment/widgets/offline_info_edit_dialog_widget.dart';
 import 'package:sixam_mart/features/order/widgets/order_banner_view_widget.dart';
 import 'package:sixam_mart/features/order/widgets/order_item_widget.dart';
@@ -50,7 +46,6 @@ class OrderInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    ExpansibleController controller = ExpansibleController();
     bool isDesktop = ResponsiveHelper.isDesktop(context);
     bool isGuestLoggedIn = AuthHelper.isGuestLoggedIn();
 
@@ -64,7 +59,7 @@ class OrderInfoWidget extends StatelessWidget {
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-        !isDesktop ? SizedBox(height: DateConverter.isBeforeTime(order.scheduleAt) && (Get.find<SplashController>().getModuleConfig(order.moduleType)?.newVariation ?? false)
+        !isDesktop ? SizedBox(height: DateConverter.isBeforeTime(order.scheduleAt) && (Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation ?? false)
           ? (order.orderStatus != 'delivered' && order.orderStatus != 'failed'
           && order.orderStatus != 'canceled' && order.orderStatus != 'refund_requested' && order.orderStatus != 'refunded'
           && order.orderStatus != 'refund_request_canceled' ) ? 280 : 140 :
@@ -216,7 +211,7 @@ class OrderInfoWidget extends StatelessWidget {
               ]),
             ) : const SizedBox(),
 
-            (Get.find<SplashController>().getModuleConfig(order.moduleType)?.newVariation ?? false) ? Column(children: [
+            (Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation ?? false) ? Column(children: [
               Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
 
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

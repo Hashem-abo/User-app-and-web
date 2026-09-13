@@ -53,6 +53,16 @@ class ApiClient extends GetxService {
   Map<String, String> updateHeader(String? token, List<int>? zoneIDs, List<int>? operationIds, String? languageCode, int? moduleID, String? latitude, String? longitude, {bool setHeader = true}) {
     Map<String, String> header = {};
 
+    String? effectiveToken = (token != null && token.isNotEmpty && token != 'null')
+        ? token
+        : ((this.token != null && this.token!.isNotEmpty && this.token != 'null')
+            ? this.token
+            : sharedPreferences.getString(AppConstants.token));
+
+    if (effectiveToken != null && effectiveToken.isNotEmpty && effectiveToken != 'null') {
+      this.token = effectiveToken;
+    }
+
     AddressModel? userAddress = AddressHelper.getUserAddressFromSharedPref();
     if (latitude == null || latitude.isEmpty || latitude == '0') {
       latitude = userAddress?.latitude;
@@ -94,8 +104,10 @@ class ApiClient extends GetxService {
       AppConstants.localizationKey: languageCode ?? AppConstants.languages[0].languageCode!,
       AppConstants.latitude: validLat,
       AppConstants.longitude: validLng,
-      'Authorization': 'Bearer $token'
     });
+    if (effectiveToken != null && effectiveToken.isNotEmpty && effectiveToken != 'null') {
+      header['Authorization'] = 'Bearer $effectiveToken';
+    }
     if (!header.containsKey(AppConstants.zoneId) || header[AppConstants.zoneId] == null || header[AppConstants.zoneId]!.isEmpty || header[AppConstants.zoneId] == '[]') {
       header[AppConstants.zoneId] = jsonEncode([1]);
     }
@@ -141,6 +153,65 @@ class ApiClient extends GetxService {
     resHeaders[AppConstants.longitude] = cleanCoord(resHeaders[AppConstants.longitude], '44.191006');
 
     return resHeaders;
+  }
+
+  Map<String, String> _maskHeadersForLog(Map<String, String>? headers) {
+    if (headers == null) return {};
+    Map<String, String> masked = Map.from(headers);
+    if (masked.containsKey('Authorization')) {
+      String? auth = masked['Authorization'];
+      if (auth != null && auth.startsWith('Bearer ') && auth.length > 15) {
+        masked['Authorization'] = 'Bearer ${auth.substring(7, 11)}...[REDACTED]';
+      } else if (auth != null && auth.isNotEmpty) {
+        masked['Authorization'] = '[REDACTED]';
+      }
+    }
+    return masked;
+  }
+
+  dynamic _maskBodyForLog(dynamic body) {
+    if (body == null) return null;
+    if (body is Map) {
+      Map<dynamic, dynamic> masked = {};
+      body.forEach((key, value) {
+        String keyStr = key.toString().toLowerCase();
+        if (keyStr.contains('password') ||
+            keyStr == 'otp' ||
+            keyStr == 'code' ||
+            keyStr == 'token' ||
+            keyStr == 'temp_token' ||
+            keyStr == 'access_token' ||
+            keyStr.contains('secret') ||
+            keyStr == 'app_sign' ||
+            keyStr.contains('cvv') ||
+            keyStr.contains('card_number') ||
+            keyStr == 'pin') {
+          masked[key] = '[REDACTED]';
+        } else if (value is Map || value is List) {
+          masked[key] = _maskBodyForLog(value);
+        } else {
+          masked[key] = value;
+        }
+      });
+      return masked;
+    } else if (body is List) {
+      return body.map((item) => _maskBodyForLog(item)).toList();
+    }
+    return body;
+  }
+
+  dynamic _maskResponseBodyForLog(String uri, dynamic body) {
+    if (body == null) return null;
+    String lowerUri = uri.toLowerCase();
+    if (lowerUri.contains('/auth/') ||
+        lowerUri.contains('/login') ||
+        lowerUri.contains('/sign-up') ||
+        lowerUri.contains('/verify-') ||
+        lowerUri.contains('/reset-password') ||
+        lowerUri.contains('/cm-firebase-token')) {
+      return _maskBodyForLog(body);
+    }
+    return body;
   }
 
   Map<String, String> getHeader() => _sanitizeHeaders(_mainHeaders);
@@ -251,7 +322,7 @@ class ApiClient extends GetxService {
         }
 
         if (kDebugMode) {
-          log('====> API Call: $uri\nHeader: $finalHeaders');
+          log('====> API Call: $uri\nHeader: ${_maskHeadersForLog(finalHeaders)}');
         }
 
         Uri requestUri = Uri.parse(appBaseUrl + uri);
@@ -301,8 +372,8 @@ class ApiClient extends GetxService {
     try {
       Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
-        print('====> API Call: $uri\nHeader: $finalHeaders');
-        print('====> API Body: $body');
+        print('====> API Call: $uri\nHeader: ${_maskHeadersForLog(finalHeaders)}');
+        print('====> API Body: ${_maskBodyForLog(body)}');
       }
 
       Map<dynamic, dynamic> newBody = {};
@@ -332,8 +403,8 @@ class ApiClient extends GetxService {
   Future<Response> postMultipartData(String uri, Map<String, String> body, List<MultipartBody> multipartBody, {List<MultipartDocument>? multipartDoc, Map<String, String>? headers, int? timeout, bool handleError = true}) async {
     try {
       Map<String, String> finalHeaders = _sanitizeHeaders(headers);
-      debugPrint('====> API Call: $uri\nHeader: $finalHeaders');
-      debugPrint('====> API Body: $body with ${multipartBody.length} and multipart ${multipartDoc?.length}');
+      debugPrint('====> API Call: $uri\nHeader: ${_maskHeadersForLog(finalHeaders)}');
+      debugPrint('====> API Body: ${_maskBodyForLog(body)} with ${multipartBody.length} and multipart ${multipartDoc?.length}');
       http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse(appBaseUrl+uri));
       request.headers.addAll(finalHeaders);
       for(MultipartBody multipart in multipartBody) {
@@ -396,8 +467,8 @@ class ApiClient extends GetxService {
     try {
       Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
-        print('====> API Call: $uri\nHeader: $finalHeaders');
-        print('====> API Body: $body');
+        print('====> API Call: $uri\nHeader: ${_maskHeadersForLog(finalHeaders)}');
+        print('====> API Body: ${_maskBodyForLog(body)}');
       }
 
       Map<dynamic, dynamic> newBody = {};
@@ -428,7 +499,7 @@ class ApiClient extends GetxService {
     try {
       Map<String, String> finalHeaders = _sanitizeHeaders(headers);
       if(kDebugMode) {
-        print('====> API Call: $uri\nHeader: $finalHeaders');
+        print('====> API Call: $uri\nHeader: ${_maskHeadersForLog(finalHeaders)}');
       }
       http.Response response = await http.delete(
         Uri.parse(appBaseUrl+uri),
@@ -461,17 +532,17 @@ class ApiClient extends GetxService {
       }else if(response0.body.toString().startsWith('{message')) {
         response0 = Response(statusCode: response0.statusCode, body: response0.body, statusText: response0.body['message']);
       }
-    }else if(response0.statusCode != 200 && response0.body == null) {
+    }else if(!response0.isOk && response0.statusCode != 204 && response0.body == null) {
       response0 = Response(statusCode: 0, statusText: noInternetMessage);
     }
     if(kDebugMode) {
       print('====> API Response: [${response0.statusCode}] $uri');
       if(!ResponsiveHelper.isWeb() || response.statusCode != 500){
-        print('${response0.body}');
+        print('${_maskResponseBodyForLog(uri, response0.body)}');
       }
     }
     if(handleError) {
-      if(response0.statusCode == 200) {
+      if(response0.isOk) {
         return response0;
       } else {
         ApiChecker.checkApi(response0);

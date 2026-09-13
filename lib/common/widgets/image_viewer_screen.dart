@@ -7,7 +7,6 @@ import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/helper/color_converter.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
 
 class ImageViewerScreen extends StatefulWidget {
   final Item item;
@@ -24,6 +23,8 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
   final List<String?> _imageList = [];
   ChoiceOptions? _colorOption;
   int _colorOptionIndex = -1;
+
+  bool get hasColors => _colorOption != null && _colorOption!.options != null && _colorOption!.options!.isNotEmpty;
 
   @override
   void initState() {
@@ -127,37 +128,38 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
+  /*
   bool _isVariantImageAt(int index) {
-    if (index >= 0 && index < _imageList.length && widget.item.variations != null) {
-      String? currentUrl = _imageList[index];
-      for (var v in widget.item.variations!) {
-        if (v.imagesFullUrl != null) {
-          for (var img in v.imagesFullUrl!) {
-            if (_isSameImage(img, currentUrl)) return true;
+    if (index >= _imageList.length) return false;
+    String? currentUrl = _imageList[index];
+    if (currentUrl == null) return false;
+
+    if (widget.item.variations != null) {
+      for (var variation in widget.item.variations!) {
+        if (variation.imagesFullUrl != null) {
+          for (var img in variation.imagesFullUrl!) {
+            if (_isSameImage(img, currentUrl)) {
+              return true;
+            }
           }
         }
       }
     }
     return false;
   }
+  */
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    bool hasColors = _colorOption != null && _colorOption!.options != null && _colorOption!.options!.isNotEmpty;
     double bottomPadding = MediaQuery.of(context).padding.bottom;
     double bottomBarHeight = 60 + bottomPadding;
-
-    Color? selectedColor;
-    if (hasColors && _colorOption != null && _colorOption!.options != null && _selectedColorIndex < _colorOption!.options!.length) {
-      String colorName = _colorOption!.options![_selectedColorIndex].trim();
-      selectedColor = ColorConverter.getColorFromOption(colorName);
-    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -165,8 +167,6 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
         top: false,
         bottom: false,
         child: GetBuilder<ItemController>(builder: (itemController) {
-          bool isCurrentVariantImage = _isVariantImageAt(itemController.imageIndex);
-
           Widget galleryWidget = PhotoViewGallery.builder(
             scrollPhysics: const BouncingScrollPhysics(),
             backgroundDecoration: const BoxDecoration(color: Colors.black),
@@ -247,7 +247,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                   child: Center(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.4),
+                        color: Colors.black.withValues(alpha: 0.4),
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
@@ -274,7 +274,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                   child: Center(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.4),
+                        color: Colors.black.withValues(alpha: 0.4),
                         shape: BoxShape.circle,
                       ),
                       child: IconButton(
@@ -306,7 +306,7 @@ class _ImageViewerScreenState extends State<ImageViewerScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.18),
+                          color: Colors.white.withValues(alpha: 0.18),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Text(

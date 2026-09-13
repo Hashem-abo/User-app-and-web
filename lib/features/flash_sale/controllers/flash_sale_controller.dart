@@ -25,7 +25,6 @@ class FlashSaleController extends GetxController implements GetxService {
     if (_flashSaleModel == null || _flashSaleModel!.activeProducts == null) return _flashSaleModel;
     AddressModel? address = AddressHelper.getUserAddressFromSharedPref();
     int? activeZoneId = address?.zoneId;
-    bool moduleStock = Get.find<SplashController>().configModel?.moduleConfig?.module?.stock ?? false;
 
     List<ActiveProducts> filteredProducts = _flashSaleModel!.activeProducts!.where((p) {
       if (p.item == null) return true;
@@ -66,7 +65,6 @@ class FlashSaleController extends GetxController implements GetxService {
 
     List<Products> filteredProducts = _productFlashSale!.products!.where((p) {
       if (p.item == null) return true;
-      if (activeZoneId == null || activeZoneId == 0) return true;
       int? itemZoneId = p.item!.zoneId;
       if ((itemZoneId == null || itemZoneId == 0) && p.item!.storeDetails != null) {
         itemZoneId = p.item!.storeDetails!['zone_id'];

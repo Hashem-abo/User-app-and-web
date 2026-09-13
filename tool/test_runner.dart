@@ -22,7 +22,6 @@
 //   dart run tool/test_runner.dart --export test_report.md
 // =============================================================================
 
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -55,12 +54,17 @@ void main(List<String> args) async {
 
   for (int i = 0; i < args.length; i++) {
     final arg = args[i];
-    if (arg == '--summary') showSummary = true;
-    else if (arg == '--errors' || arg == '--failures') showErrors = true;
-    else if (arg == '--passed' || arg == '--correct') showPassed = true;
-    else if (arg == '--all') showAll = true;
-    else if (arg == '--json') outputJson = true;
-    else if (arg == '--export' && i + 1 < args.length) {
+    if (arg == '--summary') {
+      showSummary = true;
+    } else if (arg == '--errors' || arg == '--failures') {
+      showErrors = true;
+    } else if (arg == '--passed' || arg == '--correct') {
+      showPassed = true;
+    } else if (arg == '--all') {
+      showAll = true;
+    } else if (arg == '--json') {
+      outputJson = true;
+    } else if (arg == '--export' && i + 1 < args.length) {
       exportPath = args[++i];
     } else if (arg == '--suite' && i + 1 < args.length) {
       suitePath = args[++i];
@@ -116,11 +120,17 @@ void main(List<String> args) async {
         // Skip internal runner / harness tests
         if (!name.startsWith('loading ') && !name.contains('(setUpAll)') && !name.contains('(tearDownAll)')) {
           String category = 'General';
-          if (name.contains('[BUSINESS LOGIC]')) category = 'Business Logic & Calculations';
-          else if (name.contains('[DATA PARSING]')) category = 'Data Parsing & Null Safety';
-          else if (name.contains('[AUTH & LIFECYCLE]')) category = 'Auth & System Lifecycle';
-          else if (name.contains('[UI/UX & RESOURCES]')) category = 'UI/UX & Resource Guards';
-          else if (name.contains('[FIXED]')) category = 'Regression Verification';
+          if (name.contains('[BUSINESS LOGIC]')) {
+            category = 'Business Logic & Calculations';
+          } else if (name.contains('[DATA PARSING]')) {
+            category = 'Data Parsing & Null Safety';
+          } else if (name.contains('[AUTH & LIFECYCLE]')) {
+            category = 'Auth & System Lifecycle';
+          } else if (name.contains('[UI/UX & RESOURCES]')) {
+            category = 'UI/UX & Resource Guards';
+          } else if (name.contains('[FIXED]')) {
+            category = 'Regression Verification';
+          }
 
           tests[id] = TestInfo(id: id, name: name, category: category);
         }

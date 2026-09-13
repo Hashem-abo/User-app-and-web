@@ -62,7 +62,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final FocusNode _streetNode = FocusNode();
   final FocusNode _houseNode = FocusNode();
   final FocusNode _floorNode = FocusNode();
-  final FocusNode _emailFocus = FocusNode();
   CameraPosition? _cameraPosition;
   late LatLng _initialPosition;
   bool _otherSelect = false;

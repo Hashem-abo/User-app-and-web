@@ -7,8 +7,6 @@ import 'package:sixam_mart/features/language/controllers/language_controller.dar
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/home/widgets/web/module_widget.dart';
 import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
-import 'package:sixam_mart/features/home/widgets/horizontal_module_view.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -16,7 +14,6 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
-import 'package:sixam_mart/features/parcel/widgets/parcel_app_bar_widget.dart';
 import 'package:sixam_mart/features/parcel/widgets/deliver_item_card_widget.dart';
 import 'package:sixam_mart/features/parcel/widgets/get_service_video_widget.dart';
 import 'package:sixam_mart/features/parcel/widgets/sevice_info_list_widget.dart';

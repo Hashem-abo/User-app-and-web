@@ -1,5 +1,3 @@
-// import 'package:flutter/foundation.dart';
-// import 'package:image_compression_flutter/image_compression_flutter.dart';
 //
 // class NetworkInfo {
 //

@@ -13,11 +13,8 @@ import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/features/coupon/domain/models/coupon_model.dart' hide Store;
-import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
 import 'package:sixam_mart/features/order/controllers/order_controller.dart';
-import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
@@ -65,7 +62,7 @@ class MessageBubble extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 1,
               blurRadius: 1,
             )
@@ -124,7 +121,7 @@ class MessageBubble extends StatelessWidget {
                            decoration: BoxDecoration(
                              color: Theme.of(context).cardColor,
                              borderRadius: BorderRadius.circular(10),
-                             border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.2)),
+                             border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
                            ),
                            child: Row(children: [
                              ClipRRect(
@@ -161,7 +158,7 @@ class MessageBubble extends StatelessWidget {
                          decoration: BoxDecoration(
                            color: Theme.of(context).cardColor,
                            borderRadius: BorderRadius.circular(10),
-                           border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.2)),
+                           border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
                          ),
                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                            // Header: image + name
@@ -176,7 +173,7 @@ class MessageBubble extends StatelessWidget {
                                Expanded(child: Text(item.name ?? '', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault), maxLines: 2, overflow: TextOverflow.ellipsis)),
                              ]),
                            ),
-                           Divider(height: 1, color: Theme.of(context).disabledColor.withOpacity(0.2)),
+                           Divider(height: 1, color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
 
                            // Regular variations (e.g. Size: S-100, M-120, L-150)
                            if (item.variations != null && item.variations!.isNotEmpty)
@@ -214,7 +211,7 @@ class MessageBubble extends StatelessWidget {
                        decoration: BoxDecoration(
                          color: Theme.of(context).cardColor,
                          borderRadius: BorderRadius.circular(10),
-                         border: Border.all(color: Theme.of(context).primaryColor.withOpacity(0.3)),
+                         border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.3)),
                        ),
                        child: Column(
                          crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,7 +223,7 @@ class MessageBubble extends StatelessWidget {
                                Container(
                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                  decoration: BoxDecoration(
-                                   color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                   color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                                    borderRadius: BorderRadius.circular(5),
                                  ),
                                  child: Text(
@@ -293,7 +290,7 @@ class MessageBubble extends StatelessWidget {
                      decoration: BoxDecoration(
                        color: Theme.of(context).cardColor,
                        borderRadius: BorderRadius.circular(10),
-                       border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.2)),
+                       border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
                      ),
                      child: Column(
                        crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,7 +380,7 @@ class MessageBubble extends StatelessWidget {
                          decoration: BoxDecoration(
                            color: Theme.of(context).cardColor,
                            borderRadius: BorderRadius.circular(10),
-                           border: Border.all(color: Theme.of(context).disabledColor.withOpacity(0.2)),
+                           border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.2)),
                          ),
                          child: Column(
                            crossAxisAlignment: CrossAxisAlignment.start,
@@ -399,7 +396,7 @@ class MessageBubble extends StatelessWidget {
                                  Container(
                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                    decoration: BoxDecoration(
-                                     color: Colors.green.withOpacity(0.1),
+                                     color: Colors.green.withValues(alpha: 0.1),
                                      borderRadius: BorderRadius.circular(5),
                                    ),
                                    child: Text(
@@ -470,7 +467,7 @@ class MessageBubble extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 8,
-          backgroundColor: active ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withOpacity(0.3),
+          backgroundColor: active ? Theme.of(context).primaryColor : Theme.of(context).disabledColor.withValues(alpha: 0.3),
           child: active ? const Icon(Icons.check, size: 10, color: Colors.white) : const SizedBox(),
         ),
         const SizedBox(height: 4),
@@ -489,7 +486,7 @@ class MessageBubble extends StatelessWidget {
     return Expanded(
       child: Container(
         height: 2,
-        color: active ? Get.context!.theme.primaryColor : Get.context!.theme.disabledColor.withOpacity(0.3),
+        color: active ? Get.context!.theme.primaryColor : Get.context!.theme.disabledColor.withValues(alpha: 0.3),
       ),
     );
   }

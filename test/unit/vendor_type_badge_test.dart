@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/vendor_type_badge_widget.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
-import 'package:sixam_mart/helper/vendor_type_helper.dart';
 
 void main() {
   group('VendorTypeHelper & VendorTypeBadgeWidget Comprehensive Tests', () {

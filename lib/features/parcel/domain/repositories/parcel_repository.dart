@@ -37,7 +37,7 @@ class ParcelRepository implements ParcelRepositoryInterface {
     switch(source) {
       case DataSourceEnum.client:
         Response response = await apiClient.getData(AppConstants.videoContentUri);
-        if(response.statusCode == 200) {
+        if(response.isOk) {
           videoContentDetails = VideoContentModel.fromJson(response.body);
           LocalClient.organize(source, cacheId, jsonEncode(response.body), apiClient.getHeader());
         }
@@ -58,7 +58,7 @@ class ParcelRepository implements ParcelRepositoryInterface {
     switch(source) {
       case DataSourceEnum.client:
         Response response = await apiClient.getData(AppConstants.whyChooseUri);
-        if(response.statusCode == 200) {
+        if(response.isOk) {
           whyChooseDetails = WhyChooseModel.fromJson(response.body);
           LocalClient.organize(source, cacheId, jsonEncode(response.body), apiClient.getHeader());
         }
@@ -84,7 +84,7 @@ class ParcelRepository implements ParcelRepositoryInterface {
   Future<List<ParcelCategoryModel>?> _getParcelCategory() async {
     List<ParcelCategoryModel>? parcelCategoryList;
     Response response = await apiClient.getData(AppConstants.parcelCategoryUri);
-    if(response.statusCode == 200) {
+    if(response.isOk) {
       parcelCategoryList = [];
       response.body.forEach((parcel) => parcelCategoryList!.add(ParcelCategoryModel.fromJson(parcel)));
     }
@@ -94,7 +94,7 @@ class ParcelRepository implements ParcelRepositoryInterface {
   Future<List<Data>?> _getParcelInstruction(int offset) async {
     List<Data>? parcelInstructionList;
     Response response = await apiClient.getData('${AppConstants.parcelInstructionUri}?limit=10&offset=$offset');
-    if(response.statusCode == 200) {
+    if(response.isOk) {
       parcelInstructionList = [];
       parcelInstructionList.addAll(ParcelInstructionModel.fromJson(response.body).data!);
     }
@@ -105,7 +105,7 @@ class ParcelRepository implements ParcelRepositoryInterface {
   Future<ParcelCancellationReasonsModel?> getParcelCancellationReasons({required bool isBeforePickup}) async {
     ParcelCancellationReasonsModel? cancellationReasonsModel;
     Response response = await apiClient.getData('${AppConstants.getParcelCancellationReasons}?limit=12&offset=1&user_type=customer&cancellation_type=${isBeforePickup ? 'before_pickup' : 'after_pickup'}');
-    if(response.statusCode == 200){
+    if(response.isOk){
       cancellationReasonsModel = ParcelCancellationReasonsModel.fromJson(response.body);
     }
     return cancellationReasonsModel;

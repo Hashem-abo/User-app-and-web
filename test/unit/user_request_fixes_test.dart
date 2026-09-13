@@ -155,8 +155,7 @@ void main() {
     });
 
     test('Subscribe request payload without purchase_code omits or handles null cleanly', () {
-      String? purchaseCode;
-      final Map<String, dynamic> requestPayload = {
+      Map<String, dynamic> buildPayload(String? purchaseCode) => {
         'plan_id': 3,
         'payment_type': 'wallet',
         'payment_method': 'wallet',
@@ -165,6 +164,8 @@ void main() {
         if (purchaseCode != null && purchaseCode.isNotEmpty) 'purchase_code': purchaseCode,
       };
 
+      final Map<String, dynamic> requestPayload = buildPayload(null);
+
       expect(requestPayload['payment_type'], equals('wallet'));
       expect(requestPayload.containsKey('purchase_code'), isFalse);
     });
@@ -172,14 +173,14 @@ void main() {
 
   group('USER REQUEST FIX 5: Password Fields LTR Direction, High Contrast Color & Font', () {
     test('Password fields must use LTR directionality even when app is RTL', () {
-      bool isPassword = true;
-      bool isPhone = false;
-      String? countryDialCode;
+      String resolveDirection(bool isPhone, bool isPassword, String? countryDialCode, bool isRtlContext) {
+        return (isPhone || isPassword || countryDialCode != null) ? 'ltr' : (isRtlContext ? 'rtl' : 'ltr');
+      }
       
-      // Simulating Directionality check in CustomTextField / MyTextField
-      final isRtlContext = true;
-      final resolvedDirection = (isPhone || isPassword || countryDialCode != null) ? 'ltr' : (isRtlContext ? 'rtl' : 'ltr');
-      expect(resolvedDirection, equals('ltr'));
+      expect(resolveDirection(false, true, null, true), equals('ltr'));
+      expect(resolveDirection(true, false, null, true), equals('ltr'));
+      expect(resolveDirection(false, false, '+966', true), equals('ltr'));
+      expect(resolveDirection(false, false, null, true), equals('rtl'));
     });
 
     test('Password field text color must contrast with background', () {
@@ -195,16 +196,13 @@ void main() {
     });
 
     test('Password field adaptive keyboardType switches between text and visiblePassword', () {
-      bool isPassword = true;
-      bool obscureText = true;
-
       String resolveKeyboardType(bool isPassword, bool obscureText) {
         if (!isPassword) return 'text';
         return obscureText ? 'text' : 'visiblePassword';
       }
 
-      expect(resolveKeyboardType(isPassword, true), equals('text'));
-      expect(resolveKeyboardType(isPassword, false), equals('visiblePassword'));
+      expect(resolveKeyboardType(true, true), equals('text'));
+      expect(resolveKeyboardType(true, false), equals('visiblePassword'));
     });
   });
 

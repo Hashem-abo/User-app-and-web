@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
-// Note: Keeping imports intact to prevent unused import issues elsewhere if needed,
-// or you can safely delete the pro_active_offer_model.dart import if it goes unused.
-import 'package:sixam_mart/features/pro/domain/models/pro_active_offer_model.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';

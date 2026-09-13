@@ -104,10 +104,11 @@ class ProfileController extends GetxController implements GetxService {
       final String zegoAppSign = config?.zegoAppSign ?? AppConstants.zegoAppSign;
 
       if (zegoAppId > 0 && zegoAppSign.isNotEmpty) {
-        ZegoUIKitPrebuiltCallInvitationService().init(
-          appID: zegoAppId,
-          appSign: zegoAppSign,
-          userID: 'user_${userInfoModel.id}',
+        if (!ZegoUIKitPrebuiltCallInvitationService().isInit) {
+          ZegoUIKitPrebuiltCallInvitationService().init(
+            appID: zegoAppId,
+            appSign: zegoAppSign,
+            userID: 'user_${userInfoModel.id}',
           userName: '${userInfoModel.fName} ${userInfoModel.lName}',
           plugins: [ZegoUIKitSignalingPlugin()],
         config: ZegoCallInvitationConfig(
@@ -144,6 +145,7 @@ class ProfileController extends GetxController implements GetxService {
           return config;
         },
       );
+        }
       }
     }
     update();

@@ -238,6 +238,11 @@ class Store {
     metaDescription = json['meta_description'];
     metaImage = json['meta_image'];
     verifiedSeller = json['verified_seller'] != null ? int.tryParse(json['verified_seller'].toString()) : null;
+    moduleType = json['module_type']?.toString() ?? json['module']?['module_type']?.toString();
+    if (json['module'] != null && json['module'] is Map<String, dynamic>) {
+      module = ModuleModel.fromJson(json['module']);
+      moduleType ??= module?.moduleType;
+    }
     final parsedVendorType = json['vendor_type']?.toString() ?? json['store_type']?.toString();
     if (parsedVendorType != null &&
         parsedVendorType.trim().isNotEmpty &&

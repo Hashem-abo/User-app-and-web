@@ -12,7 +12,6 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/web_page_title_widget.dart';
 import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 
 class AllStoreScreen extends StatefulWidget {
   final bool isPopular;

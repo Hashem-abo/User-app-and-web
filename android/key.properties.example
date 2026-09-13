@@ -1,0 +1,8 @@
+# Example key.properties template for Production Signing
+# Copy this file to 'android/key.properties' and fill in your actual private credentials.
+# NEVER commit 'key.properties' or your '*.jks' keystore to version control!
+
+keyAlias=your_release_key_alias
+keyPassword=your_key_password
+storeFile=../app/upload-keystore.jks
+storePassword=your_store_password

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:sixam_mart/helper/version_helper.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/auth/screens/new_user_setup_screen.dart';
 import 'package:sixam_mart/features/brands/screens/brands_product_screen.dart';
@@ -827,7 +828,7 @@ class RouteHelper {
   ];
 
   static Widget getRoute(Widget navigateTo, {AccessLocationScreen? locationScreen, bool byPuss = false}) {
-    double? minimumVersion = 0;
+    dynamic minimumVersion = 0;
     if(Get.find<SplashController>().configModel == null) {
       return const SplashScreen(body: null);
     }
@@ -836,7 +837,7 @@ class RouteHelper {
     }else if(GetPlatform.isIOS) {
       minimumVersion = Get.find<SplashController>().configModel!.appMinimumVersionIos;
     }
-    return (AppConstants.appVersion < minimumVersion! && !GetPlatform.isWeb)  ? const UpdateScreen(isUpdate: true)
+    return (VersionHelper.isVersionLower(AppConstants.appVersion, minimumVersion) && !GetPlatform.isWeb)  ? const UpdateScreen(isUpdate: true)
         : Get.find<SplashController>().configModel!.maintenanceMode! ? const UpdateScreen(isUpdate: false)
         : (AddressHelper.getUserAddressFromSharedPref() == null && !byPuss)
         ? AccessLocationScreen(fromSignUp: false, fromHome: false, route: Get.currentRoute) : navigateTo;

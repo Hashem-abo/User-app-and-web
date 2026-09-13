@@ -121,8 +121,10 @@ class AuthRepository implements AuthRepositoryInterface{
     }else{
       apiClient.updateHeader(token, null, null, sharedPreferences.getString(AppConstants.languageCode), ModuleHelper.getModule()?.id, null, null);
     }
-    await secureStorage.write(key: AppConstants.token, value: token);
-    await sharedPreferences.remove(AppConstants.token);
+    await sharedPreferences.setString(AppConstants.token, token);
+    try {
+      await secureStorage.write(key: AppConstants.token, value: token);
+    } catch (_) {}
     return true;
   }
 
@@ -286,7 +288,11 @@ class AuthRepository implements AuthRepositoryInterface{
 
   @override
   String getUserToken() {
-    return sharedPreferences.getString(AppConstants.token) ?? "";
+    String? token = sharedPreferences.getString(AppConstants.token);
+    if (token != null && token.isNotEmpty) {
+      return token;
+    }
+    return apiClient.token ?? "";
   }
 
   @override

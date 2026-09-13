@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 
 class SourceSelectorTab extends StatelessWidget {

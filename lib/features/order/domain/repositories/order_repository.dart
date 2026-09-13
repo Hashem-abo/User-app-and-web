@@ -53,7 +53,7 @@ class OrderRepository implements OrderRepositoryInterface {
       data.addAll({'guest_id': guestId ?? AuthHelper.getGuestId()});
     }
     Response response = await apiClient.postData(AppConstants.orderCancelUri, data, );
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       success = true;
     }
     return success;
@@ -67,7 +67,7 @@ class OrderRepository implements OrderRepositoryInterface {
   Future<List<OrderDetailsModel>?> _getOrderDetails(String orderID, String? guestId) async {
     List<OrderDetailsModel>? orderDetails;
     Response response = await apiClient.getData('${AppConstants.orderDetailsUri}$orderID${(guestId != null && !AuthHelper.isLoggedIn()) ? '&guest_id=$guestId' : ''}');
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       orderDetails = [];
       if (response.body is List) {
         response.body.forEach((orderDetail) => orderDetails!.add(OrderDetailsModel.fromJson(orderDetail)));
@@ -94,7 +94,7 @@ class OrderRepository implements OrderRepositoryInterface {
   Future<PaginatedOrderModel?> _getRunningOrderList(int offset, bool fromDashboard) async {
     PaginatedOrderModel? runningOrderModel;
     Response response = await apiClient.getData('${AppConstants.runningOrderListUri}?offset=$offset&limit=${fromDashboard ? 50 : 10}');
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       runningOrderModel = PaginatedOrderModel.fromJson(response.body);
     }
     return runningOrderModel;
@@ -103,7 +103,7 @@ class OrderRepository implements OrderRepositoryInterface {
   Future<PaginatedOrderModel?> _getHistoryOrderList(int offset) async {
     PaginatedOrderModel? historyOrderModel;
     Response response = await apiClient.getData('${AppConstants.historyOrderListUri}?offset=$offset&limit=10');
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       historyOrderModel = PaginatedOrderModel.fromJson(response.body);
     }
     return historyOrderModel;
@@ -112,7 +112,7 @@ class OrderRepository implements OrderRepositoryInterface {
   Future<List<CancellationData>?> _getCancelReasons() async {
     List<CancellationData>? orderCancelReasons;
     Response response = await apiClient.getData('${AppConstants.orderCancellationUri}?offset=1&limit=12&type=customer');
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       OrderCancellationBody orderCancellationBody = OrderCancellationBody.fromJson(response.body);
       orderCancelReasons = [];
       for (var element in orderCancellationBody.reasons!) {
@@ -125,7 +125,7 @@ class OrderRepository implements OrderRepositoryInterface {
   Future<List<String?>?> _getRefundReasons() async {
     List<String?>? refundReasons;
     Response response = await apiClient.getData(AppConstants.refundReasonUri);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       RefundModel refundModel = RefundModel.fromJson(response.body);
       refundReasons = [];
       for (var element in refundModel.refundReasons!) {
@@ -138,7 +138,7 @@ class OrderRepository implements OrderRepositoryInterface {
   Future<List<String?>?> _getSupportReasons() async {
     List<String?>? supportReasons;
     Response response = await apiClient.getData(AppConstants.supportReasonUri);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       SupportModel supportModel = SupportModel.fromJson(response.body);
       supportReasons = [];
       for (var element in supportModel.data!) {
@@ -156,7 +156,7 @@ class OrderRepository implements OrderRepositoryInterface {
       'return_otp': returnOtp,
     };
     Response response = await apiClient.postData(AppConstants.customerParcelReturn, data);
-    return response.statusCode == 200;
+    return response.isOk;
   }
 
   @override
@@ -173,7 +173,7 @@ class OrderRepository implements OrderRepositoryInterface {
     MonthlyOrderModel? monthlyOrderModel;
     final String moduleParam = (moduleType != null && moduleType.isNotEmpty) ? '&module_type=$moduleType' : '';
     final Response response = await apiClient.getData('${AppConstants.monthlyOrderListUri}?limit=10&offset=$offset$moduleParam');
-    if(response.statusCode == 200) {
+    if(response.isOk) {
       monthlyOrderModel = MonthlyOrderModel.fromJson(response.body);
     }
     return monthlyOrderModel;

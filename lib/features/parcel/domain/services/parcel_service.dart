@@ -42,7 +42,7 @@ class ParcelService implements ParcelServiceInterface{
   Future<LatLng> getPlaceDetails(String? placeID) async {
     LatLng latLng = const LatLng(0, 0);
     Response? response = await parcelRepositoryInterface.getPlaceDetails(placeID);
-    if(response.statusCode == 200) {
+    if(response.isOk) {
 
       final data = response.body;
       final location = data['location'];

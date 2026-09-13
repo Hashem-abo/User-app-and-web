@@ -3,10 +3,8 @@ import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/add_favourite_view.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
 import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
-import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
@@ -20,10 +18,6 @@ class VisitAgainCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isPharmacy = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.pharmacy;
-    bool isFood = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food;
-    bool isAvailable = store.open == 1 && store.active!;
-
     return TextHover(
       builder: (hovered) {
         return Stack(

@@ -38,6 +38,7 @@ import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:uuid/uuid.dart';
 
 class CheckoutController extends GetxController implements GetxService {
   final CheckoutServiceInterface checkoutServiceInterface;
@@ -59,6 +60,18 @@ class CheckoutController extends GetxController implements GetxService {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  bool _isSubmittingOrder = false;
+  bool get isSubmittingOrder => _isSubmittingOrder;
+
+  String? _orderIdempotencyKey;
+  String get orderIdempotencyKey {
+    _orderIdempotencyKey ??= const Uuid().v4();
+    return _orderIdempotencyKey!;
+  }
+  void resetOrderIdempotencyKey() {
+    _orderIdempotencyKey = const Uuid().v4();
+  }
 
   AddressModel? _guestAddress;
   AddressModel? get guestAddress => _guestAddress;
@@ -322,7 +335,7 @@ class CheckoutController extends GetxController implements GetxService {
         double.parse(address.latitude!),
         double.parse(address.longitude!),
       );
-      if (response.statusCode == 200) {
+      if (response.isOk) {
         _isAiBatched = response.body['should_batch'] ?? false;
       } else {
         _isAiBatched = false;
@@ -604,7 +617,7 @@ class CheckoutController extends GetxController implements GetxService {
         LatLng storeLatLng = LatLng(double.parse(store.latitude!), double.parse(store.longitude!));
         Response response = await checkoutServiceInterface.getDistanceInMeter(storeLatLng, originLatLng);
         try {
-          if (response.statusCode == 200 && response.body != null && response.body['distanceMeters'] != null) {
+          if (response.isOk && response.body != null && response.body['distanceMeters'] != null) {
             final double? distanceMater = double.tryParse(response.body['distanceMeters'].toString());
             dist = (distanceMater != null) ? distanceMater / 1000 : Geolocator.distanceBetween(storeLatLng.latitude, storeLatLng.longitude, originLatLng.latitude, originLatLng.longitude) / 1000;
             dur = parseDuration(response.body['duration']?.toString() ?? '');
@@ -630,7 +643,7 @@ class CheckoutController extends GetxController implements GetxService {
         // Fallback for non-store flows or empty stores (though shouldn't happen here)
         Response response = await checkoutServiceInterface.getDistanceInMeter(originLatLng, destinationLatLng);
         try {
-          if (response.statusCode == 200 && response.body != null && response.body['distanceMeters'] != null) {
+          if (response.isOk && response.body != null && response.body['distanceMeters'] != null) {
             final double? distanceMater = double.tryParse(response.body['distanceMeters'].toString());
             _distance = (distanceMater != null) ? distanceMater / 1000 : Geolocator.distanceBetween(originLatLng.latitude, originLatLng.longitude, destinationLatLng.latitude, destinationLatLng.longitude) / 1000;
             _estimatedDuration = parseDuration(response.body['duration']?.toString() ?? '');
@@ -702,86 +715,109 @@ class CheckoutController extends GetxController implements GetxService {
   }
 
   Future<String> placeOrder(PlaceOrderBodyModel placeOrderBody, int? zoneID, double amount, double? maximumCodOrderAmount, bool fromCart, bool isCashOnDeliveryActive, List<XFile>? orderAttachment, {bool isOfflinePay = false}) async {
+    if (_isSubmittingOrder) {
+      return '';
+    }
+    _isSubmittingOrder = true;
+    _isLoading = true;
+    update();
+
+    placeOrderBody.idempotencyKey = const Uuid().v4();
+
     List<MultipartBody>? multiParts = [];
     for(XFile file in orderAttachment!) {
       multiParts.add(MultipartBody('order_attachment[]', file));
     }
-    _isLoading = true;
-    update();
     String orderID = '';
     String userID = '';
-    Response response = await checkoutServiceInterface.placeOrder(placeOrderBody, multiParts);
-    _isLoading = false;
-    if (response.statusCode == 200) {
-      Get.find<AuthController>().clearProductRefCode();
-      String? message = response.body['message'];
-      orderID = response.body['order_id'].toString();
-      if(response.body['user_id'] != null) {
-        userID = response.body['user_id'].toString();
-      }
+    try {
+      Response response = await checkoutServiceInterface.placeOrder(placeOrderBody, multiParts);
+      _isLoading = false;
+      if (response.isOk) {
+        resetOrderIdempotencyKey();
+        Get.find<AuthController>().clearProductRefCode();
+        String? message = response.body['message'];
+        orderID = response.body['order_id'].toString();
+        if(response.body['user_id'] != null) {
+          userID = response.body['user_id'].toString();
+        }
 
-      if(!isOfflinePay) {
-        if(!fromCart) {
-          try {
-            List<OnlineCart>? cart = placeOrderBody.cart;
-            if (cart != null) {
-              for (var item in cart) {
-                if (item.cartId != null) {
-                  Get.find<CartController>().removeCartItemOnline(item.cartId!);
+        if(!isOfflinePay) {
+          if(!fromCart) {
+            try {
+              List<OnlineCart>? cart = placeOrderBody.cart;
+              if (cart != null) {
+                for (var item in cart) {
+                  if (item.cartId != null) {
+                    Get.find<CartController>().removeCartItemOnline(item.cartId!);
+                  }
                 }
               }
-            }
-          } catch (e) {
-            if (kDebugMode) {
-              print('Error removing items from cart: $e');
+            } catch (e) {
+              if (kDebugMode) {
+                print('Error removing items from cart: $e');
+              }
             }
           }
+          callback(true, message, orderID, zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber!, userID);
+        } else {
+          Get.find<CartController>().getCartDataOnline();
         }
-        callback(true, message, orderID, zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber!, userID);
+        _orderAttachment = null;
+        _rawAttachment = null;
+        if (kDebugMode) {
+          print('-------- Order placed successfully $orderID ----------');
+        }
       } else {
-        Get.find<CartController>().getCartDataOnline();
+        if(!isOfflinePay) {
+          callback(false, response.statusText, '-1', zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber, userID);
+        } else {
+          showCustomSnackBar(response.statusText);
+        }
       }
-      _orderAttachment = null;
-      _rawAttachment = null;
-      if (kDebugMode) {
-        print('-------- Order placed successfully $orderID ----------');
-      }
-    } else {
-
-      if(!isOfflinePay) {
-        callback(false, response.statusText, '-1', zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber, userID);
-      } else {
-        showCustomSnackBar(response.statusText);
-      }
+    } finally {
+      _isSubmittingOrder = false;
+      _isLoading = false;
+      update();
     }
-    update();
 
     return orderID;
   }
 
   Future<void> placePrescriptionOrder(int? storeId, int? zoneID, double? distance, String address, String longitude, String latitude, String note, List<XFile> orderAttachment,
       String dmTips, String deliveryInstruction, double orderAmount, double maxCodAmount, bool fromCart, bool isCashOnDeliveryActive) async {
+    if (_isSubmittingOrder) {
+      return;
+    }
+    _isSubmittingOrder = true;
+    _isLoading = true;
+    update();
+
     List<MultipartBody> multiParts = [];
     for(XFile file in orderAttachment) {
       multiParts.add(MultipartBody('order_attachment[]', file));
     }
-    _isLoading = true;
-    update();
-    Response response = await checkoutServiceInterface.placePrescriptionOrder(storeId, distance, address,longitude, latitude, note, multiParts, dmTips, deliveryInstruction);
-    _isLoading = false;
-    if (response.statusCode == 200) {
-      String? message = response.body['message'];
-      String orderID = response.body['order_id'].toString();
-      callback(true, message, orderID, zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null, '');
-      _orderAttachment = null;
-      _rawAttachment = null;
-      if (kDebugMode) {
-        print('-------- Order placed successfully $orderID ----------');
+    try {
+      Response response = await checkoutServiceInterface.placePrescriptionOrder(storeId, distance, address,longitude, latitude, note, multiParts, dmTips, deliveryInstruction);
+      _isLoading = false;
+      if (response.isOk) {
+        resetOrderIdempotencyKey();
+        String? message = response.body['message'];
+        String orderID = response.body['order_id'].toString();
+        callback(true, message, orderID, zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null, '');
+        _orderAttachment = null;
+        _rawAttachment = null;
+        if (kDebugMode) {
+          print('-------- Order placed successfully $orderID ----------');
+        }
+      } else {
+        callback(false, response.statusText, '-1', zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null, '');
       }
-    } else {
-      callback(false, response.statusText, '-1', zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null, '');
+    } finally {
+      _isSubmittingOrder = false;
+      _isLoading = false;
+      update();
     }
-    update();
   }
 
   void callback(
@@ -899,7 +935,7 @@ class CheckoutController extends GetxController implements GetxService {
 
   Future<void> getOrderTax(PlaceOrderBodyModel placeOrderBody) async {
     Response response = await checkoutServiceInterface.getOrderTax(placeOrderBody);
-    if(response.statusCode == 200) {
+    if(response.isOk) {
       _isFirstTime = false;
       _orderTax = double.tryParse(response.body['tax_amount'].toString()) ?? 0.0;
       _taxIncluded = (response.body['tax_included'] == true) ? 1 : 0;

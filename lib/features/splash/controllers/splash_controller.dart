@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:sixam_mart/helper/version_helper.dart';
 import 'package:vibration/vibration.dart';
 import 'package:sixam_mart/common/enums/data_source_enum.dart';
 import 'package:sixam_mart/api/data_module_manager.dart';
@@ -328,11 +329,11 @@ class SplashController extends GetxController implements GetxService {
 
     if (_hasNavigated) return;
 
-    double? minimumVersion = _getMinimumVersion();
-    double? latestVersion = _getLatestVersion();
+    dynamic minimumVersion = _getMinimumVersion();
+    dynamic latestVersion = _getLatestVersion();
     bool isMaintenanceMode = _configModel?.maintenanceMode ?? false;
-    bool needsUpdate = AppConstants.appVersion < (minimumVersion ?? 0);
-    bool canUpdate = AppConstants.appVersion < (latestVersion ?? 0);
+    bool needsUpdate = VersionHelper.isVersionLower(AppConstants.appVersion, minimumVersion);
+    bool canUpdate = VersionHelper.isVersionLower(AppConstants.appVersion, latestVersion);
 
     if(needsUpdate || isMaintenanceMode) {
       await _performSmoothExit(() => Get.offNamed(RouteHelper.getUpdateRoute(needsUpdate)));
@@ -347,7 +348,7 @@ class SplashController extends GetxController implements GetxService {
     }
   }
 
-  double? _getMinimumVersion() {
+  dynamic _getMinimumVersion() {
     if (GetPlatform.isAndroid) {
       return _configModel!.appMinimumVersionAndroid;
     } else if (GetPlatform.isIOS) {
@@ -356,7 +357,7 @@ class SplashController extends GetxController implements GetxService {
     return 0;
   }
 
-  double? _getLatestVersion() {
+  dynamic _getLatestVersion() {
     if (GetPlatform.isAndroid) {
       return _configModel!.appLatestVersionAndroid ?? 0;
     } else if (GetPlatform.isIOS) {

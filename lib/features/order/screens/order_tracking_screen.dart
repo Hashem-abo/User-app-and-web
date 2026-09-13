@@ -1,16 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:geolocator/geolocator.dart';
-import 'package:sixam_mart/common/controllers/theme_controller.dart';
-import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
-import 'package:sixam_mart/features/call/screens/zego_call_screen.dart';
-import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
-import 'package:sixam_mart/features/location/widgets/permission_dialog_widget.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
@@ -29,13 +22,8 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
-import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
-import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:sixam_mart/features/order/widgets/track_details_view_widget.dart';
-import 'package:sixam_mart/features/order/widgets/tracking_stepper_widget.dart';
 import 'package:sixam_mart/features/order/widgets/cancellation_dialogue_widget.dart';
 import 'package:sixam_mart/features/order/widgets/parcel_cancelation/cancellation_reason_bottom_sheet.dart';
 import 'package:sixam_mart/common/widgets/custom_bottom_sheet_widget.dart';
@@ -58,7 +46,6 @@ class OrderTrackingScreen extends StatefulWidget {
 
 class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBindingObserver {
   GoogleMapController? _controller;
-  final bool _isLoading = true;
   Set<Marker> _markers = HashSet<Marker>();
   Timer? _timer;
   bool showChatPermission = true;
@@ -1089,20 +1076,6 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
     final bool southWestLongitudeCheck = screenBounds.southwest.longitude <= fitBounds.southwest.longitude;
 
     return northEastLatitudeCheck && northEastLongitudeCheck && southWestLatitudeCheck && southWestLongitudeCheck;
-  }
-
-  void _checkPermission(Function onTap) async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if(permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if(permission == LocationPermission.denied) {
-      showCustomSnackBar('you_have_to_allow'.tr);
-    }else if(permission == LocationPermission.deniedForever) {
-      Get.dialog(const PermissionDialogWidget());
-    }else {
-      onTap();
-    }
   }
 
   void _handleCancelOrder(OrderController orderController, OrderModel order) {

@@ -250,9 +250,8 @@ class _FlashSaleCardState extends State<FlashSaleCard> {
                             ? statusList[_currentStatusIndex % statusList.length] 
                             : 'flash_sale'.tr;
                         
-                        // Check if theme is Blue-ish
-                        Color primary = Theme.of(context).primaryColor;
-                        bool isBlueish = primary.blue > primary.red && primary.blue > primary.green;
+                        // Color primary = Theme.of(context).primaryColor;
+                        // bool isBlueish = primary.blue > primary.red && primary.blue > primary.green;
 
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,

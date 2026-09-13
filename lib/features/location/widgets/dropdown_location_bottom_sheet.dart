@@ -243,7 +243,7 @@ class _DropdownLocationBottomSheetState extends State<DropdownLocationBottomShee
   List<String> _cities = [];
   Map<String, List<String>> _cityToNeighborhoods = {};
   Map<String, Map<String, List<ZoneData>>> _cityNeighborhoodToZones = {};
-  Map<String, ZoneData> _cityToZone = {};
+  // Map<String, ZoneData> _cityToZone = {};
   bool _isLoading = true;
   bool _hasError = false;
 

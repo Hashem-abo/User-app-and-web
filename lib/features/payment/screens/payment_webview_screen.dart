@@ -40,6 +40,50 @@ class PaymentScreenState extends State<PaymentWebViewScreen> {
   InAppWebViewController? webViewController;
   final GlobalKey webViewKey = GlobalKey();
 
+  static bool isAllowedPaymentDomain(Uri uri) {
+    if (uri.scheme != 'http' && uri.scheme != 'https') {
+      return false;
+    }
+    final host = uri.host.toLowerCase();
+    if (host.isEmpty) return false;
+
+    final baseHost = Uri.tryParse(AppConstants.baseUrl)?.host.toLowerCase() ?? '';
+    if (baseHost.isNotEmpty && (host == baseHost || host.endsWith('.$baseHost'))) {
+      return true;
+    }
+
+    const allowedPaymentDomains = [
+      'stripe.com',
+      'paypal.com',
+      'sslcommerz.com',
+      'paymob.com',
+      'paytabs.com',
+      'razorpay.com',
+      'flutterwave.com',
+      'paystack.com',
+      'bkash.com',
+      'nagad.com.bd',
+      'mercadopago.com',
+      'senangpay.my',
+      'hyperpay.com',
+      'thawani.om',
+      'tap.company',
+      'floosak.com',
+      'kuraimi.com',
+      'jawali.com',
+      'easywallet.com',
+      'directplace.store',
+      'reg_directplace.store',
+    ];
+
+    for (final domain in allowedPaymentDomains) {
+      if (host == domain || host.endsWith('.$domain')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -119,11 +163,18 @@ class PaymentScreenState extends State<PaymentWebViewScreen> {
               },
               shouldOverrideUrlLoading: (controller, navigationAction) async {
                 Uri uri = navigationAction.request.url!;
-                if (!["http", "https", "file", "chrome", "data", "javascript", "about"].contains(uri.scheme)) {
+                if (!["http", "https"].contains(uri.scheme)) {
                   if (await canLaunchUrl(uri)) {
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
                     return NavigationActionPolicy.CANCEL;
                   }
+                  return NavigationActionPolicy.CANCEL;
+                }
+                if (!isAllowedPaymentDomain(uri)) {
+                  if (kDebugMode) {
+                    print('Blocked untrusted navigation in payment webview: ${uri.toString()}');
+                  }
+                  return NavigationActionPolicy.CANCEL;
                 }
                 return NavigationActionPolicy.ALLOW;
               },

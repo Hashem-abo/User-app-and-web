@@ -9,8 +9,6 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/util/images.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -77,105 +75,57 @@ class _GlobalProductDetailScreenState extends State<GlobalProductDetailScreen> {
     );
   }
 
-  void _showShareBottomSheet(BuildContext context, String shareUrl, String shareText) {
-    if (AuthHelper.isLoggedIn()) {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (con) => ContactShareSheet(
-          shareableType: 'item',
-          shareableId: int.tryParse(widget.product.id ?? '') ?? 0,
-          shareableName: widget.product.title ?? '',
-          shareUrl: shareUrl,
+  /*
+  void _showShareBottomSheet(BuildContext context, String rawLink, String shareText) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (con) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeLarge),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
-      );
-    } else {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (con) => Container(
-          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeLarge),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(
+            height: 4, width: 40,
+            decoration: BoxDecoration(
+              color: Theme.of(context).disabledColor.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(10),
+            ),
           ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              height: 4, width: 40,
-              decoration: BoxDecoration(
-                color: Theme.of(context).disabledColor.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            const SizedBox(height: Dimensions.paddingSizeLarge),
-
-            Text(
-              'share_product'.tr,
-              style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
-            ),
-            Text(
-              'share_this_product_with_others'.tr,
-              style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-            ),
-            const SizedBox(height: Dimensions.paddingSizeLarge),
-
-            InkWell(
-              onTap: () {
-                Clipboard.setData(ClipboardData(text: shareUrl));
-                showCustomSnackBar('link_copied'.tr, isError: false);
-                Navigator.pop(context);
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).disabledColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                  border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
-                ),
-                child: Row(children: [
-                  Expanded(child: Text('copy_product_link'.tr, style: robotoMedium)),
-                  const Icon(Icons.copy, size: 20),
-                ]),
-              ),
-            ),
-            const SizedBox(height: Dimensions.paddingSizeSmall),
-
-            InkWell(
-              onTap: () {
-                Navigator.pop(context);
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (con) => ContactShareSheet(
-                    shareableType: 'global_product',
-                    shareableId: int.tryParse('${widget.product.id}') ?? 0,
-                    shareableName: widget.product.title ?? '',
-                    shareUrl: shareUrl,
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).disabledColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                  border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
-                ),
-                child: Row(children: [
-                  Expanded(child: Text('share_via_apps'.tr, style: robotoMedium)),
-                  const Icon(Icons.send, size: 20),
-                ]),
-              ),
-            ),
-            const SizedBox(height: Dimensions.paddingSizeLarge),
-          ]),
-        ),
-      );
-    }
+          const SizedBox(height: Dimensions.paddingSizeLarge),
+          Text('share_product'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+          const SizedBox(height: Dimensions.paddingSizeLarge),
+          _buildShareOption(context, 'copy_product_link'.tr, Icons.copy, () {
+            Clipboard.setData(ClipboardData(text: rawLink));
+            showCustomSnackBar('link_copied'.tr, isError: false);
+            Navigator.pop(context);
+          }),
+        ]),
+      ),
+    );
   }
+
+  Widget _buildShareOption(BuildContext context, String title, IconData icon, Function onTap) {
+    return InkWell(
+      onTap: onTap as void Function()?,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
+        decoration: BoxDecoration(
+          color: Theme.of(context).disabledColor.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+          border: Border.all(color: Theme.of(context).disabledColor.withValues(alpha: 0.1)),
+        ),
+        child: Row(children: [
+          Expanded(child: Text(title, style: robotoMedium)),
+          Icon(icon, size: 20),
+        ]),
+      ),
+    );
+  }
+  */
 
   @override
   Widget build(BuildContext context) {

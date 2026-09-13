@@ -24,18 +24,26 @@ class ProPlanSelectorWidget extends StatefulWidget {
 
 class _ProPlanSelectorWidgetState extends State<ProPlanSelectorWidget> {
   int _selectedPlanIndex = 0;
+
+  /*
   late ScrollController _durationScrollController;
   bool _canScrollLeft = false;
   bool _canScrollRight = false;
+  */
 
   @override
   void initState() {
     super.initState();
+    _selectedPlanIndex = _getSelectedPlanIndex(widget.plans);
+
+    /*
     _durationScrollController = ScrollController();
     _durationScrollController.addListener(_updateScrollButtons);
     WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollButtons());
+    */
   }
 
+  /*
   @override
   void dispose() {
     _durationScrollController.dispose();
@@ -55,8 +63,13 @@ class _ProPlanSelectorWidgetState extends State<ProPlanSelectorWidget> {
     final newOffset = isLeft
         ? (_durationScrollController.offset - scrollAmount).clamp(0.0, _durationScrollController.position.maxScrollExtent)
         : (_durationScrollController.offset + scrollAmount).clamp(0.0, _durationScrollController.position.maxScrollExtent);
-    _durationScrollController.animateTo(newOffset, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    _durationScrollController.animateTo(
+      newOffset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
+  */
 
   @override
   Widget build(BuildContext context) {
@@ -99,99 +112,6 @@ class _ProPlanSelectorWidgetState extends State<ProPlanSelectorWidget> {
             Expanded(
               flex: 3,
               child: _buildSubscribeButton(context, selectedPlan, buttonColor, widget.onCancel),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDurationSelector(BuildContext context, List<MapEntry<int, PlanItem>> durationPlans, List<PlanItem> plans, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('select_duration'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeDefault)),
-        const SizedBox(height: Dimensions.paddingSizeSmall),
-        Stack(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                color: Theme.of(context).disabledColor.withAlpha(20),
-              ),
-              child: SingleChildScrollView(
-                controller: _durationScrollController,
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: List.generate(durationPlans.length, (index) {
-                    final MapEntry<int, PlanItem> durationPlan = durationPlans[index];
-                    final bool isSelected = _getDurationKey(plans[_selectedPlanIndex]) == _getDurationKey(durationPlan.value);
-                    return Padding(
-                      padding: EdgeInsets.only(right: index < durationPlans.length - 1 ? Dimensions.paddingSizeExtraSmall : 0),
-                      child: GestureDetector(
-                        onTap: () => setState(() => _selectedPlanIndex = durationPlan.key),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
-                          decoration: BoxDecoration(
-                            color: isSelected ? Theme.of(context).cardColor : Colors.transparent,
-                            borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                            boxShadow: [
-                              if(isSelected) BoxShadow(
-                                color: Theme.of(context).disabledColor.withAlpha(30),
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            _getDurationKey(durationPlan.value),
-                            textAlign: TextAlign.center,
-                            style: robotoBold.copyWith(
-                              fontSize: Dimensions.fontSizeSmall,
-                              color: isSelected ? color : Theme.of(context).textTheme.bodyLarge?.color,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                ),
-              ),
-            ),
-            if(_canScrollLeft) Positioned(
-              left: 4, top: 0, bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => _scrollDuration(true),
-                  child: Container(
-                    padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      shape: BoxShape.circle,
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                    ),
-                    child: Icon(Icons.chevron_left, size: 18, color: color),
-                  ),
-                ),
-              ),
-            ),
-            if(_canScrollRight) Positioned(
-              right: 4, top: 0, bottom: 0,
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => _scrollDuration(false),
-                  child: Container(
-                    padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      shape: BoxShape.circle,
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                    ),
-                    child: Icon(Icons.chevron_right, size: 18, color: color),
-                  ),
-                ),
-              ),
             ),
           ],
         ),
@@ -365,32 +285,5 @@ class _ProPlanSelectorWidgetState extends State<ProPlanSelectorWidget> {
     if (_selectedPlanIndex < plans.length) return _selectedPlanIndex;
     _selectedPlanIndex = 0;
     return _selectedPlanIndex;
-  }
-
-  List<MapEntry<int, PlanItem>> _getUniqueDurationPlans(List<PlanItem> plans) {
-    final List<MapEntry<int, PlanItem>> durationPlans = [];
-    final Set<String> keys = {};
-    for (int index = 0; index < plans.length; index++) {
-      final String key = _getDurationKey(plans[index]);
-      if (keys.add(key)) {
-        durationPlans.add(MapEntry(index, plans[index]));
-      }
-    }
-    return durationPlans;
-  }
-
-  List<MapEntry<int, PlanItem>> _getSelectedDurationPlans(List<PlanItem> plans, PlanItem selectedPlan) {
-    final String selectedDuration = _getDurationKey(selectedPlan);
-    final List<MapEntry<int, PlanItem>> result = [];
-    for (int index = 0; index < plans.length; index++) {
-      if (_getDurationKey(plans[index]) == selectedDuration) {
-        result.add(MapEntry(index, plans[index]));
-      }
-    }
-    return result;
-  }
-
-  String _getDurationKey(PlanItem plan) {
-    return plan.durationLabel?.trim().isNotEmpty == true ? plan.durationLabel! : (plan.duration?.toString() ?? '');
   }
 }

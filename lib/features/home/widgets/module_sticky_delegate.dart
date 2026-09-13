@@ -5,13 +5,9 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-// import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart'; // + ahmed
 import 'package:sixam_mart/features/location/widgets/zone_selection_bottom_sheet.dart';
-import 'package:sixam_mart/helper/auth_helper.dart'; // + ahmed
 import 'package:sixam_mart/helper/address_helper.dart'; // + ahmed
-// import 'package:sixam_mart/util/images.dart';
-// import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 
 // ahmed: Delegate for sticky module header with transition
 // ahmed: Delegate for sticky module header with transition

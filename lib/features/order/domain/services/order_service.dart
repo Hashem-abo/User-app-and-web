@@ -11,6 +11,9 @@ import 'package:sixam_mart/features/order/domain/services/order_service_interfac
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
+import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
+import 'package:sixam_mart/features/checkout/widgets/payment_failed_dialog.dart';
+import 'package:sixam_mart/features/order/controllers/order_controller.dart';
 
 class OrderService implements OrderServiceInterface {
   final OrderRepositoryInterface orderRepositoryInterface;
@@ -59,7 +62,7 @@ class OrderService implements OrderServiceInterface {
         'customer_note': note,
       });
       Response response = await orderRepositoryInterface.submitRefundRequest(body, refundImage);
-      if (response.statusCode == 200) {
+      if (response.isOk) {
         showCustomSnackBar(response.body['message'], isError: false);
         Get.offAllNamed(RouteHelper.getInitialRoute());
       }
@@ -104,7 +107,7 @@ class OrderService implements OrderServiceInterface {
   Future<bool> switchToCOD(String? orderID, {String? guestId}) async {
     bool isSuccess = false;
     Response response = await orderRepositoryInterface.switchToCOD(orderID,guestId: guestId);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       isSuccess = true;
       await Get.offAllNamed(RouteHelper.getInitialRoute());
       showCustomSnackBar(response.body['message'], isError: false);
@@ -117,8 +120,8 @@ class OrderService implements OrderServiceInterface {
     required Function onClose, required final String? addFundUrl, required final String? subscriptionUrl,
     required final String orderID, int? storeId, required bool createAccount, required String guestId}) {
 
-    bool forOrder = (addFundUrl == '' && addFundUrl!.isEmpty && subscriptionUrl == '' && subscriptionUrl!.isEmpty);
-    bool forSubscription = (subscriptionUrl != null && subscriptionUrl.isNotEmpty && addFundUrl == '' && addFundUrl!.isEmpty);
+    bool forOrder = (addFundUrl == null || addFundUrl.isEmpty) && (subscriptionUrl == null || subscriptionUrl.isEmpty);
+    bool forSubscription = (subscriptionUrl != null && subscriptionUrl.isNotEmpty);
 
     if(canRedirect) {
       bool isSuccess = forSubscription ? url.startsWith('${AppConstants.baseUrl}/subscription-success')
@@ -134,9 +137,25 @@ class OrderService implements OrderServiceInterface {
 
       if(forOrder){
         if (isSuccess) {
+          if (Get.isRegistered<CartController>()) {
+            Get.find<CartController>().clearCartList();
+          }
+          if (Get.isRegistered<OrderController>()) {
+            Get.find<OrderController>().timerTrackOrder(orderID, contactNumber: contactNumber);
+          }
           Get.offNamed(RouteHelper.getOrderSuccessRoute(orderID, contactNumber, createAccount: createAccount, guestId: guestId));
         } else if (isFailed || isCancel) {
-          Get.offNamed(RouteHelper.getOrderSuccessRoute(orderID, contactNumber, createAccount: createAccount, guestId: guestId));
+          if (Get.currentRoute.contains(RouteHelper.payment)) {
+            Get.back();
+          }
+          Get.dialog(PaymentFailedDialog(
+            orderID: orderID,
+            orderAmount: null,
+            maxCodOrderAmount: null,
+            orderType: 'delivery',
+            isCashOnDelivery: true,
+            guestId: guestId,
+          ));
         }
       } else{
         if(isSuccess || isFailed || isCancel) {
@@ -144,11 +163,10 @@ class OrderService implements OrderServiceInterface {
             Get.back();
           }
           if(forSubscription) {
-            Get.find<HomeController>().saveRegistrationSuccessfulSharedPref(true);
-            Get.find<HomeController>().saveIsStoreRegistrationSharedPref(true);
+            Get.find<HomeController>().saveRegistrationSuccessfulSharedPref(isSuccess);
+            Get.find<HomeController>().saveIsStoreRegistrationSharedPref(isSuccess);
             Get.offAllNamed(RouteHelper.getSubscriptionSuccessRoute(status: isSuccess ? 'success' : isFailed ? 'fail' : 'cancel', fromSubscription: true, storeId: storeId));
           } else {
-            Get.back();
             Get.toNamed(RouteHelper.getWalletRoute(fundStatus: isSuccess ? 'success' : isFailed ? 'fail' : 'cancel', token: UniqueKey().toString()));
           }
         }
@@ -165,7 +183,7 @@ class OrderService implements OrderServiceInterface {
   @override
   Future<bool> removeMonthlyOrder(int id) async {
     Response response = await orderRepositoryInterface.removeMonthlyOrder(id);
-    return response.statusCode == 200;
+    return response.isOk;
   }
 
 }

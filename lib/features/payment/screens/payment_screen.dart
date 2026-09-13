@@ -13,6 +13,7 @@ import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:sixam_mart/features/checkout/widgets/payment_failed_dialog.dart';
 import 'package:sixam_mart/features/wallet/widgets/fund_payment_dialog_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentScreen extends StatefulWidget {
   final OrderModel orderModel;
@@ -197,6 +198,72 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
 
+  bool _isAllowedPaymentDomain(Uri uri) {
+    if (uri.scheme != 'http' && uri.scheme != 'https') {
+      return false;
+    }
+    final host = uri.host.toLowerCase();
+    if (host.isEmpty) return false;
+
+    final baseHost = Uri.tryParse(AppConstants.baseUrl)?.host.toLowerCase() ?? '';
+    if (baseHost.isNotEmpty && (host == baseHost || host.endsWith('.$baseHost'))) {
+      return true;
+    }
+
+    const allowedPaymentDomains = [
+      'stripe.com',
+      'paypal.com',
+      'sslcommerz.com',
+      'paymob.com',
+      'paytabs.com',
+      'razorpay.com',
+      'flutterwave.com',
+      'paystack.com',
+      'bkash.com',
+      'nagad.com.bd',
+      'mercadopago.com',
+      'senangpay.my',
+      'hyperpay.com',
+      'thawani.om',
+      'tap.company',
+      'floosak.com',
+      'kuraimi.com',
+      'jawali.com',
+      'easywallet.com',
+      'directplace.store',
+      'reg_directplace.store',
+    ];
+
+    for (final domain in allowedPaymentDomains) {
+      if (host == domain || host.endsWith('.$domain')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  Future<NavigationActionPolicy?>? shouldOverrideUrlLoading(NavigationAction navigationAction) async {
+    Uri? uri = navigationAction.request.url;
+    if (uri == null) return NavigationActionPolicy.CANCEL;
+
+    if (!["http", "https"].contains(uri.scheme)) {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return NavigationActionPolicy.CANCEL;
+      }
+      return NavigationActionPolicy.CANCEL;
+    }
+
+    if (!_isAllowedPaymentDomain(uri)) {
+      if (kDebugMode) {
+        print('Blocked untrusted navigation in InAppBrowser: ${uri.toString()}');
+      }
+      return NavigationActionPolicy.CANCEL;
+    }
+    return NavigationActionPolicy.ALLOW;
+  }
+
   @override
   Future onLoadStop(url) async {
     pullToRefreshController?.endRefreshing();
@@ -251,13 +318,6 @@ class MyInAppBrowser extends InAppBrowser {
     }
   }
 
-  @override
-  Future<NavigationActionPolicy> shouldOverrideUrlLoading(navigationAction) async {
-    if (kDebugMode) {
-      print("\n\nOverride ${navigationAction.request.url}\n\n");
-    }
-    return NavigationActionPolicy.ALLOW;
-  }
 
   @override
   void onLoadResource(resource) {

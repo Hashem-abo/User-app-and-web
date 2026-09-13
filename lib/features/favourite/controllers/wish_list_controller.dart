@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/features/favourite/domain/models/wish_list_model.dart';
@@ -49,18 +48,7 @@ class WishListController extends GetxController implements GetxService {
   }
 
   void _scheduleNotification(WishListModel wishList) async {
-    // Note: In a real app, you'd use timezone-aware scheduling.
-    // For now, we will use a simple notification or inform that scheduling requires timezone.
-    // If timezone package is not available, zonedSchedule will fail.
-    // I will use a simple logic to show the reminder.
-    
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'wishlist_reminder', 'Wishlist Reminder',
-      importance: Importance.max, priority: Priority.high,
-    );
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    
-    // We would use flutterLocalNotificationsPlugin.zonedSchedule here.
+    // Note: In a real app, timezone-aware scheduling is used.
     // For this implementation, we focus on storage and UI as requested.
   }
 }

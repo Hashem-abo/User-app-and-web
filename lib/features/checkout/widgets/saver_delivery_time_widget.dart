@@ -313,8 +313,11 @@ class SaverDeliveryTimeWidget extends StatelessWidget {
     return '(${leftResult.text} - ${rightResult.text})';
   }
 
-  // Keep a simple helper for callers that just need the display string
-  String _getSlidTime(int value) => _getSlidTimeResult(value).text;
+  /*
+  String _getSlidTime(int minTime, int maxTime, String? timeType) {
+    return '$minTime-$maxTime $timeType';
+  }
+  */
 }
 
 /// Result of converting a raw minute count into a display time string.

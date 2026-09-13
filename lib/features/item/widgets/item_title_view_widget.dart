@@ -8,7 +8,6 @@ import 'package:sixam_mart/common/widgets/custom_tool_tip_widget.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
@@ -21,7 +20,6 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/organic_tag.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/features/review/widgets/review_widget.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
 import 'package:sixam_mart/features/contact_share/screens/contact_share_sheet.dart';
@@ -75,7 +73,7 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
     if (kDebugMode) {
       print(widget.inStock ? 'out_of_stock'.tr : 'in_stock'.tr);
     }
-    final bool isLoggedIn = AuthHelper.isLoggedIn();
+    // final bool isLoggedIn = AuthHelper.isLoggedIn();
     double? startingPrice;
     double? endingPrice;
     if(widget.item != null && widget.item!.variations != null && widget.item!.variations!.isNotEmpty) {

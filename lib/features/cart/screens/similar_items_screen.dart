@@ -45,12 +45,6 @@ class _SimilarItemsScreenState extends State<SimilarItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isFood = widget.item.moduleType == 'food';
-    bool isShop = widget.item.moduleType == 'ecommerce' ||
-        widget.item.moduleType == 'shop' ||
-        widget.item.moduleType == 'grocery' ||
-        widget.item.moduleType == 'pharmacy';
-
     double? startingPrice = widget.item.price;
     double? discount = widget.item.discount;
     String? discountType = widget.item.discountType;

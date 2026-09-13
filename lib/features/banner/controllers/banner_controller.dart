@@ -51,12 +51,11 @@ class BannerController extends GetxController implements GetxService {
   }
 
   bool _isBannerLoaded = false;
+  bool get isBannerLoaded => _isBannerLoaded;
   bool _isFeaturedBannerLoaded = false;
   final Map<int, List<String?>> _moduleBannerImageList = {};
   final Map<int, List<dynamic>> _moduleBannerDataList = {};
   bool _isPromotionalBannerLoaded = false;
-  final bool _isTaxiBannerLoaded = false;
-  final bool _isParcelOtherBannerLoaded = false;
 
   Future<void> getFeaturedBanner({bool reload = false}) async {
     if(!reload && _isFeaturedBannerLoaded && _featuredBannerList != null && _featuredBannerList!.isNotEmpty) {

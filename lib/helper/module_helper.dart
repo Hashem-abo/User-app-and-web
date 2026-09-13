@@ -69,10 +69,19 @@ class ModuleHelper {
 
   /// Returns whether unit should be displayed for an item.
   static bool isUnitVisible(dynamic item) {
+    if (item == null) return false;
+    String? unit;
+    if (item is Item) {
+      unit = item.unitType;
+    } else {
+      try {
+        unit = item?.unitType?.toString();
+      } catch (_) {}
+    }
     return isUnitVisibleForType(
-      unitType: item?.unitType,
-      moduleId: item?.moduleId,
-      moduleType: item?.moduleType,
+      unitType: unit,
+      moduleId: item is Item ? item.moduleId : (item?.moduleId as int?),
+      moduleType: item is Item ? item.moduleType : (item?.moduleType?.toString()),
     );
   }
 
@@ -94,8 +103,8 @@ class ModuleHelper {
       return false;
     }
 
-    // Show unit for grocery
-    if (type == AppConstants.grocery || type == 'grocery') {
+    // Show unit for grocery or Zad (moduleId == 1)
+    if (moduleId == 1 || isZad(moduleId: moduleId, moduleType: type) || type == AppConstants.grocery || type == 'grocery') {
       return true;
     }
 
@@ -126,28 +135,29 @@ class ModuleHelper {
     String? moduleType,
     String? moduleName,
   }) {
-    if (moduleType == 'zad' || moduleType == AppConstants.grocery || moduleType == 'grocery') {
+    if (moduleId == 1) {
+      return true;
+    }
+    final name = (moduleName ?? '').trim().toLowerCase();
+    if (name.contains('zad') || name.contains('زاد')) {
+      return true;
+    }
+    if (moduleType == 'zad') {
       return true;
     }
     final resolvedType = getModuleTypeById(moduleId);
-    if (resolvedType == AppConstants.grocery || resolvedType == 'grocery' || resolvedType == 'zad') {
+    if (resolvedType == 'zad') {
       return true;
-    }
-    if (moduleName != null) {
-      final name = moduleName.trim().toLowerCase();
-      if (name.contains('zad') || name.contains('زاد') || name.contains('grocery')) {
-        return true;
-      }
     }
     if (Get.isRegistered<SplashController>()) {
       final module = getModule() ?? getCacheModule();
       if (module != null) {
         if (moduleId == null || moduleId == module.id) {
-          if (module.moduleType == AppConstants.grocery || module.moduleType == 'grocery' || module.moduleType == 'zad') {
+          if (module.id == 1 || module.moduleType == 'zad') {
             return true;
           }
-          final name = (module.moduleName ?? '').trim().toLowerCase();
-          if (name.contains('zad') || name.contains('زاد') || name.contains('grocery')) {
+          final mName = (module.moduleName ?? '').trim().toLowerCase();
+          if (mName.contains('zad') || mName.contains('زاد')) {
             return true;
           }
         }
@@ -169,6 +179,9 @@ class ModuleHelper {
 
     final int? directId = moduleId ?? item?.moduleId;
     if (directId != null) {
+      if (directId == 1 || directId == 2) {
+        return true;
+      }
       final resolvedType = getModuleTypeById(directId);
       if (resolvedType == AppConstants.grocery || resolvedType == AppConstants.pharmacy || resolvedType == 'grocery' || resolvedType == 'pharmacy') {
         return true;

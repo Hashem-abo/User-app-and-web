@@ -31,6 +31,7 @@ class ContactShareController extends GetxController implements GetxService {
   List<dynamic> get filteredMatchedUsers => _filteredMatchedUsers;
 
   String _searchQuery = '';
+  String get searchQuery => _searchQuery;
 
   Future<void> initSharing() async {
     _isLoading = true;

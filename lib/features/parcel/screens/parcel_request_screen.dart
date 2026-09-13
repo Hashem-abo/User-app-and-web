@@ -657,7 +657,7 @@ class _ParcelRequestScreenState extends State<ParcelRequestScreen> {
                     top: false,
                     child: _TotalAndSendRow(
                       total: total, taxIncluded: checkoutController.taxIncluded == 1,
-                      isLoading: parcelController.isLoading,
+                      isLoading: parcelController.isLoading || parcelController.isSubmittingParcel,
                       acceptTerms: parcelController.acceptTerms,
                       onSend: () => _handleSendRequest(
                         parcelController: parcelController, charge: charge, isGuestLoggedIn: isGuestLoggedIn,
@@ -1282,7 +1282,7 @@ class _TotalAndSendRow extends StatelessWidget {
         CustomButton(
           buttonText: 'send_request'.tr,
           isLoading: isLoading,
-          onPressed: acceptTerms ? onSend : null,
+          onPressed: (acceptTerms && !isLoading) ? onSend : null,
         ),
       ]),
     );

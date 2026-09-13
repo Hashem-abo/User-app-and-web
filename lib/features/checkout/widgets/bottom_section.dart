@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/common/widgets/custom_tool_tip_widget.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/checkout/widgets/extra_discount_view_widget.dart';
 import 'package:sixam_mart/features/checkout/widgets/prescription_image_picker_widget.dart';
@@ -22,7 +21,6 @@ import 'package:sixam_mart/features/checkout/widgets/partial_pay_view.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/features/cart/widgets/add_to_monthly_widget.dart';
 import 'package:sixam_mart/helper/module_helper.dart';
-import 'package:sixam_mart/util/app_constants.dart';
 
 class BottomSection extends StatelessWidget {
   final CheckoutController checkoutController;

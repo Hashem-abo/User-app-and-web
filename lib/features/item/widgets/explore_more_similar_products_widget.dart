@@ -4,7 +4,6 @@ import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';

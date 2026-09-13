@@ -22,7 +22,6 @@ import 'package:sixam_mart/common/widgets/confirmation_dialog.dart';
 import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
-import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/common/widgets/discount_tag.dart';
 import 'package:sixam_mart/common/widgets/quantity_button.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
@@ -529,10 +528,10 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                           return CustomButton(
                             width: ResponsiveHelper.isDesktop(context) ? MediaQuery.of(context).size.width / 2.0 : null,
                             isLoading: cartController.isLoading || cartController.isItemAdding(item.id),
-                            buttonText: (stock != null && stock! <= 0)
+                            buttonText: (stock != null && stock <= 0)
                                 ? 'out_of_stock'.tr : widget.isCampaign ? 'order_now'.tr
                                 : (itemController.cartIndex != -1) ? 'update_in_cart'.tr : 'add_to_cart'.tr,
-                            onPressed: (stock != null && stock! <= 0) ? null : () async {
+                            onPressed: (stock != null && stock <= 0) ? null : () async {
                               if (cartController.isLoading || cartController.isItemAdding(item.id)) return;
                               String? invalid;
                               if(_newVariation) {

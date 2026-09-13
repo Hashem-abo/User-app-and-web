@@ -49,16 +49,16 @@ void main() {
       const double additionalCharge = 0.0;
       const double extraPackagingCharge = 5.0;
       const double dmTips = 10.0;
-      const bool taxIncluded = false;
 
       // ACTUAL CODE in order_details_screen.dart line 201:
       final double productionComputedItemsPrice = (orderAmount + discount) 
-          - ((taxIncluded ? 0 : tax) + deliveryCharge) 
+          - (tax + deliveryCharge) 
           - additionalCharge;
 
       const double trueItemsPrice = 100.0;
 
       // Bug: Missing dmTips and extraPackagingCharge inflates itemsPrice by $15
+      expect(extraPackagingCharge + dmTips, equals(15.0));
       expect(productionComputedItemsPrice, equals(115.0));
       expect(productionComputedItemsPrice != trueItemsPrice, isTrue);
     });

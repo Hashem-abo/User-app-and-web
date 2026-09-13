@@ -118,23 +118,18 @@ void main() {
     test('Continue action in subscription performs check or triggers onboarding', () {
       final double planPrice = 100.0;
       final double walletBalance = 120.0;
-      final bool isWalletSelected = true;
-      final int selectedDigitalIndex = -1;
 
-      bool subscriptionTriggered = false;
-      bool onboardingOpened = false;
-
-      // User taps Continue button:
-      if (isWalletSelected) {
-        if (walletBalance >= planPrice) {
-          subscriptionTriggered = true;
+      bool handleContinue(bool isWallet, int digitalIndex) {
+        if (isWallet) {
+          return walletBalance >= planPrice;
+        } else if (digitalIndex != -1) {
+          return false;
         }
-      } else if (selectedDigitalIndex != -1) {
-        onboardingOpened = true;
+        return false;
       }
 
-      expect(subscriptionTriggered, isTrue);
-      expect(onboardingOpened, isFalse);
+      expect(handleContinue(true, -1), isTrue);
+      expect(handleContinue(false, 0), isFalse);
     });
 
     test('Continue action with digital wallet gateway opens PaymentOnboardingDialog', () {

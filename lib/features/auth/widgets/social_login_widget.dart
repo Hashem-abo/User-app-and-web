@@ -282,8 +282,18 @@ class SocialLoginWidget extends StatelessWidget {
     }else{
       try{
         if(googleSignIn.supportsAuthenticate()) {
-          String? googleClientId = Get.find<SplashController>().configModel?.googleClientId ?? AppConstants.googleServerClientId;
-          await googleSignIn.initialize(serverClientId: (googleClientId != null && googleClientId.isNotEmpty) ? googleClientId : null).then((_) async {
+          String googleClientId;
+          if (GetPlatform.isAndroid) {
+            final remoteId = Get.find<SplashController>().configModel?.googleClientId;
+            if (remoteId != null && remoteId.isNotEmpty && remoteId.startsWith('72955669368')) {
+              googleClientId = remoteId;
+            } else {
+              googleClientId = AppConstants.googleServerClientId;
+            }
+          } else {
+            googleClientId = Get.find<SplashController>().configModel?.googleClientId ?? AppConstants.googleServerClientId;
+          }
+          await googleSignIn.initialize(serverClientId: googleClientId.isNotEmpty ? googleClientId : null).then((_) async {
 
             googleSignIn.signOut();
             GoogleSignInAccount googleAccount = await googleSignIn.authenticate();
@@ -305,9 +315,11 @@ class SocialLoginWidget extends StatelessWidget {
           });
         }else {
           debugPrint("Google Sign-In not supported on this device.");
+          showCustomSnackBar("Google Sign-In not supported on this device.");
         }
       }catch(e){
         debugPrint('Error in google sign in: $e');
+        showCustomSnackBar(e.toString());
       }
     }
   }

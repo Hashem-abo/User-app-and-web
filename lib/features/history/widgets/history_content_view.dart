@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/card_design/item_card.dart';
 import 'package:sixam_mart/common/widgets/card_design/store_card_with_distance.dart';
-import 'package:sixam_mart/common/widgets/no_data_screen.dart';
 import 'package:sixam_mart/features/history/controllers/item_history_controller.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 
-import 'package:sixam_mart/common/widgets/item_view.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
 import 'package:sixam_mart/common/widgets/web_page_title_widget.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';

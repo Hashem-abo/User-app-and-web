@@ -67,5 +67,7 @@ android/build.gradle.kts
 *.key
 *.pem
 *.p12
+key.properties
+**/key.properties
 
 PROJECT_DOCUMENTATION_AR.md

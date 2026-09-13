@@ -250,7 +250,7 @@ class OrderCalculationWidget extends StatelessWidget {
                 ]),
                 const SizedBox(height: 10),
 
-                (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? Row(
+                (Get.find<SplashController>().getModuleConfig(order.moduleType).addOn ?? false) ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('addons'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
@@ -258,16 +258,16 @@ class OrderCalculationWidget extends StatelessWidget {
                   ],
                 ) : const SizedBox(),
 
-                (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? Divider(thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5),) : const SizedBox(),
+                (Get.find<SplashController>().getModuleConfig(order.moduleType).addOn ?? false) ? Divider(thickness: 1, color: Theme.of(context).hintColor.withValues(alpha: 0.5),) : const SizedBox(),
 
-                (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? Row(
+                (Get.find<SplashController>().getModuleConfig(order.moduleType).addOn ?? false) ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('subtotal'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
                     Text(PriceConverter.convertPrice(subTotal), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall), textDirection: TextDirection.ltr),
                   ],
                 ) : const SizedBox(),
-                SizedBox(height: (Get.find<SplashController>().getModuleConfig(order.moduleType)?.addOn ?? false) ? 10 : 0),
+                SizedBox(height: (Get.find<SplashController>().getModuleConfig(order.moduleType).addOn ?? false) ? 10 : 0),
 
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Text('discount'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),

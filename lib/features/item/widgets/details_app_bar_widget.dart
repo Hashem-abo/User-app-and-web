@@ -6,7 +6,6 @@ import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/util/app_constants.dart';
@@ -62,6 +61,7 @@ class DetailsAppBarWidgetState extends State<DetailsAppBarWidget> with SingleTic
     );
   }
 
+  /*
   void _showShareBottomSheet(BuildContext context, String rawLink, String shareText) {
     showModalBottomSheet(
       context: context,
@@ -147,6 +147,7 @@ class DetailsAppBarWidgetState extends State<DetailsAppBarWidget> with SingleTic
       ),
     );
   }
+  */
 
   @override
   Widget build(BuildContext context) {

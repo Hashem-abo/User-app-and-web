@@ -199,7 +199,7 @@ class _DynamicMotherShelfViewState extends State<DynamicMotherShelfView> {
 
         ShelfModel child = shelf.children![index];
         double width = shelf.itemCardWidth?.toDouble() ?? 110;
-        double imageHeight = shelf.height?.toDouble() ?? 130;
+        // double imageHeight = shelf.height?.toDouble() ?? 130;
         
         return Expanded(
           child: InkWell(

@@ -28,7 +28,6 @@ class GuestTrackOrderScreen extends StatefulWidget {
 }
 
 class _GuestTrackOrderScreenState extends State<GuestTrackOrderScreen> {
-  @override
   Timer? _timer;
 
   @override

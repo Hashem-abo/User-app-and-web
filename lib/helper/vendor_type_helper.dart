@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 
@@ -91,7 +90,7 @@ class VendorTypeHelper {
       return (trVal.isNotEmpty && trVal != 'factory') ? trVal : 'Factory';
     }
 
-    // Only show vendor types that are NOT retail (wholesaler or factory).
-    return '';
+    // Return custom vendor type (e.g. مخبز / صيدلية) as-is when not retailer.
+    return type?.trim() ?? '';
   }
 }

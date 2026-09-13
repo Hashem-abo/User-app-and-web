@@ -17,7 +17,6 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/custom_loader.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/service/controllers/service_controller.dart';
-import 'package:sixam_mart/features/chat/controllers/ai_chat_controller.dart';
 
 class SearchController extends GetxController implements GetxService {
   final SearchServiceInterface searchServiceInterface;
@@ -522,8 +521,6 @@ class SearchController extends GetxController implements GetxService {
               if (aiResponse != null) {
                 await openAIService.recordAiUsage('image_search', deductPoints: deductPoints);
                 String item = aiResponse['identified_item'] ?? 'unknown';
-                String details = aiResponse['more_details'] ?? '';
-                String query = aiResponse['optimized_query'] ?? item;
 
                 if (item.toLowerCase() == 'unknown') {
                   showCustomSnackBar('could_not_identify_the_item'.tr);

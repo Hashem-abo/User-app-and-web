@@ -17,7 +17,7 @@ class CheckoutRepository implements CheckoutRepositoryInterface {
   Future<int> getDmTipMostTapped() async {
     int mostDmTipAmount = 0;
     Response response = await apiClient.getData(AppConstants.mostTipsUri);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       mostDmTipAmount = response.body['most_tips_amount'] ?? 0;
     }
     return mostDmTipAmount;
@@ -46,7 +46,7 @@ class CheckoutRepository implements CheckoutRepositoryInterface {
   Future<double> getExtraCharge(double? distance) async {
     double extraCharge = 0;
     Response response = await apiClient.getData('${AppConstants.vehicleChargeUri}?distance=$distance', handleError: false);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       extraCharge = double.parse(response.body.toString());
     }
     return extraCharge;
@@ -99,7 +99,7 @@ class CheckoutRepository implements CheckoutRepositoryInterface {
   Future<List<OfflineMethodModel>?> _getOfflineMethodList() async {
     List<OfflineMethodModel>? offlineMethodList;
     Response response = await apiClient.getData(AppConstants.offlineMethodListUri);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       offlineMethodList = [];
       if(response.body is List) {
         response.body.forEach((method) => offlineMethodList!.add(OfflineMethodModel.fromJson(method)));
@@ -131,7 +131,7 @@ class CheckoutRepository implements CheckoutRepositoryInterface {
       'guest_id': guestId ?? '',
     };
     Response response = await apiClient.postData(AppConstants.getSurgePriceUri, body);
-    if (response.statusCode == 200) {
+    if (response.isOk) {
       surgePrice = SurgePriceModel.fromJson(response.body);
     }
     return surgePrice;

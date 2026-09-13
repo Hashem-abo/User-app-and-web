@@ -600,9 +600,9 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             //     ),
             //   ),
             CustomButton(
-              isLoading: checkoutController.isLoading,
+              isLoading: checkoutController.isLoading || checkoutController.isSubmittingOrder,
               buttonText: '${'confirm_order'.tr} - ${PriceConverter.convertPrice(total)}',
-              onPressed: checkoutController.acceptTerms ? () {
+              onPressed: (checkoutController.acceptTerms && !checkoutController.isLoading && !checkoutController.isSubmittingOrder) ? () {
           bool isAvailable = true;
           DateTime scheduleStartDate = DateTime.now();
           DateTime scheduleEndDate = DateTime.now();

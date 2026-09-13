@@ -23,9 +23,6 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/features/menu/widgets/menu_button.dart';
 import 'package:sixam_mart/features/pro/widgets/pro_badge_avatar_widget.dart';
 import 'package:sixam_mart/common/widgets/login_suggestion_bottomsheet.dart';
-// import 'package:sixam_mart/features/profile/screens/size_information_screen.dart';
-// import 'package:sixam_mart/features/profile/screens/edit_size_screen.dart';
-// import 'package:sixam_mart/features/profile/screens/preference_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
