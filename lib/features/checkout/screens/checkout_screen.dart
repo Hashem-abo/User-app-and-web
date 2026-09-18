@@ -1,4 +1,4 @@
-﻿import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:suliman/common/widgets/address_widget.dart';
 import 'package:suliman/features/address/controllers/address_controller.dart';
@@ -375,9 +375,22 @@ class CheckoutScreenState extends State<CheckoutScreen> {
             surgePrice: checkoutController.surgePrice?.price, surgePriceType: checkoutController.surgePrice?.priceType,
           );
 
+          // FBS: if a Platform Hub can fulfill all cart items at a lower fee, use that fee
+          final double? fbsFee = checkoutController.fbsDeliveryCharge;
+          if (fbsFee != null && fbsFee < deliveryCharge && deliveryCharge > 0) {
+            deliveryCharge = fbsFee;
+          }
+
           if(checkoutController.orderType != 'take_away' && checkoutController.store != null) {
-            _deliveryChargeForView = deliveryCharge == -1 ? 'calculating'.tr
-                : deliveryCharge == 0 ? 'free'.tr : PriceConverter.convertPrice(deliveryCharge);
+            if (fbsFee != null && fbsFee < originalCharge && originalCharge > 0) {
+              // Show original price struck-through + discounted FBS price
+              _deliveryChargeForView = deliveryCharge == 0
+                  ? 'free'.tr
+                  : '${PriceConverter.convertPrice(originalCharge)} → ${PriceConverter.convertPrice(deliveryCharge)} ⚡';
+            } else {
+              _deliveryChargeForView = deliveryCharge == -1 ? 'calculating'.tr
+                  : deliveryCharge == 0 ? 'free'.tr : PriceConverter.convertPrice(deliveryCharge);
+            }
           }
 
           double extraPackagingCharge = widget.storeId != null ? 0 : _calculateExtraPackagingCharge(checkoutController);
@@ -540,18 +553,50 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge, vertical: Dimensions.paddingSizeSmall),
                         padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.05),
+                          color: checkoutController.isFbsFulfilled
+                              ? const Color(0xFFF0FDF4)
+                              : Theme.of(context).primaryColor.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                          border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
+                          border: Border.all(
+                            color: checkoutController.isFbsFulfilled
+                                ? const Color(0xFF86EFAC)
+                                : Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                          ),
                         ),
-                        child: Row(children: [
-                          Icon(Icons.auto_awesome, color: Theme.of(context).primaryColor, size: 16),
-                          const SizedBox(width: Dimensions.paddingSizeSmall),
-                          Expanded(child: Text(
-                            "note_more_than_one_order".tr,
-                            style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
-                          )),
-                        ]),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              checkoutController.isFbsFulfilled ? Icons.bolt_rounded : Icons.auto_awesome,
+                              color: checkoutController.isFbsFulfilled ? const Color(0xFF15803D) : Theme.of(context).primaryColor,
+                              size: 20,
+                            ),
+                            const SizedBox(width: Dimensions.paddingSizeSmall),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (checkoutController.isFbsFulfilled)
+                                    Text(
+                                      'fbs_consolidated_delivery_title'.tr,
+                                      style: robotoBold.copyWith(fontSize: Dimensions.fontSizeSmall, color: const Color(0xFF15803D)),
+                                    ),
+                                  if (checkoutController.isFbsFulfilled)
+                                    const SizedBox(height: 2),
+                                  Text(
+                                    checkoutController.isFbsFulfilled
+                                        ? 'fbs_consolidated_delivery_notice'.tr
+                                        : "note_more_than_one_order".tr,
+                                    style: robotoRegular.copyWith(
+                                      fontSize: Dimensions.fontSizeSmall,
+                                      color: checkoutController.isFbsFulfilled ? const Color(0xFF166534) : Theme.of(context).primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                     _orderPlaceButton(

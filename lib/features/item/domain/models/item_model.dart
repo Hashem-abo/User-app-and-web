@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/features/item/domain/models/basic_medicine_model.dart';
@@ -118,6 +118,16 @@ class Item {
   String? storeCategoryName;
   String? slug;
   bool? freeDelivery;
+  bool? isExpressAvailable;
+  String? expressDeliveryTime;
+  int? hubStock;
+  int? storeStock;
+  int? nearestHubId;
+  String? storeType;
+  String? hubName;
+  int? vendorsCount;
+  double? minCatalogPrice;
+  double? maxCatalogPrice;
 
   Item({
     this.id,
@@ -169,6 +179,13 @@ class Item {
     this.storeCategoryName,
     this.slug,
     this.freeDelivery,
+    this.isExpressAvailable,
+    this.expressDeliveryTime,
+    this.hubStock,
+    this.storeStock,
+    this.nearestHubId,
+    this.storeType,
+    this.hubName,
   });
 
   Item.fromJson(Map<String, dynamic> json) {
@@ -306,6 +323,16 @@ class Item {
     storeCategoryName = json['store_category_name'];
     slug = json['slug'];
     freeDelivery = json['free_delivery'] is bool ? json['free_delivery'] : (json['free_delivery'] == 1 || json['free_delivery'] == '1');
+    isExpressAvailable = json['is_express_available'] == true || json['is_express_available'] == 1 || json['is_express_available'] == '1';
+    expressDeliveryTime = json['express_delivery_time']?.toString();
+    hubStock = json['hub_stock'] != null ? int.tryParse(json['hub_stock'].toString()) : null;
+    storeStock = json['store_stock'] != null ? int.tryParse(json['store_stock'].toString()) : null;
+    nearestHubId = json['nearest_hub_id'] != null ? int.tryParse(json['nearest_hub_id'].toString()) : null;
+    storeType = json['store_type']?.toString();
+    hubName = json['hub_name']?.toString();
+    vendorsCount = json['vendors_count'] != null ? int.tryParse(json['vendors_count'].toString()) : 1;
+    minCatalogPrice = json['min_catalog_price'] != null ? double.tryParse(json['min_catalog_price'].toString()) : null;
+    maxCatalogPrice = json['max_catalog_price'] != null ? double.tryParse(json['max_catalog_price'].toString()) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -369,6 +396,13 @@ class Item {
     data['order_count'] = orderCount;
     data['whislists_count'] = wishlistCount;
     data['views_count'] = itemViewCount;
+    data['is_express_available'] = isExpressAvailable;
+    data['express_delivery_time'] = expressDeliveryTime;
+    data['hub_stock'] = hubStock;
+    data['store_stock'] = storeStock;
+    data['nearest_hub_id'] = nearestHubId;
+    data['store_type'] = storeType;
+    data['hub_name'] = hubName;
     return data;
   }
 }

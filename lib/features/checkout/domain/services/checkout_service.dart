@@ -1,4 +1,4 @@
-﻿import 'package:get/get_connect/http/src/response/response.dart';
+import 'package:get/get_connect/http/src/response/response.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:suliman/api/api_client.dart';
 import 'package:suliman/features/checkout/domain/models/surge_price_model.dart';
@@ -124,6 +124,11 @@ class CheckoutService implements CheckoutServiceInterface {
   @override
   Future<SurgePriceModel?> getSurgePrice({required String zoneId, required String moduleId, required String dateTime, String? guestId}) async {
     return await checkoutRepositoryInterface.getSurgePrice(zoneId: zoneId, moduleId: moduleId, dateTime: dateTime, guestId: guestId);
+  }
+
+  @override
+  Future<Response> calculateFbsDeliveryFee({required int storeId, required String latitude, required String longitude, required double distance}) async {
+    return await checkoutRepositoryInterface.calculateFbsDeliveryFee(storeId: storeId, latitude: latitude, longitude: longitude, distance: distance);
   }
 
   @override

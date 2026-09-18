@@ -1,4 +1,4 @@
-﻿import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -950,7 +950,7 @@ class _DeliveryTipsCard extends StatelessWidget {
                           ? 'not_now'.tr
                           : isCustomChip
                               ? raw.tr.toCapitalized()
-                              : '\$$raw',
+                              : raw,
                       isSelected: controller.selectedTips == index,
                       isSuggested: raw != '0' && !isCustomChip && raw == controller.mostDmTipAmount.toString(),
                       onTap: () {

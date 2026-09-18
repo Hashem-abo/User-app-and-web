@@ -1,4 +1,5 @@
 {
+  "available_from": "Available from",
   "vendor_registration": "Vendor Registration",
   "store_registration": "Store Registration",
   "join_as_vendor": "Join as Vendor",
@@ -2373,5 +2374,8 @@
   "order_not_found_or_unauthorized": "Order not available or unauthorized",
   "you_dont_have_permission_to_view_this_order": "You do not have permission to view this order or it has been removed",
   "back_to_orders": "Back to Orders",
-  "suliman_pro": "Suliman Pro"
+  "suliman_pro": "Suliman Pro",
+  "fbs_consolidated_delivery_title": "Consolidated Shipment from Platform Central Hub (FBS ⚡)",
+  "fbs_consolidated_delivery_notice": "Your items from multiple stores are bundled into a single package from the central hub, saving multiple delivery charges.",
+  "auto_applied": "Auto Applied"
 }

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:suliman/features/item/domain/models/item_model.dart';
 import 'package:suliman/common/widgets/custom_snackbar.dart';
@@ -360,7 +360,11 @@ class CartController extends GetxController implements GetxService {
     bool haveVariation = false;
     
     for (var cartModel in cartList) {
-      if (cartModel.item!.storeId != storeId) {
+      int effectiveStoreId = (cartModel.item?.nearestHubId != null && cartModel.item!.nearestHubId! > 0)
+          ? cartModel.item!.nearestHubId!
+          : (cartModel.item?.storeId ?? 0);
+
+      if (effectiveStoreId != storeId) {
         continue;
       }
       
@@ -666,7 +670,9 @@ class CartController extends GetxController implements GetxService {
     List<int> cartIdsToRemove = [];
     _cartList.removeWhere((cartItem) {
       if (cartItem.item != null) {
-        int? sId = cartItem.item!.storeId;
+        int? sId = (cartItem.item!.nearestHubId != null && cartItem.item!.nearestHubId! > 0)
+            ? cartItem.item!.nearestHubId!
+            : cartItem.item!.storeId;
         if (sId == null && cartItem.item!.storeDetails != null && cartItem.item!.storeDetails!['id'] != null) {
           sId = int.tryParse(cartItem.item!.storeDetails!['id'].toString());
         }

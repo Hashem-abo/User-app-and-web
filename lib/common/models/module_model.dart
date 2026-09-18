@@ -14,6 +14,8 @@ class ModuleModel {
 
   String? skyHeaderFullUrl;
   String? shopModuleBannerBgFullUrl;
+  String? selectedIconBigFullUrl;
+  String? selectedIconSmallFullUrl;
   String? middleButtonIconFullUrl;
   String? adsBannerImageFullUrl;
   String? adsBannerLinkType;
@@ -66,6 +68,9 @@ class ModuleModel {
     this.zones,
     this.skyHeaderFullUrl,
     this.shopModuleBannerBgFullUrl,
+    this.selectedIconBigFullUrl,
+    this.selectedIconSmallFullUrl,
+    this.middleButtonIconFullUrl,
     this.adsBannerImageFullUrl,
     this.adsBannerLinkType,
     this.adsBannerLinkId,
@@ -115,6 +120,8 @@ class ModuleModel {
     updatedAt = json['updated_at'];
     skyHeaderFullUrl = json['sky_header_full_url'];
     shopModuleBannerBgFullUrl = json['shop_module_banner_bg_full_url'];
+    selectedIconBigFullUrl = json['selected_icon_big_full_url'];
+    selectedIconSmallFullUrl = json['selected_icon_small_full_url'];
     middleButtonIconFullUrl = json['middle_button_icon_full_url'];
     adsBannerImageFullUrl = json['ads_banner_image_full_url'];
     adsBannerLinkType = json['ads_banner_link_type'];
@@ -180,6 +187,8 @@ class ModuleModel {
     data['updated_at'] = updatedAt;
     data['sky_header_full_url'] = skyHeaderFullUrl;
     data['shop_module_banner_bg_full_url'] = shopModuleBannerBgFullUrl;
+    data['selected_icon_big_full_url'] = selectedIconBigFullUrl;
+    data['selected_icon_small_full_url'] = selectedIconSmallFullUrl;
     data['middle_button_icon_full_url'] = middleButtonIconFullUrl;
     data['ads_banner_image_full_url'] = adsBannerImageFullUrl;
     data['ads_banner_link_type'] = adsBannerLinkType;

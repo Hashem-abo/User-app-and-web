@@ -1,0 +1,50 @@
+//
+//  ZegoAudioDataManager.h
+//  Pods
+//
+//  Manager for audio data callbacks (onCapturedAudioData, onPlaybackAudioData, etc.).
+//
+
+#ifndef ZegoAudioDataManager_h
+#define ZegoAudioDataManager_h
+
+#import <Foundation/Foundation.h>
+#import "ZegoCustomVideoDefine.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@protocol ZegoFlutterAudioDataHandler <NSObject>
+
+@optional
+
+- (void)onCapturedAudioData:(const unsigned char *)data
+                dataLength:(unsigned int)dataLength
+                     param:(ZGFlutterAudioFrameParam *)param;
+
+- (void)onPlaybackAudioData:(const unsigned char *)data
+                dataLength:(unsigned int)dataLength
+                     param:(ZGFlutterAudioFrameParam *)param;
+
+- (void)onMixedAudioData:(const unsigned char *)data
+              dataLength:(unsigned int)dataLength
+                   param:(ZGFlutterAudioFrameParam *)param;
+
+- (void)onPlayerAudioData:(const unsigned char *)data
+               dataLength:(unsigned int)dataLength
+                    param:(ZGFlutterAudioFrameParam *)param
+                 streamID:(NSString *)streamID;
+
+@end
+
+@interface ZegoAudioDataManager : NSObject
+
++ (instancetype)sharedInstance;
+
+- (void)setAudioDataHandler:(nullable id<ZegoFlutterAudioDataHandler>)handler;
+- (nullable id<ZegoFlutterAudioDataHandler>)getHandler;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* ZegoAudioDataManager_h */

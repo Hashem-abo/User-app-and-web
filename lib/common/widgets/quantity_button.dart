@@ -1,4 +1,4 @@
-﻿import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:suliman/util/images.dart';
 
@@ -8,7 +8,8 @@ class QuantityButton extends StatefulWidget {
   final bool fromSheet;
   final bool showRemoveIcon;
   final Color? color;
-  const QuantityButton({super.key, required this.isIncrement, required this.onTap, this.fromSheet = false, this.showRemoveIcon = false, this.color});
+  final bool isDisabled;
+  const QuantityButton({super.key, required this.isIncrement, required this.onTap, this.fromSheet = false, this.showRemoveIcon = false, this.color, this.isDisabled = false});
 
   @override
   State<QuantityButton> createState() => _QuantityButtonState();
@@ -23,7 +24,7 @@ class _QuantityButtonState extends State<QuantityButton> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTapDown: (_) {
-        if (widget.onTap != null) {
+        if (widget.onTap != null && !widget.isDisabled) {
           setState(() => _isPressed = true);
         }
       },
@@ -38,7 +39,7 @@ class _QuantityButtonState extends State<QuantityButton> {
         }
       },
       onTap: () {
-        if (widget.onTap != null) {
+        if (widget.onTap != null && !widget.isDisabled) {
           (widget.onTap as void Function())();
         }
       },
@@ -51,12 +52,14 @@ class _QuantityButtonState extends State<QuantityButton> {
           margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: widget.showRemoveIcon
-                ? Theme.of(context).colorScheme.error.withValues(alpha: 0.1)
-                : widget.isIncrement
-                    ? widget.color ?? Theme.of(context).primaryColor
-                    : Theme.of(context).disabledColor.withValues(alpha: 0.2),
-            boxShadow: widget.isIncrement
+            color: widget.isDisabled
+                ? Theme.of(context).disabledColor.withValues(alpha: 0.2)
+                : widget.showRemoveIcon
+                    ? Theme.of(context).colorScheme.error.withValues(alpha: 0.1)
+                    : widget.isIncrement
+                        ? widget.color ?? Theme.of(context).primaryColor
+                        : Theme.of(context).disabledColor.withValues(alpha: 0.2),
+            boxShadow: widget.isIncrement && !widget.isDisabled
                 ? [
                     BoxShadow(
                       color: (widget.color ?? Theme.of(context).primaryColor).withValues(alpha: 0.25),
@@ -72,11 +75,13 @@ class _QuantityButtonState extends State<QuantityButton> {
               : Icon(
                   widget.isIncrement ? Icons.add : Icons.remove,
                   size: 16,
-                  color: widget.showRemoveIcon
-                      ? Theme.of(context).colorScheme.error
-                      : widget.isIncrement
-                          ? Theme.of(context).cardColor
-                          : Theme.of(context).disabledColor,
+                  color: widget.isDisabled
+                      ? Theme.of(context).disabledColor
+                      : widget.showRemoveIcon
+                          ? Theme.of(context).colorScheme.error
+                          : widget.isIncrement
+                              ? Theme.of(context).cardColor
+                              : Theme.of(context).disabledColor,
                 ),
         ),
       ),

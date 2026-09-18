@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:suliman/common/widgets/address_widget.dart';
@@ -163,6 +163,14 @@ class DeliverySection extends StatelessWidget {
                             LatLng(lat, lng),
                             LatLng(storeLat, storeLng),
                           );
+                          if (checkoutController.store!.id != null && checkoutController.distance != null && checkoutController.distance! > 0) {
+                            await checkoutController.calculateFbsDeliveryFee(
+                              storeId: checkoutController.store!.id!,
+                              latitude: lat.toString(),
+                              longitude: lng.toString(),
+                              distance: checkoutController.distance!,
+                            );
+                          }
                         }
                       }
                       checkoutController.update();
@@ -264,6 +272,14 @@ class DeliverySection extends StatelessWidget {
                       LatLng(lat, lng),
                       LatLng(storeLat, storeLng),
                     );
+                    if (checkoutController.store!.id != null && checkoutController.distance != null && checkoutController.distance! > 0) {
+                      await checkoutController.calculateFbsDeliveryFee(
+                        storeId: checkoutController.store!.id!,
+                        latitude: lat.toString(),
+                        longitude: lng.toString(),
+                        distance: checkoutController.distance!,
+                      );
+                    }
                   }
                 }
                 checkoutController.update();

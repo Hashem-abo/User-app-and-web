@@ -1,4 +1,4 @@
-﻿import 'package:suliman/features/notification/domain/models/notification_model.dart';
+import 'package:suliman/features/notification/domain/models/notification_model.dart';
 import 'package:suliman/helper/date_converter.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/notification/domain/service/notification_service_interface.dart';
@@ -28,7 +28,7 @@ class NotificationController extends GetxController implements GetxService {
       }
       update();
     }
-    return _notificationList!.length;
+    return _notificationList?.length ?? 0;
   }
 
   void saveSeenNotificationCount(int count) {

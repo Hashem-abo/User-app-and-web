@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/util/dimensions.dart';
@@ -217,8 +217,11 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                                         : BorderRadius.circular(
                                                             100),
                                                     child: CustomImage(
-                                                      image:
-                                                          '${splashController.moduleList![index].iconFullUrl}',
+                                                      image: isSelected 
+                                                          ? (buttonWidth > 65 
+                                                              ? (splashController.moduleList![index].selectedIconBigFullUrl ?? splashController.moduleList![index].iconFullUrl ?? '') 
+                                                              : (splashController.moduleList![index].selectedIconSmallFullUrl ?? splashController.moduleList![index].iconFullUrl ?? ''))
+                                                          : '${splashController.moduleList![index].iconFullUrl}',
                                                       height: buttonHeight,
                                                       width: buttonWidth,
                                                       fit: BoxFit.contain,

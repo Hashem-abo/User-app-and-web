@@ -86,35 +86,35 @@ class OrderInfoWidget extends StatelessWidget {
             const SizedBox(height: Dimensions.paddingSizeLarge),
 
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(parcel ? 'delivery_id'.tr : 'order_id'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+              Text(parcel ? 'delivery_id'.tr : 'order_id'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
               Text('#${order.id}', style: robotoBold),
             ]),
             Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
 
             parcel && order.orderStatus == AppConstants.canceled ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('return_date_and_time'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+              Text('return_date_and_time'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
               Text(order.parcelCancellation?.returnDate != null ? DateConverter.dateTimeStringToDateTime(order.parcelCancellation!.returnDate!) : 'not_set_yet'.tr, style: robotoRegular),
             ]) : const SizedBox(),
             parcel && order.orderStatus == AppConstants.canceled ? Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)) : const SizedBox(),
 
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('order_date'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+              Text('order_date'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
-              Text(order.createdAt != null ? DateConverter.dateTimeStringToDateTime(order.createdAt!) : '', style: robotoRegular),
+              Text(order.createdAt != null ? DateConverter.dateTimeStringToDateTime(order.createdAt!) : '', style: robotoMedium),
             ]),
             Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
 
             order.scheduled == 1 ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('scheduled_at'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+              Text('scheduled_at'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
               Text(order.scheduleAt != null ? DateConverter.dateTimeStringToDateTime(order.scheduleAt!) : '', style: robotoRegular),
             ]) : const SizedBox(),
             order.scheduled == 1 ? Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)) : const SizedBox(),
 
             order.orderStatus != 'canceled' && (Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false) ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('delivery_verification_code'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+              Text('delivery_verification_code'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
               InkWell(
                 onTap: () {
@@ -135,7 +135,7 @@ class OrderInfoWidget extends StatelessWidget {
             order.orderStatus != 'canceled' && (Get.find<SplashController>().configModel?.orderDeliveryVerification ?? false) ? Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)) : const SizedBox(),
 
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('payment_method'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+              Text('payment_method'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
@@ -163,10 +163,10 @@ class OrderInfoWidget extends StatelessWidget {
                 ]),
               ),
             ]),
-            const SizedBox(height: Dimensions.paddingSizeSmall),
+          Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
 
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text('order_status'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+              Text('order_status'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
 
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
@@ -187,7 +187,7 @@ class OrderInfoWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                Text(parcel ? 'charge_pay_by'.tr : 'item'.tr, style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
+                Text(parcel ? 'charge_pay_by'.tr : 'item'.tr, style: robotoSemiBold.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color?.withValues(alpha: 0.6))),
                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                 Text(

@@ -1,4 +1,4 @@
-﻿import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -129,6 +129,13 @@ class CheckoutController extends GetxController implements GetxService {
 
   double? _distance;
   double? get distance => _distance;
+
+  double? _fbsDeliveryCharge;
+  double? get fbsDeliveryCharge => _fbsDeliveryCharge;
+  bool _isFbsFulfilled = false;
+  bool get isFbsFulfilled => _isFbsFulfilled;
+  String? _fbsHubName;
+  String? get fbsHubName => _fbsHubName;
 
   double? _estimatedDuration;
   double? get estimatedDuration => _estimatedDuration;
@@ -419,6 +426,15 @@ class CheckoutController extends GetxController implements GetxService {
           LatLng(double.parse(address.latitude!), double.parse(address.longitude!)),
           LatLng(double.parse(_store!.latitude!), double.parse(_store!.longitude!)),
         );
+        // Check if FBS can fulfill this order at a reduced delivery fee
+        if (_store!.id != null && _distance != null && _distance! > 0) {
+          await calculateFbsDeliveryFee(
+            storeId: _store!.id!,
+            latitude: address.latitude!,
+            longitude: address.longitude!,
+            distance: _distance!,
+          );
+        }
       }
     }
   }
@@ -950,6 +966,32 @@ class CheckoutController extends GetxController implements GetxService {
     SurgePriceModel? surgePriceModel = await checkoutServiceInterface.getSurgePrice(zoneId: zoneId, moduleId: moduleId, dateTime: dateTime, guestId: guestId);
     if(surgePriceModel != null) {
       _surgePrice = surgePriceModel;
+    }
+    update();
+  }
+
+  /// Calls backend to check if all cart items can be fulfilled by Platform Hub at lower delivery fee
+  Future<void> calculateFbsDeliveryFee({
+    required int storeId,
+    required String latitude,
+    required String longitude,
+    required double distance,
+  }) async {
+    _fbsDeliveryCharge = null;
+    _isFbsFulfilled = false;
+    _fbsHubName = null;
+    Response response = await checkoutServiceInterface.calculateFbsDeliveryFee(
+      storeId: storeId,
+      latitude: latitude,
+      longitude: longitude,
+      distance: distance,
+    );
+    if (response.isOk && response.body != null) {
+      _isFbsFulfilled = response.body['is_fbs_fulfilled'] == true;
+      if (_isFbsFulfilled && response.body['final_delivery_fee'] != null) {
+        _fbsDeliveryCharge = double.tryParse(response.body['final_delivery_fee'].toString());
+        _fbsHubName = response.body['hub_name']?.toString();
+      }
     }
     update();
   }

@@ -1,4 +1,4 @@
-﻿import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
+import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
 import 'package:suliman/common/widgets/custom_tool_tip_widget.dart';
 import 'package:suliman/common/widgets/item_bottom_sheet_shimmer.dart';
 import 'package:suliman/features/cart/controllers/cart_controller.dart';
@@ -518,6 +518,7 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                 onTap: () => itemController.setQuantity(true, stock, item.quantityLimit, getxSnackBar: true),
                                 isIncrement: true,
                                 fromSheet: true,
+                                isDisabled: Get.find<CartController>().isLoading || Get.find<CartController>().isItemAdding(item.id),
                               ),
                             ]),
                             const SizedBox(width: Dimensions.paddingSizeSmall),

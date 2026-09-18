@@ -1,0 +1,5 @@
+android: https://artifact-node.zego.cloud/generic/rtc/public/native/ZegoExpressAudio/android/ZegoExpressAudio-android-shared-java.zip?version=3.25.0.50954
+ios: https://artifact-node.zego.cloud/generic/rtc/public/native/ZegoExpressAudio/ios/ZegoExpressAudio-ios-shared-objc.zip?version=3.25.0.50954
+linux: https://artifact-node.zego.cloud/generic/rtc/public/native/ZegoExpressVideo/linux/ZegoExpressVideo-linux-gnu-shared-cpp.zip?version=3.24.0.49603
+macos: https://artifact-node.zego.cloud/generic/rtc/public/native/ZegoExpressVideo/mac/ZegoExpressVideo-mac-shared-objc.zip?version=3.25.0.50976
+windows: https://artifact-node.zego.cloud/generic/rtc/public/native/ZegoExpressVideo/win/ZegoExpressVideo-win-shared-cpp.zip?version=3.25.0.50976

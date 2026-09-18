@@ -1,4 +1,4 @@
-﻿import 'package:get/get_connect/connect.dart';
+import 'package:get/get_connect/connect.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suliman/api/api_client.dart';
@@ -136,5 +136,23 @@ class CheckoutRepository implements CheckoutRepositoryInterface {
     }
     return surgePrice;
   }
-  
+
+  @override
+  Future<Response> calculateFbsDeliveryFee({
+    required int storeId,
+    required String latitude,
+    required String longitude,
+    required double distance,
+  }) async {
+    return await apiClient.postData(
+      AppConstants.calculateFbsFeeUri,
+      {
+        'store_id': storeId,
+        'latitude': latitude,
+        'longitude': longitude,
+        'distance': distance,
+      },
+      handleError: false,
+    );
+  }
 }

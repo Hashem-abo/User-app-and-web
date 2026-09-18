@@ -1,4 +1,4 @@
-﻿import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
+import 'package:expandable_bottom_sheet/expandable_bottom_sheet.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -52,6 +52,22 @@ import 'package:suliman/features/favourite/controllers/wish_list_controller.dart
 import 'package:suliman/features/favourite/domain/models/wish_list_model.dart';
 import 'package:intl/intl.dart';
 
+int _getEffectiveStoreId(Item? item) {
+  if (item == null) return 0;
+  if (item.nearestHubId != null && item.nearestHubId! > 0) {
+    return item.nearestHubId!;
+  }
+  return item.storeId ?? 0;
+}
+
+String _getEffectiveStoreName(Item? item) {
+  if (item == null) return '';
+  if (item.hubName != null && item.hubName!.isNotEmpty) {
+    return item.hubName!;
+  }
+  return item.storeName ?? '';
+}
+
 class CartScreen extends StatefulWidget {
   final bool fromNav;
   const CartScreen({super.key, required this.fromNav});
@@ -81,12 +97,10 @@ class _CartScreenState extends State<CartScreen> {
       Get.find<ProfileController>().getUserInfo();
       Get.find<ProController>().getProActiveOffer(moduleType: Get.find<SplashController>().module?.moduleType);
     }
-    if(Get.find<CartController>().cartList.isEmpty) {
-      await Get.find<CartController>().getCartDataOnline();
-    }
+    await Get.find<CartController>().getCartDataOnline();
     if(Get.find<CartController>().cartList.isNotEmpty){
       if (Get.find<CartController>().selectedStoreId == null) {
-        Get.find<CartController>().setSelectedStoreId(Get.find<CartController>().cartList[0].item!.storeId, notify: false);
+        Get.find<CartController>().setSelectedStoreId(_getEffectiveStoreId(Get.find<CartController>().cartList[0].item), notify: false);
       }
       if (kDebugMode) {
         print('----cart item : ${Get.find<CartController>().cartList[0].toJson()}');
@@ -99,8 +113,9 @@ class _CartScreenState extends State<CartScreen> {
         Get.find<CartController>().toggleExtraPackage(willUpdate: false);
       }
       Get.find<CartController>().setAvailableIndex(-1, willUpdate: false);
-      Get.find<StoreController>().getCartStoreSuggestedItemList(Get.find<CartController>().selectedStoreId ?? Get.find<CartController>().cartList[0].item!.storeId);
-      Get.find<StoreController>().getStoreDetails(Store(id: Get.find<CartController>().cartList[0].item!.storeId, name: null), false, fromCart: true);
+      int initialStoreId = Get.find<CartController>().selectedStoreId ?? _getEffectiveStoreId(Get.find<CartController>().cartList[0].item);
+      Get.find<StoreController>().getCartStoreSuggestedItemList(initialStoreId);
+      Get.find<StoreController>().getStoreDetails(Store(id: initialStoreId, name: null), false, fromCart: true);
       Get.find<CartController>().calculationCart();
       showReferAndEarnSnackBar();
     }
@@ -541,7 +556,7 @@ class _CartScreenState extends State<CartScreen> {
           int storeCount = 0;
           Set<int> storeIds = {};
           for(var cart in cartController.cartList) {
-            storeIds.add(cart.item!.storeId!);
+            storeIds.add(_getEffectiveStoreId(cart.item));
           }
           storeCount = storeIds.length;
 
@@ -626,24 +641,24 @@ class _CartScreenState extends State<CartScreen> {
                                           builder: (context) {
                                             Map<int, List<int>> groupedCart = {};
                                             for (int i = 0; i < cartController.cartList.length; i++) {
-                                              int storeId = cartController.cartList[i].item!.storeId!;
+                                              int storeId = _getEffectiveStoreId(cartController.cartList[i].item);
                                               if (!groupedCart.containsKey(storeId)) {
                                                 groupedCart[storeId] = [];
                                               }
                                               groupedCart[storeId]!.add(i);
                                             }
 
-                                            bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery';
-                                            
-                                            if (isFoodOrGrocery) {
-                                              int selectedStoreId = (cartController.selectedStoreId != null && groupedCart.containsKey(cartController.selectedStoreId))
-                                                   ? cartController.selectedStoreId!
-                                                   : groupedCart.keys.first;
+                                             bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery';
+                                             
+                                             if (isFoodOrGrocery) {
+                                               int selectedStoreId = (cartController.selectedStoreId != null && groupedCart.containsKey(cartController.selectedStoreId))
+                                                    ? cartController.selectedStoreId!
+                                                    : groupedCart.keys.first;
 
-                                              if (cartController.selectedStoreId != selectedStoreId) {
-                                                WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                  cartController.setSelectedStoreId(selectedStoreId, notify: false);
-                                                  Get.find<StoreController>().getCartStoreSuggestedItemList(selectedStoreId);
+                                               if (cartController.selectedStoreId != selectedStoreId) {
+                                                 WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                   cartController.setSelectedStoreId(selectedStoreId, notify: false);
+                                                   Get.find<StoreController>().getCartStoreSuggestedItemList(selectedStoreId);
                                                   
                                                   // Update SplashController module in background
                                                   int? newModuleId = cartController.cartList[groupedCart[selectedStoreId]![0]].item!.moduleId;
@@ -665,7 +680,7 @@ class _CartScreenState extends State<CartScreen> {
                                                     itemCount: groupedCart.length,
                                                     itemBuilder: (context, index) {
                                                       int storeId = groupedCart.keys.elementAt(index);
-                                                      String storeName = cartController.cartList[groupedCart[storeId]![0]].item!.storeName ?? '';
+                                                      String storeName = _getEffectiveStoreName(cartController.cartList[groupedCart[storeId]![0]].item);
                                                       bool isSelected = storeId == selectedStoreId;
                                                       
                                                       return InkWell(
@@ -1222,9 +1237,9 @@ class CheckoutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery';
-    int? selectedStoreId = (cartController.selectedStoreId != null && cartController.cartList.any((cart) => cart.item!.storeId == cartController.selectedStoreId))
+    int? selectedStoreId = (cartController.selectedStoreId != null && cartController.cartList.any((cart) => _getEffectiveStoreId(cart.item) == cartController.selectedStoreId))
         ? cartController.selectedStoreId!
-        : (cartController.cartList.isNotEmpty ? cartController.cartList[0].item!.storeId : null);
+        : (cartController.cartList.isNotEmpty ? _getEffectiveStoreId(cartController.cartList[0].item) : null);
 
     return Container(
       width: Dimensions.webMaxWidth,
@@ -1268,7 +1283,7 @@ class CheckoutButton extends StatelessWidget {
                     children: [
                       Icon(Icons.keyboard_arrow_down, color: Colors.grey[600], size: 20),
                       Text(
-                        PriceConverter.convertPrice(isFoodOrGrocery && selectedStoreId != null ? cartController.getSubTotalForStore(selectedStoreId)['total']! : cartController.subTotal),
+                        PriceConverter.convertPrice(cartController.subTotal),
                         style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Colors.black),
                         //textDirection: TextDirection.ltr,
                       ),
@@ -1286,7 +1301,7 @@ class CheckoutButton extends StatelessWidget {
                 bool allUnavailable = true;
                 if (isFoodOrGrocery && selectedStoreId != null) {
                   for(int i=0; i<cartController.cartList.length; i++) {
-                    if(cartController.cartList[i].item!.storeId == selectedStoreId) {
+                    if(_getEffectiveStoreId(cartController.cartList[i].item) == selectedStoreId) {
                       if (!availableList[i]) {
                         isUnavailable = true;
                       } else {
@@ -1313,16 +1328,31 @@ class CheckoutButton extends StatelessWidget {
                     onPressed: allUnavailable ? null : () async {
                       int? targetStoreId = (isFoodOrGrocery && selectedStoreId != null)
                           ? selectedStoreId
-                          : (cartController.cartList.isNotEmpty ? cartController.cartList[0].item?.storeId : null);
+                          : (cartController.cartList.isNotEmpty ? _getEffectiveStoreId(cartController.cartList[0].item) : null);
 
                       if (targetStoreId != null) {
                         Store? store = Get.find<StoreController>().store;
                         if (store == null || store.id != targetStoreId) {
                           store = await Get.find<StoreController>().getStoreDetails(Store(id: targetStoreId), false, fromCart: true);
                         }
+
+                        if (store != null) {
+                          bool isStoreOpen = (store.open == 1) && (store.active ?? true);
+                          if (!isStoreOpen) {
+                            String message = store.storeOpeningTime != null && store.storeOpeningTime!.isNotEmpty
+                                ? '${'store_is_closed'.tr}. ${'opens_at'.tr} ${store.storeOpeningTime}'
+                                : 'store_is_closed_schedule'.tr;
+                            showCustomSnackBar(message);
+                            return;
+                          }
+                        }
+
                         double currentSubTotal = (isFoodOrGrocery && selectedStoreId != null)
                             ? (cartController.getSubTotalForStore(selectedStoreId)['total'] ?? 0)
                             : cartController.subTotal;
+                        if (currentSubTotal <= 0 && cartController.subTotal > 0) {
+                          currentSubTotal = cartController.subTotal;
+                        }
 
                         if (store != null && store.minimumOrder != null && store.minimumOrder! > 0) {
                           if (currentSubTotal < store.minimumOrder!) {
@@ -1347,7 +1377,7 @@ class CheckoutButton extends StatelessWidget {
                                 List<int> toRemove = [];
                                 for(int i=0; i<cartController.cartList.length; i++) {
                                   if (isFoodOrGrocery && selectedStoreId != null) {
-                                    if(cartController.cartList[i].item!.storeId == selectedStoreId && !availableList[i]) {
+                                    if(_getEffectiveStoreId(cartController.cartList[i].item) == selectedStoreId && !availableList[i]) {
                                       toRemove.add(i);
                                     }
                                   } else {
@@ -1379,14 +1409,18 @@ class CheckoutButton extends StatelessWidget {
                                 await cartController.flushPendingQuantityUpdates();
 
                                 if (isFoodOrGrocery && selectedStoreId != null) {
-                                  List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
+                                  List<CartModel> filteredCartList = cartController.cartList.where((cart) => _getEffectiveStoreId(cart.item) == selectedStoreId).toList();
                                   Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
                                     fromCart: false,
                                     cartList: filteredCartList,
                                     storeId: selectedStoreId,
                                   ));
                                 } else {
-                                  Get.toNamed(RouteHelper.getCheckoutRoute('cart'));
+                                  Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
+                                    fromCart: true,
+                                    cartList: cartController.cartList,
+                                    storeId: null,
+                                  ));
                                 }
                               },
                             );
@@ -1412,15 +1446,18 @@ class CheckoutButton extends StatelessWidget {
                         await cartController.flushPendingQuantityUpdates();
 
                         if (isFoodOrGrocery && selectedStoreId != null) {
-                          List<CartModel> filteredCartList = cartController.cartList.where((cart) => cart.item?.storeId == selectedStoreId).toList();
-                          
+                          List<CartModel> filteredCartList = cartController.cartList.where((cart) => _getEffectiveStoreId(cart.item) == selectedStoreId).toList();
                           Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
                             fromCart: false,
                             cartList: filteredCartList,
                             storeId: selectedStoreId,
                           ));
                         } else {
-                          Get.toNamed(RouteHelper.getCheckoutRoute('cart'));
+                          Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
+                            fromCart: true,
+                            cartList: cartController.cartList,
+                            storeId: null,
+                          ));
                         }
                       }
                     },

@@ -1,4 +1,4 @@
-﻿import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -256,6 +256,37 @@ class _ItemCardState extends State<ItemCard> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            if (widget.item?.isExpressAvailable == true)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                margin: const EdgeInsets.only(bottom: 4),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFE65100), Color(0xFFFF9800)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(0xFFFF9800).withOpacity(0.35),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    )
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.bolt, color: Colors.white, size: 11),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      widget.item?.expressDeliveryTime != null && widget.item!.expressDeliveryTime!.isNotEmpty
+                                          ? '${'express'.tr} ⚡ ${widget.item!.expressDeliveryTime}'
+                                          : '${'express'.tr} ⚡',
+                                      style: robotoBold.copyWith(color: Colors.white, fontSize: 8),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             if (badgeText != null)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -726,6 +757,15 @@ class _ItemCardState extends State<ItemCard> {
                                         'color': Colors.indigo,
                                       });
                                     }
+
+                                       // Multi-Vendor Store Count
+                                       if(widget.item != null && (widget.item?.vendorsCount ?? 1) > 1) {
+                                         statusList.add({
+                                           'text': '${'available_from'.tr} ${widget.item!.vendorsCount} ${'stores'.tr}',
+                                           'icon': Icons.storefront_rounded,
+                                           'color': Colors.indigo,
+                                         });
+                                       }
 
                                       if (widget.item != null) {
                                         if (widget.item!.orderCount != null && widget.item!.orderCount! > 10) {

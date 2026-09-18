@@ -1,4 +1,4 @@
-﻿import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
@@ -264,7 +264,7 @@ class _ItemViewAllScreenState extends State<ItemViewAllScreen> {
                   ),
                   itemCount: 14,
                   itemBuilder: (context, index) {
-                    return const ItemShimmerView();
+                    return ItemShimmerView(isFood: isFood);
                   },
                 ),
               ),
@@ -283,7 +283,8 @@ class _ItemViewAllScreenState extends State<ItemViewAllScreen> {
 }
 
 class ItemShimmerView extends StatelessWidget {
-  const ItemShimmerView({super.key});
+  final bool isFood;
+  const ItemShimmerView({super.key, this.isFood = false});
 
   @override
   Widget build(BuildContext context) {
@@ -292,53 +293,63 @@ class ItemShimmerView extends StatelessWidget {
       enabled: true,
       child: Container(
         padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-        height: 350, width: 200,
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
         ),
-        child: Column(children: [
-
-          Container(
-            height: 150, width: double.infinity,
-            decoration: BoxDecoration(
-              color: Theme.of(context).shadowColor,
-              borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: isFood ? 6 : 7,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).shadowColor,
+                  borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
+                ),
+              ),
             ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-            child: Column(children: [
-
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).shadowColor,
-                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+            Expanded(
+              flex: isFood ? 4 : 5,
+              child: Padding(
+                padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).shadowColor,
+                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      ),
+                      height: 12,
+                      width: 100,
+                    ),
+                    const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).shadowColor,
+                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      ),
+                      height: 14,
+                      width: double.infinity,
+                    ),
+                    const SizedBox(height: Dimensions.paddingSizeExtraSmall),
+                    Container(
+                      height: 12,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).shadowColor,
+                        borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      ),
+                    ),
+                  ],
                 ),
-                height: 15, width: 100,
               ),
-              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).shadowColor,
-                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                ),
-                height: 20, width: 200,
-              ),
-              const SizedBox(height: Dimensions.paddingSizeSmall),
-
-              Container(
-                height: 15, width: 100,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).shadowColor,
-                  borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                ),
-              ),
-            ]),
-          ),
-        ]),
+            ),
+          ],
+        ),
       ),
     );
   }

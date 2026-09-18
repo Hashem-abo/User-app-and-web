@@ -58,7 +58,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
     await Get.find<OrderController>().trackOrder(widget.orderId.toString(), reload ? null : widget.orderModel, false, contactNumber: contact).then((value) {
       if(widget.fromOfflinePayment) {
-        Future.delayed(const Duration(seconds: 2), () => showAnimatedDialog(Get.context!, OfflineSuccessDialog(orderId: widget.orderId)));
+        Future.delayed(const Duration(seconds: 30), () => showAnimatedDialog(Get.context!, OfflineSuccessDialog(orderId: widget.orderId)));
       }
     });
     Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: contact);
@@ -68,7 +68,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
     if (Get.find<OrderController>().trackModel?.orderStatus != 'delivered' &&
         Get.find<OrderController>().trackModel?.orderStatus != 'failed' &&
         Get.find<OrderController>().trackModel?.orderStatus != 'canceled') {
-      _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 60), (timer) {
         Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: contact);
       });
     }

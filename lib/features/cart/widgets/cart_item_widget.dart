@@ -1,4 +1,4 @@
-﻿import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
 import 'package:suliman/common/widgets/custom_ink_well.dart';
@@ -416,6 +416,7 @@ class _CartItemWidgetState extends State<CartItemWidget> {
                               );
                             },
                             isIncrement: true,
+                            isDisabled: cartController.isLoading || cartController.isItemAdding(widget.cart.item?.id),
                           ),
                         ]) : Wrap(
                           spacing: Dimensions.paddingSizeExtraSmall,

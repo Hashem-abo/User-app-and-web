@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/rendering.dart';
 import 'package:suliman/features/review/controllers/review_controller.dart';
 import 'package:suliman/features/cart/controllers/cart_controller.dart';
@@ -898,7 +898,7 @@ class _StoreScreenState extends State<StoreScreen> {
               ResponsiveHelper.isDesktop(context) ? const SliverToBoxAdapter(child:SizedBox()) :
               (storeController.categoryList!.isNotEmpty) ? SliverPersistentHeader(
                 pinned: true,
-                delegate: SliverDelegate(height: _selectedTab == 0 ? 125 : 70, child: Center(child: Container(
+                delegate: SliverDelegate(height: _selectedTab == 0 ? 145 : 75, child: Center(child: Container(
                   width: Dimensions.webMaxWidth,
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,

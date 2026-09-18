@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:suliman/helper/date_converter.dart';
@@ -221,6 +221,9 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                 bool isStoreOpen = DateConverter.isAvailable(widget.item!.availableTimeStarts, widget.item!.availableTimeEnds);
                 statusList.add({'text': isStoreOpen ? 'open'.tr : 'closed'.tr, 'icon': Icons.access_time});
                 
+                if (widget.item?.isExpressAvailable == true) {
+                  statusList.add({'text': '${'express'.tr}: ${widget.item!.expressDeliveryTime ?? '15-30 min'}', 'icon': Icons.bolt, 'color': Colors.orange});
+                }
                 if (widget.item!.deliveryTime != null && widget.item!.deliveryTime!.isNotEmpty) {
                   statusList.add({'text': '${'delivery_time'.tr}: ${widget.item!.deliveryTime!.replaceAll('min', 'min'.tr).replaceAll('mins', 'mins'.tr)}', 'icon': Icons.delivery_dining});
                 }
@@ -471,6 +474,9 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                               bool isStoreOpen = DateConverter.isAvailable(widget.item!.availableTimeStarts, widget.item!.availableTimeEnds);
                               statusList.add({'text': isStoreOpen ? 'open'.tr : 'closed'.tr, 'icon': Icons.access_time});
                               
+                              if (widget.item?.isExpressAvailable == true) {
+                                statusList.add({'text': '${'express'.tr}: ${widget.item!.expressDeliveryTime ?? '15-30 min'}', 'icon': Icons.bolt, 'color': Colors.orange});
+                              }
                               if (widget.item!.deliveryTime != null && widget.item!.deliveryTime!.isNotEmpty) {
                                 statusList.add({'text': '${'delivery_time'.tr}: ${widget.item!.deliveryTime!.replaceAll('min', 'min'.tr).replaceAll('mins', 'mins'.tr)}', 'icon': Icons.delivery_dining});
                               }

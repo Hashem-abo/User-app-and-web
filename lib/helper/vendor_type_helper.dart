@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:suliman/features/language/controllers/language_controller.dart';
 
 class VendorTypeHelper {
@@ -90,7 +90,13 @@ class VendorTypeHelper {
       return (trVal.isNotEmpty && trVal != 'factory') ? trVal : 'Factory';
     }
 
+    final clean = type!.trim().toLowerCase();
+    if (clean == 'platform_hub' || clean == 'fbs_hub' || clean == 'hub' || clean == 'dark_storefront') {
+      if (arabic) return 'مستودع FBS';
+      return 'FBS Hub';
+    }
+
     // Return custom vendor type (e.g. مخبز / صيدلية) as-is when not retailer.
-    return type?.trim() ?? '';
+    return type.trim();
   }
 }

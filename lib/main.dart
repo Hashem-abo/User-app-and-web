@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:intl/date_symbol_data_local.dart';
 import 'dart:ui';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';

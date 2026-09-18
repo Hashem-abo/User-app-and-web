@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/cart/controllers/cart_controller.dart';
 import 'package:suliman/features/checkout/widgets/extra_discount_view_widget.dart';
