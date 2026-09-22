@@ -1,4 +1,4 @@
-﻿import 'package:suliman/features/address/domain/models/address_model.dart';
+import 'package:suliman/features/address/domain/models/address_model.dart';
 import 'package:suliman/features/parcel/domain/models/parcel_category_model.dart';
 import 'package:suliman/features/store/domain/models/store_model.dart';
 
@@ -38,7 +38,7 @@ class PaginatedOrderModel {
 class OrderModel {
   static double _asDouble(dynamic value) => double.tryParse(value?.toString() ?? '') ?? 0;
   int? id;
-  int? userId;
+  dynamic userId;
   double? orderAmount;
   double? couponDiscountAmount;
   String? couponDiscountTitle;
@@ -674,7 +674,7 @@ class ParcelCancellation {
 class Reviews {
   int? id;
   int? itemId;
-  int? userId;
+  dynamic userId;
   String? comment;
   String? attachment;
   int? rating;

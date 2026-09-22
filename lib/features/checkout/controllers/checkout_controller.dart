@@ -866,7 +866,7 @@ class CheckoutController extends GetxController implements GetxService {
           html.window.open(selectedUrl,"_self");
         } else{
           Get.offNamed(RouteHelper.getPaymentRoute(
-            orderID, Get.find<ProfileController>().userInfoModel?.id ?? (userID.isNotEmpty ? int.parse(userID) : 0), orderType, amount,
+            orderID, Get.find<ProfileController>().userInfoModel?.id ?? (userID.isNotEmpty ? userID : 0), orderType, amount,
             isCashOnDeliveryActive, digitalPaymentName, guestId: userID.isNotEmpty ? userID : AuthHelper.getGuestId(),
             contactNumber: contactNumber,
           ));

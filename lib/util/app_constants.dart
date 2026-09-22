@@ -1,4 +1,4 @@
-import 'package:get/get.dart';
+﻿import 'package:get/get.dart';
 import 'package:suliman/common/models/choose_us_model.dart';
 import 'package:suliman/features/language/domain/models/language_model.dart';
 import 'package:suliman/util/images.dart';
@@ -25,17 +25,21 @@ class AppConstants {
   ];
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
-    static const String webHostedUrl = 'http://192.168.0.179';
+  static const String webHostedUrl = 'http://192.168.137.1/adminoldtest';
+  // static const String webHostedUrl = 'http://192.168.8.179/adminoldtest';
+  // static const String webHostedUrl = 'http://192.168.0.179';
   // static const String webHostedUrl = 'https://t.directplace.store';
-  //static const String webHostedUrl = 'https://sulimanplus.com';
+  // static const String webHostedUrl = 'https://sulimanplus.com';
 
   static const bool useReactWebsite = false;
   static const String googleServerClientId =
       '72955669368-ak9ou1maimkatvlngk39s815qc2vql19.apps.googleusercontent.com';
 
-   static const String baseUrl = 'http://192.168.0.179/adminold';
+  static const String baseUrl = 'http://192.168.137.1/adminoldtest';
+  // static const String baseUrl = 'http://192.168.8.179/adminoldtest';
+  // static const String baseUrl = 'http://192.168.0.179/adminold';
   // static const String baseUrl = 'https://ta.directplace.store';
- // static const String baseUrl = 'https://sulimanplus.com';
+  // static const String baseUrl = 'https://sulimanplus.com';
 
   static const String categoryUri = '/api/v1/categories';
   static const String homepageUri = '/api/v1/homepage';
@@ -58,7 +62,8 @@ class AppConstants {
   static const String verifyPhoneUri = '/api/v1/auth/verify-phone';
   static const String checkEmailUri = '/api/v1/auth/check-email';
   static const String verifyEmailUri = '/api/v1/auth/verify-email';
-  static const String calculateFbsFeeUri = '/api/v1/customer/order/calculate-fbs-fee';
+  static const String calculateFbsFeeUri =
+      '/api/v1/customer/order/calculate-fbs-fee';
   static const String registerUri = '/api/v1/auth/sign-up';
   static const String loginUri = '/api/v1/auth/login';
   static const String logoutUri = '/api/v1/auth/logout';

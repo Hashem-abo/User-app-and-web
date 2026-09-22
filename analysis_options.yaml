@@ -13,6 +13,7 @@ analyzer:
     - android/**
     - ios/**
     - web/**
+    - assets/**
     - "**/*.g.dart"
     - "**/*.freezed.dart"
   errors:

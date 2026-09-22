@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +13,8 @@ import 'package:suliman/common/widgets/custom_app_bar.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:suliman/features/checkout/widgets/payment_failed_dialog.dart';
 import 'package:suliman/features/wallet/widgets/fund_payment_dialog_widget.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -25,7 +27,7 @@ class PaymentScreen extends StatefulWidget {
   final String? subscriptionUrl;
   final int? storeId;
   final bool createAccount;
-  final int? createUserId;
+  final dynamic createUserId;
   const PaymentScreen({super.key, required this.orderModel, required this.isCashOnDelivery, this.addFundUrl, required this.paymentMethod,
     required this.guestId, required this.contactNumber, this.storeId, this.subscriptionUrl, this.createAccount = false, this.createUserId});
 
@@ -46,7 +48,12 @@ class PaymentScreenState extends State<PaymentScreen> {
     super.initState();
 
     if ((widget.addFundUrl == null || widget.addFundUrl!.isEmpty) && (widget.subscriptionUrl == null || widget.subscriptionUrl!.isEmpty)) {
-      selectedUrl = '${AppConstants.baseUrl}/payment-mobile?customer_id=${widget.createAccount ? widget.createUserId : widget.orderModel.userId == 0 ? widget.guestId : widget.orderModel.userId}&order_id=${widget.orderModel.id}&payment_method=${widget.paymentMethod}';
+      dynamic customerId = widget.createAccount
+          ? widget.createUserId
+          : (widget.orderModel.userId == 0 || widget.orderModel.userId == null || widget.orderModel.userId == '0')
+              ? (AuthHelper.isLoggedIn() ? (Get.find<ProfileController>().userInfoModel?.id ?? widget.guestId) : widget.guestId)
+              : widget.orderModel.userId;
+      selectedUrl = '${AppConstants.baseUrl}/payment-mobile?customer_id=$customerId&order_id=${widget.orderModel.id}&payment_method=${widget.paymentMethod}';
     } else if (widget.subscriptionUrl != null && widget.subscriptionUrl!.isNotEmpty) {
       selectedUrl = widget.subscriptionUrl!;
     } else {

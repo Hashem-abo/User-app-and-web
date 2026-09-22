@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:suliman/helper/version_helper.dart';
 import 'package:suliman/features/auth/controllers/auth_controller.dart';
 import 'package:suliman/features/auth/screens/new_user_setup_screen.dart';
@@ -324,7 +324,7 @@ class RouteHelper {
   static String getOrderSuccessRoute(String orderID, String? contactNumber, {bool? createAccount, String guestId = ''}) {
     return '$orderSuccess?id=$orderID&contact_number=$contactNumber&create_account=$createAccount&guest_id=$guestId';
   }
-  static String getPaymentRoute(String id, int? user, String? type, double amount, bool? codDelivery, String? paymentMethod, {required String guestId, String? contactNumber, String? addFundUrl, String? subscriptionUrl, int? storeId, bool? createAccount, int? createUserId, bool? isProSubscription, bool? isRenew}
+  static String getPaymentRoute(String id, dynamic user, String? type, double amount, bool? codDelivery, String? paymentMethod, {required String guestId, String? contactNumber, String? addFundUrl, String? subscriptionUrl, int? storeId, bool? createAccount, int? createUserId, bool? isProSubscription, bool? isRenew}
       ) => '$payment?id=$id&user=$user&type=$type&amount=$amount&cod-delivery=$codDelivery&add-fund-url=$addFundUrl&payment-method=$paymentMethod&guest-id=$guestId&number=$contactNumber&subscription-url=$subscriptionUrl&store_id=$storeId&create_account=$createAccount&create_user_id=$createUserId&is_pro_subscription=$isProSubscription&is_renew=$isRenew';
   static String getCheckoutRoute(String page,{int? storeId}) => '$checkout?page=$page&store-id=$storeId';
   static String getOrderTrackingRoute(int? id, String? contactNumber) => '$orderTracking?id=$id&number=$contactNumber';
@@ -568,8 +568,9 @@ class RouteHelper {
     ),
     )),
     GetPage(name: payment, page: () {
+      dynamic userParam = (Get.parameters['user'] != null && Get.parameters['user'] != 'null' && Get.parameters['user'] != '') ? Get.parameters['user'] : 0;
       OrderModel order = OrderModel(
-        id: int.tryParse(Get.parameters['id'] ?? '') ?? 0, orderType: Get.parameters['type'], userId: int.tryParse(Get.parameters['user'] ?? '') ?? 0,
+        id: int.tryParse(Get.parameters['id'] ?? '') ?? 0, orderType: Get.parameters['type'], userId: userParam,
         orderAmount: double.tryParse(Get.parameters['amount'] ?? '') ?? 0.0,
       );
       bool isCodActive = Get.parameters['cod-delivery'] == 'true';
@@ -586,7 +587,7 @@ class RouteHelper {
       String number = Get.parameters['number']!;
       int? storeId = (Get.parameters['store_id'] != null && Get.parameters['store_id'] != 'null') ? int.parse(Get.parameters['store_id']!) : null;
       bool createAccount = Get.parameters['create_account'] == 'true';
-      int? createUserId = Get.parameters['create_user_id'] != null && Get.parameters['create_user_id'] != 'null' ? int.parse(Get.parameters['create_user_id']!) : null;
+      dynamic createUserId = (Get.parameters['create_user_id'] != null && Get.parameters['create_user_id'] != 'null' && Get.parameters['create_user_id'] != '') ? Get.parameters['create_user_id'] : null;
       return getRoute(AppConstants.payInWevView ? PaymentWebViewScreen(
         orderModel: order, isCashOnDelivery: isCodActive, addFundUrl: addFundUrl, paymentMethod: paymentMethod, guestId: guestId,
         contactNumber: number, subscriptionUrl: subscriptionUrl, storeId: storeId, createAccount: createAccount,

@@ -1,7 +1,7 @@
-﻿import 'package:suliman/features/chat/domain/models/conversation_model.dart';
+import 'package:suliman/features/chat/domain/models/conversation_model.dart';
 
 class UserInfoModel {
-  int? id;
+  dynamic id;
   String? fName;
   String? lName;
   String? email;

@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -570,7 +570,7 @@ class ParcelController extends GetxController implements GetxService {
         resetParcelIdempotencyKey();
         String? message = response.body['message'];
         orderID = response.body['order_id'].toString();
-        int createUserId = response.body['user_id'];
+        dynamic createUserId = response.body['user_id'] ?? 0;
 
         if(forParcel && _destinationAddress != null) {
           await addParcelRecentAddress(_destinationAddress!);
@@ -603,7 +603,7 @@ class ParcelController extends GetxController implements GetxService {
     return orderID;
   }
 
-  Future<void> parcelCallback(bool isSuccess, String? message, String orderID, int? zoneID, double orderAmount, double? maxCodAmount, bool isCashOnDeliveryActive, String? contactNumber, {int? createUserId}) async {
+  Future<void> parcelCallback(bool isSuccess, String? message, String orderID, int? zoneID, double orderAmount, double? maxCodAmount, bool isCashOnDeliveryActive, String? contactNumber, {dynamic createUserId}) async {
     Get.find<ParcelController>().startLoader(false);
     if(isSuccess) {
       if(isDmTipSave){
