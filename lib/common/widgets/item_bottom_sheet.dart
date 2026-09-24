@@ -109,7 +109,9 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
         double? initialDiscount = item.discount;
         double? discount = item.discount;
         String? discountType = item.discountType;
-        int? stock = item.stock ?? 0;
+        bool hasStockManagement = item.moduleType != 'food' &&
+            (Get.find<SplashController>().getModuleConfig(item.moduleType).stock ?? false);
+        int? stock = hasStockManagement ? (item.stock ?? 0) : null;
 
         if(discountType == 'amount'){
           discount = discount! * itemController.quantity!;
@@ -144,7 +146,9 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
             if (variations.type?.replaceAll(' ', '').toLowerCase() == variationType.replaceAll(' ', '').toLowerCase()) {
               price = variations.price;
               variation = variations;
-              stock = variations.stock;
+              if (hasStockManagement) {
+                stock = variations.stock;
+              }
               break;
             }
           }
@@ -529,10 +533,12 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                           return CustomButton(
                             width: ResponsiveHelper.isDesktop(context) ? MediaQuery.of(context).size.width / 2.0 : null,
                             isLoading: cartController.isLoading || cartController.isItemAdding(item.id),
-                            buttonText: (stock != null && stock <= 0)
-                                ? 'out_of_stock'.tr : widget.isCampaign ? 'order_now'.tr
-                                : (itemController.cartIndex != -1) ? 'update_in_cart'.tr : 'add_to_cart'.tr,
-                            onPressed: (stock != null && stock <= 0) ? null : () async {
+                            buttonText: (item.quantityLimit != null && item.quantityLimit == 0)
+                                ? 'item_is_not_available_in_the_store'.tr
+                                : (stock != null && stock <= 0)
+                                    ? 'out_of_stock'.tr : widget.isCampaign ? 'order_now'.tr
+                                    : (itemController.cartIndex != -1) ? 'update_in_cart'.tr : 'add_to_cart'.tr,
+                            onPressed: ((stock != null && stock <= 0) || (item.quantityLimit != null && item.quantityLimit == 0)) ? null : () async {
                               if (cartController.isLoading || cartController.isItemAdding(item.id)) return;
                               String? invalid;
                               if(_newVariation) {
@@ -612,12 +618,17 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                      cartModel.item!.storeId, cartModel.item!.moduleId ?? (Get.find<SplashController>().module != null
                                        ? Get.find<SplashController>().module!.id : Get.find<SplashController>().cacheModule!.id),
                                    )) {
-                                    Get.dialog(ConfirmationDialog(
-                                      icon: Images.warning,
-                                      title: 'are_you_sure_to_reset'.tr,
-                                      description: (Get.find<SplashController>().configModel?.moduleConfig?.module?.showRestaurantText ?? false)
-                                          ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr,
-                                      onYesPressed: () {
+                                     int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
+                                     bool isMultiStore = (Get.find<SplashController>().configModel!.enableAiOrderBatching ?? false) || maxStores > 1;
+
+                                     Get.dialog(ConfirmationDialog(
+                                       icon: Images.warning,
+                                       title: 'are_you_sure_to_reset'.tr,
+                                       description: isMultiStore && maxStores > 1
+                                           ? 'max_stores_in_cart_reached'.tr.replaceAll('@max', maxStores.toString())
+                                           : ((Get.find<SplashController>().configModel?.moduleConfig?.module?.showRestaurantText ?? false)
+                                               ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr),
+                                       onYesPressed: () {
                                         Get.back();
                                         Get.find<CartController>().clearCartOnline().then((success) async {
                                           if(success) {
@@ -901,14 +912,20 @@ class NewVariationView extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.only(bottom: (item!.foodVariations != null && item!.foodVariations!.isNotEmpty) ? Dimensions.paddingSizeLarge : 0),
       itemBuilder: (context, index) {
+        bool isRequired = item!.foodVariations![index].required == true;
         int selectedCount = 0;
-        if(item!.foodVariations![index].required!){
+        if (index < itemController.selectedVariations.length) {
           for (var value in itemController.selectedVariations[index]) {
-            if(value == true){
+            if (value == true) {
               selectedCount++;
             }
           }
         }
+        int minRequired = item!.foodVariations![index].multiSelect == true
+            ? (item!.foodVariations![index].min ?? 1)
+            : 1;
+        bool isCompleted = selectedCount >= minRequired;
+
         return Container(
           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
           margin: EdgeInsets.only(bottom: index != item!.foodVariations!.length - 1 ? Dimensions.paddingSizeLarge : 0),
@@ -924,18 +941,20 @@ class NewVariationView extends StatelessWidget {
 
               Container(
                 decoration: BoxDecoration(
-                  color: item!.foodVariations![index].required! && (item!.foodVariations![index].multiSelect! ? item!.foodVariations![index].min! : 1) > selectedCount ? Theme.of(context).colorScheme.error.withValues(alpha: 0.1) : Theme.of(context).disabledColor.withValues(alpha: 0.1),
+                  color: isRequired && !isCompleted
+                      ? Theme.of(context).colorScheme.error.withValues(alpha: 0.1)
+                      : Theme.of(context).disabledColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
                 ),
                 padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
 
                 child: Text(
-                  item!.foodVariations![index].required!
-                      ? (item!.foodVariations![index].multiSelect! ? item!.foodVariations![index].min! : 1) <= selectedCount ? 'completed'.tr : 'required'.tr
+                  isRequired
+                      ? (isCompleted ? 'completed'.tr : 'required'.tr)
                       : 'optional'.tr,
                   style: robotoRegular.copyWith(
-                    color: item!.foodVariations![index].required!
-                        ? (item!.foodVariations![index].multiSelect! ? item!.foodVariations![index].min! : 1) <= selectedCount ? Theme.of(context).hintColor : Theme.of(context).colorScheme.error
+                    color: isRequired
+                        ? (isCompleted ? Theme.of(context).hintColor : Theme.of(context).colorScheme.error)
                         : Theme.of(context).hintColor,
                     fontSize: Dimensions.fontSizeSmall,
                   ),

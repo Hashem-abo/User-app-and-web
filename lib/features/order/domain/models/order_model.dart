@@ -240,7 +240,7 @@ class OrderModel {
     refundCancellationNote = json['refund_cancellation_note'];
     refundCustomerNote = json['refund_customer_note'];
     refund = json['refund'] != null ? Refund.fromJson(json['refund']) : null;
-    prescriptionOrder = json['prescription_order'];
+    prescriptionOrder = json['prescription_order'] == true || json['prescription_order'] == 1 || json['prescription_order'] == '1';
     taxStatus = json['tax_status'] == 'included' ? true : false;
     cancellationReason = json['cancellation_reason'];
     processingTime = json['processing_time'];

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -9,6 +9,7 @@ import 'package:get/get_connect/http/src/request/request.dart';
 import 'package:suliman/api/cancellation_token.dart';
 import 'package:suliman/api/data_module_manager.dart';
 import 'package:suliman/api/api_checker.dart';
+import 'package:suliman/helper/network_info.dart';
 import 'package:suliman/features/address/domain/models/address_model.dart';
 import 'package:suliman/common/models/error_response.dart';
 import 'package:suliman/common/models/module_model.dart';
@@ -356,6 +357,7 @@ class ApiClient extends GetxService {
         if (cancelToken != null && cancelToken.isCancelled) {
           return Response(statusCode: -1, statusText: cancelToken.cancelReason ?? 'Request cancelled');
         }
+        NetworkInfo.setLastKnownConnection(false);
         if (kDebugMode) {
           print('------------${e.toString()}');
         }
@@ -396,6 +398,7 @@ class ApiClient extends GetxService {
       }
       return result;
     } catch (e) {
+      NetworkInfo.setLastKnownConnection(false);
       return Response(statusCode: 1, statusText: noInternetMessage);
     }
   }
@@ -540,6 +543,11 @@ class ApiClient extends GetxService {
       if(!ResponsiveHelper.isWeb() || response.statusCode != 500){
         print('${_maskResponseBodyForLog(uri, response0.body)}');
       }
+    }
+    if (response0.isOk) {
+      NetworkInfo.setLastKnownConnection(true);
+    } else if (response0.statusCode == 0 || response0.statusCode == 1 || response0.statusText == noInternetMessage) {
+      NetworkInfo.setLastKnownConnection(false);
     }
     if(handleError) {
       if(response0.isOk) {

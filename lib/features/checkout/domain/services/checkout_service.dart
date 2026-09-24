@@ -132,6 +132,11 @@ class CheckoutService implements CheckoutServiceInterface {
   }
 
   @override
+  Future<Response> calculateDeliveryFee(Map<String, dynamic> body) async {
+    return await checkoutRepositoryInterface.calculateDeliveryFee(body);
+  }
+
+  @override
   List<String> getMonthlyReorderPolicy() => const [
     'monthly_reorder_policy_step_1',
     'monthly_reorder_policy_step_2',

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:suliman/features/item/domain/models/item_model.dart';
@@ -25,6 +25,9 @@ class SearchController extends GetxController implements GetxService {
   SearchController({required this.searchServiceInterface}) {
     _speech = stt.SpeechToText();
   }
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   List<Item>? _searchItemList;
   List<Item>? get searchItemList => _searchItemList;
@@ -260,6 +263,7 @@ class SearchController extends GetxController implements GetxService {
 
   Future<void> searchData(String? query, bool fromHome) async {
     if((_isStore && query!.isNotEmpty && query != _storeResultText) || (!_isStore && query!.isNotEmpty && (query != _itemResultText || fromHome))) {
+      _isLoading = true;
       _searchHomeText = query;
       _searchText = query;
       _rating = -1;
@@ -323,12 +327,14 @@ class SearchController extends GetxController implements GetxService {
           }
         }
       }
+      _isLoading = false;
       update();
     }
   }
 
   Future<void> searchByAiData(String? query, bool fromHome) async {
     if(query != null && query.isNotEmpty && (query != _itemResultText || fromHome)) {
+      _isLoading = true;
       _searchHomeText = query;
       _searchText = query;
       _rating = -1;
@@ -363,6 +369,7 @@ class SearchController extends GetxController implements GetxService {
           }
         }
       }
+      _isLoading = false;
       update();
     }
   }

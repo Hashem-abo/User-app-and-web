@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:suliman/common/widgets/custom_bottom_sheet_widget.dart';
 import 'package:suliman/common/widgets/web_menu_bar.dart';
 import 'package:suliman/features/auth/controllers/auth_controller.dart';
@@ -54,15 +54,14 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
   void _loadData(BuildContext context, bool reload) async {
     String? contact = (widget.contactNumber != null && widget.contactNumber != 'null' && widget.contactNumber!.isNotEmpty) 
         ? widget.contactNumber 
-        : Get.find<OrderController>().trackModel?.deliveryAddress?.contactPersonNumber;
+        : (widget.orderModel?.deliveryAddress?.contactPersonNumber ?? Get.find<OrderController>().trackModel?.deliveryAddress?.contactPersonNumber);
 
-    await Get.find<OrderController>().trackOrder(widget.orderId.toString(), reload ? null : widget.orderModel, false, contactNumber: contact).then((value) {
+    await Get.find<OrderController>().trackOrder(widget.orderId.toString(), null, false, contactNumber: contact).then((value) {
       if(widget.fromOfflinePayment) {
         Future.delayed(const Duration(seconds: 30), () => showAnimatedDialog(Get.context!, OfflineSuccessDialog(orderId: widget.orderId)));
       }
     });
-    Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: contact);
-    Get.find<OrderController>().getOrderDetails(widget.orderId.toString());
+    await Get.find<OrderController>().getOrderDetails(widget.orderId.toString());
 
     _timer?.cancel();
     if (Get.find<OrderController>().trackModel?.orderStatus != 'delivered' &&
@@ -315,32 +314,32 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
               isDesktop ? const SizedBox() : buildBottomView(orderController, order, parcel, total),
 
             ]) : (orderController.isLoading ? const CustomLoaderWidget() : Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.lock_outline_rounded, size: 70, color: Theme.of(context).disabledColor),
-                      const SizedBox(height: Dimensions.paddingSizeDefault),
-                      Text('order_not_found_or_unauthorized'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge), textAlign: TextAlign.center),
-                      const SizedBox(height: Dimensions.paddingSizeSmall),
-                      Text('you_dont_have_permission_to_view_this_order'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor), textAlign: TextAlign.center),
-                      const SizedBox(height: Dimensions.paddingSizeLarge),
-                      CustomButton(
-                        buttonText: 'back_to_orders'.tr,
-                        width: 200,
-                        onPressed: () {
-                          if (Navigator.canPop(context)) {
-                            Get.back();
-                          } else {
-                            Get.offAllNamed(RouteHelper.getInitialRoute());
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ));
+                        child: Padding(
+                          padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.lock_outline_rounded, size: 70, color: Theme.of(context).disabledColor),
+                              const SizedBox(height: Dimensions.paddingSizeDefault),
+                              Text('order_not_found_or_unauthorized'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge), textAlign: TextAlign.center),
+                              const SizedBox(height: Dimensions.paddingSizeSmall),
+                              Text('you_dont_have_permission_to_view_this_order'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor), textAlign: TextAlign.center),
+                              const SizedBox(height: Dimensions.paddingSizeLarge),
+                              CustomButton(
+                                buttonText: 'back_to_orders'.tr,
+                                width: 200,
+                                onPressed: () {
+                                  if (Navigator.canPop(context)) {
+                                    Get.back();
+                                  } else {
+                                    Get.offAllNamed(RouteHelper.getInitialRoute());
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ));
           })),
         );
       }),

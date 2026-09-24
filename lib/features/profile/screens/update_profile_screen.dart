@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:suliman/features/profile/screens/edit_size_screen.dart';
@@ -67,11 +67,16 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     _countryDialCode = authController.getUserCountryCode().isNotEmpty ? authController.getUserCountryCode()
         : CountryCode.fromCountryCode(Get.find<SplashController>().configModel!.country!).dialCode;
 
-    if(Get.find<AuthController>().isLoggedIn() && Get.find<ProfileController>().userInfoModel == null) {
-      Get.find<ProfileController>().getUserInfo();
+    ProfileController profileController = Get.find<ProfileController>();
+    if(Get.find<AuthController>().isLoggedIn() && profileController.userInfoModel == null) {
+      profileController.getUserInfo();
     }
-    Get.find<ProfileController>().getUserInfo();
-    Get.find<ProfileController>().initData();
+    profileController.getUserInfo();
+    profileController.initData();
+
+    if (profileController.userInfoModel?.phone != null && profileController.userInfoModel!.phone!.isNotEmpty) {
+      _splitPhoneNumber(profileController.userInfoModel!.phone!);
+    }
   }
 
   @override
@@ -104,7 +109,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: GetBuilder<ProfileController>(builder: (profileController) {
 
-        if(profileController.userInfoModel != null && _phoneController.text.isEmpty && _isPhoneLoading) {
+        if(profileController.userInfoModel != null && _phoneController.text.isEmpty && (_isPhoneLoading || (profileController.userInfoModel?.phone != null && profileController.userInfoModel!.phone!.isNotEmpty))) {
           if(profileController.userInfoModel?.phone != null && profileController.userInfoModel!.phone!.isNotEmpty){
             _splitPhoneNumber(profileController.userInfoModel!.phone!);
           }
@@ -322,7 +327,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 5, spreadRadius: 1)],
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 5, spreadRadius: 1)],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

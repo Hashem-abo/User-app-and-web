@@ -1,4 +1,4 @@
-﻿import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,6 +6,7 @@ import 'package:suliman/common/widgets/custom_button.dart';
 import 'package:suliman/common/widgets/custom_snackbar.dart';
 import 'package:suliman/common/widgets/custom_text_field.dart';
 import 'package:suliman/features/auth/controllers/auth_controller.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
 import 'package:suliman/features/auth/domain/enum/centralize_login_enum.dart';
 import 'package:suliman/features/language/controllers/language_controller.dart';
 import 'package:suliman/features/location/controllers/location_controller.dart';
@@ -51,6 +52,9 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
     _formKeyInfo = GlobalKey<FormState>();
     _countryDialCode = CountryCode.fromCountryCode(Get.find<SplashController>().configModel!.country!).dialCode;
     _isSocial ? _nameController.text = widget.name : _nameController.text = '';
+    if (widget.phone != null && widget.phone!.trim().isNotEmpty && widget.phone != 'null') {
+      _phoneController.text = widget.phone!.trim();
+    }
   }
 
   @override
@@ -277,13 +281,10 @@ class _NewUserSetupScreenState extends State<NewUserSetupScreen> {
       referCode: _referCodeController.text.trim(), gender: _selectedGender,
     ).then((response) {
       if(response.isSuccess) {
-        // if(widget.backFromThis && AddressHelper.getUserAddressFromSharedPref() != null) {
-        //   Get.back();
-        //   Get.back();
-        //   Get.find<LocationController>().syncZoneData();
-        // } else {
-          Get.find<LocationController>().navigateToLocationScreen('sign-in', offNamed: true);
-        // }
+        if (Get.isRegistered<ProfileController>()) {
+          Get.find<ProfileController>().getUserInfo();
+        }
+        Get.find<LocationController>().navigateToLocationScreen('sign-in', offNamed: true);
       } else {
         showCustomSnackBar(response.message);
       }

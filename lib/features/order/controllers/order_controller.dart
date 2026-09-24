@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:suliman/common/models/response_model.dart';
 import 'package:suliman/features/order/domain/models/order_cancellation_body.dart';
@@ -154,6 +154,7 @@ class OrderController extends GetxController implements GetxService {
   Future<void> getRunningOrders(int offset, {bool isUpdate = false, bool fromDashboard = false}) async {
     if(offset == 1) {
       _runningOrderModel = null;
+      _isLoading = true;
       if(isUpdate) {
         update();
       }
@@ -167,13 +168,15 @@ class OrderController extends GetxController implements GetxService {
         _runningOrderModel!.offset = orderModel.offset;
         _runningOrderModel!.totalSize = orderModel.totalSize;
       }
-      update();
     }
+    _isLoading = false;
+    update();
   }
 
   Future<void> getHistoryOrders(int offset, {bool isUpdate = false}) async {
     if(offset == 1) {
       _historyOrderModel = null;
+      _isLoading = true;
       if(isUpdate) {
         update();
       }
@@ -187,8 +190,9 @@ class OrderController extends GetxController implements GetxService {
         _historyOrderModel!.offset = orderModel.offset;
         _historyOrderModel!.totalSize = orderModel.totalSize;
       }
-      update();
     }
+    _isLoading = false;
+    update();
   }
 
   Future<void> getSupportReasons() async {
@@ -200,19 +204,24 @@ class OrderController extends GetxController implements GetxService {
     _orderDetails = null;
     _isLoading = true;
     _showCancelled = false;
-
-    if(_trackModel == null || (_trackModel!.orderType != 'parcel' && !_trackModel!.prescriptionOrder! && _trackModel!.moduleType != 'global_shopping')) {
-      List<OrderDetailsModel>? detailsList = await orderServiceInterface.getOrderDetails(orderID, AuthHelper.isLoggedIn() ? null : AuthHelper.getGuestId());
-      _isLoading = false;
-      _orderDetails = [];
-      if (detailsList != null) {
-        _orderDetails!.addAll(detailsList);
-      }
-    } else {
-      _isLoading = false;
-      _orderDetails = [];
-    }
     update();
+
+    try {
+      if(_trackModel == null || (_trackModel?.orderType != 'parcel' && (_trackModel?.prescriptionOrder != true) && _trackModel?.moduleType != 'global_shopping')) {
+        List<OrderDetailsModel>? detailsList = await orderServiceInterface.getOrderDetails(orderID, AuthHelper.isLoggedIn() ? null : AuthHelper.getGuestId());
+        _orderDetails = [];
+        if (detailsList != null) {
+          _orderDetails!.addAll(detailsList);
+        }
+      } else {
+        _orderDetails = [];
+      }
+    } catch (e) {
+      _orderDetails = [];
+    } finally {
+      _isLoading = false;
+      update();
+    }
     return _orderDetails;
   }
 
@@ -241,6 +250,8 @@ class OrderController extends GetxController implements GetxService {
     } else {
       _trackModel = orderModel;
       _responseModel = ResponseModel(true, 'Successful');
+      _isLoading = false;
+      update();
     }
     return _responseModel;
   }

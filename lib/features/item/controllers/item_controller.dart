@@ -1,4 +1,4 @@
-﻿import 'package:suliman/api/data_module_manager.dart';
+import 'package:suliman/api/data_module_manager.dart';
 import 'package:suliman/common/models/tab_pagination_state.dart';
 import 'package:suliman/common/enums/data_source_enum.dart';
 import 'package:suliman/features/profile/controllers/profile_controller.dart';
@@ -482,6 +482,26 @@ class ItemController extends GetxController implements GetxService {
     _isPopularItemListLoaded = false;
     _isReviewedItemListLoaded = false;
     _isDiscountedItemListLoaded = false;
+
+    // Reset aggregation state to prevent cross-module contamination
+    _isAggregating = false;
+    _aggregatedModuleIds.clear();
+    _currentAggregatedModuleIndex = 0;
+    _offsetList.clear();
+    _offset = 1;
+
+    // Clear in-flight requests and tokens
+    _reviewedInFlightOffsets.clear();
+    _popularInFlightOffsets.clear();
+    _discountedInFlightOffsets.clear();
+    _nationalInFlightOffsets.clear();
+    for (var state in _nationalTabStates.values) {
+      state.cancelInFlight();
+    }
+    _nationalTabStates.clear();
+
+    DataModuleManager().invalidateContext('national_products_tab');
+    DataModuleManager().invalidateContext('items_list');
     update();
   }
 
@@ -503,8 +523,11 @@ class ItemController extends GetxController implements GetxService {
     _isPopularItemListLoaded = false;
     _isReviewedItemListLoaded = false;
     _isDiscountedItemListLoaded = false;
+    _isAggregating = false;
     _currentAggregatedModuleIndex = 0;
     _aggregatedModuleIds = [];
+    _offsetList.clear();
+    _offset = 1;
 
     if (clearAllModuleCache) {
       _moduleBasicMedicineModel.clear();
@@ -724,7 +747,8 @@ class ItemController extends GetxController implements GetxService {
   }
 
   bool hasMoreData({bool isPopular = false, bool isSpecial = false}) {
-    if(isPopular && _isAggregating){ // Check for aggregation
+    final bool isModuleAggregated = (Get.find<SplashController>().module?.showNationalProducts ?? false);
+    if(isPopular && _isAggregating && isModuleAggregated){ // Check for aggregation
        if (_currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) return true;
        return _nationalAggregatedItemList != null && _nationalAggregatedItemList!.length < _pageSize!;
     }else if(isPopular){
@@ -1009,6 +1033,15 @@ class ItemController extends GetxController implements GetxService {
   }
 
   Future<void> getReviewedItemList({required String offset, DataSourceEnum dataSource = DataSourceEnum.local, bool notify = false, bool firstTimeCategoryLoad = false, bool reload = false, bool fromLocalTransition = false}) async {
+    // If the active module is not an aggregated module (e.g. Restaurants, Grocery, etc.), force disable aggregation
+    final bool isModuleAggregated = (Get.find<SplashController>().module?.showNationalProducts ?? false);
+    if (!isModuleAggregated && _isAggregating) {
+      _isAggregating = false;
+      _aggregatedModuleIds.clear();
+      _currentAggregatedModuleIndex = 0;
+    }
+    final bool canAggregate = _isAggregating && isModuleAggregated;
+
     if(!reload && _isReviewedItemListLoaded && offset == '1' && _reviewedItemList != null && _reviewedItemList!.isNotEmpty) {
       if(notify) update();
       return;
@@ -1035,7 +1068,7 @@ class ItemController extends GetxController implements GetxService {
     }
 
     if (offset == '1' && (reload || (dataSource == DataSourceEnum.local && !fromLocalTransition))) {
-      if (!_isAggregating || _currentAggregatedModuleIndex == 0) { // + ahmed
+      if (!canAggregate || _currentAggregatedModuleIndex == 0) {
         _offsetList = [];
         _offset = 1;
         _reviewedItemList = null;
@@ -1056,8 +1089,7 @@ class ItemController extends GetxController implements GetxService {
       _reviewedInFlightOffsets.add(inFlightKey);
       
       try {
-        // + ahmed
-        if (_isAggregating && _aggregatedModuleIds.isEmpty) {
+        if (canAggregate && _aggregatedModuleIds.isEmpty) {
           _reviewedItemList = [];
           _isLoading = false;
           Future.microtask(() => update());
@@ -1065,13 +1097,13 @@ class ItemController extends GetxController implements GetxService {
         }
 
         int? currentModuleId;
-        if (_isAggregating && _currentAggregatedModuleIndex < _aggregatedModuleIds.length) {
+        if (canAggregate && _currentAggregatedModuleIndex < _aggregatedModuleIds.length) {
           currentModuleId = _aggregatedModuleIds[_currentAggregatedModuleIndex];
         }
 
         ItemModel? itemModel = await itemServiceInterface.getReviewedItemList(
           type: _reviewedType, source: dataSource, offset: _offset, search: _searchController.text, categoryIds: _selectedCategoryIds,
-          filter: _filter, rating: _rating, minPrice: _selectedMinPrice, maxPrice: _selectedMaxPrice, moduleId: currentModuleId, // + ahmed
+          filter: _filter, rating: _rating, minPrice: _selectedMinPrice, maxPrice: _selectedMaxPrice, moduleId: currentModuleId,
         );
 
         _preparedReviewedItems(itemModel, offset, firstTimeCategoryLoad, fromLocalTransition: fromLocalTransition);
@@ -1094,31 +1126,34 @@ class ItemController extends GetxController implements GetxService {
   }
 
   void _preparedReviewedItems(ItemModel? itemModel, String offset, bool firstTimeCategoryLoad, {bool fromLocalTransition = false}) {
+    final bool isModuleAggregated = (Get.find<SplashController>().module?.showNationalProducts ?? false);
+    final bool canAggregate = _isAggregating && isModuleAggregated;
+
     if (itemModel != null) {
-      if (offset == '1' && !fromLocalTransition) {
-        if (!_isAggregating || _currentAggregatedModuleIndex == 0) { // + ahmed
+      if (offset == '1') {
+        if (!canAggregate || _currentAggregatedModuleIndex == 0) {
            _reviewedItemList = [];
            _reviewedCategoriesList = [];
            if(firstTimeCategoryLoad) _categoryList = [];
         }
       }
-      _reviewedItemList ??= []; // + ahmed
-      _reviewedCategoriesList ??= []; // + ahmed
+      _reviewedItemList ??= [];
+      _reviewedCategoriesList ??= [];
 
       _reviewedItemList!.addAll(itemModel.items!);
       _reviewedCategoriesList!.addAll(itemModel.categories!);
       
-      // + ahmed: Recursion for Reviewed Items
-      if (_isAggregating) {
+      // Recursion for Reviewed Items (only when aggregation is active)
+      if (canAggregate) {
          if (itemModel.items!.isEmpty && _currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) {
-             print('DEBUG: [Reviewed] Empty result for module index $_currentAggregatedModuleIndex, switching to next...');
+             debugPrint('DEBUG: [Reviewed] Empty result for module index $_currentAggregatedModuleIndex, switching to next...');
              _currentAggregatedModuleIndex++;
              _offset = 1; 
              _offsetList = [];
              getReviewedItemList(offset: '1', dataSource: DataSourceEnum.client, notify: true);
              return; 
          } else if (itemModel.totalSize! <= itemModel.offset! * int.parse(itemModel.limit!)) {
-             print('DEBUG: [Reviewed] End of list for module index $_currentAggregatedModuleIndex, preparing next...');
+             debugPrint('DEBUG: [Reviewed] End of list for module index $_currentAggregatedModuleIndex, preparing next...');
              if (_currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) {
                _currentAggregatedModuleIndex++;
                _offset = 0; 
@@ -1131,9 +1166,9 @@ class ItemController extends GetxController implements GetxService {
       _pageSize = itemModel.totalSize;
       _isLoading = false;
     } else {
-      // + ahmed: Handle API Error/Null Result
-      if (_isAggregating && _currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) {
-          print('DEBUG: [Reviewed] Error/Null result for module index $_currentAggregatedModuleIndex, switching to next...');
+      // Handle API Error/Null Result
+      if (canAggregate && _currentAggregatedModuleIndex < _aggregatedModuleIds.length - 1) {
+          debugPrint('DEBUG: [Reviewed] Error/Null result for module index $_currentAggregatedModuleIndex, switching to next...');
           _currentAggregatedModuleIndex++;
           _offset = 1; 
           _offsetList = [];
@@ -1662,7 +1697,8 @@ class ItemController extends GetxController implements GetxService {
   }
 
   Future<void> setQuantity(bool isIncrement, int? stock,  int? quantityLimit, {bool getxSnackBar = false}) async {
-    _quantity = await itemServiceInterface.setQuantity(isIncrement, Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!, stock, _quantity!, quantityLimit, getxSnackBar: getxSnackBar);
+    bool hasStock = _item?.moduleType != 'food' && (Get.find<SplashController>().getModuleConfig(_item?.moduleType).stock ?? false);
+    _quantity = await itemServiceInterface.setQuantity(isIncrement, hasStock, stock, _quantity!, quantityLimit, getxSnackBar: getxSnackBar);
     update();
   }
 
@@ -1818,16 +1854,21 @@ class ItemController extends GetxController implements GetxService {
           update();
           showCustomSnackBar('item_is_not_available_in_the_store'.tr);
         }
-        else if(Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && _item!.stock! <= 0){
+        else if(_item?.moduleType != 'food' && (Get.find<SplashController>().getModuleConfig(_item?.moduleType).stock ?? false) && _item!.stock! <= 0){
           showCustomSnackBar('out_of_stock'.tr);
         }
         else if (Get.find<CartController>().existAnotherStoreItem(cartModel.item!.storeId, ModuleHelper.getModule() != null
             ? ModuleHelper.getModule()?.id : ModuleHelper.getCacheModule()?.id)) {
+          int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
+          bool isMultiStore = (Get.find<SplashController>().configModel!.enableAiOrderBatching ?? false) || maxStores > 1;
+
           Get.dialog(ConfirmationDialog(
             icon: Images.warning,
             title: 'are_you_sure_to_reset'.tr,
-            description: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-                ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr,
+            description: isMultiStore && maxStores > 1
+                ? 'max_stores_in_cart_reached'.tr.replaceAll('@max', maxStores.toString())
+                : (Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
+                    ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr),
             onYesPressed: () {
               Get.find<CartController>().clearCartOnline().then((success) async {
                 if (success) {

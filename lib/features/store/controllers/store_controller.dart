@@ -1,4 +1,4 @@
-﻿import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -626,10 +626,12 @@ class StoreController extends GetxController implements GetxService {
           _categoryList!.add(CategoryModel(id: -2, name: 'most_requested'.tr));
         }
       } else {
-        if (hasMostOrdered && hasFavorites) {
+        _categoryList!.add(CategoryModel(id: 0, name: 'all'.tr));
+        if (hasFavorites) {
           _categoryList!.add(CategoryModel(id: -1, name: 'favorites'.tr));
-        } else {
-          _categoryList!.add(CategoryModel(id: 0, name: 'all'.tr));
+        }
+        if (hasMostOrdered) {
+          _categoryList!.add(CategoryModel(id: -2, name: 'most_requested'.tr));
         }
       }
       

@@ -39,6 +39,7 @@ import 'package:suliman/util/app_constants.dart';
 import 'package:suliman/common/widgets/custom_snackbar.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:uuid/uuid.dart';
+import 'package:suliman/helper/network_info.dart';
 
 class CheckoutController extends GetxController implements GetxService {
   final CheckoutServiceInterface checkoutServiceInterface;
@@ -136,6 +137,15 @@ class CheckoutController extends GetxController implements GetxService {
   bool get isFbsFulfilled => _isFbsFulfilled;
   String? _fbsHubName;
   String? get fbsHubName => _fbsHubName;
+
+  double? _serverDeliveryCharge;
+  double? get serverDeliveryCharge => _serverDeliveryCharge;
+  double? _serverOriginalDeliveryCharge;
+  double? get serverOriginalDeliveryCharge => _serverOriginalDeliveryCharge;
+  Map<int, double>? _serverStoreDeliveryCharges;
+  Map<int, double>? get serverStoreDeliveryCharges => _serverStoreDeliveryCharges;
+  bool _isLoadingDeliveryFee = false;
+  bool get isLoadingDeliveryFee => _isLoadingDeliveryFee;
 
   double? _estimatedDuration;
   double? get estimatedDuration => _estimatedDuration;
@@ -333,7 +343,17 @@ class CheckoutController extends GetxController implements GetxService {
     }
   }
 
+  // AI Batching feature flag: set to false to disable and unify delivery fees
+  static const bool enableAiBatching = false;
+
   Future<void> checkAiBatching({bool isUpdate = true}) async {
+    if (!enableAiBatching) {
+      _isAiBatched = false;
+      if(isUpdate) {
+        update();
+      }
+      return;
+    }
     AddressModel? address = _guestAddress ?? AddressHelper.getUserAddressFromSharedPref();
     if (_stores != null && _stores!.length > 1 && address != null && address.latitude != null && address.longitude != null) {
       List<int> storeIds = _stores!.map((s) => s.id!).toList();
@@ -380,62 +400,82 @@ class CheckoutController extends GetxController implements GetxService {
   }
 
   Future<void> initCheckoutData(int? storeId) async {
-    Get.find<CouponController>().removeCouponData(false);
+    bool hasNet = await NetworkInfo.hasConnection();
+    if (!hasNet) {
+      _isLoading = false;
+      update();
+      return;
+    }
 
-    if (storeId == null) {
-      _stores = [];
-      Set<int> storeIds = {};
-      for (var cart in Get.find<CartController>().cartList) {
-        if (cart.item!.storeId != null) {
-          storeIds.add(cart.item!.storeId!);
+    _isLoading = true;
+    update();
+
+    try {
+      Get.find<CouponController>().removeCouponData(false);
+
+      if (storeId == null) {
+        _stores = [];
+        Set<int> storeIds = {};
+        for (var cart in Get.find<CartController>().cartList) {
+          if (cart.item!.storeId != null) {
+            storeIds.add(cart.item!.storeId!);
+          }
+        }
+        for (int id in storeIds) {
+          Store? s = await Get.find<StoreController>().getStoreDetails(Store(id: id), false);
+          if (s != null) {
+            _stores!.add(s);
+          }
+        }
+        if (_stores!.isNotEmpty) {
+          _store = _stores![0];
+        }
+      } else {
+        _store = await Get.find<StoreController>().getStoreDetails(Store(id: storeId), false);
+        if (_store != null) {
+          _stores = [_store!];
         }
       }
-      for (int id in storeIds) {
-        Store? s = await Get.find<StoreController>().getStoreDetails(Store(id: id), false);
-        if (s != null) {
-          _stores!.add(s);
-        }
-      }
-      if (_stores!.isNotEmpty) {
-        _store = _stores![0];
-      }
-    } else {
-      _store = await Get.find<StoreController>().getStoreDetails(Store(id: storeId), false);
+
+      _setSaverDeliveryData();
+
       if (_store != null) {
-        _stores = [_store!];
-      }
-    }
-
-    _setSaverDeliveryData();
-
-    if (_store != null) {
-      await getSurgePrice(
-        zoneId: _store!.zoneId.toString(),
-        moduleId: _store!.moduleId.toString(),
-        dateTime: DateConverter.dateToDateTime(DateTime.now()),
-        guestId: AuthHelper.getGuestId(),
-      );
-
-      initializeTimeSlot(_store!);
-    }
-    await checkAiBatching(isUpdate: false);
-    if(_stores != null && _stores!.isNotEmpty && _store != null) {
-      AddressModel? address = _guestAddress ?? AddressHelper.getUserAddressFromSharedPref();
-      if(address != null && address.latitude != null && address.longitude != null) {
-        await getDistanceInKM(
-          LatLng(double.parse(address.latitude!), double.parse(address.longitude!)),
-          LatLng(double.parse(_store!.latitude!), double.parse(_store!.longitude!)),
+        await getSurgePrice(
+          zoneId: _store!.zoneId.toString(),
+          moduleId: _store!.moduleId.toString(),
+          dateTime: DateConverter.dateToDateTime(DateTime.now()),
+          guestId: AuthHelper.getGuestId(),
         );
-        // Check if FBS can fulfill this order at a reduced delivery fee
-        if (_store!.id != null && _distance != null && _distance! > 0) {
-          await calculateFbsDeliveryFee(
-            storeId: _store!.id!,
-            latitude: address.latitude!,
-            longitude: address.longitude!,
-            distance: _distance!,
+
+        initializeTimeSlot(_store!);
+      }
+      await checkAiBatching(isUpdate: false);
+      if(_stores != null && _stores!.isNotEmpty && _store != null) {
+        AddressModel? address = _guestAddress ?? AddressHelper.getUserAddressFromSharedPref();
+        if(address != null && address.latitude != null && address.longitude != null) {
+          await getDistanceInKM(
+            LatLng(double.parse(address.latitude!), double.parse(address.longitude!)),
+            LatLng(double.parse(_store!.latitude!), double.parse(_store!.longitude!)),
           );
+          // Check if FBS can fulfill this order at a reduced delivery fee
+          if (_store!.id != null && _distance != null && _distance! > 0) {
+            await calculateFbsDeliveryFee(
+              storeId: _store!.id!,
+              latitude: address.latitude!,
+              longitude: address.longitude!,
+              distance: _distance!,
+            );
+          }
+          await fetchDeliveryFeeFromServer();
         }
       }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error in initCheckoutData: $e');
+      }
+    } finally {
+      _isLoading = false;
+      update();
     }
   }
 
@@ -495,6 +535,7 @@ class CheckoutController extends GetxController implements GetxService {
         }
       }
     }
+    await fetchDeliveryFeeFromServer();
     if(notify) {
       update();
     }
@@ -511,6 +552,7 @@ class CheckoutController extends GetxController implements GetxService {
     _addressIndex = index;
     _setSaverDeliveryData();
     checkAiBatching();
+    fetchDeliveryFeeFromServer();
     update();
   }
 
@@ -518,6 +560,7 @@ class CheckoutController extends GetxController implements GetxService {
     _guestAddress = address;
     _setSaverDeliveryData();
     checkAiBatching(isUpdate: isUpdate);
+    fetchDeliveryFeeFromServer(customAddress: address);
     if(isUpdate) {
       update();
     }
@@ -778,6 +821,9 @@ class CheckoutController extends GetxController implements GetxService {
           callback(true, message, orderID, zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber!, userID);
         } else {
           Get.find<CartController>().getCartDataOnline();
+          if (AuthHelper.isLoggedIn() && Get.isRegistered<ProfileController>()) {
+            Get.find<ProfileController>().getUserInfo();
+          }
         }
         _orderAttachment = null;
         _rawAttachment = null;
@@ -842,6 +888,9 @@ class CheckoutController extends GetxController implements GetxService {
       String userID) async {
 
     if(isSuccess) {
+      if (AuthHelper.isLoggedIn() && Get.isRegistered<ProfileController>()) {
+        Get.find<ProfileController>().getUserInfo();
+      }
       if(fromCart) {
         Get.find<CartController>().clearCartList();
       }
@@ -994,6 +1043,95 @@ class CheckoutController extends GetxController implements GetxService {
       }
     }
     update();
+  }
+
+  Future<void> fetchDeliveryFeeFromServer({AddressModel? customAddress}) async {
+    if (_orderType == 'take_away') {
+      _serverDeliveryCharge = 0;
+      _serverOriginalDeliveryCharge = 0;
+      _serverStoreDeliveryCharges = {};
+      _isLoadingDeliveryFee = false;
+      update();
+      return;
+    }
+
+    List<int> storeIds = [];
+    if (_stores != null && _stores!.isNotEmpty) {
+      for (var s in _stores!) {
+        if (s.id != null) storeIds.add(s.id!);
+      }
+    } else if (_store != null && _store!.id != null) {
+      storeIds.add(_store!.id!);
+    }
+
+    if (storeIds.isEmpty) {
+      return;
+    }
+
+    AddressModel? address = customAddress ?? _guestAddress ?? AddressHelper.getUserAddressFromSharedPref();
+    if (address == null || address.latitude == null || address.longitude == null || address.latitude == '0' || address.latitude!.isEmpty) {
+      return;
+    }
+
+    _isLoadingDeliveryFee = true;
+    update();
+
+    Map<String, dynamic> body = {
+      'latitude': address.latitude,
+      'longitude': address.longitude,
+      'order_type': _orderType ?? 'delivery',
+      'store_ids': storeIds,
+    };
+
+    if (address.id != null && address.id! > 0) {
+      body['address_id'] = address.id;
+    }
+
+    if (_storeDistances.isNotEmpty) {
+      Map<String, double> distancesMap = {};
+      _storeDistances.forEach((key, value) {
+        distancesMap[key.toString()] = value;
+      });
+      body['store_distances'] = distancesMap;
+    }
+
+    if (Get.isRegistered<CouponController>() && Get.find<CouponController>().coupon?.code != null) {
+      body['coupon_code'] = Get.find<CouponController>().coupon!.code;
+    }
+
+    try {
+      Response response = await checkoutServiceInterface.calculateDeliveryFee(body);
+      if (response.isOk && response.body != null && response.body['status'] == true) {
+        _serverDeliveryCharge = double.tryParse(response.body['delivery_charge']?.toString() ?? '0');
+        _serverOriginalDeliveryCharge = double.tryParse(response.body['original_delivery_charge']?.toString() ?? '0');
+
+        if (response.body['store_delivery_charges'] != null && response.body['store_delivery_charges'] is Map) {
+          _serverStoreDeliveryCharges = {};
+          (response.body['store_delivery_charges'] as Map).forEach((k, v) {
+            int? sid = int.tryParse(k.toString());
+            double? fee = double.tryParse(v.toString());
+            if (sid != null && fee != null) {
+              _serverStoreDeliveryCharges![sid] = fee;
+            }
+          });
+        }
+
+        if (response.body['store_distances'] != null && response.body['store_distances'] is Map) {
+          (response.body['store_distances'] as Map).forEach((k, v) {
+            int? sid = int.tryParse(k.toString());
+            double? d = double.tryParse(v.toString());
+            if (sid != null && d != null && !_storeDistances.containsKey(sid)) {
+              _storeDistances[sid] = d;
+            }
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error calculating server delivery fee: $e');
+    } finally {
+      _isLoadingDeliveryFee = false;
+      update();
+    }
   }
 
 }

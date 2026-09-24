@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:suliman/features/cart/controllers/cart_controller.dart';
@@ -38,6 +38,7 @@ import 'package:suliman/util/app_constants.dart';
 import 'package:suliman/common/widgets/rating_bar.dart';
 import 'package:suliman/helper/date_converter.dart';
 import 'package:suliman/features/review/screens/item_review_screen.dart';
+import 'package:suliman/helper/item_helper.dart';
 import 'package:suliman/common/widgets/custom_image.dart';
 import 'package:suliman/features/product_question/controllers/product_question_controller.dart';
 import 'package:suliman/features/product_question/screens/product_question_screen.dart';
@@ -122,7 +123,9 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
 
         Item? item = itemController.item;
         
-        int? stock = 0;
+        bool hasStockManagement = item?.moduleType != 'food' &&
+            (Get.find<SplashController>().getModuleConfig(item?.moduleType).stock ?? false);
+        int? stock = hasStockManagement ? (item?.stock ?? 0) : null;
         CartModel? cartModel;
         OnlineCart? cart;
         double priceWithAddons = 0;
@@ -155,12 +158,16 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
           }
 
           double? price = item.price;
-          stock = item.stock ?? 0;
+          if (hasStockManagement) {
+            stock = item.stock ?? 0;
+          }
           for (Variation v in variations) {
             if (v.type == variationType) {
               price = v.price;
               variation = v;
-              stock = v.stock;
+              if (hasStockManagement) {
+                stock = v.stock;
+              }
               break;
             }
           }
@@ -277,193 +284,210 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       builder: (context) {
                         return ItemTitleViewWidget(
                           item: item, inStorePage: widget.inStorePage, isCampaign: item.availableDateStarts != null,
-                          inStock: (Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && stock! <= 0),
+                          inStock: ItemHelper.isItemEntirelyOutOfStock(item),
                           price: priceWithDiscount,
                         );
                       }
                     ),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (_getTryOnCategory(item) != null) ...[
-                          InkWell(
-                            onTap: () {
-                              String category = _getTryOnCategory(item) ?? 'clothing';
-                              // Use VirtualTryOnScreen for ALL categories to ensure AI Advice integration
-                              // and consistent 2D overlay behavior (since assets are likely 2D images).
-                              List<String> images = [];
-                              if (item.imagesFullUrl != null && item.imagesFullUrl!.isNotEmpty) {
-                                images.addAll(item.imagesFullUrl!);
-                              } else if (item.imageFullUrl != null) {
-                                images.add(item.imageFullUrl!);
-                              }
-                              if (item.variations != null) {
-                                for (var v in item.variations!) {
-                                  if (v.imagesFullUrl != null && v.imagesFullUrl!.isNotEmpty) {
-                                    for (var img in v.imagesFullUrl!) {
-                                      if (!images.contains(img)) images.add(img);
-                                    }
-                                  }
-                                }
-                              }
-                              
-                              String selectedImageUrl = item.imageFullUrl ?? '';
-                              if (variation != null && variation.imagesFullUrl != null && variation.imagesFullUrl!.isNotEmpty) {
-                                selectedImageUrl = variation.imagesFullUrl!.first;
-                              }
+                    Builder(
+                      builder: (context) {
+                        final bool isGrocery = ModuleHelper.isGrocery(item: item) ||
+                            (item.moduleType != null && item.moduleType.toString().toLowerCase() == 'grocery') ||
+                            (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString().toLowerCase() == 'grocery');
+                        final bool showAdvisor = !isGrocery;
+                        final bool showTryOn = _getTryOnCategory(item) != null;
 
-                              Get.to(() => VirtualTryOnScreen(
-                                imageUrl: selectedImageUrl,
-                                imageList: images,
-                                category: category,
-                              ));
-                            },
-                            child: Container(
-                              width: 140,
-                              height: 40,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).cardColor,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.blueGrey[600]!, width: 1),
-                              ),
-                              child: Text(
-                                'virtual_try_on'.tr,
-                                style: robotoMedium.copyWith(color: Colors.blueGrey[800], fontSize: Dimensions.fontSizeDefault),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                        ],
-                        
-                        InkWell(
-                          onTap: () async {
-                             if (!AuthHelper.isLoggedIn()) {
-                               showCustomSnackBar('you_are_not_logged_in'.tr);
-                               return;
-                             }
-                             final aiService = OpenAIService();
-                             final limitStatus = await aiService.checkAiLimit('account_advice');
-                             if (limitStatus == AiLimitStatus.limitReached) return;
-                             final bool deductPoints = limitStatus == AiLimitStatus.pointsApproved;
+                        if (!showAdvisor && !showTryOn) {
+                          return const SizedBox();
+                        }
 
-                             Get.dialog(const Center(child: CustomLoaderWidget()));
-                             String category = _getTryOnCategory(item) ?? 'general';
-                             String variations = '';
-                             if (item.choiceOptions != null) {
-                               variations = item.choiceOptions!.map((e) => '${e.title}: ${e.options?.join(', ')}').join('; ');
-                             }
-                             String storeName = item.storeName ?? 'Unknown Store';
-                             String storeRating = (item.avgRating ?? 0.0).toStringAsFixed(1);
-                             final advice = await aiService.getAccountAdvice(item.name ?? '', item.description ?? '', category, variations, storeName, storeRating);
-                             Get.back(); // Close loading dialog
-                             if (advice != null) {
-                               await aiService.recordAiUsage('account_advice', deductPoints: deductPoints);
-                               Get.dialog(
-                                 Dialog(
-                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                   insetPadding: const EdgeInsets.all(20),
-                                   child: Container(
-                                     width: Get.width,
-                                     constraints: BoxConstraints(maxHeight: Get.height * 0.75),
-                                     padding: const EdgeInsets.all(20),
-                                     decoration: BoxDecoration(
-                                       color: Theme.of(context).cardColor,
-                                       borderRadius: BorderRadius.circular(20),
-                                     ),
-                                     child: Column(
-                                       mainAxisSize: MainAxisSize.min,
-                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                       children: [
-                                         Row(
-                                           children: [
-                                             Container(
-                                               padding: const EdgeInsets.all(10),
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (showTryOn) ...[
+                                  InkWell(
+                                    onTap: () {
+                                      String category = _getTryOnCategory(item) ?? 'clothing';
+                                      List<String> images = [];
+                                      if (item.imagesFullUrl != null && item.imagesFullUrl!.isNotEmpty) {
+                                        images.addAll(item.imagesFullUrl!);
+                                      } else if (item.imageFullUrl != null) {
+                                        images.add(item.imageFullUrl!);
+                                      }
+                                      if (item.variations != null) {
+                                        for (var v in item.variations!) {
+                                          if (v.imagesFullUrl != null && v.imagesFullUrl!.isNotEmpty) {
+                                            for (var img in v.imagesFullUrl!) {
+                                              if (!images.contains(img)) images.add(img);
+                                            }
+                                          }
+                                        }
+                                      }
+                                      
+                                      String selectedImageUrl = item.imageFullUrl ?? '';
+                                      if (variation != null && variation.imagesFullUrl != null && variation.imagesFullUrl!.isNotEmpty) {
+                                        selectedImageUrl = variation.imagesFullUrl!.first;
+                                      }
+
+                                      Get.to(() => VirtualTryOnScreen(
+                                        imageUrl: selectedImageUrl,
+                                        imageList: images,
+                                        category: category,
+                                      ));
+                                    },
+                                    child: Container(
+                                      width: showAdvisor ? 140 : 340,
+                                      height: 40,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Colors.blueGrey[600]!, width: 1),
+                                      ),
+                                      child: Text(
+                                        'virtual_try_on'.tr,
+                                        style: robotoMedium.copyWith(color: Colors.blueGrey[800], fontSize: Dimensions.fontSizeDefault),
+                                      ),
+                                    ),
+                                  ),
+                                  if (showAdvisor) const SizedBox(width: 10),
+                                ],
+                                
+                                if (showAdvisor)
+                                  InkWell(
+                                    onTap: () async {
+                                       if (!AuthHelper.isLoggedIn()) {
+                                         showCustomSnackBar('you_are_not_logged_in'.tr);
+                                         return;
+                                       }
+                                       final aiService = OpenAIService();
+                                       final limitStatus = await aiService.checkAiLimit('account_advice');
+                                       if (limitStatus == AiLimitStatus.limitReached) return;
+                                       final bool deductPoints = limitStatus == AiLimitStatus.pointsApproved;
+
+                                       Get.dialog(const Center(child: CustomLoaderWidget()));
+                                       String category = _getTryOnCategory(item) ?? 'general';
+                                       String variations = '';
+                                       if (item.choiceOptions != null) {
+                                         variations = item.choiceOptions!.map((e) => '${e.title}: ${e.options?.join(', ')}').join('; ');
+                                       }
+                                       String storeName = item.storeName ?? 'Unknown Store';
+                                       String storeRating = (item.avgRating ?? 0.0).toStringAsFixed(1);
+                                       final advice = await aiService.getAccountAdvice(item.name ?? '', item.description ?? '', category, variations, storeName, storeRating);
+                                       Get.back(); // Close loading dialog
+                                       if (advice != null) {
+                                         await aiService.recordAiUsage('account_advice', deductPoints: deductPoints);
+                                         Get.dialog(
+                                           Dialog(
+                                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                             insetPadding: const EdgeInsets.all(20),
+                                             child: Container(
+                                               width: Get.width,
+                                               constraints: BoxConstraints(maxHeight: Get.height * 0.75),
+                                               padding: const EdgeInsets.all(20),
                                                decoration: BoxDecoration(
-                                                 color: Theme.of(context).primaryColor.withOpacity(0.1),
-                                                 shape: BoxShape.circle,
+                                                 color: Theme.of(context).cardColor,
+                                                 borderRadius: BorderRadius.circular(20),
                                                ),
-                                               child: Icon(Icons.auto_awesome, color: Theme.of(context).primaryColor, size: 24),
-                                             ),
-                                             const SizedBox(width: 15),
-                                             Expanded(
-                                               child: Text(
-                                                 'advisor'.tr,
-                                                 style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
-                                               ),
-                                             ),
-                                             IconButton(
-                                               onPressed: () => Get.back(),
-                                               icon: const Icon(Icons.close),
-                                               splashRadius: 20,
-                                               padding: EdgeInsets.zero,
-                                               constraints: const BoxConstraints(),
-                                             ),
-                                           ],
-                                         ),
-                                         const SizedBox(height: 15),
-                                         const Divider(height: 1, thickness: 1),
-                                         const SizedBox(height: 15),
-                                         Flexible(
-                                           child: Scrollbar(
-                                             child: SingleChildScrollView(
-                                               physics: const BouncingScrollPhysics(),
-                                               child: MarkdownBody(
-                                                 data: advice,
-                                                 selectable: true,
-                                                 styleSheet: MarkdownStyleSheet(
-                                                   p: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.8)),
-                                                   h1: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge),
-                                                   h2: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
-                                                   h3: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
-                                                   listBullet: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault),
-                                                 ),
+                                               child: Column(
+                                                 mainAxisSize: MainAxisSize.min,
+                                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                                 children: [
+                                                   Row(
+                                                     children: [
+                                                       Container(
+                                                         padding: const EdgeInsets.all(10),
+                                                         decoration: BoxDecoration(
+                                                           color: Theme.of(context).primaryColor.withOpacity(0.1),
+                                                           shape: BoxShape.circle,
+                                                         ),
+                                                         child: Icon(Icons.auto_awesome, color: Theme.of(context).primaryColor, size: 24),
+                                                       ),
+                                                       const SizedBox(width: 15),
+                                                       Expanded(
+                                                         child: Text(
+                                                           'advisor'.tr,
+                                                           style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
+                                                         ),
+                                                       ),
+                                                       IconButton(
+                                                         onPressed: () => Get.back(),
+                                                         icon: const Icon(Icons.close),
+                                                         splashRadius: 20,
+                                                         padding: EdgeInsets.zero,
+                                                         constraints: const BoxConstraints(),
+                                                       ),
+                                                     ],
+                                                   ),
+                                                   const SizedBox(height: 15),
+                                                   const Divider(height: 1, thickness: 1),
+                                                   const SizedBox(height: 15),
+                                                   Flexible(
+                                                     child: Scrollbar(
+                                                       child: SingleChildScrollView(
+                                                         physics: const BouncingScrollPhysics(),
+                                                         child: MarkdownBody(
+                                                           data: advice,
+                                                           selectable: true,
+                                                           styleSheet: MarkdownStyleSheet(
+                                                             p: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge?.color?.withOpacity(0.8)),
+                                                             h1: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge),
+                                                             h2: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge),
+                                                             h3: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
+                                                             listBullet: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault),
+                                                           ),
+                                                         ),
+                                                       ),
+                                                     ),
+                                                   ),
+                                                   const SizedBox(height: 20),
+                                                   SizedBox(
+                                                     width: double.infinity,
+                                                     child: ElevatedButton(
+                                                       style: ElevatedButton.styleFrom(
+                                                         backgroundColor: Theme.of(context).primaryColor,
+                                                         padding: const EdgeInsets.symmetric(vertical: 12),
+                                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                         elevation: 0,
+                                                       ),
+                                                       onPressed: () => Get.back(),
+                                                       child: Text('ok'.tr, style: robotoBold.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeLarge)),
+                                                     ),
+                                                   ),
+                                                 ],
                                                ),
                                              ),
                                            ),
-                                         ),
-                                         const SizedBox(height: 20),
-                                         SizedBox(
-                                           width: double.infinity,
-                                           child: ElevatedButton(
-                                             style: ElevatedButton.styleFrom(
-                                               backgroundColor: Theme.of(context).primaryColor,
-                                               padding: const EdgeInsets.symmetric(vertical: 12),
-                                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                               elevation: 0,
-                                             ),
-                                             onPressed: () => Get.back(),
-                                             child: Text('ok'.tr, style: robotoBold.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeLarge)),
-                                           ),
-                                         ),
-                                       ],
-                                     ),
-                                   ),
-                                 ),
-                               );
-                             } else {
-                               showCustomSnackBar('failed_to_get_advice'.tr);
-                             }
-                          },
-                          child: Container(
-                            width: _getTryOnCategory(item) != null ? 140 :340,
-                            height: 40,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.blueGrey[600]!, width: 1),
+                                         );
+                                       } else {
+                                         showCustomSnackBar('failed_to_get_advice'.tr);
+                                       }
+                                    },
+                                    child: Container(
+                                      width: showTryOn ? 140 : 340,
+                                      height: 40,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(color: Colors.blueGrey[600]!, width: 1),
+                                      ),
+                                      child: Text(
+                                        'advisor'.tr,
+                                        style: robotoMedium.copyWith(color: Colors.blueGrey[800], fontSize: Dimensions.fontSizeDefault),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
-                            child: Text(
-                              'advisor'.tr,
-                              style: robotoMedium.copyWith(color: Colors.blueGrey[800], fontSize: Dimensions.fontSizeDefault),
-                            ),
-                          ),
-                        ),
-                      ],
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      }
                     ),
-                    const SizedBox(height: 20),
                     GetBuilder<CouponController>(builder: (couponController) {
                       List<CouponModel> storeCoupons = [];
                       if(couponController.couponList != null && widget.item != null) {
@@ -1373,7 +1397,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                           onTap: () {
                              if(item.quantityLimit != null && item.quantityLimit == 0) {
                                 showCustomSnackBar('item_is_not_available_in_the_store'.tr);
-                             } else if(!Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > _localQuantity) {
+                              } else if(!hasStockManagement || (stock != null && stock > _localQuantity)) {
                                 setState(() => _localQuantity++);
                              } else {
                                 showCustomSnackBar('out_of_stock'.tr);
@@ -1443,11 +1467,16 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                   item.storeId, Get.find<SplashController>().module != null
                                     ? Get.find<SplashController>().module!.id : Get.find<SplashController>().cacheModule!.id,
                                 )) {
+                                  int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
+                                  bool isMultiStore = (Get.find<SplashController>().configModel!.enableAiOrderBatching ?? false) || maxStores > 1;
+
                                   Get.dialog(ConfirmationDialog(
                                     icon: Images.warning,
                                     title: 'are_you_sure_to_reset'.tr,
-                                    description: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-                                        ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr,
+                                    description: isMultiStore && maxStores > 1
+                                        ? 'max_stores_in_cart_reached'.tr.replaceAll('@max', maxStores.toString())
+                                        : (Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
+                                            ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr),
                                     onYesPressed: () {
                                       Get.back();
                                       Get.find<CartController>().clearCartOnline().then((success) async {
@@ -1521,10 +1550,10 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                           isLoading: cartController.isLoading,
                           buttonText: (item.quantityLimit != null && item.quantityLimit == 0)
                               ? 'item_is_not_available_in_the_store'.tr
-                              : (item.moduleType != 'food' && Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! && stock! <= 0) ? 'out_of_stock'.tr
+                              : (hasStockManagement && stock != null && stock <= 0) ? 'out_of_stock'.tr
                               : item.availableDateStarts != null ? 'order_now'.tr : cartIndex != -1 ? 'update_in_cart'.tr : 'add_to_cart'.tr,
-                          onPressed: (cart == null || cartModel == null || (item.quantityLimit != null && item.quantityLimit == 0)) ? null : (item.moduleType == 'food' || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > 0) ?  () async {
-                            if(item.moduleType == 'food' || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock! || stock! > 0) {
+                          onPressed: (cart == null || cartModel == null || (item.quantityLimit != null && item.quantityLimit == 0)) ? null : (!hasStockManagement || (stock != null && stock > 0)) ?  () async {
+                            if(!hasStockManagement || (stock != null && stock > 0)) {
                               if (cartIndex != -1) {
                                    setState(() {
                                       _localQuantity = cartController.cartList[cartIndex].quantity!;
@@ -1535,11 +1564,16 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                     item.storeId, Get.find<SplashController>().module != null
                                       ? Get.find<SplashController>().module!.id : Get.find<SplashController>().cacheModule!.id,
                                   )) {
+                                    int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
+                                    bool isMultiStore = (Get.find<SplashController>().configModel!.enableAiOrderBatching ?? false) || maxStores > 1;
+
                                     Get.dialog(ConfirmationDialog(
                                       icon: Images.warning,
                                       title: 'are_you_sure_to_reset'.tr,
-                                      description: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-                                          ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr,
+                                      description: isMultiStore && maxStores > 1
+                                          ? 'max_stores_in_cart_reached'.tr.replaceAll('@max', maxStores.toString())
+                                          : (Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
+                                              ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr),
                                       onYesPressed: () {
                                         Get.back();
                                         Get.find<CartController>().clearCartOnline().then((success) async {
@@ -1676,7 +1710,7 @@ class QuantityButton extends StatelessWidget {
             } else if (isIncrement && quantity! > 0) {
               if (quantityLimit != null && quantityLimit == 0) {
                 showCustomSnackBar('item_is_not_available_in_the_store'.tr);
-              } else if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
+              } else if(stock == null || quantity! < stock!) {
                 cartController.setQuantity(true, resolvedIndex, stock, quantityLimit, cartId: cartItem.id, cartModel: cartItem);
               }else {
                 showCustomSnackBar('out_of_stock'.tr);
@@ -1689,7 +1723,7 @@ class QuantityButton extends StatelessWidget {
           } else if (isIncrement && quantity! > 0) {
             if (quantityLimit != null && quantityLimit == 0) {
               showCustomSnackBar('item_is_not_available_in_the_store'.tr);
-            } else if(quantity! < stock! || !Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!) {
+            } else if(stock == null || quantity! < stock!) {
               Get.find<ItemController>().setQuantity(true, stock, quantityLimit);
             }else {
               showCustomSnackBar('out_of_stock'.tr);

@@ -21,5 +21,6 @@ abstract class CheckoutServiceInterface {
   Future<Response> getOrderTax(PlaceOrderBodyModel placeOrderBody);
   Future<SurgePriceModel?> getSurgePrice({required String zoneId, required String moduleId, required String dateTime, String? guestId});
   Future<Response> calculateFbsDeliveryFee({required int storeId, required String latitude, required String longitude, required double distance});
+  Future<Response> calculateDeliveryFee(Map<String, dynamic> body);
   List<String> getMonthlyReorderPolicy();
 }

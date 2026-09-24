@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
@@ -66,7 +66,6 @@ class _BrandsItemScreenState extends State<BrandsItemScreen> {
                     ? ItemsView(isStore: false, items: brandsController.brandItems, stores: null, noDataText: 'no_brand_item_found'.tr, mobileItemCrossAxisCount: 2)
                     : Center(child: Padding(padding: EdgeInsets.only(top: isDesktop ? context.height * 0.3 : context.height * 0.4), child: Text('no_brand_item_found'.tr)))
                     : const BrandItemScreenShimmer(),
-
               ),
 
               brandsController.isLoading ? Center(child: Padding(

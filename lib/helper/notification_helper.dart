@@ -207,6 +207,9 @@ class NotificationHelper {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'suliman', AppConstants.appName, playSound: true,
       importance: Importance.max, priority: Priority.max, sound: RawResourceAndroidNotificationSound('notification'),
+      icon: 'notification_icon',
+      largeIcon: DrawableResourceAndroidBitmap('ic_launcher'),
+      color: Color(0xFF005CAA),
     );
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
     await fln.show(0, title, body, platformChannelSpecifics, payload: notificationBody != null ? jsonEncode(notificationBody.toJson()) : null);
@@ -221,6 +224,9 @@ class NotificationHelper {
       'suliman', AppConstants.appName, importance: Importance.max,
       styleInformation: bigTextStyleInformation, priority: Priority.max, playSound: true,
       sound: const RawResourceAndroidNotificationSound('notification'),
+      icon: 'notification_icon',
+      largeIcon: const DrawableResourceAndroidBitmap('ic_launcher'),
+      color: const Color(0xFF005CAA),
     );
     NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
     await fln.show(0, title, body, platformChannelSpecifics, payload: notificationBody != null ? jsonEncode(notificationBody.toJson()) : null);
@@ -239,6 +245,7 @@ class NotificationHelper {
       largeIcon: FilePathAndroidBitmap(largeIconPath), priority: Priority.max, playSound: true,
       styleInformation: bigPictureStyleInformation, importance: Importance.max,
       sound: const RawResourceAndroidNotificationSound('notification'),
+      icon: 'notification_icon', color: const Color(0xFF005CAA),
     );
     final NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
     await fln.show(0, title, body, platformChannelSpecifics, payload: notificationBody != null ? jsonEncode(notificationBody.toJson()) : null);

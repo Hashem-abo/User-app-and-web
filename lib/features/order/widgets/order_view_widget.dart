@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/common/widgets/custom_image.dart';
 import 'package:suliman/common/widgets/custom_ink_well.dart';
@@ -10,7 +10,6 @@ import 'package:suliman/common/widgets/paginated_list_view.dart';
 import 'package:suliman/features/order/controllers/order_controller.dart';
 import 'package:suliman/features/order/domain/models/order_details_model.dart';
 import 'package:suliman/features/order/domain/models/order_model.dart';
-import 'package:suliman/features/order/screens/order_details_screen.dart';
 import 'package:suliman/features/order/widgets/order_shimmer_widget.dart';
 import 'package:suliman/features/review/screens/rate_review_screen.dart';
 import 'package:suliman/helper/date_converter.dart';
@@ -169,10 +168,6 @@ class OrderViewWidget extends StatelessWidget {
         onTap: () {
           Get.toNamed(
             RouteHelper.getOrderDetailsRoute(order.id),
-            arguments: OrderDetailsScreen(
-              orderId: order.id,
-              orderModel: order,
-            ),
           );
         },
         radius: 20,
@@ -505,7 +500,6 @@ class OrderViewWidget extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () => Get.toNamed(
                 RouteHelper.getOrderDetailsRoute(order.id),
-                arguments: OrderDetailsScreen(orderId: order.id, orderModel: order),
               ),
               icon: Icon(
                 Icons.receipt_long_rounded,
@@ -617,7 +611,6 @@ class OrderViewWidget extends StatelessWidget {
     if (isReviewed) {
       Get.toNamed(
         RouteHelper.getOrderDetailsRoute(order.id),
-        arguments: OrderDetailsScreen(orderId: order.id, orderModel: order),
       );
     } else {
       Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);

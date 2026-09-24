@@ -17,6 +17,7 @@ import 'package:suliman/helper/address_helper.dart';
 import 'package:suliman/helper/route_helper.dart';
 import 'package:suliman/features/store/controllers/store_controller.dart';
 import 'package:suliman/features/store/domain/models/store_model.dart';
+import 'package:suliman/helper/fbs_routing_helper.dart';
 
 class CartController extends GetxController implements GetxService {
   final CartServiceInterface cartServiceInterface;
@@ -360,9 +361,7 @@ class CartController extends GetxController implements GetxService {
     bool haveVariation = false;
     
     for (var cartModel in cartList) {
-      int effectiveStoreId = (cartModel.item?.nearestHubId != null && cartModel.item!.nearestHubId! > 0)
-          ? cartModel.item!.nearestHubId!
-          : (cartModel.item?.storeId ?? 0);
+      int effectiveStoreId = FbsRoutingHelper.getEffectiveStoreId(cartModel, cartList);
 
       if (effectiveStoreId != storeId) {
         continue;
@@ -670,13 +669,8 @@ class CartController extends GetxController implements GetxService {
     List<int> cartIdsToRemove = [];
     _cartList.removeWhere((cartItem) {
       if (cartItem.item != null) {
-        int? sId = (cartItem.item!.nearestHubId != null && cartItem.item!.nearestHubId! > 0)
-            ? cartItem.item!.nearestHubId!
-            : cartItem.item!.storeId;
-        if (sId == null && cartItem.item!.storeDetails != null && cartItem.item!.storeDetails!['id'] != null) {
-          sId = int.tryParse(cartItem.item!.storeDetails!['id'].toString());
-        }
-        if (sId != null && storeIds.contains(sId)) {
+        int sId = FbsRoutingHelper.getEffectiveStoreId(cartItem, _cartList);
+        if (storeIds.contains(sId)) {
           if (cartItem.id != null) {
             cartIdsToRemove.add(cartItem.id!);
             _quantityDebounceTimers[cartItem.id!]?.cancel();

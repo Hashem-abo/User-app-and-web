@@ -27,6 +27,7 @@ import 'package:suliman/helper/price_converter.dart';
 import 'package:suliman/features/contact_share/screens/contact_share_sheet.dart';
 import 'package:suliman/helper/responsive_helper.dart';
 import 'package:suliman/helper/route_helper.dart';
+import 'package:suliman/helper/network_info.dart';
 import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/util/images.dart';
 import 'package:suliman/util/styles.dart';
@@ -51,21 +52,36 @@ import 'package:suliman/features/store/screens/store_screen.dart';
 import 'package:suliman/features/favourite/controllers/wish_list_controller.dart';
 import 'package:suliman/features/favourite/domain/models/wish_list_model.dart';
 import 'package:intl/intl.dart';
+import 'package:suliman/helper/fbs_routing_helper.dart';
 
-int _getEffectiveStoreId(Item? item) {
-  if (item == null) return 0;
-  if (item.nearestHubId != null && item.nearestHubId! > 0) {
-    return item.nearestHubId!;
+int _getEffectiveStoreId(dynamic itemOrCart) {
+  if (itemOrCart == null) return 0;
+  List<CartModel> fullList = Get.isRegistered<CartController>() ? Get.find<CartController>().cartList : [];
+  if (itemOrCart is CartModel) {
+    return FbsRoutingHelper.getEffectiveStoreId(itemOrCart, fullList);
+  } else if (itemOrCart is Item) {
+    CartModel? matchedCart = fullList.firstWhereOrNull((c) => c.item?.id == itemOrCart.id);
+    if (matchedCart != null) {
+      return FbsRoutingHelper.getEffectiveStoreId(matchedCart, fullList);
+    }
+    return FbsRoutingHelper.getEffectiveStoreId(CartModel(item: itemOrCart, quantity: 1), fullList);
   }
-  return item.storeId ?? 0;
+  return 0;
 }
 
-String _getEffectiveStoreName(Item? item) {
-  if (item == null) return '';
-  if (item.hubName != null && item.hubName!.isNotEmpty) {
-    return item.hubName!;
+String _getEffectiveStoreName(dynamic itemOrCart) {
+  if (itemOrCart == null) return '';
+  List<CartModel> fullList = Get.isRegistered<CartController>() ? Get.find<CartController>().cartList : [];
+  if (itemOrCart is CartModel) {
+    return FbsRoutingHelper.getEffectiveStoreName(itemOrCart, fullList);
+  } else if (itemOrCart is Item) {
+    CartModel? matchedCart = fullList.firstWhereOrNull((c) => c.item?.id == itemOrCart.id);
+    if (matchedCart != null) {
+      return FbsRoutingHelper.getEffectiveStoreName(matchedCart, fullList);
+    }
+    return FbsRoutingHelper.getEffectiveStoreName(CartModel(item: itemOrCart, quantity: 1), fullList);
   }
-  return item.storeName ?? '';
+  return '';
 }
 
 class CartScreen extends StatefulWidget {
@@ -100,7 +116,7 @@ class _CartScreenState extends State<CartScreen> {
     await Get.find<CartController>().getCartDataOnline();
     if(Get.find<CartController>().cartList.isNotEmpty){
       if (Get.find<CartController>().selectedStoreId == null) {
-        Get.find<CartController>().setSelectedStoreId(_getEffectiveStoreId(Get.find<CartController>().cartList[0].item), notify: false);
+        Get.find<CartController>().setSelectedStoreId(_getEffectiveStoreId(Get.find<CartController>().cartList[0]), notify: false);
       }
       if (kDebugMode) {
         print('----cart item : ${Get.find<CartController>().cartList[0].toJson()}');
@@ -113,7 +129,7 @@ class _CartScreenState extends State<CartScreen> {
         Get.find<CartController>().toggleExtraPackage(willUpdate: false);
       }
       Get.find<CartController>().setAvailableIndex(-1, willUpdate: false);
-      int initialStoreId = Get.find<CartController>().selectedStoreId ?? _getEffectiveStoreId(Get.find<CartController>().cartList[0].item);
+      int initialStoreId = Get.find<CartController>().selectedStoreId ?? _getEffectiveStoreId(Get.find<CartController>().cartList[0]);
       Get.find<StoreController>().getCartStoreSuggestedItemList(initialStoreId);
       Get.find<StoreController>().getStoreDetails(Store(id: initialStoreId, name: null), false, fromCart: true);
       Get.find<CartController>().calculationCart();
@@ -556,7 +572,7 @@ class _CartScreenState extends State<CartScreen> {
           int storeCount = 0;
           Set<int> storeIds = {};
           for(var cart in cartController.cartList) {
-            storeIds.add(_getEffectiveStoreId(cart.item));
+            storeIds.add(_getEffectiveStoreId(cart));
           }
           storeCount = storeIds.length;
 
@@ -641,7 +657,7 @@ class _CartScreenState extends State<CartScreen> {
                                           builder: (context) {
                                             Map<int, List<int>> groupedCart = {};
                                             for (int i = 0; i < cartController.cartList.length; i++) {
-                                              int storeId = _getEffectiveStoreId(cartController.cartList[i].item);
+                                              int storeId = _getEffectiveStoreId(cartController.cartList[i]);
                                               if (!groupedCart.containsKey(storeId)) {
                                                 groupedCart[storeId] = [];
                                               }
@@ -680,7 +696,7 @@ class _CartScreenState extends State<CartScreen> {
                                                     itemCount: groupedCart.length,
                                                     itemBuilder: (context, index) {
                                                       int storeId = groupedCart.keys.elementAt(index);
-                                                      String storeName = _getEffectiveStoreName(cartController.cartList[groupedCart[storeId]![0]].item);
+                                                      String storeName = _getEffectiveStoreName(cartController.cartList[groupedCart[storeId]![0]]);
                                                       bool isSelected = storeId == selectedStoreId;
                                                       
                                                       return InkWell(
@@ -1228,25 +1244,36 @@ class _CartScreenState extends State<CartScreen> {
 
 }
 
-class CheckoutButton extends StatelessWidget {
+class CheckoutButton extends StatefulWidget {
   final CartController cartController;
   final List<bool> availableList;
   final Function? onPriceTap;
   const CheckoutButton({super.key, required this.cartController, required this.availableList, this.onPriceTap});
 
   @override
+  State<CheckoutButton> createState() => _CheckoutButtonState();
+}
+
+class _CheckoutButtonState extends State<CheckoutButton> {
+  bool _isProceedingToCheckout = false;
+
+  @override
   Widget build(BuildContext context) {
+    CartController cartController = widget.cartController;
+    List<bool> availableList = widget.availableList;
+    Function? onPriceTap = widget.onPriceTap;
+
     bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery';
-    int? selectedStoreId = (cartController.selectedStoreId != null && cartController.cartList.any((cart) => _getEffectiveStoreId(cart.item) == cartController.selectedStoreId))
+    int? selectedStoreId = (cartController.selectedStoreId != null && cartController.cartList.any((cart) => _getEffectiveStoreId(cart) == cartController.selectedStoreId))
         ? cartController.selectedStoreId!
-        : (cartController.cartList.isNotEmpty ? _getEffectiveStoreId(cartController.cartList[0].item) : null);
+        : (cartController.cartList.isNotEmpty ? _getEffectiveStoreId(cartController.cartList[0]) : null);
 
     return Container(
       width: Dimensions.webMaxWidth,
       padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5))],
       ),
       child: SafeArea(
         child: Column(
@@ -1260,6 +1287,7 @@ class CheckoutButton extends StatelessWidget {
                   subtotal: isFoodOrGrocery && selectedStoreId != null
                       ? (cartController.getSubTotalForStore(selectedStoreId)['total'] ?? cartController.subTotal)
                       : cartController.subTotal,
+                  cartList: cartController.cartList,
                   redirectRoute: RouteHelper.getCartRoute(),
                 ),
               ),
@@ -1301,7 +1329,7 @@ class CheckoutButton extends StatelessWidget {
                 bool allUnavailable = true;
                 if (isFoodOrGrocery && selectedStoreId != null) {
                   for(int i=0; i<cartController.cartList.length; i++) {
-                    if(_getEffectiveStoreId(cartController.cartList[i].item) == selectedStoreId) {
+                    if(_getEffectiveStoreId(cartController.cartList[i]) == selectedStoreId) {
                       if (!availableList[i]) {
                         isUnavailable = true;
                       } else {
@@ -1322,142 +1350,203 @@ class CheckoutButton extends StatelessWidget {
                 return Expanded(
                   flex: 2,
                   child: CustomButton(
+                    isLoading: _isProceedingToCheckout,
                     buttonText: 'proceed_to_checkout'.tr,
                     radius: 15,
                     height: 55,
-                    onPressed: allUnavailable ? null : () async {
-                      int? targetStoreId = (isFoodOrGrocery && selectedStoreId != null)
-                          ? selectedStoreId
-                          : (cartController.cartList.isNotEmpty ? _getEffectiveStoreId(cartController.cartList[0].item) : null);
+                    onPressed: (allUnavailable || _isProceedingToCheckout) ? null : () async {
+                      if (_isProceedingToCheckout) return;
+                      setState(() {
+                        _isProceedingToCheckout = true;
+                      });
 
-                      if (targetStoreId != null) {
-                        Store? store = Get.find<StoreController>().store;
-                        if (store == null || store.id != targetStoreId) {
-                          store = await Get.find<StoreController>().getStoreDetails(Store(id: targetStoreId), false, fromCart: true);
+                      try {
+                        bool hasNet = await NetworkInfo.hasConnection();
+                        if (!hasNet) {
+                          showCustomSnackBar('no_internet_connection'.tr);
+                          return;
                         }
 
-                        if (store != null) {
-                          bool isStoreOpen = (store.open == 1) && (store.active ?? true);
-                          if (!isStoreOpen) {
-                            String message = store.storeOpeningTime != null && store.storeOpeningTime!.isNotEmpty
-                                ? '${'store_is_closed'.tr}. ${'opens_at'.tr} ${store.storeOpeningTime}'
-                                : 'store_is_closed_schedule'.tr;
-                            showCustomSnackBar(message);
-                            return;
+                        if (!isFoodOrGrocery) {
+                          bool enableAutoBatching = Get.find<SplashController>().configModel!.enableAiOrderBatching ?? false;
+                          if (!enableAutoBatching) {
+                            Set<int> uniqueStores = {};
+                            for (var cart in cartController.cartList) {
+                              int sId = _getEffectiveStoreId(cart);
+                              if (sId > 0) uniqueStores.add(sId);
+                            }
+                            int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
+                            int effectiveMaxStores = maxStores > 1 ? maxStores : 1;
+                            if (uniqueStores.length > effectiveMaxStores) {
+                              showCustomSnackBar('max_stores_in_cart_exceeded'.tr.replaceAll('@max', effectiveMaxStores.toString()));
+                              return;
+                            }
                           }
                         }
 
-                        double currentSubTotal = (isFoodOrGrocery && selectedStoreId != null)
-                            ? (cartController.getSubTotalForStore(selectedStoreId)['total'] ?? 0)
-                            : cartController.subTotal;
-                        if (currentSubTotal <= 0 && cartController.subTotal > 0) {
-                          currentSubTotal = cartController.subTotal;
-                        }
+                        int? targetStoreId = (isFoodOrGrocery && selectedStoreId != null)
+                            ? selectedStoreId
+                            : (cartController.cartList.isNotEmpty ? _getEffectiveStoreId(cartController.cartList[0]) : null);
 
-                        if (store != null && store.minimumOrder != null && store.minimumOrder! > 0) {
-                          if (currentSubTotal < store.minimumOrder!) {
-                            showCustomSnackBar('${'minimum_order_amount_is'.tr} ${PriceConverter.convertPrice(store.minimumOrder)}');
-                            return;
+                        if (targetStoreId != null) {
+                          Store? store = Get.find<StoreController>().store;
+                          if (store == null || store.id != targetStoreId) {
+                            store = await Get.find<StoreController>().getStoreDetails(Store(id: targetStoreId), false, fromCart: true);
+                          }
+
+                          if (store != null) {
+                            bool isStoreOpen = (store.open == 1) && (store.active ?? true);
+                            if (!isStoreOpen) {
+                              String message = store.storeOpeningTime != null && store.storeOpeningTime!.isNotEmpty
+                                  ? '${'store_is_closed'.tr}. ${'opens_at'.tr} ${store.storeOpeningTime}'
+                                  : 'store_is_closed_schedule'.tr;
+                              showCustomSnackBar(message);
+                              return;
+                            }
+                          }
+
+                          double currentSubTotal = (isFoodOrGrocery && selectedStoreId != null)
+                              ? (cartController.getSubTotalForStore(selectedStoreId)['total'] ?? 0)
+                              : cartController.subTotal;
+                          if (currentSubTotal <= 0 && cartController.subTotal > 0) {
+                            currentSubTotal = cartController.subTotal;
+                          }
+
+                          if (store != null && store.minimumOrder != null && store.minimumOrder! > 0) {
+                            if (currentSubTotal < store.minimumOrder!) {
+                              showCustomSnackBar('${'minimum_order_amount_is'.tr} ${PriceConverter.convertPrice(store.minimumOrder)}');
+                              return;
+                            }
                           }
                         }
-                      }
 
-                      Get.find<CheckoutController>().updateFirstTime();
-                      Get.find<CheckoutController>().updateFirstTimeCodActive();
+                        Get.find<CheckoutController>().updateFirstTime();
+                        Get.find<CheckoutController>().updateFirstTimeCodActive();
 
-                      if (isUnavailable) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return ConfirmationDialog(
-                              icon: Images.warning,
-                              description: 'some_items_unavailable_proceed_anyway'.tr,
-                              onYesPressed: () async {
-                                Get.back();
-                                List<int> toRemove = [];
-                                for(int i=0; i<cartController.cartList.length; i++) {
-                                  if (isFoodOrGrocery && selectedStoreId != null) {
-                                    if(_getEffectiveStoreId(cartController.cartList[i].item) == selectedStoreId && !availableList[i]) {
-                                      toRemove.add(i);
+                        if (isUnavailable) {
+                          if (mounted) {
+                            setState(() {
+                              _isProceedingToCheckout = false;
+                            });
+                          }
+                          if (!context.mounted) return;
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ConfirmationDialog(
+                                icon: Images.warning,
+                                description: 'some_items_unavailable_proceed_anyway'.tr,
+                                onYesPressed: () async {
+                                  Get.back();
+                                  if (mounted) {
+                                    setState(() {
+                                      _isProceedingToCheckout = true;
+                                    });
+                                  }
+                                  try {
+                                    bool hasNet = await NetworkInfo.hasConnection();
+                                    if (!hasNet) {
+                                      showCustomSnackBar('no_internet_connection'.tr);
+                                      return;
                                     }
-                                  } else {
-                                    if(!availableList[i]) {
-                                      toRemove.add(i);
+                                    List<int> toRemove = [];
+                                    for(int i=0; i<cartController.cartList.length; i++) {
+                                       if (isFoodOrGrocery && selectedStoreId != null) {
+                                         if(_getEffectiveStoreId(cartController.cartList[i]) == selectedStoreId && !availableList[i]) {
+                                           toRemove.add(i);
+                                         }
+                                       } else {
+                                         if(!availableList[i]) {
+                                           toRemove.add(i);
+                                         }
+                                       }
+                                     }
+                                     for(int i=toRemove.length-1; i>=0; i--) {
+                                       cartController.removeFromCart(toRemove[i]);
+                                     }
+
+                                     if (Get.find<SplashController>().module == null) {
+                                       int i = 0;
+                                       List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
+                                       if (mList != null) {
+                                         for (i = 0; i < mList.length; i++) {
+                                           if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
+                                             break;
+                                           }
+                                         }
+                                         if (i < mList.length) {
+                                           Get.find<SplashController>().switchModule(i, true);
+                                         }
+                                       }
+                                     }
+                                     Get.find<CouponController>().removeCouponData(false);
+
+                                     await cartController.flushPendingQuantityUpdates();
+
+                                     if (isFoodOrGrocery && selectedStoreId != null) {
+                                       List<CartModel> filteredCartList = cartController.cartList.where((cart) => _getEffectiveStoreId(cart) == selectedStoreId).toList();
+                                       await Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
+                                         fromCart: false,
+                                         cartList: filteredCartList,
+                                         storeId: selectedStoreId,
+                                       ));
+                                     } else {
+                                       await Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
+                                         fromCart: true,
+                                         cartList: cartController.cartList,
+                                         storeId: null,
+                                       ));
+                                     }
+                                  } finally {
+                                    if (mounted) {
+                                      setState(() {
+                                        _isProceedingToCheckout = false;
+                                      });
                                     }
                                   }
+                                },
+                              );
+                            }
+                          );
+                        } else {
+                          if (Get.find<SplashController>().module == null) {
+                            int i = 0;
+                            List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
+                            if (mList != null) {
+                              for (i = 0; i < mList.length; i++) {
+                                if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
+                                  break;
                                 }
-                                for(int i=toRemove.length-1; i>=0; i--) {
-                                  cartController.removeFromCart(toRemove[i]);
-                                }
-
-                                if (Get.find<SplashController>().module == null) {
-                                  int i = 0;
-                                  List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
-                                  if (mList != null) {
-                                    for (i = 0; i < mList.length; i++) {
-                                      if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
-                                        break;
-                                      }
-                                    }
-                                    if (i < mList.length) {
-                                      Get.find<SplashController>().switchModule(i, true);
-                                    }
-                                  }
-                                }
-                                Get.find<CouponController>().removeCouponData(false);
-
-                                await cartController.flushPendingQuantityUpdates();
-
-                                if (isFoodOrGrocery && selectedStoreId != null) {
-                                  List<CartModel> filteredCartList = cartController.cartList.where((cart) => _getEffectiveStoreId(cart.item) == selectedStoreId).toList();
-                                  Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
-                                    fromCart: false,
-                                    cartList: filteredCartList,
-                                    storeId: selectedStoreId,
-                                  ));
-                                } else {
-                                  Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
-                                    fromCart: true,
-                                    cartList: cartController.cartList,
-                                    storeId: null,
-                                  ));
-                                }
-                              },
-                            );
-                          }
-                        );
-                      } else {
-                        if (Get.find<SplashController>().module == null) {
-                          int i = 0;
-                          List<ModuleModel>? mList = Get.find<SplashController>().moduleList;
-                          if (mList != null) {
-                            for (i = 0; i < mList.length; i++) {
-                              if (cartController.cartList.isNotEmpty && cartController.cartList[0].item?.moduleId == mList[i].id) {
-                                break;
+                              }
+                              if (i < mList.length) {
+                                Get.find<SplashController>().switchModule(i, true);
                               }
                             }
-                            if (i < mList.length) {
-                              Get.find<SplashController>().switchModule(i, true);
-                            }
+                          }
+                          Get.find<CouponController>().removeCouponData(false);
+                          
+                          await cartController.flushPendingQuantityUpdates();
+
+                          if (isFoodOrGrocery && selectedStoreId != null) {
+                             List<CartModel> filteredCartList = cartController.cartList.where((cart) => _getEffectiveStoreId(cart) == selectedStoreId).toList();
+                            await Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
+                              fromCart: false,
+                              cartList: filteredCartList,
+                              storeId: selectedStoreId,
+                            ));
+                          } else {
+                            await Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
+                              fromCart: true,
+                              cartList: cartController.cartList,
+                              storeId: null,
+                            ));
                           }
                         }
-                        Get.find<CouponController>().removeCouponData(false);
-                        
-                        await cartController.flushPendingQuantityUpdates();
-
-                        if (isFoodOrGrocery && selectedStoreId != null) {
-                          List<CartModel> filteredCartList = cartController.cartList.where((cart) => _getEffectiveStoreId(cart.item) == selectedStoreId).toList();
-                          Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
-                            fromCart: false,
-                            cartList: filteredCartList,
-                            storeId: selectedStoreId,
-                          ));
-                        } else {
-                          Get.toNamed(RouteHelper.getCheckoutRoute('cart'), arguments: CheckoutScreen(
-                            fromCart: true,
-                            cartList: cartController.cartList,
-                            storeId: null,
-                          ));
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isProceedingToCheckout = false;
+                          });
                         }
                       }
                     },

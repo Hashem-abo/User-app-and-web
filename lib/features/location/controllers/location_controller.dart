@@ -1,14 +1,12 @@
-﻿import 'dart:async';
-import 'dart:io';
+import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:suliman/common/widgets/no_internet_screen.dart';
+import 'package:suliman/helper/network_info.dart';
 import 'package:suliman/features/cart/controllers/cart_controller.dart';
 import 'package:suliman/features/category/controllers/category_controller.dart';
 import 'package:suliman/features/location/screens/pick_map_screen.dart';
@@ -661,13 +659,6 @@ class LocationController extends GetxController implements GetxService {
     if(kIsWeb) {
       return true;
     }
-    final List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
-    bool isConnected = connectivityResult.contains(ConnectivityResult.wifi) || connectivityResult.contains(ConnectivityResult.mobile);
-    if(!isConnected && !Platform.isIOS) {
-      Get.offAll(()=> const NoInternetScreen());
-      return false;
-    }
-    return true;
+    return await NetworkInfo.hasConnection();
   }
-
 }

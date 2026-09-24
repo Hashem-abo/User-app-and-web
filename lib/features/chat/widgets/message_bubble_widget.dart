@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/chat/widgets/image_file_view_widget.dart';
+import 'package:suliman/features/chat/controllers/chat_controller.dart';
 import 'package:suliman/features/profile/controllers/profile_controller.dart';
 import 'package:suliman/features/chat/domain/models/conversation_model.dart';
 import 'package:suliman/features/chat/domain/models/chat_model.dart';
@@ -19,7 +20,18 @@ class MessageBubbleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isReply = message.senderId != Get.find<ProfileController>().userInfoModel!.userInfo!.id;
+    int? myId = Get.find<ProfileController>().userInfoModel?.userInfo?.id
+        ?? Get.find<ChatController>().messageModel?.conversation?.sender?.id
+        ?? (Get.find<ProfileController>().userInfoModel?.id != null ? int.tryParse(Get.find<ProfileController>().userInfoModel!.id.toString()) : null);
+
+    bool isReply;
+    if (myId != null) {
+      isReply = message.senderId != myId;
+    } else if (user != null && user!.id != null) {
+      isReply = message.senderId == user!.id;
+    } else {
+      isReply = true;
+    }
 
     return (isReply) ? Container(
       margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: Dimensions.paddingSizeDefault),
@@ -70,7 +82,7 @@ class MessageBubbleWidget extends StatelessWidget {
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
         Text(
-          DateConverter.convertTodayYesterdayFormat(message.createdAt!),
+          message.createdAt != null ? DateConverter.convertTodayYesterdayFormat(message.createdAt!) : '',
           style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall),
         ),
       ]),
@@ -137,7 +149,7 @@ class MessageBubbleWidget extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
           Text(
-            DateConverter.convertTodayYesterdayFormat(message.createdAt!),
+            message.createdAt != null ? DateConverter.convertTodayYesterdayFormat(message.createdAt!) : '',
             style: robotoRegular.copyWith(color: Theme.of(context).hintColor, fontSize: Dimensions.fontSizeSmall),
           ),
           const SizedBox(height: Dimensions.paddingSizeLarge),
@@ -198,7 +210,7 @@ class MessageBubbleWidget extends StatelessWidget {
                   ),
                 ),
 
-                Text(DateConverter.stringToLocalDateOnly(order.createdAt!), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
+                Text(order.createdAt != null ? DateConverter.stringToLocalDateOnly(order.createdAt!) : '', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall)),
               ]),
             ),
 

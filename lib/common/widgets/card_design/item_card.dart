@@ -13,7 +13,6 @@ import 'package:suliman/features/language/controllers/language_controller.dart';
 import 'package:suliman/features/item/domain/models/item_model.dart';
 import 'package:suliman/features/store/domain/models/store_model.dart';
 import 'package:suliman/helper/price_converter.dart';
-import 'package:suliman/helper/date_converter.dart';
 import 'package:suliman/helper/route_helper.dart';
 import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/util/images.dart';
@@ -688,15 +687,14 @@ class _ItemCardState extends State<ItemCard> {
                                         statusList.add({'text': widget.item!.storeName!, 'icon': Icons.store, 'color': Colors.blue});
                                       }
 
-                                      bool isStoreOpen = widget.item != null 
-                                          ? DateConverter.isAvailable(widget.item!.availableTimeStarts, widget.item!.availableTimeEnds) 
-                                          : (widget.store?.open == 1 && widget.store?.active == true);
-                                      
-                                       statusList.add({
-                                        'text': isStoreOpen ? 'open'.tr : 'closed'.tr,
-                                         'icon': Icons.circle,
-                                        'color': isStoreOpen ? Colors.green : Colors.red
-                                       });
+                                      if (widget.item == null && widget.store != null) {
+                                        bool isStoreOpen = (widget.store?.open == 1 && widget.store?.active == true);
+                                        statusList.add({
+                                          'text': isStoreOpen ? 'open'.tr : 'closed'.tr,
+                                          'icon': Icons.circle,
+                                          'color': isStoreOpen ? Colors.green : Colors.red,
+                                        });
+                                      }
 
                                       if (widget.item?.deliveryTime?.isNotEmpty ?? false) {
                                         statusList.add({'text': widget.item!.deliveryTime!.replaceAll('min', 'min'.tr), 'icon': Icons.bolt, 'color': Colors.orange});

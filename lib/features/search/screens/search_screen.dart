@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:suliman/common/controllers/theme_controller.dart';
 import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
@@ -613,6 +613,7 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
     if (barcodeValue != null && barcodeValue is String && barcodeValue.isNotEmpty) {
       _searchController.text = barcodeValue;
       _showSuggestion = false;
+      searchController.setStore(false);
       _actionSearch(true, barcodeValue, fromHome);
     }
   }

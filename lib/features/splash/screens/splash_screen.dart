@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:suliman/features/auth/controllers/auth_controller.dart';
 import 'package:suliman/features/cart/controllers/cart_controller.dart';
@@ -10,6 +10,7 @@ import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/util/images.dart';
 import 'package:suliman/common/widgets/custom_image.dart';
 import 'package:suliman/common/widgets/no_internet_screen.dart';
+import 'package:suliman/helper/network_info.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
@@ -35,8 +36,8 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     bool firstTime = true;
-    _onConnectivityChanged = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
-      bool isConnected = result.contains(ConnectivityResult.wifi) || result.contains(ConnectivityResult.mobile);
+    _onConnectivityChanged = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) async {
+      bool isConnected = await NetworkInfo.hasConnection();
 
       if(!firstTime) {
         isConnected ? ScaffoldMessenger.of(Get.context!).hideCurrentSnackBar() : const SizedBox();

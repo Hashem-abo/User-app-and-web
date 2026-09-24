@@ -155,4 +155,13 @@ class CheckoutRepository implements CheckoutRepositoryInterface {
       handleError: false,
     );
   }
+
+  @override
+  Future<Response> calculateDeliveryFee(Map<String, dynamic> body) async {
+    return await apiClient.postData(
+      AppConstants.calculateDeliveryFeeUri,
+      body,
+      handleError: false,
+    );
+  }
 }

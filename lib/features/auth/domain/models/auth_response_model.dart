@@ -6,6 +6,7 @@ class AuthResponseModel {
   IsExistUser? isExistUser;
   String? loginType;
   String? email;
+  String? name;
 
   AuthResponseModel({
     this.token,
@@ -15,6 +16,7 @@ class AuthResponseModel {
     this.isExistUser,
     this.loginType,
     this.email,
+    this.name,
   });
 
   AuthResponseModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class AuthResponseModel {
     isExistUser = json['is_exist_user'] != null ? IsExistUser.fromJson(json['is_exist_user']) : null;
     loginType = json['login_type'];
     email = json['email'];
+    name = json['name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -38,6 +41,7 @@ class AuthResponseModel {
     }
     data['login_type'] = loginType;
     data['email'] = email;
+    data['name'] = name;
     return data;
   }
 }

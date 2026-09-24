@@ -128,6 +128,11 @@ class Item {
   int? vendorsCount;
   double? minCatalogPrice;
   double? maxCatalogPrice;
+  String? storeLat;
+  String? storeLng;
+  String? hubLat;
+  String? hubLng;
+  double? hubDistanceKm;
 
   Item({
     this.id,
@@ -159,6 +164,7 @@ class Item {
     this.moduleType,
     this.unitType,
     this.stock,
+    this.availableDateStarts,
     this.organic,
     this.quantityLimit,
     this.flashSale,
@@ -186,6 +192,11 @@ class Item {
     this.nearestHubId,
     this.storeType,
     this.hubName,
+    this.storeLat,
+    this.storeLng,
+    this.hubLat,
+    this.hubLng,
+    this.hubDistanceKm,
   });
 
   Item.fromJson(Map<String, dynamic> json) {
@@ -333,6 +344,11 @@ class Item {
     vendorsCount = json['vendors_count'] != null ? int.tryParse(json['vendors_count'].toString()) : 1;
     minCatalogPrice = json['min_catalog_price'] != null ? double.tryParse(json['min_catalog_price'].toString()) : null;
     maxCatalogPrice = json['max_catalog_price'] != null ? double.tryParse(json['max_catalog_price'].toString()) : null;
+    storeLat = json['store_lat']?.toString();
+    storeLng = json['store_lng']?.toString();
+    hubLat = json['hub_lat']?.toString();
+    hubLng = json['hub_lng']?.toString();
+    hubDistanceKm = json['hub_distance_km'] != null ? double.tryParse(json['hub_distance_km'].toString()) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -403,6 +419,11 @@ class Item {
     data['nearest_hub_id'] = nearestHubId;
     data['store_type'] = storeType;
     data['hub_name'] = hubName;
+    data['store_lat'] = storeLat;
+    data['store_lng'] = storeLng;
+    data['hub_lat'] = hubLat;
+    data['hub_lng'] = hubLng;
+    data['hub_distance_km'] = hubDistanceKm;
     return data;
   }
 }
@@ -522,12 +543,17 @@ class FoodVariation {
   FoodVariation({this.name, this.multiSelect, this.min, this.max, this.required, this.variationValues});
 
   FoodVariation.fromJson(Map<String, dynamic> json) {
-    if (json['max'] != null) {
+    if (json['max'] != null || json['name'] != null) {
       name = json['name'];
-      multiSelect = json['type'] == 'multi';
-      min = multiSelect! ? int.parse(json['min'].toString()) : 0;
-      max = multiSelect! ? int.parse(json['max'].toString()) : 0;
-      required = json['required'] == 'on';
+      multiSelect = json['type'] == 'multi' || json['type'] == true;
+      min = multiSelect! ? (int.tryParse(json['min'].toString()) ?? 0) : 0;
+      max = multiSelect! ? (int.tryParse(json['max'].toString()) ?? 0) : 0;
+      bool isReq = json['required'] == 'on'
+          || json['required'] == 'true'
+          || json['required'] == true
+          || json['required'] == '1'
+          || json['required'] == 1;
+      required = isReq || (min != null && min! > 0);
       if (json['values'] != null) {
         variationValues = [];
         json['values'].forEach((v) {

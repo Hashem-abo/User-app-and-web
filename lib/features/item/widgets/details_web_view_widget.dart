@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/cart/controllers/cart_controller.dart';
 import 'package:suliman/features/item/controllers/item_controller.dart';
@@ -7,6 +7,7 @@ import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/features/checkout/domain/models/place_order_body_model.dart';
 import 'package:suliman/features/cart/domain/models/cart_model.dart';
 import 'package:suliman/helper/price_converter.dart';
+import 'package:suliman/helper/item_helper.dart';
 import 'package:suliman/helper/route_helper.dart';
 import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/util/images.dart';
@@ -121,7 +122,7 @@ class DetailsWebViewWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ItemTitleViewWidget(item: itemController.item, inStock: stock != null && stock! <= 0),
+                        ItemTitleViewWidget(item: itemController.item, inStock: ItemHelper.isItemEntirelyOutOfStock(itemController.item)),
 
                         (itemController.item!.description != null && itemController.item!.description!.isNotEmpty) ? Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,20 +302,25 @@ class DetailsWebViewWidget extends StatelessWidget {
                                 isLoading: cartController.isLoading,
                                 buttonText: (itemController.item?.quantityLimit != null && itemController.item!.quantityLimit == 0)
                                     ? 'item_is_not_available_in_the_store'.tr
-                                    : (stock != null && stock! <= 0) ? 'out_of_stock'.tr
+                                    : ItemHelper.isItemEntirelyOutOfStock(itemController.item) ? 'out_of_stock'.tr
                                     : itemController.item!.availableDateStarts != null ? 'order_now'.tr : itemController.cartIndex != -1 ? 'update_in_cart'.tr : 'add_to_cart'.tr,
-                                onPressed: ((stock != null && stock! <= 0) || (itemController.item?.quantityLimit != null && itemController.item!.quantityLimit == 0)) ? null : () async {
+                                onPressed: (ItemHelper.isItemEntirelyOutOfStock(itemController.item) || (itemController.item?.quantityLimit != null && itemController.item!.quantityLimit == 0)) ? null : () async {
                                   if(itemController.item!.availableDateStarts != null) {
                                     Get.toNamed(RouteHelper.getCheckoutRoute('campaign'), arguments: CheckoutScreen(
                                       storeId: null, fromCart: false, cartList: [cartModel],
                                     ));
-                                  }else if (Get.find<CartController>().existAnotherStoreItem(cartModel!.item!.storeId, Get.find<SplashController>().module!.id)) {
-                                    Get.dialog(ConfirmationDialog(
-                                      icon: Images.warning,
-                                      title: 'are_you_sure_to_reset'.tr,
-                                      description: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-                                          ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr,
-                                      onYesPressed: () {
+                                   }else if (Get.find<CartController>().existAnotherStoreItem(cartModel!.item!.storeId, Get.find<SplashController>().module!.id)) {
+                                     int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
+                                     bool isMultiStore = (Get.find<SplashController>().configModel!.enableAiOrderBatching ?? false) || maxStores > 1;
+
+                                     Get.dialog(ConfirmationDialog(
+                                       icon: Images.warning,
+                                       title: 'are_you_sure_to_reset'.tr,
+                                       description: isMultiStore && maxStores > 1
+                                           ? 'max_stores_in_cart_reached'.tr.replaceAll('@max', maxStores.toString())
+                                           : (Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
+                                               ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr),
+                                       onYesPressed: () {
                                         Get.back();
                                         cartController.clearCartOnline().then((success) async {
                                           if(success) {

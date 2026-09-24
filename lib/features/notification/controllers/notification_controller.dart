@@ -13,8 +13,13 @@ class NotificationController extends GetxController implements GetxService {
   bool _hasNotification = false;
   bool get hasNotification => _hasNotification;
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   Future<int> getNotificationList(bool reload) async {
     if(_notificationList == null || reload) {
+      _isLoading = true;
+      update();
       List<NotificationModel>? notificationList = await notificationServiceInterface.getNotificationList();
       if (notificationList != null) {
         _notificationList = [];
@@ -26,6 +31,7 @@ class NotificationController extends GetxController implements GetxService {
         _notificationList = iterable.toList() as List<NotificationModel>?;
         _hasNotification = _notificationList!.length != getSeenNotificationCount();
       }
+      _isLoading = false;
       update();
     }
     return _notificationList?.length ?? 0;

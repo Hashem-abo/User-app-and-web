@@ -1,4 +1,4 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -17,6 +17,8 @@ import 'package:suliman/features/auth/widgets/sign_in/existing_user_bottom_sheet
 import 'package:suliman/features/location/controllers/location_controller.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
+import 'package:suliman/helper/auth_helper.dart';
 import 'package:suliman/helper/route_helper.dart';
 import 'package:suliman/util/app_constants.dart';
 import 'package:suliman/util/dimensions.dart';
@@ -425,7 +427,9 @@ class SocialLoginWidget extends StatelessWidget {
       }
     } else if(response.isSuccess && response.authResponseModel != null && response.authResponseModel!.isPersonalInfo == false) {
 
-      String? displayName = googleBodyModel != null ? googleBodyModel.email?.split('@')[0] : appleBodyModel != null ? appleBodyModel.email?.split('@')[0] : facebookBodyModel?.email?.split('@')[0];
+      String? displayName = (response.authResponseModel?.name != null && response.authResponseModel!.name!.trim().isNotEmpty)
+          ? response.authResponseModel!.name
+          : (googleBodyModel != null ? googleBodyModel.email?.split('@')[0] : appleBodyModel != null ? appleBodyModel.email?.split('@')[0] : facebookBodyModel?.email?.split('@')[0]);
 
       if(appleBodyModel != null) {
         email = response.authResponseModel!.email;
@@ -437,6 +441,29 @@ class SocialLoginWidget extends StatelessWidget {
         Get.toNamed(RouteHelper.getNewUserSetupScreen(name: displayName ?? '', loginType: CentralizeLoginType.social.name, phone: '', email: email, backFromThis: backFromThis));
       }
     } else {
+      if (AuthHelper.isLoggedIn() && Get.isRegistered<ProfileController>()) {
+        ProfileController profileController = Get.find<ProfileController>();
+        await profileController.getUserInfo();
+        String? phone = profileController.userInfoModel?.phone;
+        String? gender = profileController.userInfoModel?.gender;
+        bool hasPhone = phone != null && phone.trim().isNotEmpty && phone.trim() != 'null' && phone.trim() != '0000000000';
+        bool hasGender = gender != null && gender.trim().isNotEmpty && gender.trim() != 'null';
+
+        if (!hasPhone || !hasGender) {
+          String? displayName = '${profileController.userInfoModel?.fName ?? ''} ${profileController.userInfoModel?.lName ?? ''}'.trim();
+          if (displayName.isEmpty) {
+            displayName = response.authResponseModel?.name ?? email?.split('@')[0];
+          }
+          if (ResponsiveHelper.isDesktop(Get.context)) {
+            Get.back();
+            Get.dialog(NewUserSetupScreen(name: displayName ?? '', loginType: CentralizeLoginType.social.name, phone: hasPhone ? phone : '', email: email, backFromThis: backFromThis));
+          } else {
+            Get.toNamed(RouteHelper.getNewUserSetupScreen(name: displayName ?? '', loginType: CentralizeLoginType.social.name, phone: hasPhone ? phone : '', email: email, backFromThis: backFromThis));
+          }
+          return;
+        }
+      }
+
       if(backFromThis) {
         await Get.find<LocationController>().syncZoneData();
         if(ResponsiveHelper.isDesktop(Get.context)){

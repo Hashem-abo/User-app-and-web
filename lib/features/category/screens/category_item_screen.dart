@@ -1,4 +1,4 @@
-﻿import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:suliman/common/widgets/custom_image.dart';
 import 'package:suliman/common/widgets/footer_view.dart';
 import 'package:suliman/features/category/controllers/category_controller.dart';
@@ -15,7 +15,6 @@ import 'package:suliman/common/widgets/menu_drawer.dart';
 import 'package:suliman/common/widgets/veg_filter_widget.dart';
 import 'package:suliman/common/widgets/web_menu_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:suliman/common/widgets/card_design/item_card.dart';
 import 'package:suliman/util/app_constants.dart';
 import 'package:suliman/helper/sliver_delegate.dart';
 import 'package:get/get.dart';
@@ -424,30 +423,12 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
                           SingleChildScrollView(
-                            child: FooterView(
-                              child: SizedBox(
-                                width: Dimensions.webMaxWidth,
-                                child: item != null ? item.isNotEmpty ? GridView.builder(
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: ResponsiveHelper.isDesktop(context) ? 5 : ResponsiveHelper.isTab(context) ? 3 : 2,
-                                    mainAxisSpacing: 0,
-                                    crossAxisSpacing: Dimensions.paddingSizeSmall,
-                                    mainAxisExtent: (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food) ? 255 :340,
-                                  ),
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: item.length,
-                                  padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                                  itemBuilder: (context, index) {
-                                    return ItemCard(
-                                      item: item![index],
-                                      isPopularItem: false,
-                                      isFood: Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food,
-                                      isShop: Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.ecommerce,
-                                    );
-                                  },
-                                ) : Center(child: Text('no_category_item_found'.tr)) : const Center(child: CustomLoaderWidget()),
-                              ),
+                            child: ItemsView(
+                              isStore: false,
+                              items: item,
+                              stores: null,
+                              noDataText: 'no_category_item_found'.tr,
+                              mobileItemCrossAxisCount: 2,
                             ),
                           ),
                           SingleChildScrollView(
@@ -715,26 +696,13 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                       child: SizedBox(
                         width: Dimensions.webMaxWidth,
                         child: Column(children: [
-                          item != null ? item.isNotEmpty ? GridView.builder(
-                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: ResponsiveHelper.isDesktop(context) ? 5 : ResponsiveHelper.isTab(context) ? 3 : 2,
-                              mainAxisSpacing: 0,
-                              crossAxisSpacing: Dimensions.paddingSizeSmall,
-                              mainAxisExtent: (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food) ? 255 :340,
-                            ),
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: item.length,
-                            padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                            itemBuilder: (context, index) {
-                              return ItemCard(
-                                item: item![index],
-                                isPopularItem: false,
-                                isFood: Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food,
-                                isShop: Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.ecommerce,
-                              );
-                            },
-                          ) : Center(child: Padding(padding: const EdgeInsets.only(top: 200), child: Text('no_category_item_found'.tr))) : const Center(child: Padding(padding: EdgeInsets.only(top: 200), child: CustomLoaderWidget())),
+                          ItemsView(
+                            isStore: false,
+                            items: item,
+                            stores: null,
+                            noDataText: 'no_category_item_found'.tr,
+                            mobileItemCrossAxisCount: 2,
+                          ),
                           
                            catController.isLoading ? const Center(child: Padding(
                             padding: EdgeInsets.all(Dimensions.paddingSizeSmall),

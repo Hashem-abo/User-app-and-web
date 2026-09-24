@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:suliman/features/auth/controllers/auth_controller.dart';
 
 class AuthHelper {
@@ -12,5 +12,13 @@ class AuthHelper {
 
   static bool isLoggedIn() {
     return Get.find<AuthController>().isLoggedIn();
+  }
+
+  static String getGuestEmail() {
+    String guestId = getGuestId();
+    if (guestId.isNotEmpty && guestId != '0' && guestId != 'null') {
+      return 'guest$guestId@gmail.com';
+    }
+    return 'guest${DateTime.now().millisecondsSinceEpoch % 1000000}@gmail.com';
   }
 }

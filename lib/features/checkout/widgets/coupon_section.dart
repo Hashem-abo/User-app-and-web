@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:suliman/common/widgets/custom_snackbar.dart';
@@ -50,9 +50,14 @@ class CouponSection extends StatelessWidget {
       if (checkoutController.isPartialPay || checkoutController.paymentMethodIndex == 1) {
         checkoutController.checkBalanceStatus(total - couponDiscount!, couponDiscount);
       }
+      checkoutController.fetchDeliveryFeeFromServer();
       return true;
     }
-    return couponCtrl.freeDelivery;
+    if (couponCtrl.freeDelivery) {
+      checkoutController.fetchDeliveryFeeFromServer();
+      return true;
+    }
+    return false;
   }
 
   void _removeCoupon() {
@@ -63,6 +68,7 @@ class CouponSection extends StatelessWidget {
     if (checkoutController.isPartialPay || checkoutController.paymentMethodIndex == 1) {
       checkoutController.checkBalanceStatus(total + currentDiscount, 0);
     }
+    checkoutController.fetchDeliveryFeeFromServer();
   }
 
   void _openSheet(BuildContext context) {

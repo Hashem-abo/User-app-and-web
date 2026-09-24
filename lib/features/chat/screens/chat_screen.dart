@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -115,7 +115,9 @@ class _ChatScreenState extends State<ChatScreen> {
               icon: const Icon(Icons.arrow_back_ios),
             ),
             title: Text(
-              chatController.messageModel != null ? '${chatController.messageModel!.conversation!.receiver!.fName}'' ${chatController.messageModel!.conversation!.receiver!.lName}' : 'receiver_name'.tr,
+              (chatController.messageModel?.conversation?.receiver?.fName != null)
+                  ? '${chatController.messageModel!.conversation!.receiver!.fName} ${chatController.messageModel!.conversation!.receiver!.lName ?? ''}'
+                  : (widget.user != null) ? '${widget.user!.fName ?? ''} ${widget.user!.lName ?? ''}' : 'receiver_name'.tr,
               style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.bodyLarge!.color),
             ),
             backgroundColor: Theme.of(context).cardColor,
@@ -133,7 +135,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: Theme.of(context).cardColor,
                   ),
                   child: ClipOval(child: CustomImage(
-                    image: '${chatController.messageModel != null ? chatController.messageModel!.conversation!.receiver!.imageFullUrl : ''}',
+                    image: chatController.messageModel?.conversation?.receiver?.imageFullUrl ?? widget.user?.imageFullUrl ?? '',
                     fit: BoxFit.cover, height: 40, width: 40,
                   )),
                 ),
@@ -175,22 +177,24 @@ class _ChatScreenState extends State<ChatScreen> {
                                   child: Row(children: [
 
                                     ClipOval(child: CustomImage(
-                                      image:'${chatController.messageModel != null ? chatController.messageModel!.conversation!.receiver!.imageFullUrl : ''}',
+                                      image: chatController.messageModel?.conversation?.receiver?.imageFullUrl ?? widget.user?.imageFullUrl ?? '',
                                       fit: BoxFit.cover, height: 35, width: 35,
                                     )),
                                     const SizedBox(width: Dimensions.paddingSizeSmall),
 
                                     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                                      chatController.messageModel != null ? Text(
-                                        '${chatController.messageModel!.conversation!.receiver!.fName}'
-                                            ' ${chatController.messageModel!.conversation!.receiver!.lName}',
+                                      (chatController.messageModel?.conversation?.receiver?.fName != null) ? Text(
+                                        '${chatController.messageModel!.conversation!.receiver!.fName} ${chatController.messageModel!.conversation!.receiver!.lName ?? ''}',
+                                        style: robotoRegular,
+                                      ) : (widget.user != null) ? Text(
+                                        '${widget.user!.fName ?? ''} ${widget.user!.lName ?? ''}',
                                         style: robotoRegular,
                                       ) : Container(
                                         height: 20, width: 100, color: Theme.of(context).disabledColor,
                                       ),
 
-                                      (chatController.messageModel != null && chatController.messageModel!.conversation!.receiver!.phone != null) ? Text(
+                                      (chatController.messageModel?.conversation?.receiver?.phone != null) ? Text(
                                         '${chatController.messageModel!.conversation!.receiver!.phone}',
                                         style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
                                       ) : const SizedBox(),
@@ -223,9 +227,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                           itemBuilder: (context, index) {
                                             return MessageBubbleWidget(
                                               message: chatController.messageModel!.messages![index],
-                                              user: chatController.messageModel!.conversation!.receiver,
-                                              userType: widget.notificationBody!.adminId != null ? UserType.admin.name
-                                                  : widget.notificationBody!.deliverymanId != null ? UserType.delivery_man.name : UserType.vendor.name,
+                                              user: chatController.messageModel?.conversation?.receiver ?? widget.user,
+                                              userType: widget.notificationBody?.adminId != null ? UserType.admin.name
+                                                  : widget.notificationBody?.deliverymanId != null ? UserType.delivery_man.name : UserType.vendor.name,
                                             );
                                           },
                                         ),
@@ -412,22 +416,24 @@ class _ChatScreenState extends State<ChatScreen> {
                     child: Row(children: [
 
                       ClipOval(child: CustomImage(
-                        image:'${chatController.messageModel != null ? chatController.messageModel!.conversation!.receiver!.imageFullUrl : ''}',
+                        image: chatController.messageModel?.conversation?.receiver?.imageFullUrl ?? widget.user?.imageFullUrl ?? '',
                         fit: BoxFit.cover, height: 35, width: 35,
                       )),
                       const SizedBox(width: Dimensions.paddingSizeSmall),
 
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                        chatController.messageModel != null ? Text(
-                          '${chatController.messageModel!.conversation!.receiver!.fName}'
-                              ' ${chatController.messageModel!.conversation!.receiver!.lName}',
+                        (chatController.messageModel?.conversation?.receiver?.fName != null) ? Text(
+                          '${chatController.messageModel!.conversation!.receiver!.fName} ${chatController.messageModel!.conversation!.receiver!.lName ?? ''}',
+                          style: robotoRegular,
+                        ) : (widget.user != null) ? Text(
+                          '${widget.user!.fName ?? ''} ${widget.user!.lName ?? ''}',
                           style: robotoRegular,
                         ) : Container(
                           height: 20, width: 100, color: Theme.of(context).disabledColor,
                         ),
 
-                        (chatController.messageModel != null && chatController.messageModel!.conversation!.receiver!.phone != null) ? Text(
+                        (chatController.messageModel?.conversation?.receiver?.phone != null) ? Text(
                           '${chatController.messageModel!.conversation!.receiver!.phone}',
                           style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).hintColor),
                         ) : const SizedBox(),
@@ -457,9 +463,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           itemBuilder: (context, index) {
                             return MessageBubbleWidget(
                               message: chatController.messageModel!.messages![index],
-                              user: chatController.messageModel!.conversation!.receiver,
-                              userType: widget.notificationBody!.adminId != null ? UserType.admin.name
-                                  : widget.notificationBody!.deliverymanId != null ? UserType.delivery_man.name : UserType.vendor.name,
+                              user: chatController.messageModel?.conversation?.receiver ?? widget.user,
+                              userType: widget.notificationBody?.adminId != null ? UserType.admin.name
+                                  : widget.notificationBody?.deliverymanId != null ? UserType.delivery_man.name : UserType.vendor.name,
                             );
                           },
                         ),

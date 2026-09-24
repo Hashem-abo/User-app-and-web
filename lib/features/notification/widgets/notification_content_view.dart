@@ -1,4 +1,4 @@
-﻿import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
+import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
 import 'package:suliman/common/widgets/web_page_title_widget.dart';
 import 'package:suliman/features/notification/controllers/notification_controller.dart';
 import 'package:suliman/features/notification/domain/models/notification_model.dart';

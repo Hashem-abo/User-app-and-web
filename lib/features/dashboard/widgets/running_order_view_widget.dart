@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/order/controllers/order_controller.dart';
 import 'package:suliman/features/order/domain/models/order_model.dart';
@@ -7,7 +7,6 @@ import 'package:suliman/util/app_constants.dart';
 import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/util/images.dart';
 import 'package:suliman/util/styles.dart';
-import 'package:suliman/features/order/screens/order_details_screen.dart';
 
 class RunningOrderViewWidget extends StatelessWidget {
   final List<OrderModel> reversOrder;
@@ -64,10 +63,6 @@ class RunningOrderViewWidget extends StatelessWidget {
                   onTap: () async {
                     await Get.toNamed(
                       RouteHelper.getOrderDetailsRoute(reversOrder[index].id),
-                      arguments: OrderDetailsScreen(
-                        orderId: reversOrder[index].id,
-                        orderModel: reversOrder[index],
-                      ),
                     );
                     if(orderController.showBottomSheet){
                       orderController.showRunningOrders();

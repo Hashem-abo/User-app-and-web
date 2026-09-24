@@ -1010,16 +1010,58 @@ class _StoreScreenState extends State<StoreScreen> {
                                               style: robotoMedium.copyWith(color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Theme.of(context).textTheme.bodyLarge!.color, fontSize: Dimensions.fontSizeSmall),
                                             ),
                                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                            storeController.categoryList![index].id == -1 ? Icon(
-                                               Icons.favorite,
-                                               color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Theme.of(context).primaryColor,
-                                               size: 20,
-                                             ) : ClipOval(
-                                               child: CustomImage(
-                                                 image: storeController.categoryList![index].imageFullUrl ?? '',
-                                                 height: 25, width: 25, fit: BoxFit.cover,
-                                               ),
-                                             ),
+                                            if (storeController.categoryList![index].id == 0 || storeController.categoryList![index].name == 'all'.tr)
+                                              Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: index == storeController.categoryIndex
+                                                      ? Theme.of(context).cardColor.withValues(alpha: 0.2)
+                                                      : Theme.of(context).primaryColor.withValues(alpha: 0.12),
+                                                ),
+                                                child: Icon(
+                                                  Icons.grid_view_rounded,
+                                                  color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Theme.of(context).primaryColor,
+                                                  size: 15,
+                                                ),
+                                              )
+                                            else if (storeController.categoryList![index].id == -1)
+                                              Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: index == storeController.categoryIndex
+                                                      ? Theme.of(context).cardColor.withValues(alpha: 0.2)
+                                                      : Colors.red.withValues(alpha: 0.12),
+                                                ),
+                                                child: Icon(
+                                                  Icons.favorite,
+                                                  color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Colors.red,
+                                                  size: 15,
+                                                ),
+                                              )
+                                            else if (storeController.categoryList![index].id == -2)
+                                              Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: index == storeController.categoryIndex
+                                                      ? Theme.of(context).cardColor.withValues(alpha: 0.2)
+                                                      : Colors.deepOrange.withValues(alpha: 0.12),
+                                                ),
+                                                child: Icon(
+                                                  Icons.local_fire_department_rounded,
+                                                  color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Colors.deepOrange,
+                                                  size: 15,
+                                                ),
+                                              )
+                                            else
+                                              ClipOval(
+                                                child: CustomImage(
+                                                  image: storeController.categoryList![index].imageFullUrl ?? '',
+                                                  height: 25, width: 25, fit: BoxFit.cover,
+                                                ),
+                                              ),
                                           ],
                                         ),
                                       ),

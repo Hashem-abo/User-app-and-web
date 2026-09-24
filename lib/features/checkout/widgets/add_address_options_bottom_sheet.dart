@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:suliman/common/widgets/custom_loader.dart';
@@ -150,7 +150,7 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
     }
 
     if (!AuthHelper.isLoggedIn()) {
-      address.email = 'guest@mile.com';
+      address.email = AuthHelper.getGuestEmail();
       checkoutController.setGuestAddress(address);
     }
     if (AuthHelper.isLoggedIn()) {
@@ -176,6 +176,7 @@ class AddAddressOptionsBottomSheet extends StatelessWidget {
           LatLng(lat, lng),
           LatLng(storeLat, storeLng),
         );
+        await checkoutController.fetchDeliveryFeeFromServer(customAddress: address);
       }
     }
     checkoutController.streetNumberController.text = address.streetNumber ?? '';

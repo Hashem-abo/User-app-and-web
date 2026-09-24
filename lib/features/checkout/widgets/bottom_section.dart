@@ -20,6 +20,7 @@ import 'package:suliman/features/checkout/widgets/note_prescription_section.dart
 import 'package:suliman/features/checkout/widgets/partial_pay_view.dart';
 import 'package:suliman/features/cart/domain/models/cart_model.dart';
 import 'package:suliman/features/cart/widgets/add_to_monthly_widget.dart';
+import 'package:suliman/features/pro/widgets/pro_cart_banner_widget.dart';
 import 'package:suliman/helper/module_helper.dart';
 
 class BottomSection extends StatelessWidget {
@@ -252,6 +253,16 @@ class BottomSection extends StatelessWidget {
 
       if (_isGroceryOrPharmacy(cartList) && !_hasCampaignOrFlashSaleItem(cartList) && (AuthHelper.isLoggedIn() && Get.find<SplashController>().configModel?.monthlyOrderRemainder == 1)) ...[
         const MonthlyReorderSection(),
+        const SizedBox(height: Dimensions.paddingSizeDefault),
+      ],
+
+      if (Get.find<SplashController>().proStaus && (Get.find<ProfileController>().userInfoModel?.proStatus ?? false)) ...[
+        ProCartBannerWidget(
+          subtotal: subTotal,
+          discount: discount,
+          couponDiscount: couponController.discount ?? 0,
+          cartList: cartList,
+        ),
         const SizedBox(height: Dimensions.paddingSizeDefault),
       ],
 

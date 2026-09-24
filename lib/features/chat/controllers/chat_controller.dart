@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:suliman/features/chat/domain/models/conversation_model.dart';
@@ -208,18 +208,22 @@ class ChatController extends GetxController implements GetxService {
         if(Get.find<ProfileController>().userInfoModel == null) {
           await Get.find<ProfileController>().getUserInfo();
         }
-        /// Manage Receiver
         _messageModel = ChatModel.fromJson(response.body);
         if(_messageModel!.conversation == null) {
           _messageModel!.conversation = Conversation(sender: User(
-            id: Get.find<ProfileController>().userInfoModel!.id, imageFullUrl: Get.find<ProfileController>().userInfoModel!.imageFullUrl,
-            fName: Get.find<ProfileController>().userInfoModel!.fName, lName: Get.find<ProfileController>().userInfoModel!.lName,
-          ), receiver: notificationBody!.adminId != null ? User(
+            id: Get.find<ProfileController>().userInfoModel?.userInfo?.id ?? (Get.find<ProfileController>().userInfoModel?.id != null ? int.tryParse(Get.find<ProfileController>().userInfoModel!.id.toString()) : null),
+            imageFullUrl: Get.find<ProfileController>().userInfoModel?.imageFullUrl,
+            fName: Get.find<ProfileController>().userInfoModel?.fName,
+            lName: Get.find<ProfileController>().userInfoModel?.lName,
+          ), receiver: (notificationBody != null && notificationBody.adminId != null) ? User(
             id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
             imageFullUrl: Get.find<SplashController>().configModel!.logoFullUrl,
           ) : user);
         }
-        _sortMessage(notificationBody!.adminId);
+        if(_messageModel!.conversation?.sender != null && Get.find<ProfileController>().userInfoModel != null && Get.find<ProfileController>().userInfoModel!.userInfo == null) {
+          Get.find<ProfileController>().updateUserWithNewData(_messageModel!.conversation!.sender);
+        }
+        _sortMessage(notificationBody?.adminId);
       }else {
         _messageModel!.totalSize = ChatModel.fromJson(response.body).totalSize;
         _messageModel!.offset = ChatModel.fromJson(response.body).offset;

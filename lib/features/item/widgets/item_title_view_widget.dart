@@ -70,9 +70,8 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) {
-      print(widget.inStock ? 'out_of_stock'.tr : 'in_stock'.tr);
-    }
+    final bool hasStockManagement = widget.item?.moduleType != 'food' &&
+        (Get.find<SplashController>().getModuleConfig(widget.item?.moduleType).stock ?? false);
     // final bool isLoggedIn = AuthHelper.isLoggedIn();
     double? startingPrice;
     double? endingPrice;
@@ -326,7 +325,7 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
             ),
             const SizedBox(width: Dimensions.paddingSizeSmall),
           ],
-          if (widget.item?.moduleId != 1) ...[
+          if (hasStockManagement) ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: 3),
               decoration: BoxDecoration(
@@ -338,9 +337,8 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
               )),
             ),
             const SizedBox(width: Dimensions.paddingSizeDefault),
-
-            OrganicTag(item: widget.item!, fromDetails: true),
           ],
+          OrganicTag(item: widget.item!, fromDetails: true),
         ]),
         const SizedBox(height: Dimensions.paddingSizeSmall),
 
@@ -425,10 +423,11 @@ class _ItemTitleViewWidgetState extends State<ItemTitleViewWidget> {
                             ),
                             const SizedBox(width: 8),
                           ],
-                          Text(
-                             widget.inStock ? 'out_of_stock'.tr : 'in_stock'.tr,
-                             style: robotoRegular.copyWith(color: widget.inStock ? Theme.of(context).colorScheme.error : Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
-                          ),
+                          if (hasStockManagement)
+                            Text(
+                               widget.inStock ? 'out_of_stock'.tr : 'in_stock'.tr,
+                               style: robotoRegular.copyWith(color: widget.inStock ? Theme.of(context).colorScheme.error : Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall),
+                            ),
                         ]),
                       ],
                     ),

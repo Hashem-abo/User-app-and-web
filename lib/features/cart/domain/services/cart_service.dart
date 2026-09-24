@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:suliman/common/widgets/custom_snackbar.dart';
 import 'package:suliman/features/item/domain/models/item_model.dart';
 import 'package:suliman/common/models/module_model.dart';
@@ -352,34 +352,19 @@ class CartService implements CartServiceInterface {
       }
     }
     
-    // Check order batching
+    // Check order batching and max stores limit from admin settings
     bool enableAutoBatching = Get.find<SplashController>().configModel!.enableAiOrderBatching ?? false;
-    int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
-
-    String? moduleType;
-    if (Get.find<SplashController>().moduleList != null) {
-      for(var module in Get.find<SplashController>().moduleList!) {
-        if(module.id == moduleId) {
-          moduleType = module.moduleType;
-          break;
-        }
-      }
-    }
-    moduleType ??= ModuleHelper.getModule()?.moduleType;
-
-    bool isFoodOrGrocery = moduleType == 'food' || moduleType == 'grocery' || moduleType == 'ecommerce';
-    if (isFoodOrGrocery) {
-      return false; // Allow adding items from different stores for tabbed cart and ecommerce
-    }
-
     if (enableAutoBatching) {
-        if (storeIds.length > maxStores) {
-           return true;
-        }
-    } else {
-        if (storeIds.length > 1) {
-           return true; 
-        }
+      // Allow adding from multiple stores freely when AI batching is enabled;
+      // the server will automatically cluster qualified nearby stores into smart batches!
+      return false;
+    }
+
+    int maxStores = Get.find<SplashController>().configModel!.batchedMaxStores ?? 1;
+    int effectiveMaxStores = maxStores > 1 ? maxStores : 1;
+
+    if (storeIds.length > effectiveMaxStores) {
+      return true;
     }
 
     return false;

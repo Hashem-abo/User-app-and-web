@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:suliman/common/widgets/custom_ink_well.dart';
@@ -147,7 +147,7 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
                       },
                     ) : const SizedBox(),
 
-                    (widget.isCashOnDeliveryActive && notHideCod && !AuthHelper.isGuestLoggedIn() && checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center') ? changeAmountView(checkoutController) : const SizedBox(),
+                    // (widget.isCashOnDeliveryActive && notHideCod && !AuthHelper.isGuestLoggedIn() && checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center') ? changeAmountView(checkoutController) : const SizedBox(),
 
                     widget.isDigitalPaymentActive && notHideDigital ? Container(
                       decoration: BoxDecoration(
@@ -245,6 +245,7 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
     );
   }
 
+  /*
   Widget changeAmountView(CheckoutController checkoutController) {
     return Column(children: [
       AnimatedSize(
@@ -303,6 +304,7 @@ class _PaymentMethodBottomSheetState extends State<PaymentMethodBottomSheet> {
       const SizedBox(height: Dimensions.paddingSizeSmall),
     ]);
   }
+  */
 
   Widget paymentButtonView({required String title, String? image, required bool isSelected, required Function? onTap, bool disablePayments = false, bool isDigitalPayment = false, required EdgeInsetsGeometry padding}) {
     return Padding(

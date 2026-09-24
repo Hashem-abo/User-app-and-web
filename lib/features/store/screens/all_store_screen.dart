@@ -1,4 +1,4 @@
-﻿import 'package:suliman/features/store/controllers/store_controller.dart';
+import 'package:suliman/features/store/controllers/store_controller.dart';
 import 'package:suliman/features/store/domain/models/store_model.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/helper/responsive_helper.dart';
@@ -164,19 +164,20 @@ class _AllStoreScreenState extends State<AllStoreScreen> {
                   SizedBox(
                     width: Dimensions.webMaxWidth,
                     child: GetBuilder<StoreController>(builder: (storeController) {
+                      List<Store>? rawList = widget.isFeatured
+                          ? storeController.featuredStoreList
+                          : widget.isPopular
+                              ? storeController.popularStoreList
+                              : widget.isTopOfferStore
+                                  ? storeController.topOfferStoreList
+                                  : widget.isRecommendedStore
+                                      ? storeController.recommendedStoreList
+                                      : storeController.latestStoreList;
+
                       return ItemsView(
                         isStore: true, items: null, isFeatured: widget.isFeatured,
                         noDataText: widget.isFeatured ? 'no_store_available'.tr : Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'no_restaurant_available'.tr : 'no_store_available'.tr,
                         stores: () {
-                          List<Store>? rawList = widget.isFeatured
-                              ? storeController.featuredStoreList
-                              : widget.isPopular
-                                  ? storeController.popularStoreList
-                                  : widget.isTopOfferStore
-                                      ? storeController.topOfferStoreList
-                                      : widget.isRecommendedStore
-                                          ? storeController.recommendedStoreList
-                                          : storeController.latestStoreList;
                           // Sort by nearest distance when viewing the Nearby screen
                           if (widget.isNearbyStore && rawList != null) {
                             List<Store> sorted = List.from(rawList);

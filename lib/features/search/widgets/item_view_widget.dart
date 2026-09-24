@@ -1,4 +1,4 @@
-﻿import 'package:suliman/features/service/widgets/service_provider_widget.dart';
+import 'package:suliman/features/service/widgets/service_provider_widget.dart';
 import 'package:suliman/features/service/widgets/service_widget.dart';
 import 'package:suliman/features/search/controllers/search_controller.dart' as search;
 import 'package:suliman/helper/responsive_helper.dart';

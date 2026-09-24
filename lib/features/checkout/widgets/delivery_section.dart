@@ -1,12 +1,16 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:suliman/common/widgets/address_widget.dart';
+import 'package:suliman/common/widgets/custom_text_field.dart';
 import 'package:suliman/features/address/controllers/address_controller.dart';
 import 'package:suliman/features/address/domain/models/address_model.dart';
 import 'package:suliman/features/checkout/controllers/checkout_controller.dart';
+import 'package:suliman/features/language/controllers/language_controller.dart';
 import 'package:suliman/features/location/controllers/location_controller.dart';
 import 'package:suliman/features/location/domain/models/zone_response_model.dart';
+import 'package:suliman/features/profile/controllers/profile_controller.dart';
 import 'package:suliman/helper/auth_helper.dart';
 import 'package:suliman/features/auth/controllers/auth_controller.dart';
 import 'package:suliman/helper/address_helper.dart';
@@ -16,7 +20,6 @@ import 'package:suliman/util/styles.dart';
 import 'package:suliman/common/widgets/custom_dropdown.dart';
 import 'package:suliman/features/checkout/widgets/guest_delivery_address.dart';
 import 'package:suliman/features/checkout/widgets/add_address_options_bottom_sheet.dart';
-
 import 'package:suliman/features/checkout/widgets/pickup_center_selection_widget.dart';
 
 class DeliverySection extends StatelessWidget {
@@ -38,14 +41,39 @@ class DeliverySection extends StatelessWidget {
     bool takeAway = (checkoutController.orderType == 'take_away');
     bool isPickupCenter = (checkoutController.orderType == 'pickup_center');
     bool isDesktop = ResponsiveHelper.isDesktop(context);
-    return Column(children: [
-      isPickupCenter
-          ? PickupCenterSelectionWidget(checkoutController: checkoutController)
-          : isGuestLoggedIn ? GuestDeliveryAddress(
-        checkoutController: checkoutController, guestNumberNode: guestNumberNode,
-        guestNameTextEditingController: guestNameTextEditingController, guestNumberTextEditingController: guestNumberTextEditingController,
-        guestEmailController: guestEmailController, guestEmailNode: guestEmailNode,
-      ) : !takeAway ? Container(
+
+    return GetBuilder<ProfileController>(builder: (profileController) {
+      final String? profilePhone = profileController.userInfoModel?.phone;
+      final bool hasProfilePhone = !isGuestLoggedIn &&
+          profilePhone != null &&
+          profilePhone.trim().isNotEmpty &&
+          profilePhone.trim() != 'null' &&
+          profilePhone.trim() != '0000000000';
+
+      if (!hasProfilePhone && guestNumberTextEditingController.text.trim().isEmpty && address.isNotEmpty) {
+        int addrIndex = (checkoutController.addressIndex != null && checkoutController.addressIndex! < address.length) ? checkoutController.addressIndex! : 0;
+        String? addrPhone = address[addrIndex].contactPersonNumber;
+        if (addrPhone != null && addrPhone.isNotEmpty && addrPhone != 'null' && addrPhone != '0000000000') {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (guestNumberTextEditingController.text.isEmpty) {
+              guestNumberTextEditingController.text = addrPhone;
+            }
+          });
+        }
+      }
+
+      return Column(children: [
+        isPickupCenter
+            ? Column(children: [
+                PickupCenterSelectionWidget(checkoutController: checkoutController),
+                if (!hasProfilePhone && !isGuestLoggedIn)
+                  _buildPhoneInputField(context),
+              ])
+            : isGuestLoggedIn ? GuestDeliveryAddress(
+          checkoutController: checkoutController, guestNumberNode: guestNumberNode,
+          guestNameTextEditingController: guestNameTextEditingController, guestNumberTextEditingController: guestNumberTextEditingController,
+          guestEmailController: guestEmailController, guestEmailNode: guestEmailNode,
+        ) : !takeAway ? Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.05), blurRadius: 10)],
@@ -171,6 +199,7 @@ class DeliverySection extends StatelessWidget {
                               distance: checkoutController.distance!,
                             );
                           }
+                          await checkoutController.fetchDeliveryFeeFromServer(customAddress: selectedAddress);
                         }
                       }
                       checkoutController.update();
@@ -280,6 +309,7 @@ class DeliverySection extends StatelessWidget {
                         distance: checkoutController.distance!,
                       );
                     }
+                    await checkoutController.fetchDeliveryFeeFromServer(customAddress: selectedAddress);
                   }
                 }
                 checkoutController.update();
@@ -306,10 +336,64 @@ class DeliverySection extends StatelessWidget {
               ),
             ),
           ),
+          if (!hasProfilePhone) ...[
+            const SizedBox(height: Dimensions.paddingSizeDefault),
+            CustomTextField(
+              labelText: 'contact_person_number'.tr,
+              titleText: 'write_number'.tr,
+              controller: guestNumberTextEditingController,
+              focusNode: guestNumberNode,
+              inputType: TextInputType.phone,
+              isPhone: true,
+              onCountryChanged: (CountryCode countryCode) {
+                checkoutController.countryDialCode = countryCode.dialCode;
+              },
+              countryDialCode: checkoutController.countryDialCode ?? Get.find<LocalizationController>().locale.countryCode,
+            ),
+          ],
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
         ]),
-      ) : const SizedBox(),
-    ]);
+      ) : (!hasProfilePhone) ? _buildPhoneInputField(context) : const SizedBox(),
+      ]);
+    });
+  }
+
+  Widget _buildPhoneInputField(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+        boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withValues(alpha: 0.05), blurRadius: 10)],
+      ),
+      padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+      margin: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(Icons.phone_outlined, size: 20, color: Theme.of(context).primaryColor),
+            const SizedBox(width: Dimensions.paddingSizeSmall),
+            Text('contact_information'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyLarge!.color)),
+          ]),
+          Padding(
+            padding: const EdgeInsets.only(top: Dimensions.paddingSizeExtraSmall, bottom: Dimensions.paddingSizeDefault),
+            child: Divider(color: Theme.of(context).disabledColor),
+          ),
+          CustomTextField(
+            labelText: 'contact_person_number'.tr,
+            titleText: 'write_number'.tr,
+            controller: guestNumberTextEditingController,
+            focusNode: guestNumberNode,
+            inputType: TextInputType.phone,
+            isPhone: true,
+            onCountryChanged: (CountryCode countryCode) {
+              checkoutController.countryDialCode = countryCode.dialCode;
+            },
+            countryDialCode: checkoutController.countryDialCode ?? Get.find<LocalizationController>().locale.countryCode,
+          ),
+        ],
+      ),
+    );
   }
 }

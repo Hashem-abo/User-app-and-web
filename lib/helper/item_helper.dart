@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:suliman/features/item/domain/models/item_model.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 
@@ -7,7 +7,12 @@ class ItemHelper {
     if (item == null) return false;
     if (item.quantityLimit != null && item.quantityLimit == 0) return true;
     bool isFood = item.moduleType == 'food';
-    bool moduleStock = Get.find<SplashController>().configModel?.moduleConfig?.module?.stock ?? false;
+    bool moduleStock = false;
+    if (item.moduleType != null) {
+      moduleStock = Get.find<SplashController>().getModuleConfig(item.moduleType).stock ?? false;
+    } else {
+      moduleStock = Get.find<SplashController>().configModel?.moduleConfig?.module?.stock ?? false;
+    }
     if (isFood || !moduleStock) return false;
 
     if (item.variations != null && item.variations!.isNotEmpty) {

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:suliman/util/dimensions.dart';
@@ -13,7 +13,7 @@ class BarcodeScannerScreen extends StatefulWidget {
 
 class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> with SingleTickerProviderStateMixin {
   final MobileScannerController controller = MobileScannerController(
-    detectionSpeed: DetectionSpeed.noDuplicates,
+    detectionSpeed: DetectionSpeed.normal,
   );
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -38,15 +38,6 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> with Single
 
   @override
   Widget build(BuildContext context) {
-    final scanWindow = Rect.fromCenter(
-      center: Offset(
-        MediaQuery.of(context).size.width / 2,
-        MediaQuery.of(context).size.height / 2 - 50,
-      ),
-      width: 280,
-      height: 280,
-    );
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -66,15 +57,50 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> with Single
         children: [
           MobileScanner(
             controller: controller,
-            scanWindow: scanWindow,
+            errorBuilder: (context, error, child) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.camera_alt_outlined, color: Colors.white54, size: 64),
+                      const SizedBox(height: Dimensions.paddingSizeDefault),
+                      Text(
+                        'camera_permission_required'.tr,
+                        style: robotoMedium.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeLarge),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: Dimensions.paddingSizeSmall),
+                      Text(
+                        error.errorCode == MobileScannerErrorCode.permissionDenied
+                            ? 'please_grant_camera_permission'.tr
+                            : (error.errorDetails?.message ?? 'error_occurred'.tr),
+                        style: robotoRegular.copyWith(color: Colors.white70, fontSize: Dimensions.fontSizeSmall),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: Dimensions.paddingSizeExtraLarge),
+                      ElevatedButton(
+                        onPressed: () => controller.start(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),
+                        ),
+                        child: Text('retry'.tr, style: robotoBold.copyWith(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
             onDetect: (capture) {
               if (_isScanCompleted) return;
               final List<Barcode> barcodes = capture.barcodes;
               if (barcodes.isNotEmpty) {
                 final barcodeValue = barcodes.first.rawValue;
-                if (barcodeValue != null && barcodeValue.isNotEmpty) {
+                if (barcodeValue != null && barcodeValue.trim().isNotEmpty) {
                   _isScanCompleted = true;
-                  Get.back(result: barcodeValue);
+                  Get.back(result: barcodeValue.trim());
                 }
               }
             },

@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -647,11 +647,16 @@ class MessageBubble extends StatelessWidget {
     );
 
     if (cartController.existAnotherStoreItem(item.storeId, ModuleHelper.getModule() != null ? ModuleHelper.getModule()?.id : ModuleHelper.getCacheModule()?.id)) {
+      int maxStores = splashController.configModel!.batchedMaxStores ?? 1;
+      bool isMultiStore = (splashController.configModel!.enableAiOrderBatching ?? false) || maxStores > 1;
+
       Get.dialog(ConfirmationDialog(
         icon: Images.warning,
         title: 'are_you_sure_to_reset'.tr,
-        description: splashController.configModel!.moduleConfig!.module!.showRestaurantText!
-            ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr,
+        description: isMultiStore && maxStores > 1
+            ? 'max_stores_in_cart_reached'.tr.replaceAll('@max', maxStores.toString())
+            : (splashController.configModel!.moduleConfig!.module!.showRestaurantText!
+                ? 'if_you_continue'.tr : 'if_you_continue_without_another_store'.tr),
         onYesPressed: () {
           cartController.clearCartOnline().then((success) async {
             if (success) {
