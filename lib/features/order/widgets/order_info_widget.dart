@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
@@ -59,7 +59,7 @@ class OrderInfoWidget extends StatelessWidget {
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-        !isDesktop ? SizedBox(height: DateConverter.isBeforeTime(order.scheduleAt) && (Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation ?? false)
+        !isDesktop ? SizedBox(height: DateConverter.isBeforeTime(order.scheduleAt) && order.moduleType == 'food'
           ? (order.orderStatus != 'delivered' && order.orderStatus != 'failed'
           && order.orderStatus != 'canceled' && order.orderStatus != 'refund_requested' && order.orderStatus != 'refunded'
           && order.orderStatus != 'refund_request_canceled' ) ? 280 : 140 :
@@ -67,6 +67,7 @@ class OrderInfoWidget extends StatelessWidget {
           || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'ecommerce')
           || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'pharmacy')
           || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'food')
+          || ((orderController.orderDetails?.isNotEmpty ?? false) && orderController.orderDetails![0].itemDetails?.moduleType == 'laundry')
           ? 140 : 0) : const SizedBox(),
 
         CustomCard(
@@ -211,7 +212,7 @@ class OrderInfoWidget extends StatelessWidget {
               ]),
             ) : const SizedBox(),
 
-            (Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation ?? false) ? Column(children: [
+            (order.moduleType == 'food' && (Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation ?? false) && order.cutlery != null) ? Column(children: [
               Divider(height: Dimensions.paddingSizeLarge, color: Theme.of(context).disabledColor.withValues(alpha: 0.5)),
 
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

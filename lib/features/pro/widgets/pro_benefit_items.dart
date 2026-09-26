@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:suliman/features/pro/domain/models/pro_active_offer_model.dart';
 import 'package:suliman/features/pro/domain/models/pro_plan_model.dart';
 import 'package:suliman/helper/module_helper.dart';
@@ -67,6 +67,7 @@ class ProBenefitItems {
       case AppConstants.food: return 'food'.tr;
       case AppConstants.pharmacy: return 'pharmacy'.tr;
       case AppConstants.ecommerce: return 'ecommerce'.tr;
+      case AppConstants.laundry: return 'laundry'.tr;
       case AppConstants.taxi: return 'rental'.tr;
       case AppConstants.ride: return 'ride_share'.tr;
       case AppConstants.parcel: return 'parcel'.tr;

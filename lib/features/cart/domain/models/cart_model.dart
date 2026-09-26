@@ -1,4 +1,4 @@
-﻿import 'package:suliman/features/item/domain/models/item_model.dart';
+import 'package:suliman/features/item/domain/models/item_model.dart';
 
 class CartModel {
   int? _id;
@@ -96,15 +96,32 @@ class CartModel {
     _stock = json['stock'];
     if (json['add_on_ids'] != null) {
       _addOnIds = [];
-      json['add_on_ids'].forEach((v) {
-        _addOnIds!.add(AddOn.fromJson(v));
-      });
+      List<dynamic> rawAddOnIds = json['add_on_ids'] is List ? json['add_on_ids'] : [];
+      List<dynamic> rawAddOnQtys = (json['add_on_qtys'] != null && json['add_on_qtys'] is List) ? json['add_on_qtys'] : [];
+      for (int i = 0; i < rawAddOnIds.length; i++) {
+        var v = rawAddOnIds[i];
+        if (v is Map) {
+          _addOnIds!.add(AddOn.fromJson(Map<String, dynamic>.from(v)));
+        } else if (v is int || v is String) {
+          int id = int.tryParse(v.toString()) ?? 0;
+          int qty = 1;
+          if (i < rawAddOnQtys.length && rawAddOnQtys[i] != null) {
+            qty = int.tryParse(rawAddOnQtys[i].toString()) ?? 1;
+          }
+          _addOnIds!.add(AddOn(id: id, quantity: qty));
+        }
+      }
     }
-    if (json['add_ons'] != null) {
+    if (json['add_ons'] != null || json['addons'] != null) {
       _addOns = [];
-      json['add_ons'].forEach((v) {
-        _addOns!.add(AddOns.fromJson(v));
-      });
+      dynamic addOnsData = json['addons'] ?? json['add_ons'];
+      if (addOnsData is List) {
+        for (var v in addOnsData) {
+          if (v is Map) {
+            _addOns!.add(AddOns.fromJson(Map<String, dynamic>.from(v)));
+          }
+        }
+      }
     }
     _isCampaign = json['is_campaign'];
     if (json['item'] != null) {

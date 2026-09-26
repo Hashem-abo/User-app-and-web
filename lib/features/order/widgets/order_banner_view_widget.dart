@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/features/order/controllers/order_controller.dart';
@@ -73,7 +73,7 @@ class OrderBannerViewWidget extends StatelessWidget {
       const SizedBox(height: Dimensions.paddingSizeDefault),
 
       DateConverter.isBeforeTime(order.scheduleAt) &&
-              (Get.find<SplashController>().getModuleConfig(order.moduleType).newVariation ?? false) &&
+              order.moduleType == 'food' &&
               ongoing
           ? Column(children: [
               Text('your_food_will_delivered_within'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).disabledColor)),
@@ -94,7 +94,36 @@ class OrderBannerViewWidget extends StatelessWidget {
               ),
               const SizedBox(height: Dimensions.paddingSizeExtraLarge),
             ])
-          : const SizedBox(),
+          : (order.moduleType == 'laundry' && ongoing && (order.orderNote?.contains('موعد استلام الملابس') ?? false))
+              ? Container(
+                  margin: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                  padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                    border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.access_time_filled_rounded, color: Theme.of(context).primaryColor, size: 22),
+                      ),
+                      const SizedBox(width: Dimensions.paddingSizeSmall),
+                      Expanded(
+                        child: Text(
+                          order.orderNote!,
+                          style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : const SizedBox(),
     ]);
   }
 }

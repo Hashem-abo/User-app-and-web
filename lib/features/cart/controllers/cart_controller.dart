@@ -272,13 +272,14 @@ class CartController extends GetxController implements GetxService {
       int? itemStock = cartModel.item!.stock;
       int? cartStock = cartModel.stock;
       int? qtyLimit = cartModel.item!.quantityLimit;
-      bool isFood = cartModel.item!.moduleType == 'food';
+      bool hasStockManagement = cartModel.item!.moduleType != 'food' &&
+          (Get.find<SplashController>().getModuleConfig(cartModel.item!.moduleType).stock ?? false);
 
-      if(!isFood && ((itemStock != null && itemStock <= 0) || (cartStock != null && cartStock <= 0) || (qtyLimit != null && qtyLimit <= 0))) {
+      if ((hasStockManagement && ((itemStock != null && itemStock <= 0) || (cartStock != null && cartStock <= 0))) || (qtyLimit != null && qtyLimit == 0)) {
         isAvailable = false;
       }
 
-      if(isAvailable && !isFoodVariation && cartModel.variation != null && cartModel.variation!.isNotEmpty) {
+      if(isAvailable && hasStockManagement && !isFoodVariation && cartModel.variation != null && cartModel.variation!.isNotEmpty) {
         String variationType = '';
         for(int i=0; i<cartModel.variation!.length; i++) {
           variationType = cartModel.variation![i].type!;
@@ -344,7 +345,7 @@ class CartController extends GetxController implements GetxService {
       _variationPrice =  variationWithoutDiscountPrice;
       _subTotal = (_itemPrice - _itemDiscountPrice) + _addOns + _variationPrice;
     } else {
-      _subTotal = (_itemPrice - _itemDiscountPrice);
+      _subTotal = (_itemPrice - _itemDiscountPrice) + _addOns;
     }
 
     return _subTotal;
@@ -393,7 +394,7 @@ class CartController extends GetxController implements GetxService {
       variationPrice =  variationWithoutDiscountPrice;
       total = (itemPrice - itemDiscountPrice) + addOns + variationPrice;
     } else {
-      total = (itemPrice - itemDiscountPrice);
+      total = (itemPrice - itemDiscountPrice) + addOns;
     }
 
     return {

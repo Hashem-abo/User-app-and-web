@@ -58,11 +58,29 @@ class StoreScreen extends StatefulWidget {
 
 class _StoreScreenState extends State<StoreScreen> {
   final ScrollController scrollController = ScrollController();
+  final ScrollController _categoryScrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   int _selectedTab = 0;
   Timer? _debounce;
   final Map<int, GlobalKey> categoryKeys = {};
+  final Map<int, GlobalKey> _categoryChipKeys = {};
   bool _isScrollingToCategory = false;
+
+  void _scrollToSelectedCategoryChip(int index) {
+    if (!_categoryScrollController.hasClients) return;
+    try {
+      double targetOffset = (index * 95.0) - (MediaQuery.of(context).size.width / 3);
+      if (targetOffset < 0) targetOffset = 0;
+      if (targetOffset > _categoryScrollController.position.maxScrollExtent) {
+        targetOffset = _categoryScrollController.position.maxScrollExtent;
+      }
+      _categoryScrollController.animateTo(
+        targetOffset,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } catch (_) {}
+  }
 
   void _scrollToCategory(int index) async {
     final storeController = Get.find<StoreController>();
@@ -70,6 +88,7 @@ class _StoreScreenState extends State<StoreScreen> {
       _isScrollingToCategory = true;
     });
     storeController.setCategoryIndexOnly(index);
+    _scrollToSelectedCategoryChip(index);
     
     if (!storeController.loadedCategoryIndexes.contains(index)) {
       await storeController.loadUntilCategory(index);
@@ -121,6 +140,7 @@ class _StoreScreenState extends State<StoreScreen> {
 
     if (activeIndex != -1 && activeIndex != storeController.categoryIndex) {
       storeController.setCategoryIndexOnly(activeIndex);
+      _scrollToSelectedCategoryChip(activeIndex);
     }
   }
 
@@ -136,6 +156,7 @@ class _StoreScreenState extends State<StoreScreen> {
     super.dispose();
 
     scrollController.dispose();
+    _categoryScrollController.dispose();
     _debounce?.cancel();
     Get.find<StoreController>().initSearchData();
     if(Get.find<StoreController>().isSearching) {
@@ -146,6 +167,7 @@ class _StoreScreenState extends State<StoreScreen> {
   Future<void> initDataCall() async {
     if (AuthHelper.isLoggedIn()) {
       Get.find<StoreController>().getFollowedStores();
+      Get.find<FavouriteController>().getFavouriteList();
       if(Get.find<SplashController>().proStaus) {
         Get.find<ProController>().getProActiveOffer(moduleType: Get.find<SplashController>().module?.moduleType);
       }
@@ -178,6 +200,8 @@ class _StoreScreenState extends State<StoreScreen> {
         if (isFood) {
           Get.find<StoreController>().initializeCategoryData(id);
         } else {
+          Get.find<StoreController>().initCategoryScrollState();
+          Get.find<StoreController>().setCategoryList();
           Get.find<StoreController>().getStoreItemList(id, 1, 'all', false);
         }
         // Defer reviews to reduce initial load
@@ -834,7 +858,12 @@ class _StoreScreenState extends State<StoreScreen> {
                                 totalSize: storeController.isSearching
                                     ? storeController.storeSearchItemModel?.totalSize
                                     : (storeController.categoryList!.isNotEmpty && storeController.categoryList![storeController.categoryIndex].id == -1)
-                                        ? (Get.find<FavouriteController>().wishItemList?.where((item) => item != null && item.storeId == (widget.store?.id ?? storeController.store?.id)).length ?? 0)
+                                        ? (() {
+                                            final seen = <int>{};
+                                            int? currentStoreId = widget.store?.id ?? storeController.store?.id;
+                                            int favCount = Get.find<FavouriteController>().wishItemList?.where((item) => item != null && (item.storeId == currentStoreId || currentStoreId == null) && item.id != null && seen.add(item.id!)).length ?? 0;
+                                            return favCount > 0 ? favCount : (storeController.storeItemModel?.totalSize ?? 0);
+                                          }())
                                         : storeController.storeItemModel?.totalSize,
                                 offset: storeController.isSearching
                                     ? storeController.storeSearchItemModel?.offset
@@ -847,9 +876,15 @@ class _StoreScreenState extends State<StoreScreen> {
                                           ? storeController.storeSearchItemModel?.items
                                           : (storeController.categoryList!.isNotEmpty && storeController.storeItemModel != null)
                                           ? (storeController.categoryList![storeController.categoryIndex].id == -1
-                                              ? (favouriteController.wishItemList != null
-                                                  ? favouriteController.wishItemList!.where((item) => item != null && item.storeId == (widget.store?.id ?? storeController.store?.id)).map((item) => item!).toList()
-                                                  : <Item>[])
+                                              ? (() {
+                                                  final seen = <int>{};
+                                                  int? currentStoreId = widget.store?.id ?? storeController.store?.id;
+                                                  List<Item> favItems = (favouriteController.wishItemList ?? [])
+                                                      .where((item) => item != null && (item.storeId == currentStoreId || currentStoreId == null) && item.id != null && seen.add(item.id!))
+                                                      .map((item) => item!)
+                                                      .toList();
+                                                  return favItems.isNotEmpty ? favItems : (storeController.storeItemModel?.items ?? <Item>[]);
+                                                }())
                                               : storeController.storeItemModel!.items)
                                           : null;
                                       if (items == null) return const CustomLoaderWidget();
@@ -898,7 +933,7 @@ class _StoreScreenState extends State<StoreScreen> {
               ResponsiveHelper.isDesktop(context) ? const SliverToBoxAdapter(child:SizedBox()) :
               (storeController.categoryList!.isNotEmpty) ? SliverPersistentHeader(
                 pinned: true,
-                delegate: SliverDelegate(height: _selectedTab == 0 ? 145 : 75, child: Center(child: Container(
+                delegate: SliverDelegate(height: _selectedTab == 0 ? 112 : 55, child: Center(child: Container(
                   width: Dimensions.webMaxWidth,
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
@@ -917,13 +952,15 @@ class _StoreScreenState extends State<StoreScreen> {
                                 color: _selectedTab == 0 ? Theme.of(context).primaryColor : Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                                 border: Border.all(color: _selectedTab == 0 ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                              ),                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: 2),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                                   Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 'all_meals'.tr : 'all_products'.tr, style: robotoMedium.copyWith(color: _selectedTab == 0 ? Colors.white : Theme.of(context).disabledColor)),
-                              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                Icon(Icons.storefront, size: 16, color: _selectedTab == 0 ? Colors.white : Theme.of(context).disabledColor),
-                              ]),
+                                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                  Icon(Icons.storefront, size: 16, color: _selectedTab == 0 ? Colors.white : Theme.of(context).disabledColor),
+                                ]),
+                              ),
                             ),
                           )),
                           const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -939,12 +976,15 @@ class _StoreScreenState extends State<StoreScreen> {
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                                 border: Border.all(color: _selectedTab == 1 ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                 Text('reviews'.tr, style: robotoMedium.copyWith(color: _selectedTab == 1 ? Colors.white : Theme.of(context).disabledColor)),
-                               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                               Icon(Icons.star_border, size: 16, color: _selectedTab == 1 ? Colors.white : Theme.of(context).disabledColor),
-                               ]),
+                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: 2),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                  Text('reviews'.tr, style: robotoMedium.copyWith(color: _selectedTab == 1 ? Colors.white : Theme.of(context).disabledColor)),
+                                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                  Icon(Icons.star_border, size: 16, color: _selectedTab == 1 ? Colors.white : Theme.of(context).disabledColor),
+                                ]),
+                              ),
                             ),
                           )),
                           const SizedBox(width: Dimensions.paddingSizeSmall),
@@ -957,12 +997,15 @@ class _StoreScreenState extends State<StoreScreen> {
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                                 border: Border.all(color: _selectedTab == 2 ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
                               ),
-                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food ? 'about_restaurant'.tr : 'about_store'.tr, style: robotoMedium.copyWith(color: _selectedTab == 2 ? Colors.white : Theme.of(context).disabledColor)),
-                                const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-                                 Icon(Icons.info_outline, size: 16, color: _selectedTab == 2 ? Colors.white : Theme.of(context).disabledColor),
-                             ]),
+                              padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall, horizontal: 2),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                  Text(Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food ? 'about_restaurant'.tr : 'about_store'.tr, style: robotoMedium.copyWith(color: _selectedTab == 2 ? Colors.white : Theme.of(context).disabledColor)),
+                                  const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                                  Icon(Icons.info_outline, size: 16, color: _selectedTab == 2 ? Colors.white : Theme.of(context).disabledColor),
+                                ]),
+                              ),
                             ),
                           )),
                         ]),
@@ -976,13 +1019,17 @@ class _StoreScreenState extends State<StoreScreen> {
                               SizedBox(
                                 height: 35,
                                 child: ListView.builder(
+                                  controller: _categoryScrollController,
                                   scrollDirection: Axis.horizontal,
-                                      itemCount: storeController.categoryList!.length,
+                                  itemCount: storeController.categoryList!.length,
                                   padding: const EdgeInsets.only(left: Dimensions.paddingSizeSmall),
                                   physics: const BouncingScrollPhysics(),
                                   itemBuilder: (context, index) {
+                                    _categoryChipKeys[index] ??= GlobalKey();
                                     return InkWell(
+                                      key: _categoryChipKeys[index],
                                       onTap: () {
+                                        _scrollToSelectedCategoryChip(index);
                                         bool isFood = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food';
                                         if (isFood) {
                                           if (storeController.isSearching) {
@@ -1040,6 +1087,21 @@ class _StoreScreenState extends State<StoreScreen> {
                                                   size: 15,
                                                 ),
                                               )
+                                            else if (storeController.categoryList![index].id == -3)
+                                              Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: index == storeController.categoryIndex
+                                                      ? Theme.of(context).cardColor.withValues(alpha: 0.2)
+                                                      : Colors.orange.withValues(alpha: 0.15),
+                                                ),
+                                                child: Icon(
+                                                  Icons.percent_rounded,
+                                                  color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Colors.orange,
+                                                  size: 15,
+                                                ),
+                                              )
                                             else if (storeController.categoryList![index].id == -2)
                                               Container(
                                                 padding: const EdgeInsets.all(4),
@@ -1052,6 +1114,21 @@ class _StoreScreenState extends State<StoreScreen> {
                                                 child: Icon(
                                                   Icons.local_fire_department_rounded,
                                                   color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Colors.deepOrange,
+                                                  size: 15,
+                                                ),
+                                              )
+                                            else if (storeController.categoryList![index].id == -4)
+                                              Container(
+                                                padding: const EdgeInsets.all(4),
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: index == storeController.categoryIndex
+                                                      ? Theme.of(context).cardColor.withValues(alpha: 0.2)
+                                                      : Colors.amber.withValues(alpha: 0.2),
+                                                ),
+                                                child: Icon(
+                                                  Icons.auto_awesome,
+                                                  color: index == storeController.categoryIndex ? Theme.of(context).cardColor : Colors.amber.shade800,
                                                   size: 15,
                                                 ),
                                               )
@@ -1201,27 +1278,26 @@ class _StoreScreenState extends State<StoreScreen> {
                     const SizedBox(height: Dimensions.paddingSizeSmall),
                     GestureDetector(
                       onHorizontalDragEnd: (DragEndDetails details) {
+                        if (storeController.categoryList == null || storeController.categoryList!.isEmpty) return;
                         bool isLtr = Get.find<LocalizationController>().isLtr;
+                        int currentIndex = storeController.categoryIndex;
+                        int newIndex = currentIndex;
                         if (details.primaryVelocity! > 0) {
                           if (isLtr) {
-                            if (storeController.categoryIndex > 0) {
-                              storeController.setCategoryIndex(storeController.categoryIndex - 1, itemSearching: storeController.isSearching);
-                            }
+                            if (currentIndex > 0) newIndex = currentIndex - 1;
                           } else {
-                            if (storeController.categoryIndex < storeController.categoryList!.length - 1) {
-                              storeController.setCategoryIndex(storeController.categoryIndex + 1, itemSearching: storeController.isSearching);
-                            }
+                            if (currentIndex < storeController.categoryList!.length - 1) newIndex = currentIndex + 1;
                           }
                         } else if (details.primaryVelocity! < 0) {
                           if (isLtr) {
-                            if (storeController.categoryIndex < storeController.categoryList!.length - 1) {
-                              storeController.setCategoryIndex(storeController.categoryIndex + 1, itemSearching: storeController.isSearching);
-                            }
+                            if (currentIndex < storeController.categoryList!.length - 1) newIndex = currentIndex + 1;
                           } else {
-                            if (storeController.categoryIndex > 0) {
-                              storeController.setCategoryIndex(storeController.categoryIndex - 1, itemSearching: storeController.isSearching);
-                            }
+                            if (currentIndex > 0) newIndex = currentIndex - 1;
                           }
+                        }
+                        if (newIndex != currentIndex) {
+                          storeController.setCategoryIndex(newIndex, itemSearching: storeController.isSearching);
+                          _scrollToSelectedCategoryChip(newIndex);
                         }
                       },
                   child: PaginatedListView(
@@ -1282,7 +1358,18 @@ class _StoreScreenState extends State<StoreScreen> {
                         bool isFood = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food';
                         if (isFood && !storeController.isSearching) {
                           if (storeController.loadedCategoryIndexes.isEmpty) {
-                            return const Center(child: CircularProgressIndicator());
+                            int? currentStoreId = widget.store?.id ?? storeController.store?.id;
+                            if (currentStoreId != null && currentStoreId != 0 && !storeController.isLoading) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (storeController.loadedCategoryIndexes.isEmpty) {
+                                  storeController.initializeCategoryData(currentStoreId);
+                                }
+                              });
+                            }
+                            return const Center(child: Padding(
+                              padding: EdgeInsets.all(Dimensions.paddingSizeExtraLarge),
+                              child: CircularProgressIndicator(),
+                            ));
                           }
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1323,8 +1410,19 @@ class _StoreScreenState extends State<StoreScreen> {
                                             children: [
                                               if (categoryId == -1)
                                                 Icon(Icons.favorite, color: Theme.of(context).primaryColor, size: 24)
+                                              else if (categoryId == -3)
+                                                const Icon(Icons.percent_rounded, color: Colors.orange, size: 24)
                                               else if (categoryId == -2)
-                                                const Icon(Icons.local_fire_department, color: Colors.orange, size: 24)
+                                                const Icon(Icons.local_fire_department, color: Colors.deepOrange, size: 24)
+                                              else if (categoryId == -4)
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFF59E0B),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  child: Text('NEW', style: robotoBold.copyWith(color: Colors.white, fontSize: 10)),
+                                                )
                                               else
                                                 ClipOval(
                                                   child: CustomImage(

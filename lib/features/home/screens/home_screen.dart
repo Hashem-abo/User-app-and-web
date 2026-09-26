@@ -1,4 +1,4 @@
-﻿import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:suliman/features/service/widgets/service_provider_widget.dart';
 import 'package:suliman/features/service/controllers/service_controller.dart';
 import 'dart:async'; // + ahmed
@@ -35,6 +35,7 @@ import 'package:suliman/features/rental_module/home/controllers/taxi_home_contro
 import 'package:suliman/features/rental_module/home/screens/taxi_home_screen.dart';
 import 'package:suliman/features/rental_module/rental_cart_screen/controllers/taxi_cart_controller.dart';
 import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/module_helper.dart';
 import 'package:suliman/helper/responsive_helper.dart';
 import 'package:suliman/helper/route_helper.dart';
 import 'package:suliman/util/app_constants.dart';
@@ -497,6 +498,9 @@ class _HomeScreenState extends State<HomeScreen>
       bool isGlobal = splashController.module != null &&
           splashController.module!.moduleType.toString().trim().toLowerCase() ==
               AppConstants.globalShopping;
+      bool isLaundry = splashController.module != null &&
+          (splashController.module!.moduleType.toString().trim().toLowerCase() ==
+              AppConstants.laundry || ModuleHelper.isLaundry());
 
       // + ahmed
       bool isAggregatedModule =
@@ -898,7 +902,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     ? const GroceryHomeScreen()
                                     : isPharmacy
                                         ? const PharmacyHomeScreen()
-                                        : isFood
+                                        : (isFood || isLaundry)
                                             ? const FoodHomeScreen()
                                             : isShop
                                                 ? const ShopHomeScreen()

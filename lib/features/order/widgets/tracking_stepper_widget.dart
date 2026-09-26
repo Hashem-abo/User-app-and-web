@@ -1,4 +1,4 @@
-﻿import 'package:suliman/util/dimensions.dart';
+import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/features/order/widgets/custom_stepper_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,7 +7,8 @@ class TrackingStepperWidget extends StatelessWidget {
   final String? status;
   final bool takeAway;
   final bool isPickupCenter;
-  const TrackingStepperWidget({super.key, required this.status, required this.takeAway, this.isPickupCenter = false});
+  final bool isLaundry;
+  const TrackingStepperWidget({super.key, required this.status, required this.takeAway, this.isPickupCenter = false, this.isLaundry = false});
 
   @override
   Widget build(BuildContext context) {
@@ -80,16 +81,16 @@ class TrackingStepperWidget extends StatelessWidget {
           title: 'order_placed'.tr, isActive: state > -1, haveLeftBar: false, haveRightBar: true, rightActive: state > 0,
         ),
         CustomStepperWidget(
-          title: 'order_confirmed'.tr, isActive: state > 0, haveLeftBar: true, haveRightBar: true, rightActive: state > 1,
+          title: isLaundry ? 'laundry_pickup_step'.tr : 'order_confirmed'.tr, isActive: state > 0, haveLeftBar: true, haveRightBar: true, rightActive: state > 1,
         ),
         CustomStepperWidget(
-          title: 'preparing_item'.tr, isActive: state > 1, haveLeftBar: true, haveRightBar: true, rightActive: state > 2,
+          title: isLaundry ? 'laundry_processing_step'.tr : 'preparing_item'.tr, isActive: state > 1, haveLeftBar: true, haveRightBar: true, rightActive: state > 2,
         ),
         CustomStepperWidget(
-          title: takeAway ? 'ready_for_handover'.tr : 'delivery_on_the_way'.tr, isActive: state > 2, haveLeftBar: true, haveRightBar: true, rightActive: state > 3,
+          title: isLaundry ? 'laundry_delivery_step'.tr : (takeAway ? 'ready_for_handover'.tr : 'delivery_on_the_way'.tr), isActive: state > 2, haveLeftBar: true, haveRightBar: true, rightActive: state > 3,
         ),
         CustomStepperWidget(
-          title: 'delivered'.tr, isActive: state > 3, haveLeftBar: true, haveRightBar: false, rightActive: state > 4,
+          title: isLaundry ? 'laundry_delivered_step'.tr : 'delivered'.tr, isActive: state > 3, haveLeftBar: true, haveRightBar: false, rightActive: state > 4,
         ),
       ]),
     );

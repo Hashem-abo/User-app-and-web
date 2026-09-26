@@ -23,6 +23,7 @@ import 'package:suliman/common/widgets/custom_app_bar.dart';
 import 'package:suliman/common/widgets/custom_button.dart';
 import 'package:suliman/common/widgets/custom_snackbar.dart';
 import 'package:suliman/common/widgets/menu_drawer.dart';
+import 'package:suliman/common/widgets/item_bottom_sheet.dart';
 import 'package:suliman/features/checkout/screens/checkout_screen.dart';
 import 'package:suliman/features/item/widgets/details_app_bar_widget.dart';
 import 'package:suliman/features/item/widgets/details_web_view_widget.dart';
@@ -206,7 +207,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
             quantity: (itemController.cartIndex != -1 && itemController.cartIndex < cartController.cartList.length) ? cartController.cartList[itemController.cartIndex].quantity 
               : itemController.quantity, addOnIds: listOfAddOnId, addOns: addOnsList, addOnQtys: listOfAddOnQty, model: widget.isCampaign ? 'ItemCampaign' : 'Item'
           );
-          priceWithAddons = priceWithQuantity + (Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn! ? addonsCost : 0);
+          priceWithAddons = priceWithQuantity + addonsCost;
         }
 
         return Scaffold(
@@ -676,6 +677,12 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                           ]);
                         },
                       ),
+                      const SizedBox(height: Dimensions.paddingSizeLarge),
+                    ],
+
+                    // Addons
+                    if (item.addOns != null && item.addOns!.isNotEmpty) ...[
+                      AddonView(itemController: itemController, item: item),
                       const SizedBox(height: Dimensions.paddingSizeLarge),
                     ],
 

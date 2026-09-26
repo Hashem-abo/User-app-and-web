@@ -1,4 +1,4 @@
-﻿import 'package:get/get.dart';
+import 'package:get/get.dart';
 import 'package:suliman/common/enums/data_source_enum.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/features/store/domain/models/cart_suggested_item_model.dart';

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/common/widgets/custom_image.dart';
 import 'package:suliman/common/widgets/footer_view.dart';
@@ -129,7 +129,7 @@ class _MyQuestionsScreenState extends State<MyQuestionsScreen> {
                                 
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.start, children: [
                                   OutlinedButton(
-                                    onPressed: () => Get.toNamed(RouteHelper.getItemDetailsRoute(question.itemId, question.item!.moduleType == 'food')),
+                                    onPressed: () => Get.toNamed(RouteHelper.getItemDetailsRoute(question.itemId, question.item?.moduleType == 'food' || question.item?.moduleType == 'laundry')),
                                     style: OutlinedButton.styleFrom(
                                       side: BorderSide(color: Theme.of(context).primaryColor),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Dimensions.radiusSmall)),

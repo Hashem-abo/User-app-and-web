@@ -260,9 +260,9 @@ class Item {
         }
       }
     }
-    if (json['add_ons'] != null) {
+    if (json['add_ons'] != null || json['addons'] != null) {
       addOns = [];
-      dynamic addOnsData = json['add_ons'];
+      dynamic addOnsData = json['addons'] ?? json['add_ons'];
       if(addOnsData is String) {
         try {
           addOnsData = jsonDecode(addOnsData);
@@ -272,8 +272,25 @@ class Item {
       }
       if(addOnsData is List) {
         for (var v in addOnsData) {
-          if (v is Map<String, dynamic>) {
-            addOns!.add(AddOns.fromJson(v));
+          if (v is Map) {
+            addOns!.add(AddOns.fromJson(Map<String, dynamic>.from(v)));
+          }
+        }
+      }
+      if (addOns!.isEmpty) {
+        dynamic fallbackData = (addOnsData == json['addons']) ? json['add_ons'] : json['addons'];
+        if (fallbackData != null) {
+          if (fallbackData is String) {
+            try {
+              fallbackData = jsonDecode(fallbackData);
+            } catch (_) {}
+          }
+          if (fallbackData is List) {
+            for (var v in fallbackData) {
+              if (v is Map) {
+                addOns!.add(AddOns.fromJson(Map<String, dynamic>.from(v)));
+              }
+            }
           }
         }
       }
@@ -296,7 +313,7 @@ class Item {
     discountType = json['discount_type'];
     availableTimeStarts = json['available_time_starts'];
     availableTimeEnds = json['available_time_ends'];
-    storeId = json['store_id'];
+    storeId = json['store_id'] != null ? int.tryParse(json['store_id'].toString()) : null;
     storeName = json['store_name'];
     deliveryTime = json['delivery_time'];
     zoneId = json['zone_id'];
@@ -496,9 +513,9 @@ class AddOns {
   });
 
   AddOns.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = json['id'] != null ? int.tryParse(json['id'].toString()) : null;
     name = json['name'];
-    price = json['price'].toDouble();
+    price = json['price'] != null ? (double.tryParse(json['price'].toString()) ?? 0.0) : 0.0;
   }
 
   Map<String, dynamic> toJson() {
@@ -581,13 +598,15 @@ class VariationValue {
   String? level;
   double? optionPrice;
   bool? isSelected;
+  int? processingTime;
 
-  VariationValue({this.level, this.optionPrice, this.isSelected});
+  VariationValue({this.level, this.optionPrice, this.isSelected, this.processingTime});
 
   VariationValue.fromJson(Map<String, dynamic> json) {
     level = json['label'];
     optionPrice = json['optionPrice'] != null ? (double.tryParse(json['optionPrice'].toString()) ?? 0.0) : 0.0;
     isSelected = json['isSelected'];
+    processingTime = json['processing_time'] != null ? int.tryParse(json['processing_time'].toString()) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -595,6 +614,7 @@ class VariationValue {
     data['label'] = level;
     data['optionPrice'] = optionPrice;
     data['isSelected'] = isSelected;
+    data['processing_time'] = processingTime;
     return data;
   }
 }

@@ -27,8 +27,8 @@ class AppConstants {
   static const int balanceInputLen = 10;
   // static const String webHostedUrl = 'http://192.168.137.1/adminoldtest';
   // static const String webHostedUrl = 'http://192.168.8.179/adminoldtest';
-  // static const String webHostedUrl = 'http://192.168.0.179';
-  static const String webHostedUrl = 'https://t.directplace.store';
+  //static const String webHostedUrl = 'http://192.168.0.179';
+   static const String webHostedUrl = 'https://t.directplace.store';
   // static const String webHostedUrl = 'https://sulimanplus.com';
 
   static const bool useReactWebsite = false;
@@ -37,7 +37,7 @@ class AppConstants {
 
   // static const String baseUrl = 'http://192.168.137.1/adminoldtest';
   // static const String baseUrl = 'http://192.168.8.179/adminoldtest';
-  // static const String baseUrl = 'http://192.168.0.179/adminold';
+  //static const String baseUrl = 'http://192.168.0.179/adminold';
   static const String baseUrl = 'https://ta.directplace.store';
   // static const String baseUrl = 'https://sulimanplus.com';
 
@@ -465,6 +465,7 @@ class AppConstants {
   static const String parcel = 'parcel';
   static const String ecommerce = 'ecommerce';
   static const String grocery = 'grocery';
+  static const String laundry = 'laundry';
   static const String taxi = 'rental';
   static const String ride = 'ride_sharing';
   static const String services = 'services';

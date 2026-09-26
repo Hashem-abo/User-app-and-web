@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/common/widgets/custom_image.dart';
 import 'package:suliman/common/widgets/rating_bar.dart';
@@ -91,7 +91,7 @@ class UserReviewWidget extends StatelessWidget {
               int? itemId = review.item?.id ?? review.itemId;
               String? moduleType = review.item?.moduleType ?? review.moduleType;
               if(itemId != null) {
-                Get.toNamed(RouteHelper.getItemDetailsRoute(itemId, moduleType == 'food'));
+                Get.toNamed(RouteHelper.getItemDetailsRoute(itemId, moduleType == 'food' || moduleType == 'laundry'));
               }
             },
             style: ElevatedButton.styleFrom(

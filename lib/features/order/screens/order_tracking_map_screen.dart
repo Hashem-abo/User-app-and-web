@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:geolocator/geolocator.dart';
@@ -215,7 +215,7 @@ class OrderTrackingMapScreenState extends State<OrderTrackingMapScreen> with Wid
 
               Positioned(
                 top: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
-                child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away', isPickupCenter: track.orderType == 'pickup_center'),
+                child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away', isPickupCenter: track.orderType == 'pickup_center', isLaundry: track.moduleType == 'laundry'),
               ),
 
               Positioned(

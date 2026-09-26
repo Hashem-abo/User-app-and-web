@@ -1,4 +1,4 @@
-﻿import 'package:suliman/common/widgets/card_design/item_card.dart';
+import 'package:suliman/common/widgets/card_design/item_card.dart';
 import 'package:suliman/util/app_constants.dart';
 import 'package:suliman/common/widgets/card_design/store_card_with_distance.dart';
 import 'package:suliman/common/widgets/web_item_widget.dart';
@@ -64,9 +64,9 @@ class _ItemsViewState extends State<ItemsView> {
         key: UniqueKey(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisSpacing: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtremeLarge : widget.stores != null ? Dimensions.paddingSizeSmall : Dimensions.paddingSizeLarge,
-          mainAxisSpacing: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtremeLarge : widget.stores != null && widget.isStore ? Dimensions.paddingSizeLarge : Dimensions.paddingSizeDefault,
-          mainAxisExtent: ResponsiveHelper.isDesktop(context) && widget.isStore ? 220
-          : ResponsiveHelper.isMobile(context) ? (widget.mobileItemCrossAxisCount != null && widget.mobileItemCrossAxisCount! > 1) ? widget.isStore ? 210 : (isFood ? 220 : 400) : widget.stores != null && widget.isStore ? 200 : 122 // + ahmed: Increase height for grid to fit carousel
+          mainAxisSpacing: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtremeLarge : widget.stores != null && widget.isStore ? Dimensions.paddingSizeSmall : Dimensions.paddingSizeDefault,
+          mainAxisExtent: ResponsiveHelper.isDesktop(context) && widget.isStore ? 120
+          : ResponsiveHelper.isMobile(context) ? (widget.mobileItemCrossAxisCount != null && widget.mobileItemCrossAxisCount! > 1) ? widget.isStore ? 210 : (isFood ? 220 : 400) : widget.stores != null && widget.isStore ? 120 : 122 // + ahmed: Increase height for grid to fit carousel
           : ResponsiveHelper.isDesktop(context) ? 300 : 122,
           crossAxisCount: ResponsiveHelper.isMobile(context) ? widget.mobileItemCrossAxisCount ?? 1 : ResponsiveHelper.isDesktop(context) && widget.stores != null  ? 3 : ResponsiveHelper.isDesktop(context) ? 4 : 3, // + ahmed
         ),

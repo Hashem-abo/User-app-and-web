@@ -1,4 +1,4 @@
-﻿import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/common/widgets/custom_image.dart';
@@ -14,6 +14,7 @@ import 'package:suliman/common/widgets/item_bottom_sheet.dart';
 import 'package:suliman/features/item/screens/item_details_screen.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/helper/responsive_helper.dart';
+import 'package:suliman/helper/module_helper.dart';
 
 class SuperBannerView extends StatefulWidget {
   final int superBannerId;
@@ -86,7 +87,7 @@ class _SuperBannerViewState extends State<SuperBannerView> {
                 return InkWell(
                   onTap: () async {
                     if (item.type == 'item' && item.linkId != null) {
-                      if(Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! || Get.find<SplashController>().module!.moduleType == 'food') {
+                      if(Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! || Get.find<SplashController>().module?.moduleType == 'food' || Get.find<SplashController>().module?.moduleType == 'laundry' || ModuleHelper.isLaundry()) {
                         ResponsiveHelper.isMobile(context) ? Get.bottomSheet(
                           ItemBottomSheet(itemId: item.linkId!, inStorePage: false, isCampaign: false),
                           backgroundColor: Colors.transparent, isScrollControlled: true,

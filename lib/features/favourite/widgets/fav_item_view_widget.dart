@@ -1,4 +1,4 @@
-﻿import 'package:suliman/features/favourite/controllers/favourite_controller.dart';
+import 'package:suliman/features/favourite/controllers/favourite_controller.dart';
 import 'package:suliman/helper/responsive_helper.dart';
 import 'package:suliman/util/dimensions.dart';
 import 'package:suliman/common/widgets/footer_view.dart';
@@ -70,7 +70,7 @@ class FavItemViewWidget extends StatelessWidget {
                       crossAxisCount: ResponsiveHelper.isMobile(context) ? (isStore ? 1 : 2) : ResponsiveHelper.isDesktop(context) ? 3 : 3,
                       crossAxisSpacing: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtremeLarge : Dimensions.paddingSizeSmall,
                       mainAxisSpacing: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtremeLarge : Dimensions.paddingSizeSmall,
-                      mainAxisExtent: ResponsiveHelper.isDesktop(context) && isStore ? 220 : ResponsiveHelper.isMobile(context) && isStore ? (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 250 : 200) : (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 220 : 350),
+                      mainAxisExtent: ResponsiveHelper.isDesktop(context) && isStore ? 120 : ResponsiveHelper.isMobile(context) && isStore ? 120 : (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food' ? 220 : 350),
                     ),
                     itemCount: isStore ? wishStoreList!.length : wishItemList!.length,
                     shrinkWrap: true,

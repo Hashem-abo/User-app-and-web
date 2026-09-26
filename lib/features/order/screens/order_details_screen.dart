@@ -220,7 +220,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 if(zList != null) {
                   for(ZoneData zData in zList) {
                     if(zData.id == order.store!.zoneId){
-                      _isCashOnDeliveryActive = zData.cashOnDelivery;
+                      _isCashOnDeliveryActive = zData.cashOnDelivery ?? false;
                     }
                     if(zData.modules != null) {
                       for(Modules m in zData.modules!) {
@@ -356,7 +356,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
     final showCancelButton = _ButtonVisibilityHelper.shouldShowCancelButton(order, orderController);
     final showTrackDeliveryButton = _ButtonVisibilityHelper.shouldShowTrackDeliveryButton(order);
     final showReviewButton = _ButtonVisibilityHelper.shouldShowReviewButton(order, orderController);
-    final showSwitchToCodButton = _ButtonVisibilityHelper.shouldShowSwitchToCodButton(order, _isCashOnDeliveryActive!);
+    final showSwitchToCodButton = _ButtonVisibilityHelper.shouldShowSwitchToCodButton(order, _isCashOnDeliveryActive ?? false);
     final showFailedCodButton = _ButtonVisibilityHelper.shouldShowFailedOrderCodButton(order);
 
     final showDecoration = showCancelButton || showTrackDeliveryButton || showReviewButton || showSwitchToCodButton;
@@ -404,7 +404,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
     final showTrackDeliveryButton = _ButtonVisibilityHelper.shouldShowParcelTrackButton(order);
     final showReturnOtp = _ButtonVisibilityHelper.shouldShowParcelReturnOtp(order);
     final showReviewButton = _ButtonVisibilityHelper.shouldShowParcelReviewButton(order);
-    final showSwitchToCodButton = _ButtonVisibilityHelper.shouldShowSwitchToCodButton(order, _isCashOnDeliveryActive!);
+    final showSwitchToCodButton = _ButtonVisibilityHelper.shouldShowSwitchToCodButton(order, _isCashOnDeliveryActive ?? false);
     final showFailedCodButton = _ButtonVisibilityHelper.shouldShowFailedOrderCodButton(order);
 
     final showDecoration = showCancelButton || showTrackDeliveryButton || showReturnOtp || showReviewButton || showSwitchToCodButton;
@@ -427,7 +427,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
             onTrackPressed: () => _handleTrackOrder(order),
           ),
 
-          if (_ButtonVisibilityHelper.shouldShowSwitchToCodButton(order, _isCashOnDeliveryActive!))
+          if (_ButtonVisibilityHelper.shouldShowSwitchToCodButton(order, _isCashOnDeliveryActive ?? false))
             _buildSwitchToCodButton(orderController, order, parcel, totalPrice),
         ] else
           _buildCancelledOrderWidget(isDesktop),

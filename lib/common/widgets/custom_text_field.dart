@@ -1,4 +1,4 @@
-﻿import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:get/get.dart';
 import 'package:suliman/common/widgets/custom_asset_image_widget.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
@@ -8,6 +8,27 @@ import 'package:suliman/util/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:suliman/common/widgets/code_picker_widget.dart';
+
+class ArabicToEnglishDigitsFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    String text = newValue.text;
+    const arabicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    const englishDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+    for (int i = 0; i < 10; i++) {
+      text = text.replaceAll(arabicDigits[i], englishDigits[i]);
+      text = text.replaceAll(persianDigits[i], englishDigits[i]);
+    }
+
+    return newValue.copyWith(
+      text: text,
+      selection: newValue.selection,
+      composing: TextRange.empty,
+    );
+  }
+}
 
 class CustomTextField extends StatefulWidget {
   final String titleText;
@@ -48,6 +69,7 @@ class CustomTextField extends StatefulWidget {
   final bool fromUpdateProfile;
   final int? maxLength;
   final double? borderRadius;
+  final List<TextInputFormatter>? inputFormatters;
 
   const CustomTextField({
     super.key,
@@ -89,6 +111,7 @@ class CustomTextField extends StatefulWidget {
     this.fromUpdateProfile = false,
     this.maxLength,
     this.borderRadius,
+    this.inputFormatters,
   });
 
   @override
@@ -171,8 +194,13 @@ class CustomTextFieldState extends State<CustomTextField> {
               obscureText: widget.isPassword ? _obscureText : false,
               obscuringCharacter: '•',
               maxLength: widget.maxLength,
-            inputFormatters: widget.inputType == TextInputType.phone ? <TextInputFormatter>[FilteringTextInputFormatter.allow(RegExp('[0-9]'))]
-                : widget.isAmount ? [FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))] : widget.isNumber ? [FilteringTextInputFormatter.allow(RegExp(r'\d'))] : null,
+            inputFormatters: [
+              ArabicToEnglishDigitsFormatter(),
+              if (widget.inputType == TextInputType.phone) FilteringTextInputFormatter.allow(RegExp(r'[0-9+]'))
+              else if (widget.isAmount) FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*'))
+              else if (widget.isNumber) FilteringTextInputFormatter.allow(RegExp(r'\d')),
+              if (widget.inputFormatters != null) ...widget.inputFormatters!,
+            ],
             decoration: InputDecoration(
               counterText: '',
               enabledBorder: OutlineInputBorder(

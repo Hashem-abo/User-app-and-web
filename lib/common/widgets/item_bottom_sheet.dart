@@ -405,10 +405,10 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                           ) : VariationView(
                             item: item, itemController: itemController,
                           ),
-                          SizedBox(height: (Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn! && item.addOns!.isNotEmpty) ? Dimensions.paddingSizeLarge : 0),
+                          SizedBox(height: (item.addOns != null && item.addOns!.isNotEmpty) ? Dimensions.paddingSizeLarge : 0),
 
                           // Addons
-                          (Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn! && item.addOns!.isNotEmpty)
+                          (item.addOns != null && item.addOns!.isNotEmpty)
                               ? AddonView(itemController: itemController, item: item): const SizedBox(),
 
 

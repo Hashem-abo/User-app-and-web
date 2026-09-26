@@ -1783,12 +1783,13 @@ class ItemController extends GetxController implements GetxService {
   String? getDiscountType(Item item) => item.discountType;
 
   void navigateToItemPage(Item? item, BuildContext context, {bool inStore = false, bool isCampaign = false}) {
-    if(Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! || item!.moduleType == 'food') {
+    if(item == null) return;
+    if(Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! || item.moduleType == 'food' || item.moduleType == 'laundry' || ModuleHelper.isLaundry()) {
       ResponsiveHelper.isMobile(context) ? Get.bottomSheet(
-        ItemBottomSheet(itemId: item!.id!, inStorePage: inStore, isCampaign: isCampaign, item: item),
+        ItemBottomSheet(itemId: item.id!, inStorePage: inStore, isCampaign: isCampaign, item: item),
         backgroundColor: Colors.transparent, isScrollControlled: true,
       ) : Get.dialog(
-        Dialog(child: ItemBottomSheet(itemId: item!.id!, inStorePage: inStore, isCampaign: isCampaign, item: item)),
+        Dialog(child: ItemBottomSheet(itemId: item.id!, inStorePage: inStore, isCampaign: isCampaign, item: item)),
       );
     }else {
       Get.toNamed(RouteHelper.getItemDetailsRoute(item.id, inStore), arguments: ItemDetailsScreen(itemId: item.id!, inStorePage: inStore, isCampaign: isCampaign, item: item));

@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:suliman/helper/version_helper.dart';
 import 'package:vibration/vibration.dart';
@@ -646,10 +646,10 @@ class SplashController extends GetxController implements GetxService {
   Module getModuleConfig(String? moduleType) {
     if (_data != null && _data!['module_config'] != null && _data!['module_config'][moduleType] != null) {
       Module module = Module.fromJson(_data!['module_config'][moduleType]);
-      moduleType == 'food' ? module.newVariation = true : module.newVariation = false;
+      (moduleType == 'food' || moduleType == 'laundry') ? module.newVariation = true : module.newVariation = false;
       return module;
     }
-    return Module(newVariation: moduleType == 'food');
+    return Module(newVariation: moduleType == 'food' || moduleType == 'laundry');
   }
 
   Future<void> getModules({Map<String, String>? headers, DataSourceEnum dataSource = DataSourceEnum.local}) async {

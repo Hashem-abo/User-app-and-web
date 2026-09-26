@@ -1,4 +1,10 @@
 {
+  "laundry": "Laundry",
+  "laundry_services": "Laundry Services",
+  "laundry_service": "Laundry Service",
+  "care_addons": "Care Addons & Customizations",
+  "laundry_instructions": "Laundry Instructions",
+  "pickup_and_delivery_schedule": "Pickup & Delivery Schedule",
   "available_from": "Available from",
   "vendor_registration": "Vendor Registration",
   "store_registration": "Store Registration",
@@ -1124,6 +1130,11 @@
   "it_s_a_great_way_to_show_your_appreciation_for_their_hard_work": "It's a great way to show your appreciation for their hard work",
   "schedule_time_tool_tip": "You can order instantly or you can also order by scheduling the time",
   "your_food_will_delivered_within": "Your food will delivered within",
+  "laundry_pickup_step": "Driver is on the way to pick up clothes from you",
+  "laundry_processing_step": "Clothes are being washed & processed at the laundry",
+  "laundry_delivery_step": "Clean clothes are on the way to you",
+  "laundry_delivered_step": "Clean clothes delivered successfully",
+  "laundry_schedule_info": "Laundry Pickup & Delivery Schedule",
   "general_info": "General Info",
   "order_date": "Order date",
   "item_info": "Item Info",
@@ -2385,5 +2396,6 @@
   "suliman_pro": "Suliman Pro",
   "fbs_consolidated_delivery_title": "Consolidated Shipment from Platform Central Hub (FBS ⚡)",
   "fbs_consolidated_delivery_notice": "Your items from multiple stores are bundled into a single package from the central hub, saving multiple delivery charges.",
-  "auto_applied": "Auto Applied"
+  "auto_applied": "Auto Applied",
+  "our_new": "Our New"
 }

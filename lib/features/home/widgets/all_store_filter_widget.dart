@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/features/home/widgets/filter_view.dart';
 import 'package:suliman/features/home/widgets/store_filter_button_widget.dart';
@@ -88,6 +88,13 @@ class AllStoreFilterWidget extends StatelessWidget {
               buttonText: 'all'.tr,
               onTap: () => storeController.setStoreType('all'),
               isSelected: storeController.storeType == 'all',
+            ),
+            const SizedBox(width: Dimensions.paddingSizeSmall),
+
+            StoreFilterButtonWidget(
+              buttonText: 'nearest'.tr,
+              onTap: () => storeController.setStoreType('nearest'),
+              isSelected: storeController.storeType == 'nearest',
             ),
             const SizedBox(width: Dimensions.paddingSizeSmall),
 

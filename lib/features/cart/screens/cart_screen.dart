@@ -612,7 +612,7 @@ class _CartScreenState extends State<CartScreen> {
       endDrawer: const MenuDrawer(),endDrawerEnableOpenDragGesture: false,
       body: GetBuilder<StoreController>(builder: (storeController) {
         return GetBuilder<CartController>(builder: (cartController) {
-          bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery';
+          bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery' || ModuleHelper.getModule()?.moduleType == 'laundry';
           int? selectedStoreId = cartController.selectedStoreId;
           Map<String, double>? storeTotals;
           if (isFoodOrGrocery && selectedStoreId != null) {
@@ -664,7 +664,7 @@ class _CartScreenState extends State<CartScreen> {
                                               groupedCart[storeId]!.add(i);
                                             }
 
-                                             bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery';
+                                             bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery' || ModuleHelper.getModule()?.moduleType == 'laundry';
                                              
                                              if (isFoodOrGrocery) {
                                                int selectedStoreId = (cartController.selectedStoreId != null && groupedCart.containsKey(cartController.selectedStoreId))
@@ -976,9 +976,9 @@ class _CartScreenState extends State<CartScreen> {
                             PriceConverter.convertAnimationPrice(storeTotals != null ? storeTotals['itemDiscountPrice']! : cartController.itemDiscountPrice, textStyle: robotoRegular),
                           ]) : Text('calculating'.tr, style: robotoRegular),
                         ]),
-                        SizedBox(height: Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn! ? Dimensions.paddingSizeSmall : 0),
+                        SizedBox(height: (storeTotals != null ? storeTotals['addOns']! > 0 : cartController.addOns > 0) ? Dimensions.paddingSizeSmall : 0),
 
-                        Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn! ? Row(
+                        (storeTotals != null ? storeTotals['addOns']! > 0 : cartController.addOns > 0) ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('addons'.tr, style: robotoRegular),
@@ -1039,7 +1039,7 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ) : const SizedBox(),
 
-            !ResponsiveHelper.isDesktop(context) && Get.find<SplashController>().getModuleConfig(item.moduleType).newVariation!
+            !ResponsiveHelper.isDesktop(context) && item.moduleType == 'food' && Get.find<SplashController>().getModuleConfig(item.moduleType).newVariation!
             && (storeController.store != null && storeController.store!.cutlery!) ? Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
@@ -1143,9 +1143,9 @@ class _CartScreenState extends State<CartScreen> {
                   ]) : Text('calculating'.tr, style: robotoRegular),
                   // Text('(-) ${PriceConverter.convertPrice(cartController.itemDiscountPrice)}', style: robotoRegular, textDirection: TextDirection.ltr),
                 ]),
-                SizedBox(height: Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn! ? 10 : 0),
+                SizedBox(height: (storeTotals != null ? storeTotals['addOns']! > 0 : cartController.addOns > 0) ? 10 : 0),
 
-                Get.find<SplashController>().configModel!.moduleConfig!.module!.addOn! ? Row(
+                (storeTotals != null ? storeTotals['addOns']! > 0 : cartController.addOns > 0) ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('addons'.tr, style: robotoRegular),
@@ -1263,7 +1263,7 @@ class _CheckoutButtonState extends State<CheckoutButton> {
     List<bool> availableList = widget.availableList;
     Function? onPriceTap = widget.onPriceTap;
 
-    bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery';
+    bool isFoodOrGrocery = ModuleHelper.getModule()?.moduleType == 'food' || ModuleHelper.getModule()?.moduleType == 'grocery' || ModuleHelper.getModule()?.moduleType == 'laundry';
     int? selectedStoreId = (cartController.selectedStoreId != null && cartController.cartList.any((cart) => _getEffectiveStoreId(cart) == cartController.selectedStoreId))
         ? cartController.selectedStoreId!
         : (cartController.cartList.isNotEmpty ? _getEffectiveStoreId(cartController.cartList[0]) : null);
@@ -1311,7 +1311,9 @@ class _CheckoutButtonState extends State<CheckoutButton> {
                     children: [
                       Icon(Icons.keyboard_arrow_down, color: Colors.grey[600], size: 20),
                       Text(
-                        PriceConverter.convertPrice(cartController.subTotal),
+                        PriceConverter.convertPrice(isFoodOrGrocery && selectedStoreId != null
+                            ? (cartController.getSubTotalForStore(selectedStoreId)['total'] ?? cartController.subTotal)
+                            : cartController.subTotal),
                         style: robotoBold.copyWith(fontSize: Dimensions.fontSizeDefault, color: Colors.black),
                         //textDirection: TextDirection.ltr,
                       ),
@@ -1418,6 +1420,19 @@ class _CheckoutButtonState extends State<CheckoutButton> {
                               return;
                             }
                           }
+                        }
+
+                        bool guestCheckoutPermission = AuthHelper.isGuestLoggedIn() &&
+                            (Get.find<SplashController>().configModel?.guestCheckoutStatus ?? false);
+
+                        if (!AuthHelper.isLoggedIn() && !guestCheckoutPermission) {
+                          if (mounted) {
+                            setState(() {
+                              _isProceedingToCheckout = false;
+                            });
+                          }
+                          Get.toNamed(RouteHelper.getSignInRoute(RouteHelper.cart));
+                          return;
                         }
 
                         Get.find<CheckoutController>().updateFirstTime();

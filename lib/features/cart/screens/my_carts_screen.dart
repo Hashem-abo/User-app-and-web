@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -185,9 +185,10 @@ class _MyCartsScreenState extends State<MyCartsScreen> {
                   int? itemStock = cart.item!.stock;
                   int? cartStock = cart.stock;
                   int? qtyLimit = cart.item!.quantityLimit;
-                  bool isFood = cart.item!.moduleType == 'food';
+                  bool hasStockManagement = cart.item!.moduleType != 'food' &&
+                      (Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).stock ?? false);
 
-                  if(!isFood && ((itemStock != null && itemStock <= 0) || (cartStock != null && cartStock <= 0) || (qtyLimit != null && qtyLimit <= 0))) {
+                  if ((hasStockManagement && ((itemStock != null && itemStock <= 0) || (cartStock != null && cartStock <= 0))) || (qtyLimit != null && qtyLimit == 0)) {
                     hasUnavailableItems = true;
                   }
                   if(cart.item!.storeDetails != null) {

@@ -1,10 +1,11 @@
-﻿import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:suliman/util/app_constants.dart';
 import 'package:suliman/util/images.dart';
 import 'package:flutter_avif/flutter_avif.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
 
 class CustomImage extends StatelessWidget {
   final String image;
@@ -32,21 +33,23 @@ class CustomImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(image.toLowerCase().endsWith('.svg')) {
-      return SvgPicture.network(
-        image, height: height, width: width, fit: fit ?? BoxFit.contain,
-        colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
-        placeholderBuilder: (BuildContext context) => Image.asset(
-          placeholder.isNotEmpty ? placeholder : (isNotification ? Images.notificationPlaceholder : Images.defultImage),
-          height: height, width: width, fit: fit, color: color,
-        ),
-        errorBuilder: (context, error, stackTrace) => Image.asset(
-          placeholder.isNotEmpty ? placeholder : (isNotification ? Images.notificationPlaceholder : Images.defultImage),
-          height: height, width: width, fit: fit, color: color,
-        ),
+    String cleanUrl = image.split('?').first.toLowerCase();
+    if(cleanUrl.endsWith('.svg')) {
+      Widget placeholderWidget = Image.asset(
+        placeholder.isNotEmpty ? placeholder : (isNotification ? Images.notificationPlaceholder : Images.defultImage),
+        height: height, width: width, fit: fit, color: color,
+      );
+
+      return NetworkSvgWithStyleFix(
+        url: kIsWeb ? '${AppConstants.baseUrl}/image-proxy?url=$image' : image,
+        height: height,
+        width: width,
+        fit: fit ?? BoxFit.contain,
+        color: color,
+        placeholder: placeholderWidget,
       );
     }
-    if(image.toLowerCase().endsWith('.avif')) {
+    if(cleanUrl.endsWith('.avif')) {
       return AvifImage.network(
         image, height: height, width: width, fit: fit,
         errorBuilder: (context, error, stackTrace) => Image.asset(
@@ -92,6 +95,150 @@ class CustomImage extends StatelessWidget {
   }
 }
 
+class NetworkSvgWithStyleFix extends StatefulWidget {
+  final String url;
+  final double? height;
+  final double? width;
+  final BoxFit fit;
+  final Color? color;
+  final Widget placeholder;
+
+  const NetworkSvgWithStyleFix({
+    super.key,
+    required this.url,
+    this.height,
+    this.width,
+    this.fit = BoxFit.contain,
+    this.color,
+    required this.placeholder,
+  });
+
+  @override
+  State<NetworkSvgWithStyleFix> createState() => _NetworkSvgWithStyleFixState();
+}
+
+class _NetworkSvgWithStyleFixState extends State<NetworkSvgWithStyleFix> {
+  static final Map<String, String> _svgCache = {};
+  String? _svgString;
+  bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSvg();
+  }
+
+  @override
+  void didUpdateWidget(covariant NetworkSvgWithStyleFix oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.url != widget.url) {
+      _loadSvg();
+    }
+  }
+
+  Future<void> _loadSvg() async {
+    if (_svgCache.containsKey(widget.url)) {
+      if (mounted) {
+        setState(() {
+          _svgString = _svgCache[widget.url];
+          _hasError = false;
+        });
+      }
+      return;
+    }
+
+    try {
+      final response = await http.get(Uri.parse(widget.url));
+      if (response.statusCode == 200) {
+        String svg = response.body;
+        svg = _inlineSvgStyles(svg);
+        _svgCache[widget.url] = svg;
+        if (mounted) {
+          setState(() {
+            _svgString = svg;
+            _hasError = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _hasError = true);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _hasError = true);
+    }
+  }
+
+  static String _inlineSvgStyles(String svg) {
+    final styleRegex = RegExp(r'<style[^>]*>([\s\S]*?)<\/style>', caseSensitive: false);
+    final styleMatches = styleRegex.allMatches(svg);
+
+    Map<String, Map<String, String>> classStyles = {};
+    for (var m in styleMatches) {
+      String styleContent = m.group(1) ?? '';
+      final ruleRegex = RegExp(r'([^{]+)\{([^}]+)\}');
+      for (var ruleMatch in ruleRegex.allMatches(styleContent)) {
+        List<String> selectors = ruleMatch.group(1)!.split(',');
+        String declarations = ruleMatch.group(2)!.trim();
+        Map<String, String> declMap = {};
+        for (var decl in declarations.split(';')) {
+          var parts = decl.split(':');
+          if (parts.length == 2) {
+            declMap[parts[0].trim().toLowerCase()] = parts[1].trim();
+          }
+        }
+        for (var sel in selectors) {
+          String cleanSel = sel.trim().replaceAll('.', '');
+          if (cleanSel.isNotEmpty) {
+            classStyles.putIfAbsent(cleanSel, () => {}).addAll(declMap);
+          }
+        }
+      }
+    }
+
+    if (classStyles.isEmpty) return svg;
+
+    String processed = svg;
+    classStyles.forEach((className, styles) {
+      String styleAttributes = '';
+      if (styles.containsKey('fill')) {
+        styleAttributes += ' fill="${styles['fill']}"';
+      }
+      if (styles.containsKey('stroke')) {
+        styleAttributes += ' stroke="${styles['stroke']}"';
+      }
+      if (styles.containsKey('stroke-width')) {
+        styleAttributes += ' stroke-width="${styles['stroke-width']}"';
+      }
+      if (styles.containsKey('font-size')) {
+        styleAttributes += ' font-size="${styles['font-size']}"';
+      }
+      if (styles.containsKey('font-weight')) {
+        styleAttributes += ' font-weight="${styles['font-weight']}"';
+      }
+      if (styleAttributes.isNotEmpty) {
+        final elemRegex = RegExp('class=["\'][^"\']*\\b$className\\b[^"\']*["\']');
+        processed = processed.replaceAllMapped(elemRegex, (match) => '${match.group(0)}$styleAttributes');
+      }
+    });
+
+    return processed;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_hasError) return widget.placeholder;
+    if (_svgString != null) {
+      return SvgPicture.string(
+        _svgString!,
+        height: widget.height,
+        width: widget.width,
+        fit: widget.fit,
+        colorFilter: widget.color != null ? ColorFilter.mode(widget.color!, BlendMode.srcIn) : null,
+      );
+    }
+    return widget.placeholder;
+  }
+}
+
 /// Lightweight static placeholder — zero tickers, zero rebuild overhead during list scrolling
 class _ShimmerPlaceholder extends StatelessWidget {
   final double? height;
@@ -100,11 +247,10 @@ class _ShimmerPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: height,
       width: width,
-      color: isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEFEFEF),
+      color: Theme.of(context).disabledColor.withValues(alpha: 0.08),
     );
   }
 }

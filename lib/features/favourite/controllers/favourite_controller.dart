@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:suliman/helper/auth_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:suliman/common/models/response_model.dart';
 import 'package:suliman/features/splash/controllers/splash_controller.dart';
 import 'package:suliman/features/item/domain/models/item_model.dart';
@@ -31,23 +32,31 @@ class FavouriteController extends GetxController implements GetxService {
     update();
     if(isStore) {
       _wishStoreList ??= [];
-      _wishStoreIdList.add(storeID);
-      _wishStoreList!.add(Store());
+      if(!_wishStoreIdList.contains(storeID)) {
+        _wishStoreIdList.add(storeID);
+        _wishStoreList!.add(Store());
+      }
     }else{
       _wishItemList ??= [];
-      _wishItemList!.add(product);
-      _wishItemIdList.add(product!.id);
+      if(product != null && !_wishItemIdList.contains(product.id)) {
+        _wishItemList!.add(product);
+        _wishItemIdList.add(product.id);
+      }
     }
     ResponseModel responseModel = await favouriteServiceInterface.addFavouriteList(isStore ? storeID : product!.id, isStore);
     if (responseModel.isSuccess) {
       showCustomSnackBar(responseModel.message, isError: false, getXSnackBar: getXSnackBar);
     } else {
-      if(isStore) {
-        _wishStoreIdList.removeWhere((id) => id == storeID);
-      } else {
-        _wishItemIdList.removeWhere((id) => id == product!.id);
+      String message = responseModel.message ?? '';
+      bool alreadyAdded = message.contains('already') || message.contains('بالفعل');
+      if(!alreadyAdded) {
+        if(isStore) {
+          _wishStoreIdList.removeWhere((id) => id == storeID);
+        } else {
+          _wishItemIdList.removeWhere((id) => id == product!.id);
+        }
       }
-      showCustomSnackBar(responseModel.message, isError: true, getXSnackBar: getXSnackBar);
+      showCustomSnackBar(responseModel.message, isError: !alreadyAdded, getXSnackBar: getXSnackBar);
     }
     _isRemoving = false;
     update();
@@ -97,6 +106,13 @@ class FavouriteController extends GetxController implements GetxService {
   }
 
   Future<void> getFavouriteList() async {
+    if (!AuthHelper.isLoggedIn()) {
+      _wishItemList = [];
+      _wishStoreList = [];
+      _wishStoreIdList = [];
+      _wishItemIdList = [];
+      return;
+    }
     _wishItemList = null;
     _wishStoreList = null;
     Response response = await favouriteServiceInterface.getFavouriteList();
@@ -108,15 +124,13 @@ class FavouriteController extends GetxController implements GetxService {
       _wishItemIdList = [];
 
       if(response.body['item'] != null) {
-        response.body['item'].forEach((item) async {
-          if(item['module_type'] == null || !Get.find<SplashController>().getModuleConfig(item['module_type']).newVariation!
-            || item['variations'] == null || item['variations'].isEmpty || (item['food_variations'] != null && item['food_variations'].isNotEmpty)){
-
-            Item i = Item.fromJson(item);
+        response.body['item'].forEach((item) {
+          Item i = Item.fromJson(item);
+          if (i.id != null && !_wishItemIdList.contains(i.id)) {
             if(Get.find<SplashController>().module == null){
               _wishItemList!.addAll(favouriteServiceInterface.wishItemList(i));
               _wishItemIdList.addAll(favouriteServiceInterface.wishItemIdList(i));
-            }else if(Get.find<SplashController>().module!.id == i.moduleId){
+            }else if(Get.find<SplashController>().module!.id == i.moduleId || i.moduleId == null){
               _wishItemList!.add(i);
               _wishItemIdList.add(i.id);
             }
@@ -124,23 +138,25 @@ class FavouriteController extends GetxController implements GetxService {
         });
       }
 
-      response.body['store'].forEach((store) async {
-        if(Get.find<SplashController>().module == null){
-          _wishStoreList!.addAll(favouriteServiceInterface.wishStoreList(store));
-          _wishStoreIdList.addAll(favouriteServiceInterface.wishStoreIdList(store));
-        }else{
+      if(response.body['store'] != null) {
+        response.body['store'].forEach((store) {
           Store? s;
           try{
             s = Store.fromJson(store);
           }catch(e){
             debugPrint('exception create in store list create : $e');
           }
-          if(s != null && Get.find<SplashController>().module!.id == s.moduleId) {
-            _wishStoreList!.add(s);
-            _wishStoreIdList.add(s.id);
+          if(s != null && s.id != null && !_wishStoreIdList.contains(s.id)) {
+            if(Get.find<SplashController>().module == null){
+              _wishStoreList!.addAll(favouriteServiceInterface.wishStoreList(store));
+              _wishStoreIdList.addAll(favouriteServiceInterface.wishStoreIdList(store));
+            }else if(Get.find<SplashController>().module!.id == s.moduleId || s.moduleId == null) {
+              _wishStoreList!.add(s);
+              _wishStoreIdList.add(s.id);
+            }
           }
-        }
-      });
+        });
+      }
     }
     update();
   }

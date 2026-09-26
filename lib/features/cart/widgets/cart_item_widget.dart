@@ -609,33 +609,40 @@ class _CartItemWidgetState extends State<CartItemWidget> {
     bool newVariation = Get.find<SplashController>().getModuleConfig(cartModel.item!.moduleType).newVariation ?? false;
     double price = 0;
     if(newVariation) {
-      for(int index = 0; index< cartModel.item!.foodVariations!.length; index++) {
-        for(int i=0; i<cartModel.item!.foodVariations![index].variationValues!.length; i++) {
-          if(cartModel.foodVariations![index][i]!) {
-            price += (PriceConverter.convertWithDiscount(cartModel.item!.foodVariations![index].variationValues![i].optionPrice!, discount, discountType, isFoodVariation: true)! * cartModel.quantity!);
+      if(cartModel.item?.foodVariations != null && cartModel.foodVariations != null) {
+        for(int index = 0; index < cartModel.item!.foodVariations!.length; index++) {
+          if(index < cartModel.foodVariations!.length && cartModel.foodVariations![index] != null) {
+            for(int i=0; i < (cartModel.item!.foodVariations![index].variationValues?.length ?? 0); i++) {
+              if(i < cartModel.foodVariations![index]!.length && (cartModel.foodVariations![index]![i] ?? false)) {
+                price += (PriceConverter.convertWithDiscount(cartModel.item!.foodVariations![index].variationValues![i].optionPrice!, discount, discountType, isFoodVariation: true)! * (cartModel.quantity ?? 1));
+              }
+            }
           }
         }
       }
 
-      price = price + _calculateAddonPrice(cartModel) + (PriceConverter.convertWithDiscount(cartModel.item!.price!, discount, discountType, isFoodVariation: true)! * cartModel.quantity!);
+      price = price + _calculateAddonPrice(cartModel) + (PriceConverter.convertWithDiscount(cartModel.item!.price!, discount, discountType, isFoodVariation: true)! * (cartModel.quantity ?? 1));
 
     } else {
 
       String variationType = '';
-      for(int i=0; i<cartModel.variation!.length; i++) {
-        variationType = cartModel.variation![i].type!;
+      if(cartModel.variation != null) {
+        for(int i=0; i<cartModel.variation!.length; i++) {
+          variationType = cartModel.variation![i].type ?? '';
+        }
       }
 
-      if(variationType.isNotEmpty) {
+      if(variationType.isNotEmpty && cartModel.item?.variations != null) {
         for (Variation variation in cartModel.item!.variations!) {
           if (variation.type == variationType) {
-            price = (PriceConverter.convertWithDiscount(variation.price!, discount, discountType)! * cartModel.quantity!);
+            price = (PriceConverter.convertWithDiscount(variation.price!, discount, discountType)! * (cartModel.quantity ?? 1));
             break;
           }
         }
       } else {
-        price = (PriceConverter.convertWithDiscount(cartModel.item!.price!, discount, discountType)! * cartModel.quantity!);
+        price = (PriceConverter.convertWithDiscount(cartModel.item!.price!, discount, discountType)! * (cartModel.quantity ?? 1));
       }
+      price = price + _calculateAddonPrice(cartModel);
     }
     return price;
   }
@@ -644,13 +651,13 @@ class _CartItemWidgetState extends State<CartItemWidget> {
     String? variationText = '';
     int count = 0;
 
-    if(Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).newVariation!) {
-      if(cart.foodVariations!.isNotEmpty) {
+    if(Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).newVariation ?? false) {
+      if(cart.foodVariations != null && cart.foodVariations!.isNotEmpty && cart.item?.foodVariations != null) {
         for(int index=0; index<cart.foodVariations!.length; index++) {
-          if(cart.foodVariations![index].contains(true)) {
+          if(index < cart.item!.foodVariations!.length && cart.foodVariations![index] != null && cart.foodVariations![index]!.contains(true)) {
             variationText = '${variationText!}${variationText.isNotEmpty ? ', ' : ''}${cart.item!.foodVariations![index].name} (';
-            for(int i=0; i<cart.foodVariations![index].length; i++) {
-              if(cart.foodVariations![index][i]!) {
+            for(int i=0; i<cart.foodVariations![index]!.length; i++) {
+              if((cart.foodVariations![index]![i] ?? false) && cart.item!.foodVariations![index].variationValues != null && i < cart.item!.foodVariations![index].variationValues!.length) {
                 variationText = '${variationText!}${variationText.endsWith('(') ? '' : ', '}${cart.item!.foodVariations![index].variationValues![i].level}';
                 count ++;
               }
@@ -680,15 +687,19 @@ class _CartItemWidgetState extends State<CartItemWidget> {
   String? _setupAddonsText({required CartModel cart}) {
     String addOnText = '';
     int index0 = 0;
-    List<int?> ids = [];
-    List<int?> qtys = [];
-    for (var addOn in cart.addOnIds!) {
-      ids.add(addOn.id);
-      qtys.add(addOn.quantity);
+    List<AddOns> availableAddons = cart.item?.addOns ?? cart.addOns ?? [];
+    if (availableAddons.isEmpty && (cart.addOns == null || cart.addOns!.isEmpty)) return '';
+    Map<int, int> addonQtyMap = {};
+    if (cart.addOnIds != null) {
+      for (var addOn in cart.addOnIds!) {
+        if (addOn.id != null) {
+          addonQtyMap[addOn.id!] = addOn.quantity ?? 1;
+        }
+      }
     }
-    for (var addOn in cart.item!.addOns!) {
-      if (ids.contains(addOn.id)) {
-        addOnText = '$addOnText${(index0 == 0) ? '' : ',  '}${addOn.name} (${qtys[index0]})';
+    for (var addOn in availableAddons) {
+      if (addOn.id != null && addonQtyMap.containsKey(addOn.id)) {
+        addOnText = '$addOnText${(index0 == 0) ? '' : ',  '}${addOn.name} (${addonQtyMap[addOn.id]})';
         index0 = index0 + 1;
       }
     }
@@ -696,19 +707,31 @@ class _CartItemWidgetState extends State<CartItemWidget> {
   }
 
   double _calculateAddonPrice(CartModel cartModel) {
+    if (cartModel.addOnIds == null || cartModel.addOnIds!.isEmpty) {
+      if (cartModel.addOns != null && cartModel.addOns!.isNotEmpty) {
+        double p = 0;
+        for (var a in cartModel.addOns!) {
+          p += (a.price ?? 0);
+        }
+        return p;
+      }
+      return 0;
+    }
     List<AddOns> addOnList = [];
     double addonPrice = 0;
+    List<AddOns> sourceAddons = cartModel.item?.addOns ?? cartModel.addOns ?? [];
     for (var addOnId in cartModel.addOnIds!) {
-      for(AddOns addOns in cartModel.item!.addOns!) {
-        if(addOns.id == addOnId.id) {
+      for (AddOns addOns in sourceAddons) {
+        if (addOns.id == addOnId.id) {
           addOnList.add(addOns);
           break;
         }
       }
     }
 
-    for(int index=0; index<addOnList.length; index++) {
-      addonPrice = addonPrice + (addOnList[index].price! * cartModel.addOnIds![index].quantity!);
+    for (int index = 0; index < addOnList.length; index++) {
+      int qty = (index < cartModel.addOnIds!.length) ? (cartModel.addOnIds![index].quantity ?? 1) : 1;
+      addonPrice = addonPrice + ((addOnList[index].price ?? 0) * qty);
     }
     return addonPrice;
   }

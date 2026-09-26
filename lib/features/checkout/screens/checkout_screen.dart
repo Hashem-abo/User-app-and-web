@@ -19,6 +19,7 @@ import 'package:suliman/features/pro/controllers/pro_controller.dart';
 import 'package:suliman/features/pro/domain/models/pro_active_offer_model.dart';
 import 'package:suliman/helper/address_helper.dart';
 import 'package:suliman/helper/auth_helper.dart';
+import 'package:suliman/helper/module_helper.dart';
 import 'package:suliman/helper/date_converter.dart';
 import 'package:suliman/helper/network_info.dart';
 import 'package:suliman/helper/price_converter.dart';
@@ -1607,29 +1608,36 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                               }
 
                               List<OrderVariation> variations = [];
-                              if (Get.find<SplashController>()
-                                  .getModuleConfig(cart.item!.moduleType)
-                                  .newVariation!) {
+                              if ((Get.find<SplashController>()
+                                      .getModuleConfig(cart.item!.moduleType)
+                                      .newVariation ?? false) &&
+                                  cart.item?.foodVariations != null &&
+                                  cart.foodVariations != null) {
                                 for (int i = 0;
                                     i < cart.item!.foodVariations!.length;
                                     i++) {
-                                  if (cart.foodVariations![i].contains(true)) {
+                                  if (i < cart.foodVariations!.length &&
+                                      cart.foodVariations![i] != null &&
+                                      cart.foodVariations![i]!.contains(true)) {
                                     variations.add(OrderVariation(
                                         name:
                                             cart.item!.foodVariations![i].name,
                                         values:
                                             OrderVariationValue(label: [])));
-                                    for (int j = 0;
-                                        j <
-                                            cart.item!.foodVariations![i]
-                                                .variationValues!.length;
-                                        j++) {
-                                      if (cart.foodVariations![i][j]!) {
-                                        variations[variations.length - 1]
-                                            .values!
-                                            .label!
-                                            .add(cart.item!.foodVariations![i]
-                                                .variationValues![j].level);
+                                    if (cart.item!.foodVariations![i].variationValues != null) {
+                                      for (int j = 0;
+                                          j <
+                                              cart.item!.foodVariations![i]
+                                                  .variationValues!.length;
+                                          j++) {
+                                        if (j < cart.foodVariations![i]!.length &&
+                                            (cart.foodVariations![i]![j] ?? false)) {
+                                          variations[variations.length - 1]
+                                              .values!
+                                              .label!
+                                              .add(cart.item!.foodVariations![i]
+                                                  .variationValues![j].level);
+                                        }
                                       }
                                     }
                                   }
@@ -1664,6 +1672,28 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                               ));
                             }
 
+                            String effectiveOrderNote = checkoutController.noteController.text.trim();
+                            bool isLaundryOrder = ModuleHelper.isLaundry(
+                              moduleId: checkoutController.store?.moduleId,
+                              item: (_cartList != null && _cartList!.isNotEmpty) ? _cartList![0]?.item : null,
+                            );
+
+                            if (isLaundryOrder) {
+                              String pickupInfo = checkoutController.preferableLaundryPickupTime.isNotEmpty
+                                  ? '${checkoutController.selectedLaundryPickupDateSlot == 0 ? "اليوم" : checkoutController.selectedLaundryPickupDateSlot == 1 ? "غداً" : "بعد غد"} (${checkoutController.preferableLaundryPickupTime})'
+                                  : '';
+                              String deliveryInfo = checkoutController.preferableLaundryDeliveryTime.isNotEmpty
+                                  ? '${checkoutController.selectedLaundryDeliveryDateSlot == 0 ? "اليوم" : checkoutController.selectedLaundryDeliveryDateSlot == 1 ? "غداً" : checkoutController.selectedLaundryDeliveryDateSlot == 2 ? "بعد غد" : "خلال ${checkoutController.selectedLaundryDeliveryDateSlot} أيام"} (${checkoutController.preferableLaundryDeliveryTime})'
+                                  : '';
+                              List<String> scheduleNotes = [];
+                              if (pickupInfo.isNotEmpty) scheduleNotes.add('موعد استلام الملابس: $pickupInfo');
+                              if (deliveryInfo.isNotEmpty) scheduleNotes.add('موعد تسليم الملابس: $deliveryInfo');
+                              if (scheduleNotes.isNotEmpty) {
+                                String scheduleHeader = '[${scheduleNotes.join(' | ')}]';
+                                effectiveOrderNote = effectiveOrderNote.isNotEmpty ? '$scheduleHeader\n$effectiveOrderNote' : scheduleHeader;
+                              }
+                            }
+
                             PlaceOrderBodyModel placeOrderBody =
                                 PlaceOrderBodyModel(
                               cart: carts,
@@ -1680,7 +1710,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                       : DateConverter.dateToDateAndTime(
                                           scheduleEndDate),
                               orderAmount: total,
-                              orderNote: checkoutController.noteController.text,
+                              orderNote: effectiveOrderNote,
                               orderType: checkoutController.orderType,
                               paymentMethod: checkoutController
                                           .paymentMethodIndex ==
@@ -1756,8 +1786,9 @@ class CheckoutScreenState extends State<CheckoutScreen> {
                                   ? ''
                                   : checkoutController.tipController.text
                                       .trim(),
-                              cutlery:
-                                  Get.find<CartController>().addCutlery ? 1 : 0,
+                              cutlery: isLaundryOrder
+                                  ? 0
+                                  : (Get.find<CartController>().addCutlery ? 1 : 0),
                               unavailableItemNote: Get.find<CartController>()
                                           .notAvailableIndex !=
                                       -1
@@ -2057,26 +2088,31 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   double _calculateAddonsPrice(
       {required Store? store, required List<CartModel?>? cartList}) {
     double addOns = 0;
-    if (store != null && cartList != null) {
+    if (cartList != null) {
       for (var cartModel in cartList) {
-        if (cartModel?.item == null ||
-            cartModel?.addOnIds == null ||
-            cartModel?.item?.addOns == null) continue;
-        List<AddOns> addOnList = [];
-        for (var addOnId in cartModel!.addOnIds!) {
-          for (AddOns addOnsItem in cartModel.item!.addOns!) {
-            if (addOnsItem.id == addOnId.id) {
-              addOnList.add(addOnsItem);
-              break;
+        if (cartModel == null) continue;
+        List<AddOns> availableAddons = cartModel.item?.addOns ?? cartModel.addOns ?? [];
+        if (cartModel.addOnIds != null && cartModel.addOnIds!.isNotEmpty) {
+          List<AddOns> addOnList = [];
+          for (var addOnId in cartModel.addOnIds!) {
+            for (AddOns addOnsItem in availableAddons) {
+              if (addOnsItem.id == addOnId.id) {
+                addOnList.add(addOnsItem);
+                break;
+              }
             }
           }
-        }
-        for (int index = 0; index < addOnList.length; index++) {
-          double p = addOnList[index].price ?? 0;
-          int q = (index < cartModel.addOnIds!.length)
-              ? (cartModel.addOnIds![index].quantity ?? 1)
-              : 1;
-          addOns = addOns + (p * q);
+          for (int index = 0; index < addOnList.length; index++) {
+            double p = addOnList[index].price ?? 0;
+            int q = (index < cartModel.addOnIds!.length)
+                ? (cartModel.addOnIds![index].quantity ?? 1)
+                : 1;
+            addOns = addOns + (p * q);
+          }
+        } else if (cartModel.addOns != null && cartModel.addOns!.isNotEmpty) {
+          for (var a in cartModel.addOns!) {
+            addOns += (a.price ?? 0);
+          }
         }
       }
     }
@@ -2278,26 +2314,28 @@ class CheckoutScreenState extends State<CheckoutScreen> {
   double _calculateFoodVariationDiscount({required CartModel? cartModel}) {
     double variationPrice = 0;
     double variationDiscount = 0;
-    if (cartModel != null) {
+    if (cartModel != null && cartModel.item?.foodVariations != null && cartModel.foodVariations != null) {
       double? discount = cartModel.item!.discount;
       String? discountType = cartModel.item!.discountType;
       for (int index = 0;
           index < cartModel.item!.foodVariations!.length;
           index++) {
-        for (int i = 0;
-            i < cartModel.item!.foodVariations![index].variationValues!.length;
-            i++) {
-          if (cartModel.foodVariations![index][i]!) {
-            variationPrice += (PriceConverter.convertWithDiscount(
-                    cartModel.item!.foodVariations![index].variationValues![i]
-                        .optionPrice!,
-                    discount,
-                    discountType,
-                    isFoodVariation: true)! *
-                cartModel.quantity!);
-            variationDiscount += (cartModel.item!.foodVariations![index]
-                    .variationValues![i].optionPrice! *
-                cartModel.quantity!);
+        if (index < cartModel.foodVariations!.length && cartModel.foodVariations![index] != null) {
+          for (int i = 0;
+              i < (cartModel.item!.foodVariations![index].variationValues?.length ?? 0);
+              i++) {
+            if (i < cartModel.foodVariations![index]!.length && (cartModel.foodVariations![index]![i] ?? false)) {
+              variationPrice += (PriceConverter.convertWithDiscount(
+                      cartModel.item!.foodVariations![index].variationValues![i]
+                          .optionPrice!,
+                      discount,
+                      discountType,
+                      isFoodVariation: true)! *
+                  (cartModel.quantity ?? 1));
+              variationDiscount += (cartModel.item!.foodVariations![index]
+                      .variationValues![i].optionPrice! *
+                  (cartModel.quantity ?? 1));
+            }
           }
         }
       }
@@ -2345,7 +2383,7 @@ class CheckoutScreenState extends State<CheckoutScreen> {
     if (isFoodVariation) {
       subTotal = price + addOns + variations;
     } else {
-      subTotal = price;
+      subTotal = price + addOns;
     }
 
     return subTotal;
@@ -2546,6 +2584,16 @@ class CheckoutScreenState extends State<CheckoutScreen> {
         badWeatherChargeForToolTip = surgePrice;
         deliveryCharge = deliveryCharge + surgePrice;
       }
+    }
+
+    final bool isLaundry = ModuleHelper.isLaundry(
+      moduleId: store?.moduleId ?? ((_cartList != null && _cartList!.isNotEmpty) ? _cartList![0]?.item?.moduleId : null),
+      moduleType: store?.module?.moduleType ?? ((_cartList != null && _cartList!.isNotEmpty) ? _cartList![0]?.item?.moduleType : null),
+      item: (_cartList != null && _cartList!.isNotEmpty) ? _cartList![0]?.item : null,
+    );
+
+    if (isLaundry && checkoutController.orderType != 'take_away' && checkoutController.orderType != 'pickup_center') {
+      deliveryCharge = deliveryCharge * 2;
     }
 
     return (deliveryCharge / 100).ceilToDouble() * 100;

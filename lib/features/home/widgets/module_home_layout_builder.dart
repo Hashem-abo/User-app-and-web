@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:suliman/common/models/module_model.dart';
 import 'package:suliman/features/shelf/controllers/shelf_controller.dart';
@@ -127,7 +127,7 @@ class ModuleHomeLayoutBuilder extends StatelessWidget {
     bool isShop = module.moduleType == 'ecommerce';
     bool isGrocery = module.moduleType == 'grocery';
     bool isPharmacy = module.moduleType == 'pharmacy';
-    bool isFood = module.moduleType == 'food';
+    bool isFood = module.moduleType == 'food' || module.moduleType == 'laundry';
     String? title = config.titles?[Get.locale?.languageCode];
     title ??= config.titles?['default'];
     double? height = config.height != null && config.height!.isNotEmpty ? double.tryParse(config.height!) : null;

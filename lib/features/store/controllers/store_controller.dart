@@ -604,87 +604,85 @@ class StoreController extends GetxController implements GetxService {
   void setCategoryList() {
     if(Get.find<CategoryController>().categoryList != null && _store != null) {
       _categoryList = [];
-      final favouriteController = Get.find<FavouriteController>();
-      bool hasFavorites = false;
-      if (favouriteController.wishItemList != null) {
-        for (var item in favouriteController.wishItemList!) {
-          if (item != null && item.storeId == _store!.id) {
-            hasFavorites = true;
-            break;
-          }
-        }
-      }
-      bool hasMostOrdered = _recommendedItemModel != null && _recommendedItemModel!.items!.isNotEmpty;
       
       bool isFood = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food';
       
-      if (isFood) {
-        if (hasFavorites) {
-          _categoryList!.add(CategoryModel(id: -1, name: 'favorites'.tr));
-        }
-        if (hasMostOrdered) {
-          _categoryList!.add(CategoryModel(id: -2, name: 'most_requested'.tr));
-        }
-      } else {
+      if (!isFood) {
         _categoryList!.add(CategoryModel(id: 0, name: 'all'.tr));
-        if (hasFavorites) {
-          _categoryList!.add(CategoryModel(id: -1, name: 'favorites'.tr));
-        }
-        if (hasMostOrdered) {
-          _categoryList!.add(CategoryModel(id: -2, name: 'most_requested'.tr));
-        }
       }
+
+      // 1. المفضلة
+      if (AuthHelper.isLoggedIn()) {
+        _categoryList!.add(CategoryModel(id: -1, name: 'favorites'.tr));
+      }
+
+      // 2. العروض
+      _categoryList!.add(CategoryModel(id: -3, name: 'offers'.tr));
+
+      // 3. الأكثر طلباً
+      _categoryList!.add(CategoryModel(id: -2, name: 'most_requested'.tr));
       
       for (var category in Get.find<CategoryController>().categoryList!) {
         if(_store!.categoryIds!.contains(category.id)) {
           _categoryList!.add(category);
         }
       }
-      debugPrint("DEBUG: [Store Category Info] Store: ${_store!.name} (ID: ${_store!.id})");
-      debugPrint("DEBUG: category_ids returned by server: ${_store!.categoryIds}");
-      debugPrint("DEBUG: parsed categories displayed in App: ${_categoryList!.map((e) => '${e.name} (ID: ${e.id})').toList()}");
     }
   }
 
+  Store? _cartStore;
+  Store? get cartStore => _cartStore ?? _store;
+
   Future<Store?> getStoreDetails(Store store, bool fromModule, {bool fromCart = false, String slug = ''}) async {
-    _categoryIndex = 0;
-    _recommendedItemModel = null;
-    initCategoryScrollState();
-    if(store.name != null) {
+    if (!fromCart) {
+      _categoryIndex = 0;
+      _recommendedItemModel = null;
+      initCategoryScrollState();
+    }
+    if(store.name != null && !fromCart) {
       _store = store;
     }else {
-      _isLoading = true;
-      _store = null;
+      if (!fromCart) {
+        _isLoading = true;
+        _store = null;
+      }
       Store? storeDetails = await storeServiceInterface.getStoreDetails(store.id.toString(), fromCart, slug, Get.find<LocalizationController>().locale.languageCode,
           ModuleHelper.getModule(), ModuleHelper.getCacheModule()?.id, ModuleHelper.getModule()?.id);
       if (storeDetails != null) {
-        _store = storeDetails;
-        Get.find<CheckoutController>().initializeTimeSlot(_store!);
+        if (fromCart) {
+          _cartStore = storeDetails;
+          if (_store == null || _store!.id == store.id) {
+            _store = storeDetails;
+          }
+        } else {
+          _store = storeDetails;
+        }
+        Get.find<CheckoutController>().initializeTimeSlot(storeDetails);
         if(!fromCart && slug.isEmpty){
           Get.find<CheckoutController>().getDistanceInKM(
             LatLng(
               double.parse(AddressHelper.getUserAddressFromSharedPref()!.latitude!),
               double.parse(AddressHelper.getUserAddressFromSharedPref()!.longitude!),
             ),
-            LatLng(double.parse(_store!.latitude!), double.parse(_store!.longitude!)),
+            LatLng(double.parse(storeDetails.latitude!), double.parse(storeDetails.longitude!)),
           );
         }
         if(slug.isNotEmpty){
-          await Get.find<LocationController>().setStoreAddressToUserAddress(LatLng(double.parse(_store!.latitude!), double.parse(_store!.longitude!)));
+          await Get.find<LocationController>().setStoreAddressToUserAddress(LatLng(double.parse(storeDetails.latitude!), double.parse(storeDetails.longitude!)));
         }
         if(fromModule) {
           HomeScreen.loadData(true);
-        }/*else {
-          Get.find<CheckoutController>().clearPrevData();
-        }*/
+        }
       }
-      Get.find<CheckoutController>().setOrderType(
-        _store != null ? _store!.delivery! ? 'delivery' : 'take_away' : 'delivery', notify: false,
-      );
-      _isLoading = false;
+      if (!fromCart) {
+        Get.find<CheckoutController>().setOrderType(
+          _store != null ? (_store!.delivery! ? 'delivery' : 'take_away') : 'delivery', notify: false,
+        );
+        _isLoading = false;
+      }
       update();
     }
-    return _store;
+    return fromCart ? (_cartStore ?? _store) : _store;
   }
 
   Future<void> getRecommendedStoreList({DataSourceEnum dataSource = DataSourceEnum.local, bool fromRecall = false, bool reload = false}) async {
@@ -748,12 +746,19 @@ class StoreController extends GetxController implements GetxService {
     int offset = isPaginate ? (_categoryOffsets[categoryId] ?? 1) + 1 : 1;
 
     if (categoryId == -1) {
-      final favouriteController = Get.find<FavouriteController>();
       List<Item> storeFavorites = [];
-      if (favouriteController.wishItemList != null) {
-        for (var item in favouriteController.wishItemList!) {
-          if (item != null && item.storeId == _store!.id) {
-            storeFavorites.add(item);
+      if (AuthHelper.isLoggedIn()) {
+        final favouriteController = Get.find<FavouriteController>();
+        if (favouriteController.wishItemList == null || favouriteController.wishItemList!.isEmpty) {
+          await favouriteController.getFavouriteList();
+        }
+        Set<int> seenItemIds = {};
+        int? targetStoreId = _store?.id;
+        if (favouriteController.wishItemList != null) {
+          for (var item in favouriteController.wishItemList!) {
+            if (item != null && item.id != null && (item.storeId == targetStoreId || targetStoreId == null) && seenItemIds.add(item.id!)) {
+              storeFavorites.add(item);
+            }
           }
         }
       }
@@ -768,6 +773,16 @@ class StoreController extends GetxController implements GetxService {
       update();
     } else if (categoryId == -2) {
       List<Item> recommended = _recommendedItemModel?.items ?? [];
+      if (recommended.isEmpty) {
+        ItemModel? model = await storeServiceInterface.getStoreItemList(
+          storeID: _store!.id,
+          offset: offset,
+          categoryID: 0,
+          type: _type,
+          filter: ['popular'],
+        );
+        recommended = model?.items ?? [];
+      }
       _categoryItems[categoryId] = recommended;
       _categoryOffsets[categoryId] = 1;
       _categoryTotalSizes[categoryId] = recommended.length;
@@ -776,6 +791,55 @@ class StoreController extends GetxController implements GetxService {
         _loadedCategoryIndexes.add(index);
         _loadedCategoryIndexes.sort();
       }
+      update();
+    } else if (categoryId == -3) {
+      ItemModel? storeItemModel = await storeServiceInterface.getStoreItemList(
+        storeID: _store!.id,
+        offset: offset,
+        categoryID: 0,
+        type: _type,
+        filter: ['discounted'],
+      );
+      if (storeItemModel != null) {
+        if (isPaginate) {
+          _categoryItems[categoryId]!.addAll(storeItemModel.items ?? []);
+          _categoryOffsets[categoryId] = storeItemModel.offset ?? offset;
+          _categoryTotalSizes[categoryId] = storeItemModel.totalSize ?? 0;
+        } else {
+          _categoryItems[categoryId] = storeItemModel.items ?? [];
+          _categoryOffsets[categoryId] = 1;
+          _categoryTotalSizes[categoryId] = storeItemModel.totalSize ?? 0;
+        }
+        if (!_loadedCategoryIndexes.contains(index)) {
+          _loadedCategoryIndexes.add(index);
+          _loadedCategoryIndexes.sort();
+        }
+      }
+      _categoryLoading[categoryId] = false;
+      update();
+    } else if (categoryId == -4) {
+      ItemModel? storeItemModel = await storeServiceInterface.getStoreItemList(
+        storeID: _store!.id,
+        offset: offset,
+        categoryID: 0,
+        type: 'all',
+      );
+      if (storeItemModel != null) {
+        if (isPaginate) {
+          _categoryItems[categoryId]!.addAll(storeItemModel.items ?? []);
+          _categoryOffsets[categoryId] = storeItemModel.offset ?? offset;
+          _categoryTotalSizes[categoryId] = storeItemModel.totalSize ?? 0;
+        } else {
+          _categoryItems[categoryId] = storeItemModel.items ?? [];
+          _categoryOffsets[categoryId] = 1;
+          _categoryTotalSizes[categoryId] = storeItemModel.totalSize ?? 0;
+        }
+        if (!_loadedCategoryIndexes.contains(index)) {
+          _loadedCategoryIndexes.add(index);
+          _loadedCategoryIndexes.sort();
+        }
+      }
+      _categoryLoading[categoryId] = false;
       update();
     } else {
       ItemModel? storeItemModel = await storeServiceInterface.getStoreItemList(
@@ -859,12 +923,19 @@ class StoreController extends GetxController implements GetxService {
     }
 
     if (selectedCategoryId == -1) {
-      final favouriteController = Get.find<FavouriteController>();
       List<Item> storeFavorites = [];
-      if (favouriteController.wishItemList != null) {
-        for (var item in favouriteController.wishItemList!) {
-          if (item != null && item.storeId == storeID) {
-            storeFavorites.add(item);
+      if (AuthHelper.isLoggedIn()) {
+        final favouriteController = Get.find<FavouriteController>();
+        if (favouriteController.wishItemList == null || favouriteController.wishItemList!.isEmpty) {
+          await favouriteController.getFavouriteList();
+        }
+        Set<int> seenItemIds = {};
+        int? targetStoreId = storeID ?? _store?.id;
+        if (favouriteController.wishItemList != null) {
+          for (var item in favouriteController.wishItemList!) {
+            if (item != null && item.id != null && (item.storeId == targetStoreId || targetStoreId == null) && seenItemIds.add(item.id!)) {
+              storeFavorites.add(item);
+            }
           }
         }
       }
@@ -877,11 +948,25 @@ class StoreController extends GetxController implements GetxService {
       return;
     }
 
+    List<String>? currentFilter = _filter;
+    int apiCategoryId = selectedCategoryId;
+    if (selectedCategoryId == -3) {
+      apiCategoryId = 0;
+      currentFilter = (currentFilter != null ? List<String>.from(currentFilter) : <String>[])..add('discounted');
+    } else if (selectedCategoryId == -2) {
+      apiCategoryId = 0;
+      currentFilter = (currentFilter != null ? List<String>.from(currentFilter) : <String>[])..add('popular');
+    } else if (selectedCategoryId == -4) {
+      apiCategoryId = 0;
+    } else if (selectedCategoryId < 0) {
+      apiCategoryId = 0;
+    }
+
     ItemModel? storeItemModel = await storeServiceInterface.getStoreItemList(
       storeID: storeID, offset: offset,
-      categoryID: selectedCategoryId,
+      categoryID: apiCategoryId,
       type: type,
-      filter: _filter,
+      filter: currentFilter,
       rating: _rating == -1 ? null : _rating,
       lowerValue: _lowerValue == 0 ? null : _lowerValue,
       upperValue: _upperValue == 0 ? null : _upperValue,
@@ -949,22 +1034,7 @@ class StoreController extends GetxController implements GetxService {
         selectedCategoryId = _categoryList![index].id ?? 0;
       }
 
-      if (selectedCategoryId == -1) {
-        final favouriteController = Get.find<FavouriteController>();
-        List<Item> storeFavorites = [];
-        if (favouriteController.wishItemList != null) {
-          for (var item in favouriteController.wishItemList!) {
-            if (item != null && item.storeId == _store?.id) {
-              storeFavorites.add(item);
-            }
-          }
-        }
-        _storeItemModel = ItemModel(
-          items: storeFavorites,
-          totalSize: storeFavorites.length,
-          offset: 1,
-        );
-      } else if (_categoryStoreItemModelCache.containsKey(selectedCategoryId) && _categoryStoreItemModelCache[selectedCategoryId] != null) {
+      if (_categoryStoreItemModelCache.containsKey(selectedCategoryId) && _categoryStoreItemModelCache[selectedCategoryId] != null && selectedCategoryId > 0) {
         _storeItemModel = _categoryStoreItemModelCache[selectedCategoryId];
       } else {
         _storeItemModel = null;

@@ -199,27 +199,44 @@ class BottomSection extends StatelessWidget {
                     ],
                   ),
                   ...cartList!.map((cart) {
+                    if (cart?.item == null) return const TableRow(children: []);
+
+                    bool isNewVariation = (cart!.item?.moduleType != null
+                        ? (Get.find<SplashController>().getModuleConfig(cart.item!.moduleType).newVariation ?? false)
+                        : false) || (Get.find<SplashController>().module?.moduleType == 'food' || Get.find<SplashController>().module?.moduleType == 'laundry');
+
                     String variationStr = '';
-                    if (Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == 'food') {
-                      if (cart!.item != null && cart.item!.foodVariations != null) {
+                    double variationPriceTotal = 0;
+
+                    if (isNewVariation) {
+                      if (cart.item?.foodVariations != null && cart.foodVariations != null) {
                         for (int i = 0; i < cart.item!.foodVariations!.length; i++) {
                           final foodVar = cart.item!.foodVariations![i];
-                          if (cart.foodVariations != null && i < cart.foodVariations!.length) {
+                          if (i < cart.foodVariations!.length && cart.foodVariations![i] != null) {
                             final selectedValues = cart.foodVariations![i];
-                            for (int j = 0; j < foodVar.variationValues!.length; j++) {
-                              if (j < selectedValues.length && selectedValues[j] == true) {
+                            for (int j = 0; j < (foodVar.variationValues?.length ?? 0); j++) {
+                              if (j < selectedValues.length && (selectedValues[j] ?? false)) {
                                 if (variationStr.isNotEmpty) variationStr += ', ';
                                 variationStr += foodVar.variationValues![j].level ?? '';
+                                variationPriceTotal += (foodVar.variationValues![j].optionPrice ?? 0);
                               }
                             }
                           }
                         }
                       }
                     } else {
-                      if (cart!.variation != null && cart.variation!.isNotEmpty) {
+                      if (cart.variation != null && cart.variation!.isNotEmpty) {
                         variationStr = cart.variation!.where((v) => v.type != null).map((v) => v.type!).join(', ');
+                        for (var v in cart.variation!) {
+                          variationPriceTotal += (v.price ?? 0);
+                        }
                       }
                     }
+
+                    double unitBasePrice = (cart.item?.price ?? cart.price ?? 0);
+                    double unitPriceWithVariation = unitBasePrice + variationPriceTotal;
+                    int qty = cart.quantity ?? 1;
+                    double rowTotalPrice = unitPriceWithVariation * qty;
 
                     return TableRow(
                       children: [
@@ -231,15 +248,22 @@ class BottomSection extends StatelessWidget {
                               Text(cart.item!.name!, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), maxLines: 2, overflow: TextOverflow.ellipsis),
                               if (variationStr.isNotEmpty) ...[
                                 const SizedBox(height: 2),
-                                Text(variationStr, style: robotoRegular.copyWith(fontSize: 10, color: Theme.of(context).disabledColor)),
+                                Text(
+                                  variationStr,
+                                  style: robotoRegular.copyWith(
+                                    fontSize: 10,
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ],
                             ],
                           ),
                         ),
                         if (hasUnit) Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(cart.item!.unitType ?? '-', style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textAlign: TextAlign.center)),
-                        Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(PriceConverter.convertPrice(cart.price ?? cart.item!.price), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.rtl)),
-                        Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(cart.quantity.toString(), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textAlign: TextAlign.center)),
-                        Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(PriceConverter.convertPrice((cart.price ?? cart.item!.price!) * cart.quantity!), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.rtl)),
+                        Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(PriceConverter.convertPrice(unitPriceWithVariation), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.rtl)),
+                        Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(qty.toString(), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textAlign: TextAlign.center)),
+                        Padding(padding: const EdgeInsets.all(Dimensions.paddingSizeSmall), child: Text(PriceConverter.convertPrice(rowTotalPrice), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall), textDirection: TextDirection.rtl)),
                       ],
                     );
                   }),
@@ -280,6 +304,12 @@ class BottomSection extends StatelessWidget {
           _priceRow(
             label: storeId == null ? (module.addOn! ? 'subtotal'.tr : 'item_price'.tr) : 'item_price'.tr,
             value: PriceConverter.convertPrice(subTotal),
+            context: context,
+          ),
+
+          if(addOns > 0) _priceRow(
+            label: 'addons'.tr,
+            value: '(+) ${PriceConverter.convertPrice(addOns)}',
             context: context,
           ),
 

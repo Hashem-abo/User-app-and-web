@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,9 +20,11 @@ import 'package:suliman/features/checkout/widgets/delivery_section.dart';
 import 'package:suliman/features/checkout/widgets/deliveryman_tips_section.dart';
 import 'package:suliman/features/checkout/widgets/payment_section.dart';
 import 'package:suliman/features/checkout/widgets/time_slot_section.dart';
+import 'package:suliman/features/checkout/widgets/laundry_time_slot_section.dart';
 import 'package:suliman/features/store/widgets/camera_button_sheet_widget.dart';
 import 'package:suliman/features/checkout/widgets/saver_delivery_time_widget.dart';
 import 'package:suliman/helper/address_helper.dart';
+import 'package:suliman/helper/module_helper.dart';
 import 'package:suliman/features/language/controllers/language_controller.dart';
 import 'dart:io';
 
@@ -82,6 +84,11 @@ class TopSection extends StatelessWidget {
     bool takeAway = (checkoutController.orderType == 'take_away');
     bool isDesktop = ResponsiveHelper.isDesktop(context);
     bool isGuestLoggedIn = AuthHelper.isGuestLoggedIn();
+    bool isLaundry = ModuleHelper.isLaundry(
+      moduleId: checkoutController.store?.moduleId ?? ((cartList != null && cartList!.isNotEmpty) ? cartList![0]?.item?.moduleId : null),
+      moduleType: ((cartList != null && cartList!.isNotEmpty) ? cartList![0]?.item?.moduleType : null),
+      item: (cartList != null && cartList!.isNotEmpty) ? cartList![0]?.item : null,
+    );
 
     return Container(
       decoration: ResponsiveHelper.isDesktop(context) ? BoxDecoration(
@@ -256,14 +263,22 @@ class TopSection extends StatelessWidget {
 
                   SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
                     (!isOutZone && Get.find<SplashController>().configModel?.homeDeliveryStatus == 1 && (checkoutController.store?.delivery ?? true)) ? DeliveryOptionButtonWidget(
-                      value: 'delivery', title: 'home_delivery'.tr, charge: charge,
+                      value: 'delivery',
+                      title: isLaundry
+                          ? 'استلام وتوصيل بالمندوب'
+                          : 'home_delivery'.tr,
+                      charge: charge,
                       isFree: checkoutController.store?.freeDelivery ?? false,  fromWeb: true, total: total,
                       deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
                     ) : const SizedBox(),
                     if (!isOutZone) const SizedBox(width: Dimensions.paddingSizeDefault),
 
                     (!isOutZone && Get.find<SplashController>().configModel?.takeawayStatus == 1 && (checkoutController.store?.takeAway ?? true) && (storeId == null || (cartList != null && cartList!.isNotEmpty))) ? DeliveryOptionButtonWidget(
-                      value: 'take_away', title: 'take_away'.tr, charge: deliveryCharge, isFree: true,  fromWeb: true, total: total,
+                      value: 'take_away',
+                      title: isLaundry
+                          ? 'تسليم واستلام من المحل'
+                          : 'take_away'.tr,
+                      charge: deliveryCharge, isFree: true,  fromWeb: true, total: total,
                       deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
                     ) : const SizedBox(),
 
@@ -330,10 +345,25 @@ class TopSection extends StatelessWidget {
         const SizedBox(),
 
         /// Time Slot Section
-        TimeSlotSection(
-          storeId: storeId, checkoutController: checkoutController, cartList: cartList, tooltipController2: tooltipController2,
-          tomorrowClosed: tomorrowClosed, todayClosed: todayClosed, module: module,
-        ),
+        isLaundry
+            ? LaundryTimeSlotSection(
+                storeId: storeId,
+                checkoutController: checkoutController,
+                cartList: cartList,
+                tooltipController2: tooltipController2,
+                tomorrowClosed: tomorrowClosed,
+                todayClosed: todayClosed,
+                module: module,
+              )
+            : TimeSlotSection(
+                storeId: storeId,
+                checkoutController: checkoutController,
+                cartList: cartList,
+                tooltipController2: tooltipController2,
+                tomorrowClosed: tomorrowClosed,
+                todayClosed: todayClosed,
+                module: module,
+              ),
 
         /// Coupon..
         !isDesktop && !isGuestLoggedIn ? CouponSection(

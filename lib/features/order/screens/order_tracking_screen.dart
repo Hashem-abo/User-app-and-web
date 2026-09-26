@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:suliman/features/auth/controllers/auth_controller.dart';
@@ -343,6 +343,37 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
             ),
             const SizedBox(height: Dimensions.paddingSizeDefault),*/
 
+            // Laundry Schedule Card (if laundry order)
+            if (track.moduleType == 'laundry' && (track.orderNote?.contains('موعد استلام الملابس') ?? false))
+              Container(
+                margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeDefault),
+                padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                  border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.access_time_filled_rounded, color: Theme.of(context).primaryColor, size: 22),
+                    ),
+                    const SizedBox(width: Dimensions.paddingSizeSmall),
+                    Expanded(
+                      child: Text(
+                        track.orderNote!,
+                        style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             // Timeline Card
             Container(
               padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
@@ -356,13 +387,21 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                 Text('order_status'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
                 const SizedBox(height: Dimensions.paddingSizeDefault),
 
-                _buildTimelineStep(context, 'order_placed'.tr, track.createdAt, true),
-                _buildTimelineStep(context, 'order_confirmed'.tr, track.confirmed, track.confirmed != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
-                _buildTimelineStep(context, 'preparing_item'.tr, track.processing, track.processing != null || track.handover != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
-                _buildTimelineStep(context, track.orderType == 'take_away' ? 'ready_for_handover'.tr : 'delivery_on_the_way'.tr, track.orderType == 'take_away' ? (track.handover ?? track.pickedUp) : track.pickedUp, track.handover != null || track.pickedUp != null || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
-                if (track.orderType == 'pickup_center')
-                  _buildTimelineStep(context, 'arrived_at_pickup_center'.tr, track.orderStatus == 'arrived_at_pickup_center' ? track.updatedAt : null, track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
-                _buildTimelineStep(context, 'delivered'.tr, track.delivered, track.orderStatus == 'delivered', isLast: true),
+                if (track.moduleType == 'laundry') ...[
+                  _buildTimelineStep(context, 'order_placed'.tr, track.createdAt, true),
+                  _buildTimelineStep(context, 'laundry_pickup_step'.tr, track.confirmed, track.confirmed != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'delivered'),
+                  _buildTimelineStep(context, 'laundry_processing_step'.tr, track.processing, track.processing != null || track.handover != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'delivered'),
+                  _buildTimelineStep(context, 'laundry_delivery_step'.tr, track.pickedUp, track.handover != null || track.pickedUp != null || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'delivered'),
+                  _buildTimelineStep(context, 'laundry_delivered_step'.tr, track.delivered, track.orderStatus == 'delivered', isLast: true),
+                ] else ...[
+                  _buildTimelineStep(context, 'order_placed'.tr, track.createdAt, true),
+                  _buildTimelineStep(context, 'order_confirmed'.tr, track.confirmed, track.confirmed != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                  _buildTimelineStep(context, 'preparing_item'.tr, track.processing, track.processing != null || track.handover != null || track.orderStatus == 'processing' || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                  _buildTimelineStep(context, track.orderType == 'take_away' ? 'ready_for_handover'.tr : 'delivery_on_the_way'.tr, track.orderType == 'take_away' ? (track.handover ?? track.pickedUp) : track.pickedUp, track.handover != null || track.pickedUp != null || track.orderStatus == 'handover' || track.orderStatus == 'picked_up' || track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                  if (track.orderType == 'pickup_center')
+                    _buildTimelineStep(context, 'arrived_at_pickup_center'.tr, track.orderStatus == 'arrived_at_pickup_center' ? track.updatedAt : null, track.orderStatus == 'arrived_at_pickup_center' || track.orderStatus == 'delivered'),
+                  _buildTimelineStep(context, 'delivered'.tr, track.delivered, track.orderStatus == 'delivered', isLast: true),
+                ],
 
                 const SizedBox(height: Dimensions.paddingSizeDefault),
                 if(track.deliveryMan != null && track.orderStatus != 'delivered' && track.orderStatus != 'failed' && track.orderStatus != 'canceled' && track.orderStatus != 'refunded')
@@ -431,7 +470,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
             // const SizedBox(height: Dimensions.paddingSizeDefault),
 
             // Products Summary
-            if(orderController.orderDetails != null)
+            /*if(orderController.orderDetails != null)
               Builder(
                 builder: (context) {
                   bool hasUnit = orderController.orderDetails!.any((detail) => detail.itemDetails?.unitType != null && detail.itemDetails?.unitType?.isNotEmpty == true);
@@ -504,7 +543,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> with WidgetsBi
                   );
                 }
               ),
-            const SizedBox(height: Dimensions.paddingSizeDefault),
+            const SizedBox(height: Dimensions.paddingSizeDefault),*/
 
             // Order Summary
             Container(

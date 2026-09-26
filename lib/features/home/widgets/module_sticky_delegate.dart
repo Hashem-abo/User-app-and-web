@@ -149,6 +149,24 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                                       .moduleViewTextPosition ??
                                                   'bottom';
 
+                                              final module = splashController.moduleList![index];
+                                              final String? smallIcon = (module.selectedIconSmallFullUrl != null &&
+                                                      module.selectedIconSmallFullUrl!.trim().isNotEmpty &&
+                                                      module.selectedIconSmallFullUrl != 'null')
+                                                  ? module.selectedIconSmallFullUrl
+                                                  : null;
+                                              final String? bigIcon = (module.selectedIconBigFullUrl != null &&
+                                                      module.selectedIconBigFullUrl!.trim().isNotEmpty &&
+                                                      module.selectedIconBigFullUrl != 'null')
+                                                  ? module.selectedIconBigFullUrl
+                                                  : null;
+
+                                              final String moduleImageUrl = isSelected
+                                                  ? (buttonWidth > 65
+                                                      ? (bigIcon ?? smallIcon ?? module.iconFullUrl ?? '')
+                                                      : (smallIcon ?? bigIcon ?? module.iconFullUrl ?? ''))
+                                                  : (module.iconFullUrl ?? '');
+
                                               Widget imageContainer =
                                                   AnimatedScale(
                                                 scale: isSelected ? 1.05 : 1.0,
@@ -167,10 +185,6 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                                       isSelected ? 1 : 0),
 
                                                   decoration: BoxDecoration(
-                                                    color: isSelected
-                                                        ? Theme.of(context)
-                                                            .primaryColor
-                                                        : null,
 
                                                     // إطار بلون الثيم للعنصر المحدد فقط
                                                     border: isSelected
@@ -217,11 +231,7 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                                         : BorderRadius.circular(
                                                             100),
                                                     child: CustomImage(
-                                                      image: isSelected 
-                                                          ? (buttonWidth > 65 
-                                                              ? (splashController.moduleList![index].selectedIconBigFullUrl ?? splashController.moduleList![index].iconFullUrl ?? '') 
-                                                              : (splashController.moduleList![index].selectedIconSmallFullUrl ?? splashController.moduleList![index].iconFullUrl ?? ''))
-                                                          : '${splashController.moduleList![index].iconFullUrl}',
+                                                      image: moduleImageUrl,
                                                       height: buttonHeight,
                                                       width: buttonWidth,
                                                       fit: BoxFit.contain,
@@ -397,10 +407,24 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                         splashController.moduleList?.length ??
                                             0,
                                     itemBuilder: (context, index) {
-                                      // bool isSelected = splashController.module != null &&
-                                      //                   (splashController.module!.id == splashController.moduleList![index].id ||
-                                      //                    (splashController.module!.moduleType != null &&
-                                      //                     splashController.module!.moduleType == splashController.moduleList![index].moduleType));
+                                      bool isSelected = splashController.module != null &&
+                                          (splashController.module!.id == splashController.moduleList![index].id ||
+                                              (splashController.module!.moduleType != null &&
+                                                  splashController.module!.moduleType == splashController.moduleList![index].moduleType));
+                                      final module = splashController.moduleList![index];
+                                      final String? smallIcon = (module.selectedIconSmallFullUrl != null &&
+                                              module.selectedIconSmallFullUrl!.trim().isNotEmpty &&
+                                              module.selectedIconSmallFullUrl != "null")
+                                          ? module.selectedIconSmallFullUrl
+                                          : null;
+                                      final String? bigIcon = (module.selectedIconBigFullUrl != null &&
+                                              module.selectedIconBigFullUrl!.trim().isNotEmpty &&
+                                              module.selectedIconBigFullUrl != "null")
+                                          ? module.selectedIconBigFullUrl
+                                          : null;
+                                      final String collapsedImageUrl = isSelected
+                                          ? (smallIcon ?? bigIcon ?? module.thumbnailFullUrl ?? module.iconFullUrl ?? "")
+                                          : (module.thumbnailFullUrl ?? module.iconFullUrl ?? "");
                                       return Padding(
                                         padding: const EdgeInsets.only(
                                             right: Dimensions.paddingSizeSmall),
@@ -420,8 +444,7 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
                                                   BorderRadius.circular(
                                                       Dimensions.radiusLarge),
                                               child: CustomImage(
-                                                image:
-                                                    '${splashController.moduleList![index].thumbnailFullUrl}',
+                                                 image: collapsedImageUrl,
                                                 height: 60,
                                                 width: 100,
                                                 fit: BoxFit.contain,
@@ -590,17 +613,7 @@ class ModuleStickyDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(ModuleStickyDelegate oldDelegate) {
-    return oldDelegate.searchBar != searchBar ||
-        oldDelegate.searchBarHeight != searchBarHeight ||
-        oldDelegate.expandedHeight != expandedHeight ||
-        oldDelegate.collapsedHeight != collapsedHeight ||
-        oldDelegate.showLocationHeader !=
-            showLocationHeader || // Check if module type changed
-        oldDelegate.locationHeaderFontColor != locationHeaderFontColor ||
-        oldDelegate.paddingTop != paddingTop ||
-        oldDelegate.expandedScrollController != expandedScrollController ||
-        oldDelegate.collapsedScrollController != collapsedScrollController ||
-        oldDelegate.splashController != splashController;
+    return true;
   }
 }
 

@@ -1,4 +1,4 @@
-enum ModuleType { food, ecommerce, grocery, pharmacy }
+enum ModuleType { food, ecommerce, grocery, pharmacy, laundry }
 
 extension CatExtension on ModuleType {
   String? get type {
@@ -11,6 +11,9 @@ extension CatExtension on ModuleType {
         return 'grocery';
       case ModuleType.pharmacy:
         return 'pharmacy';
-      }
+      case ModuleType.laundry:
+        return 'laundry';
+    }
   }
 }
+
